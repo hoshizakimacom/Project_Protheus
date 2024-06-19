@@ -1,0 +1,19 @@
+#INCLUDE "PROTHEUS.CH"
+
+User Function M05A34()
+
+If SC5->C5_MSBLQL == '2'
+	If MsgYesNo(I18N('Deseja Inativar o pedido de venda #1 ?',{SC5->C5_NUM}),'Atenção')
+		RecLock('SC5',.F.)
+		SC5->C5_MSBLQL := '1'
+		SC5->(MsUnLock())
+	Endif
+Else
+	If MsgYesNo(I18N('Deseja Ativar o pedido de venda #1 ?',{SC5->C5_NUM}),'Atenção')
+		RecLock('SC5',.F.)
+		SC5->C5_MSBLQL := '2'
+		SC5->(MsUnLock())	
+	Endif
+EndIf    
+
+Return
