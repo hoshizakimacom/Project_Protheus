@@ -1,0 +1,247 @@
+#Include 'Protheus.ch'
+
+//+------------------------------------------------------------------------------------------------
+//  Função chamada de gatilhos na SB1
+//+------------------------------------------------------------------------------------------------
+User Function M05G03(_cField)
+    Local _aArea        := GetArea()
+
+    _cField := AllTrim(_cField)
+
+    Do Case
+    Case _cField == 'B1_TIPO'
+        MG04GetCta()    // Inclui conta
+        MG04GetCc()     // Inclui Centro de Custo
+
+    Case _cField $ 'B1_POSIPI|B1_EX_NCM'
+        MG04GetIPI()    // Inclui IPI do produto
+        MG04GetGrp()    // Inclui grupo de tribuação
+        MG04GetCes()    // Inclui CEST
+
+    Case _cField == 'B1_ORIGEM'
+        //MG04GetOri()    // Apaga POSIPI
+
+    Case _cField == 'B1_GRUPO'
+        MG04GetCon()    // Inclui Conta
+
+    Case _cField == 'B1_XFAMILI'
+        MG04SetFam()    // Apaga campos relacionados
+
+    EndCase
+
+    RestArea(_aArea)
+Return  // &('M->' + _cField)
+
+//+------------------------------------------------------------------------------------------------
+//| Apaga campos relacionados a familia
+//+------------------------------------------------------------------------------------------------
+Static Function MG04SetFam()
+
+    FwFldPut("B1_GRUPO",Space(TamSX3('B1_GRUPO')[1]))
+    FwFldPut("B1_XSUBGRP",Space(TamSX3('B1_XSUBGRP')[1]))
+
+    If FwFldGet("B1_TIPO") $ 'MC|SV|AI'
+        FwFldPut("B1_CONTA",Space(TamSX3('B1_CONTA')[1]))
+        
+    EndIf
+Return
+
+//+------------------------------------------------------------------------------------------------
+//| Preenche conta contábil de acordo com o grupo e tipo informados no cadstro do produto
+//+------------------------------------------------------------------------------------------------
+Static Function MG04GetCon()
+	Local	cContaRet	:= Posicione( 'SBM' , 1 , xFilial('SBM') + FwFldGet("B1_GRUPO") , 'BM_XCONTA' )
+
+    If !Empty(FwFldGet("B1_GRUPO")) .And. FwFldGet("B1_TIPO") $ 'MC|SV|AI'
+    	
+        FwFldPut("B1_CONTA", cContaRet)
+    EndIf
+
+    FwFldPut("B1_XSUBGRP",Space(TamSX3('B1_XSUBGRP')[1]))
+Return
+
+//+------------------------------------------------------------------------------------------------
+//| Preenche grupo de tributação do produto
+//+------------------------------------------------------------------------------------------------
+Static Function MG04GetGrp()
+    Local _cOrigem  := FwFldGet("B1_ORIGEM")
+    Local _cGrTrib  := Space(TamSX3('B1_GRTRIB')[1])
+
+    SYD->(DbGoTop())
+    SYD->(DbSetOrder(1))
+
+    If SYD->(DbSeek( xFilial('SYD') + FwFldGet("B1_POSIPI") + FwFldGet("B1_EX_NCM") ))
+        Do Case
+
+        Case _cOrigem == '1'
+            _cGrTrib := SYD->YD_XGRIMP
+
+        Case _cOrigem == '8' .And. FwFldGet("B1_TIPO") == 'PA'
+            _cGrTrib := SYD->YD_XGRTRIB
+
+        Case _cOrigem $ '2-3-8'
+            _cGrTrib := SYD->YD_XGRREVE
+
+        Case !(_cOrigem $ '2-3-8')
+            _cGrTrib := SYD->YD_XGRTRIB
+
+        End Case
+    EndIf
+
+    FwFldPut("B1_GRTRIB", _cGrTrib)
+Return
+
+//+------------------------------------------------------------------------------------------------
+//| Preenche CEST do produto
+//+------------------------------------------------------------------------------------------------
+Static Function MG04GetCes()
+    Local _cCest  := Space(TamSX3('B1_CEST')[1])
+
+    _cCest      := Posicione('SYD',1,xFilial('SYD') + FwFldGet("B1_POSIPI") + FwFldGet("B1_EX_NCM"),'YD_XCEST' )
+    FwFldPut("B1_CEST", _cCest)
+Return
+
+//+------------------------------------------------------------------------------------------------
+//| Apaga POSIPI do Produto
+//+------------------------------------------------------------------------------------------------
+Static Function MG04GetOri()
+/*
+    FwFldPut("B1_POSIPI",Space(TamSX3('B1_POSIPI')[1]))
+    FwFldPut("B1_EX_NCM",Space(TamSX3('B1_EX_NCM')[1]))
+    FwFldPut("B1_CEST",Space(TamSX3('B1_CEST')[1]))
+    FwFldPut("B1_IPI",0)
+    FwFldPut("B1_GRTRIB",Space(TamSX3('B1_GRTRIB')[1]))
+*/
+Return
+
+//+------------------------------------------------------------------------------------------------
+//| Atualiza IPI
+//+------------------------------------------------------------------------------------------------
+Static Function MG04GetIPI()
+    Local _cPosIPI  := FwFldGet("B1_POSIPI")
+    Local _nIPI     := 0
+
+    _nIPI       := Posicione('SYD',1,xFilial('SYD') + FwFldGet("B1_POSIPI") + FwFldGet("B1_EX_NCM"),'YD_PER_IPI' )
+    FwFldPut("B1_IPI",_nIPI)
+
+Return
+
+
+//+------------------------------------------------------------------------------------------------
+//| Atualiza conta contabil do produto
+//+------------------------------------------------------------------------------------------------
+Static Function MG04GetCta()
+    Local _cTipo    := M->B1_TIPO
+    Local _cConta   := Space(TamSX3('B1_CONTA')[1])
+    
+    Do Case
+    Case _cTipo == 'MP'         // Matéria prima
+        _cConta := '1140100001'
+
+    Case _cTipo == 'BN'         // Beneficiamento
+        _cConta := '1140100011'
+
+    Case _cTipo == 'ME'         // Mercadoria
+        _cConta := '1140100005'
+
+    Case _cTipo == 'EM'         // Embalagem
+        _cConta := '1140100003'
+
+    Case _cTipo == 'MI'         // Material intermediário
+        _cConta := '1140100002'
+
+    Case _cTipo == 'PA'         // Produto Acabado
+        _cConta := '1140100007'
+
+    Case _cTipo == 'PI'         // Produto intermediário
+        _cConta := '1140100008'
+
+    Otherwise
+        _cConta         := Space(TamSx3('B1_CONTA')[1])
+        FwFldPut("B1_GRUPO", Space(TamSx3('B1_GRUPO')[1]))
+    EndCase
+
+    FwFldPut("B1_CONTA", _cConta)
+Return
+
+
+//+------------------------------------------------------------------------------------------------
+//| Atualiza Centro de Custo
+//+------------------------------------------------------------------------------------------------
+Static Function MG04GetCc()
+    Local _cTipo    := FwFldGet("B1_TIPO")
+    Local _cLocal   := ""
+    Local _cCC      := ""
+    
+    Do Case
+        Case FwFldGet("B1_XFAMILI") == '000001'    // Refrigeracao
+            If _cTipo $ "BN|MI" 
+                _cCc    := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_CC")  
+                _cLocal := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_LOCPAD")
+            Endif
+    
+        Case FwFldGet("B1_XFAMILI") == '000002'    // Cocção
+            If _cTipo $ "BN|MI" 
+                _cCc    := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_CC")  
+                _cLocal := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_LOCPAD")
+            Endif
+
+        Case FwFldGet("B1_XFAMILI") == '000003'    // Mobiliário Aço
+            If _cTipo $ "BN|MI" 
+                _cCc    := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_CC")  
+                _cLocal := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_LOCPAD")
+            Endif
+
+        Case FwFldGet("B1_XFAMILI") == '000004'    // Máquina de Gelo - Componentes
+            If _cTipo $ "BN|MI" 
+                _cCc    := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_CC")  
+                _cLocal := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_LOCPAD")
+            Endif
+
+        Case FwFldGet("B1_XFAMILI") == '000005'    // Revenda - Hoshizaki
+            If _cTipo $ "MI|ME" 
+                _cCc    := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_CC")  
+                _cLocal := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_LOCPAD")
+            Endif
+        
+        Case FwFldGet("B1_XFAMILI") == '000006'    // Revenda não Hoshizaki
+            If _cTipo $ "MI|ME" 
+                _cCc    := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_CC")  
+                _cLocal := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_LOCPAD")
+            Endif
+
+        Case FwFldGet("B1_XFAMILI") == '000007'    // Matéria Prima
+            If _cTipo $ "MP" 
+                _cCc    := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_CC")  
+                _cLocal := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_LOCPAD")
+            Endif
+        
+        Case FwFldGet("B1_XFAMILI") == '000008'    // Peças de Reposição - Suporte Tec.
+            If _cTipo $ "ME" 
+                _cCc    := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_CC")  
+                _cLocal := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_LOCPAD")
+            Endif
+        
+        Case FwFldGet("B1_XFAMILI") == '000011'    // Embalagem
+            If _cTipo $ "EM" 
+                _cCc    := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_CC")  
+                _cLocal := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_LOCPAD")
+            Endif
+
+        Case FwFldGet("B1_XFAMILI") == '000013'    // Ansul
+            If _cTipo $ "BN|MI|ME" 
+                _cCc    := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_CC")  
+                _cLocal := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_LOCPAD")
+            Endif
+        
+        Case FwFldGet("B1_XFAMILI") == '000014'    // Biozone
+            If _cTipo $ "MI|ME" 
+                _cCc    := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_CC")  
+                _cLocal := Posicione("ZA1",1,xFilial("ZA1")+FwFldGet("B1_XFAMILI"),"ZA1_LOCPAD")
+            Endif
+    EndCase
+
+    FwFldPut("B1_LOCPAD", _cLocal)
+    FwFldPut("B1_CC", _cCc)
+    
+Return
