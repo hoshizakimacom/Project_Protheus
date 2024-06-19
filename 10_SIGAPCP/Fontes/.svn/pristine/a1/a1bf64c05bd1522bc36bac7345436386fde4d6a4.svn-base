@@ -1,0 +1,29 @@
+#Include "TOTVS.ch"
+#Include "TopConn.ch"
+
+//+----------------------------------------------------------------------------------------------
+// Rotina responsável pela impressão da OP
+// Por Range
+//+----------------------------------------------------------------------------------------------
+User Function M10R16()
+Local cPerg    := "M10R16"
+Local cQuery   := ""
+
+If Pergunte(cPerg,.T.)
+
+    cQuery   :=  "SELECT C2_NUM,C2_ITEM,C2_SEQUEN,C2_ITEMGRD FROM " + RetSqlName("SC2") + " "
+    cQuery   +=  "WHERE C2_NUM+C2_ITEM+C2_SEQUEN >= '" + MV_PAR01 + "' "
+    cQuery   +=  "  AND C2_NUM+C2_ITEM+C2_SEQUEN <= '" + MV_PAR02 + "' "
+    cQuery   +=  "  AND D_E_L_E_T_ = '' "
+
+    TcQuery cQuery New Alias "QRYSC2"
+    DbSelectArea("QRYSC2")
+
+    While QRYSC2->(!EOF())
+        _cOP:= QRYSC2->(C2_NUM + C2_ITEM + C2_SEQUEN + C2_ITEMGRD)
+        Processa({||u_M10RProc(_cOP)},,,.T.)
+        QRYSC2->(DBSKIP())
+    Enddo
+Endif
+
+Return
