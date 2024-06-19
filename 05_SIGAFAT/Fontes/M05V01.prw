@@ -1,0 +1,170 @@
+#Include 'Protheus.ch'
+
+
+//+---------------------------------------------------------------------------------------------------------------------------------------------
+//| Validação SCJ / SCK
+//| Chamada da campo CJ_CLIENTE, CJ_LOJA, CJ_CLIENT , CJ_LOJAENT
+//+---------------------------------------------------------------------------------------------------------------------------------------------
+User Function M05V01(cField)
+    Local lRet     := .T.
+    Private nDesc     := 0
+    Private nDescFam  := 0
+
+    Default cField := ''
+
+    If Type('__lRepres') <> 'L'
+        __lRepres := .T.
+    End If
+
+    Do Case
+    Case cField $ '|CJ_CLIENTE|CJ_LOJA|'
+        lRet   := MV05Cli(M->CJ_CLIENTE,M->CJ_LOJA)
+
+    Case cField $ '|CJ_CLIENT|CJ_LOJAENT|'
+        lRet   := MV05Cli(M->CJ_CLIENT,M->CJ_LOJAENT)
+
+    Case cField == 'CJ_CONDPAG'
+        lRet   := MV05CondPg(M->CJ_CONDPAG)
+
+    Case cField == 'CJ_TABELA'
+        lRet   := MV05TabPrc(M->CJ_TABELA)
+
+    Case cField == 'CK_PRODUTO'
+        lRet   := MV05Prod(M->CK_PRODUTO)
+
+    Case cField == 'CK_XDTENC'
+        lRet   := MV05DtEnc(M->CK_XDTENC)
+
+    // Valida desconto total
+    Case cField $ 'CJ_DESC1|CJ_DESC2|CJ_DESC3|CJ_DESC4|CJ_DESCONT|'
+        lRet := U_M05A28('OV',.F.)
+
+    Case cField $ 'CK_DESCONT'
+        lRet := U_M05A28('OV',.T.)
+
+    EndCase
+
+Return lRet
+
+//+---------------------------------------------------------------------------------------------------------------------------------------------
+//| Valida cliente para acesso de representantes
+//+---------------------------------------------------------------------------------------------------------------------------------------------
+Static Function MV05DtEnc(dDtEnc)
+    Local lRet  := .T.
+
+    If dDtEnc < Date()
+        MsgAviso('Não é permitido encerrar orçamento com data retroatica.' + CRLF + CRLF + 'Verifique.')
+        lRet := .F.
+    EndIf
+
+Return lRet
+
+//+---------------------------------------------------------------------------------------------------------------------------------------------
+//| Valida cliente para acesso de representantes
+//+---------------------------------------------------------------------------------------------------------------------------------------------
+Static Function MV05Cli(_cCli,_cLoja)
+    Local _lRet         := .T.
+    Local _aAreaSA1     := {}
+    Private _cEst         := ''
+
+    If __lRepres .And. !Empty(_cCli) .And. !Empty(_cLoja)
+        _aAreaSA1     := SA1->(GetArea())
+
+        SA1->(DbSetOrder(1))
+        SA1->(DbGoTop())
+
+        If _lRet := (SA1->(DbSeek( xFilial('SA1')  + _cCli + _cLoja )))
+            _lRet := SA1->A1_XREP == '1' //.And. SA1->A1_EST == __cEst
+
+        EndIf
+
+        If !_lRet
+            MsgInfo(I18N('Cliente #1 / #2 não localizado.' + CRLF + 'Verifique.',{_cCli,_cLoja}),'Atenção')
+        EndIf
+
+        RestArea(_aAreaSA1)
+    EndIf
+    
+	// Caso o cliente for Arcos Dourados, efetua a liberação financeira.
+	If _cCli == AllTrim(GetMv("AM_CLIMCD"))  //'002953'
+		M->CJ_XSTSFIN := '2'
+	Else
+		M->CJ_XSTSFIN := '1'
+	Endif    
+    
+Return _lRet
+
+//+---------------------------------------------------------------------------------------------------------------------------------------------
+//| Valida Condição de Pagamento para acesso de representantes
+//+---------------------------------------------------------------------------------------------------------------------------------------------
+Static Function MV05CondPg(_cCodPag)
+    Local _lRet         := .T.
+    Local _aAreaSE4     := {}
+
+    If __lRepres .And. !Empty(_cCodPag)
+        _aAreaSE4     := SE4->(GetArea())
+
+        _lRet := Posicione('SE4',1,xFilial('SE4') + _cCodPag,'E4_XREP') == '1'
+
+        If !_lRet
+            MsgInfo(I18N('Condição de pagamento #1 não localizada.' + CRLF + 'Verifique.',{_cCodPag}),'Atenção')
+        EndIf
+
+        RestArea(_aAreaSE4)
+    EndIf
+Return _lRet
+
+//+---------------------------------------------------------------------------------------------------------------------------------------------
+//| Valida tabela de preços para acesso de representantes
+//+---------------------------------------------------------------------------------------------------------------------------------------------
+Static Function MV05TabPrc(_cCodTab)
+    Local _lRet         := .T.
+    Local _aAreaDA0     := {}
+
+    If __lRepres .And. !Empty(_cCodTab)
+        _aAreaDA0     := DA0->(GetArea())
+
+        _lRet := Posicione('DA0',1,xFilial('DA0') + _cCodTab,'DA0_XREP') == '1'
+
+        If !_lRet
+            MsgInfo(I18N('Tabela de Preços #1 não localizada.' + CRLF + 'Verifique.',{_cCodTab}),'Atenção')
+        EndIf
+
+        RestArea(_aAreaDA0)
+    EndIf
+Return _lRet
+
+//+---------------------------------------------------------------------------------------------------------------------------------------------
+//| Valida produto para acesso de representantes
+//+---------------------------------------------------------------------------------------------------------------------------------------------
+Static Function MV05Prod(_cProduto)
+    Local _lRet         := .T.
+    Local _aAreaSB1     := {}
+
+    If __lRepres .And. !Empty(_cProduto)
+        _aAreaSB1     := SB1->(GetArea())
+
+        _lRet := Posicione('SB1',1,xFilial('SB1') + _cProduto,'B1_XREP') == '1'
+
+        If !_lRet
+            MsgInfo(I18N('Produto #1 não localizado.' + CRLF + 'Verifique.',{_cProduto}),'Atenção')
+        EndIf
+
+        RestArea(_aAreaSB1)
+    EndIf
+
+   If __lComerc .And. !Empty(_cProduto)
+        _aAreaSB1     := SB1->(GetArea())
+
+        _lRet := Posicione('SB1',1,xFilial('SB1') + _cProduto,'B1_TIPO') $ 'PA-ME'
+
+        If !_lRet
+            MsgInfo(I18N('Produto #1 não localizado.' + CRLF + 'Verifique!',{_cProduto}),'Atenção')
+        EndIf
+
+        RestArea(_aAreaSB1)
+    EndIf
+
+Return _lRet
+
+//+---------------------------------------------------------------------------------------------------------------------------------------------
