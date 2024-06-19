@@ -1,0 +1,54 @@
+#Include 'Protheus.ch'
+#Include 'FwMVCDef.ch'
+
+//+------------------------------------------------------------------------------------------------
+//| Cadastro de Codigo de instalação
+//+------------------------------------------------------------------------------------------------
+User Function M05A20()
+    Local _oBrowse  := FwMBrowse():New()
+
+    _oBrowse:SetAlias('ZA8')
+    _oBrowse:SetDescription('Cadastro de Grupo Econômico')
+
+    _oBrowse:Activate()
+Return
+
+//+------------------------------------------------------------------------------------------------
+Static Function MenuDef()
+    Local aRotina := {}
+
+    ADD OPTION aRotina TITLE 'Visualizar' ACTION 'VIEWDEF.M05A20' OPERATION 2 ACCESS 0
+    ADD OPTION aRotina TITLE 'Incluir'    ACTION 'VIEWDEF.M05A20' OPERATION 3 ACCESS 0
+    ADD OPTION aRotina TITLE 'Alterar'    ACTION 'VIEWDEF.M05A20' OPERATION 4 ACCESS 0
+    ADD OPTION aRotina TITLE 'Excluir'    ACTION 'VIEWDEF.M05A20' OPERATION 5 ACCESS 0
+Return aRotina
+
+
+//+------------------------------------------------------------------------------------------------
+Static Function ModelDef()
+    Local oStruZA8 := FWFormStruct( 1, 'ZA8', /*bAvalCampo*/,/*lViewUsado*/ )
+    Local oModel
+
+    oModel := MPFormModel():New('M05A20M', /*bPreValidacao*/, /*bPosValidacao*/, /*bCommit*/, /*bCancel*/ )
+    oModel:AddFields( 'ZA8MASTER', /*cOwner*/, oStruZA8, /*bPreValidacao*/, /*bPosValidacao*/, /*bCarga*/ )
+    oModel:SetDescription( 'Grupo Econômico' )
+
+    oModel:GetModel( 'ZA8MASTER' ):SetDescription( 'Dados do Grupo Econômico' )
+
+Return oModel
+
+//+------------------------------------------------------------------------------------------------
+Static Function ViewDef()
+    Local oModel   := FWLoadModel( 'M05A20' )
+    Local oStruZA8 := FWFormStruct( 2, 'ZA8' )
+    Local oView
+    Private cCampos := {}
+
+    oView := FWFormView():New()
+
+    oView:SetModel( oModel )
+    oView:AddField( 'VIEW_ZA8', oStruZA8, 'ZA8MASTER' )
+
+    oView:CreateHorizontalBox( 'TELA' , 100 )
+    oView:SetOwnerView( 'VIEW_ZA8', 'TELA' )
+Return oView
