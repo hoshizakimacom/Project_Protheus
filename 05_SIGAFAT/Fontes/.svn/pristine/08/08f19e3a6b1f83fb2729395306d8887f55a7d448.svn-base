@@ -1,0 +1,170 @@
+#Include 'Protheus.ch'
+
+//+--------------------------------------------------------------------------------------------------
+//| Função que inclui anexo no orçamento de vendas
+//  Chamado do ponto de entrada MA415MNU
+//+--------------------------------------------------------------------------------------------------
+User Function M05A25_A()
+    Local _cMascara     := 'Todos os arquivos|*.*'
+    Local _cTitulo      := 'Escolha o arquivo'
+    Local _nMascpad     := 0
+    Local _cDirOri      := 'C:\'
+    Local _cDirDes      := AllTrim(GetMv('AM_05A25_A',.T.,''))
+    Local _lSalvar      := .F. /*.F. = Salva || .T. = Abre*/
+    Local _nOpcoes      := GETF_LOCALHARD
+    Local _lArvore      := .F. /*.T. = apresenta o árvore do servidor || .F. = não apresenta*/
+    Local _aArquivo := {}
+    Local _lOk          := .F.
+
+    If Empty(_cDirDes)
+        Aviso('Atenção','É obrigatório informar o diretório de armazenamento no parâmetro AM_05A25_A.',{'OK'},3)
+    Else
+        _cDirDes    += AllTrim(SCJ->(CJ_FILIAL + CJ_NUM)) + '\'
+        _cDirOri    := cGetFile( _cMascara, _cTitulo, _nMascpad, _cDirOri, _lSalvar, _nOpcoes, _lArvore)
+
+        If !Empty(_cDirOri)
+            _aFiles := Directory(_cDirOri, "D")
+
+            MakeDir(_cDirDes)
+
+            If !(_lOk := !File(_cDirDes + _aFiles[1][1]))
+                If MsgYesNo('Arquivo já anexado ao Orçamento.' + CRLF + 'Deseja atualizar o arquivo?',"Atenção")
+                    If !(_lOk := FErase(_cDirDes + _aFiles[1][1]) <> -1)
+                        MsgAlert('Erro ao apagar arquivo: ' + STR(FERROR()),"Atenção")
+                    EndIf
+                EndIf
+            EndIf
+
+            If _lOk
+                __CopyFile(_cDirOri,_cDirDes + _aFiles[1][1])
+
+                If File(_cDirDes + _aFiles[1][1])
+                    RecLock('SCJ',.F.)
+                        SCJ->CJ_XANEXO := I18N('Arquivo: #1    | Data: #2    | Usuário: #3 ',{Upper(_aFiles[1][1]),DToC(Date()) + ' ' + Time(),Upper(UsrRetName(RetCodUsr()))})
+                    SCJ->(MsUnLock())
+
+                    MsgInfo('Arquivo anexado com sucesso!',"Atenção")
+                Else
+                    Alert('Erro ao anexar arquivo.',"Atenção")
+                EndIf
+            EndIf
+
+
+        Else
+            Alert('Arquivo não informado!')
+        EndIf
+    EndIf
+Return
+
+//+-------------------------------------------------------------------------------
+//  Fonte responsável pela visualização do anexo no orçamento
+//  Chamado do ponto de entrada MA415MNU
+//+-------------------------------------------------------------------------------
+User Function M05A25_B()
+    Local _cDir     := AllTrim(GetMv('AM_05A25_A',.T.,''))
+
+    If Empty(_cDir)
+        Aviso('Atenção','É obrigatório informar o diretório de armazenamento no parâmetro AM_05A25_A.',{'OK'},3)
+    Else
+        _cDir   += AllTrim(SCJ->(CJ_FILIAL + CJ_NUM)) + '\'
+
+        MakeDir(_cDir)
+        WinExec('explorer.exe ' + _cDir)
+    EndIf
+Return
+
+//+--------------------------------------------------------------------------------------------------
+//| Função que inclui anexo no Pedido de Vendas
+//| Chamado do PE MA410MNU
+//+--------------------------------------------------------------------------------------------------
+User Function M05A25_C()
+    Local _cMascara     := 'Todos os arquivos|*.*'
+    Local _cTitulo      := 'Escolha o arquivo'
+    Local _nMascpad     := 0
+    Local _cDirOri      := 'C:\'
+    Local _cDirDes      := AllTrim(GetMv('AM_05A25_B',.T.,''))
+    Local _lSalvar      := .F. /*.F. = Salva || .T. = Abre*/
+    Local _nOpcoes      := GETF_LOCALHARD
+    Local _lArvore      := .F. /*.T. = apresenta o árvore do servidor || .F. = não apresenta*/
+    Local _aArquivo := {}
+    Local _lOk          := .F.
+
+    If Empty(_cDirDes)
+        Aviso('Atenção','É obrigatório informar o diretório de armazenamento no parâmetro AM_05A25_B.',{'OK'},3)
+    Else
+        _cDirDes    += AllTrim(SC5->(C5_FILIAL+C5_NUM)) + '\'
+        _cDirOri    := cGetFile( _cMascara, _cTitulo, _nMascpad, _cDirOri, _lSalvar, _nOpcoes, _lArvore)
+
+        If !Empty(_cDirOri)
+            _aFiles := Directory(_cDirOri, "D")
+
+            MakeDir(_cDirDes)
+
+            If !(_lOk := !File(_cDirDes + _aFiles[1][1]))
+                If MsgYesNo('Arquivo já anexado ao Orçamento.' + CRLF + 'Deseja atualizar o arquivo?',"Atenção")
+                    If !(_lOk := FErase(_cDirDes + _aFiles[1][1]) <> -1)
+                        MsgAlert('Erro ao apagar arquivo: ' + STR(FERROR()),"Atenção")
+                    EndIf
+                EndIf
+            EndIf
+
+            If _lOk
+                __CopyFile(_cDirOri,_cDirDes + _aFiles[1][1])
+
+                If File(_cDirDes + _aFiles[1][1])
+
+                    RecLock('SC5',.F.)
+                        SC5->C5_XANEXOP := I18N('Arquivo: #1    | Data: #2    | Usuário: #3 ',{Upper(_aFiles[1][1]),DToC(Date()) + ' ' + Time(),Upper(UsrRetName(RetCodUsr()))})
+                    SC5->(MsUnLock())
+
+                    MsgInfo('Arquivo anexado com sucesso!',"Atenção")
+                Else
+                    Alert('Erro ao anexar arquivo.')
+                EndIf
+            EndIf
+
+
+        Else
+            Alert('Arquivo não informado!')
+        EndIf
+    EndIf
+Return
+
+//+-------------------------------------------------------------------------------
+//| Fonte responsável pela visualização do anexo do pedido de venda
+//| Chamado do PE MA410MNU
+//+-------------------------------------------------------------------------------
+User Function M05A25_D()
+    Local _cDir     := AllTrim(GetMv('AM_05A25_B',.T.,''))
+    Local _aDir     := {}
+
+
+    If Empty(_cDir)
+        Aviso('Atenção','É obrigatório informar o diretório de armazenamento no parâmetro AM_05A25_B.',{'OK'},3)
+    Else
+        _cDir += AllTrim(SC5->(C5_FILIAL+C5_NUM) ) + '\'
+
+        MakeDir(_cDir)
+        WinExec('explorer.exe ' + _cDir)
+    EndIf
+Return
+
+//+-------------------------------------------------------------------------------
+//| Fonte responsável pela visualização do anxo do orçamento através do pedido
+//| de venda
+//| Chamado do PE MA410MNU
+//+-------------------------------------------------------------------------------
+User Function M05A25_E()
+    Local _cDir     := AllTrim(GetMv('AM_05A25_A',.T.,''))
+    Local _aDir     := {}
+
+
+    If Empty(_cDir)
+        Aviso('Atenção','É obrigatório informar o diretório de armazenamento no parâmetro AM_05A25_A.',{'OK'},3)
+    Else
+        _cDir += AllTrim(SC5->(C5_FILIAL + C5_XNUNORC)) + '\'
+
+        MakeDir(_cDir)
+        WinExec('explorer.exe ' + _cDir)
+    EndIf
+Return
