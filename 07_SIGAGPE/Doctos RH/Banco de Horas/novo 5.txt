@@ -1,0 +1,592 @@
+
+THREAD ERROR ([5232], VMIRANDA, SRVAM-APL01)   16/03/2023 11:18:56
+Erro na abertura da tabela SYS_COMPANY usando o drive: TOPCONN on FWTABLEDDL:OPENTABLE(FWTABLEDDL.PRX) 30/12/2022 14:25:06 line : 1115
+
+[TOTVS build: 7.00.210324P-20221215]
+Called from MPSYSOPENTABLES(MPSYSOPENTABLES.PRW) 30/12/2022 14:25:06 line : 125
+Called from OPENSM0(APLIB100.PRW) 30/12/2022 14:25:04 line : 744
+Called from FWGETUSREMPR(FWAPP.PRW) 30/12/2022 14:25:06 line : 1953
+Called from APPGETENV(FWAPP.PRW) 30/12/2022 14:25:06 line : 1348
+Called from {|ODESKTOP,OUSERAUTH| APPGETENV(ODESKTOP,@OUSERAUTH)}(FWAPP.PRW) 30/12/2022 14:25:06 line : 1087
+Called from {|OPARAM|OPARAM:=FWUSERPARAM():NEW(),OPARAM:CUSER:=CGETUSER,OPARAM:CPSW:=CGETPSW,OPARAM:LCHKSSO:=LCHKSSO,IF(EVAL(BVALID,ODESKTOP,@OUSERAUTH,OPARAM),(EVAL(BNEXT,ODESKTOP,@OUSERAUTH)),),IF(LCANCHGIDIOM,FWSAVEANDCHGIDIOM(CIDIOMA),)}(FWUISKIN.PRW) 30/12/2022 14:25:06 line : 1395
+Called from ::TWINDOW:ACTIVATE
+Called from MSAPP:ACTIVATE(FWAPP.PRW) 30/12/2022 14:25:06 line : 766
+Called from SIGACFG(APLIB000.PRW) 30/12/2022 14:25:04 line : 1012
+
+[TOTVS Environment: MACOM_1233]
+[TOTVS Environment RPODB: top]
+[TOTVS Environment Trace: 0]
+[TOTVS Environment IBXLog: Nenhum]
+[TOTVS Environment KillStack: Nenhum]
+[TOTVS Environment TraceStack: Nenhum]
+[TOTVS Environment SpecialKey: Nenhum]
+[TOTVS Environment LocalFiles: CTREE]
+[TOTVS Environment LogProfiler: Nenhum]
+[TOTVS Environment TopMemoMega: 1]
+[TOTVS Environment RPOLanguage: Portuguese]
+[TOTVS Environment RegionalLanguage: Nenhum]
+[TOTVS Environment LocalDBExtension: .dtc]
+[TOTVS Environment ConnectionTimeOut: Nenhum]
+[TOTVS Environment General CTreeMode: Nenhum]
+[TOTVS Environment General ConsoleLog: Nenhum]
+[TOTVS Environment General ConsoleFile: Nenhum]
+[TOTVS Environment General MaxQuerySize: Nenhum]
+[TOTVS Environment General MaxStringSize: 10]
+[TOTVS Remote Lib: QT-5.15.9 WIN]
+[TOTVS Remote type: Microsoft Windows]
+[TOTVS Remote Build: 7.00.210324P-20221111]
+[TOTVS Remote Version: 20.3.1.2]
+[TOTVS Server Type: Console]
+[TOTVS Server Build: 7.00.210324P-20221215]
+[TOTVS Server Version: 20.3.1.2]
+[TOTVS Server 64 bits: Sim]
+[TOTVS Server Unix: Não]
+[TOTVS DBAccess DB: MSSQL]
+[TOTVS DBAccess API Build: 20220303-20221111]
+[TOTVS DBAccess Build: 20220303-20221111]
+[TOTVS DBAccess Type: WinNT (x64)]
+[TOTVS DBAccess Latency with SGDB: 1]
+[TOTVS Framework Versão: 20230109]
+[TOTVS Framework Date: 20221230_142435]
+[TOTVS Framework Commit: d300aa7230500328a6a3bcd0beaa1316a97c760f]
+[TOTVS RPO Release: 12.1.033]
+[TOTVS License Server Version: 3.3.3]
+[TOTVS Workarea - Alias: Nenhum]
+[TOTVS Dicionário no banco de dados: Sim]
+
+Publicas
+  Public 1: CPAISLOC(C) :BRA
+  Public 2: LWSISPORTAL(L) :.F.
+  Public 3: OAPP(O) :O
+  Public 4: HELP(L) :.F.
+  Public 5: USIGAADV(L) :.F.
+  Public 6: CACESSO(C) :SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+  Public 7: CARQTAB(C) :
+  Public 8: CARQREL(C) :SIGACFG.REL
+  Public 9: CARQEMP(C) :SIGAMAT.EMP
+  Public 10: AEMPRESAS(A) :
+  Public 11: CUSUARIO(C) :
+  Public 12: CNIVEL(N) :9
+  Public 13: ACBROWSE(U) :NIL
+  Public 14: ATRIGGER(A) :
+  Public 15: __CINTERNET(U) :NIL
+  Public 16: __CBINDER(U) :NIL
+  Public 17: __CTERMINAL(U) :NIL
+  Public 18: MV_RELT(U) :NIL
+  Public 19: MV_CENT(U) :NIL
+  Public 20: MV_MILHAR(U) :NIL
+  Public 21: ADVFONT(U) :NIL
+  Public 22: CSTRACESSO(C) :
+  Public 23: TINICIO(C) :11:18:14
+  Public 24: CMODULO(C) :CFG
+  Public 25: NMODULO(N) :99
+  Public 26: OMAINWND(O) :O
+  Public 27: DDATABASE(D) :2023/03/16
+  Public 28: CEMPANT(C) :
+  Public 29: CNUMEMP(C) :
+  Public 30: CFILANT(C) :xx
+  Public 31: CVERSAO(C) :TOTVS Manufatura MSSQL Macom_1233
+  Public 32: CFOPENED(C) :SX5
+  Public 33: CUSERNAME(C) :Administrador
+  Public 34: __CUSERID(C) :000000
+  Public 35: __CCREDENTIAL(C) :****************
+  Public 36: __LLOGOFF(L) :.F.
+  Public 37: LQUERY(L) :.F.
+  Public 38: __MVCOMBOBOX(L) :.F.
+  Public 39: __LSX8(L) :.F.
+  Public 40: ASX8(A) :
+  Public 41: ACOORDENA(A) :
+  Public 42: VAR_IXB(U) :NIL
+  Public 43: __TTSBREAK(L) :.F.
+  Public 44: __TTSPUSH(A) :
+  Public 45: __CLOGSIGA(C) :NNNNNN
+  Public 46: __TTSINUSE(U) :NIL
+  Public 47: __LFKINUSE(L) :.F.
+  Public 48: __TTSCOMMIT(U) :NIL
+  Public 49: __LACENTO(L) :.F.
+  Public 50: __LANGUAGE(C) :PORTUGUESE
+  Public 51: __LPYME(L) :.F.
+  Public 52: __LPYMESX1(L) :.F.
+  Public 53: __LPYMESX2(L) :.F.
+  Public 54: __LPYMESX3(L) :.F.
+  Public 55: __LPYMESX6(L) :.F.
+  Public 56: RPTPARAM(C) :Parâmetros
+  Public 57: RPTHORA(C) :Hora...:
+  Public 58: RPTDTREF(C) :DT.Ref.:
+  Public 59: RPTEMISS(C) :Emissão:
+  Public 60: RPTPERG(C) :Pergunta
+  Public 61: RPTFOLHA(C) :Folha..:
+  Public 62: RPTEND(C) :Hora Término:
+  Public 63: __DRIVER(C) :                                                                
+  Public 64: __RELDIR(C) :        
+  Public 65: __IDIOMA(C) : 
+  Public 66: __VLDUSER(D) :00/00/00
+  Public 67: __GRPUSER(C) :      
+  Public 68: __ALTPSW(L) :.F.
+  Public 69: __NUSERACS(N) :0
+  Public 70: __AIMPRESS(A) :
+  Public 71: __LDIRACS(L) :.F.
+  Public 72: __READVAR(C) :
+  Public 73: MV_PAR01(C) :
+  Public 74: MV_PAR02(C) :
+  Public 75: MV_PAR03(C) :
+  Public 76: MV_PAR04(C) :
+  Public 77: MV_PAR05(C) :
+  Public 78: MV_PAR06(C) :
+  Public 79: MV_PAR07(C) :
+  Public 80: MV_PAR08(C) :
+  Public 81: MV_PAR09(C) :
+  Public 82: MV_PAR10(C) :
+  Public 83: MV_PAR11(C) :
+  Public 84: MV_PAR12(C) :
+  Public 85: MV_PAR13(C) :
+  Public 86: MV_PAR14(C) :
+  Public 87: MV_PAR15(C) :
+  Public 88: MV_PAR16(C) :
+  Public 89: MV_PAR17(C) :
+  Public 90: MV_PAR18(C) :
+  Public 91: MV_PAR19(C) :
+  Public 92: MV_PAR20(C) :
+  Public 93: MV_PAR21(C) :
+  Public 94: MV_PAR22(C) :
+  Public 95: MV_PAR23(C) :
+  Public 96: MV_PAR24(C) :
+  Public 97: MV_PAR25(C) :
+  Public 98: MV_PAR26(C) :
+  Public 99: MV_PAR27(C) :
+  Public 100: MV_PAR28(C) :
+  Public 101: MV_PAR29(C) :
+  Public 102: MV_PAR30(C) :
+  Public 103: MV_PAR31(C) :
+  Public 104: MV_PAR32(C) :
+  Public 105: MV_PAR33(C) :
+  Public 106: MV_PAR34(C) :
+  Public 107: MV_PAR35(C) :
+  Public 108: MV_PAR36(C) :
+  Public 109: MV_PAR37(C) :
+  Public 110: MV_PAR38(C) :
+  Public 111: MV_PAR39(C) :
+  Public 112: MV_PAR40(C) :
+  Public 113: MV_PAR41(C) :
+  Public 114: MV_PAR42(C) :
+  Public 115: MV_PAR43(C) :
+  Public 116: MV_PAR44(C) :
+  Public 117: MV_PAR45(C) :
+  Public 118: MV_PAR46(C) :
+  Public 119: MV_PAR47(C) :
+  Public 120: MV_PAR48(C) :
+  Public 121: MV_PAR49(C) :
+  Public 122: MV_PAR50(C) :
+  Public 123: MV_PAR51(C) :
+  Public 124: MV_PAR52(C) :
+  Public 125: MV_PAR53(C) :
+  Public 126: MV_PAR54(C) :
+  Public 127: MV_PAR55(C) :
+  Public 128: MV_PAR56(C) :
+  Public 129: MV_PAR57(C) :
+  Public 130: MV_PAR58(C) :
+  Public 131: MV_PAR59(C) :
+  Public 132: MV_PAR60(C) :
+  Public 133: __CSX1HLP(C) :        
+  Public 134: __LOCALDRIVER(C) :DBFCDX
+  Public 135: __CRDD(C) :TOPCONN
+  Public 136: LAS400(L) :.T.
+  Public 137: LFILAS(L) :.F.
+  Public 138: CFILAS(C) :
+  Public 139: __ASPLIST(A) :
+  Public 140: __CRDDNTTS(C) :DBFCDX
+  Public 141: AMOTBX(A) :
+  Public 142: MV_MOEDA1(N) :0
+  Public 143: MV_MOEDA2(N) :0
+  Public 144: MV_MOEDA3(N) :0
+  Public 145: MV_MOEDA4(N) :0
+  Public 146: MV_MOEDA5(N) :0
+  Public 147: MV_SIMB1(C) :
+  Public 148: MV_SIMB2(C) :
+  Public 149: MV_SIMB3(C) :
+  Public 150: MV_SIMB4(C) :
+  Public 151: MV_SIMB5(C) :
+  Public 152: MV_CRNEG(C) :
+  Public 153: MV_CPNEG(C) :
+  Public 154: MV_MULNATR(L) :.F.
+  Public 155: MV_MULNATP(L) :.F.
+  Public 156: MVPROVIS(C) :
+  Public 157: MVPAGANT(C) :
+  Public 158: MVRECANT(C) :
+  Public 159: MVNOTAFIS(C) :
+  Public 160: MVABATIM(C) :
+  Public 161: MVDUPLIC(C) :
+  Public 162: MVFATURA(C) :
+  Public 163: MVCHEQUE(C) :
+  Public 164: MVCHEQUES(C) :
+  Public 165: MVRPA(C) :
+  Public 166: MVTAXA(C) :
+  Public 167: MVTXA(C) :
+  Public 168: MVIRF(C) :
+  Public 169: MVINSS(C) :
+  Public 170: MVCOFINS(C) :
+  Public 171: MVPIS(C) :
+  Public 172: MVCS(C) :
+  Public 173: MVISS(C) :
+  Public 174: MVFUABT(C) :
+  Public 175: MVIRABT(C) :
+  Public 176: MVINABT(C) :
+  Public 177: MVISABT(C) :
+  Public 178: MVPIABT(C) :
+  Public 179: MVCFABT(C) :
+  Public 180: MVCSABT(C) :
+  Public 181: MVFEABT(C) :
+  Public 182: MVENVBCOR(C) :
+  Public 183: MVENVBCOP(C) :
+  Public 184: MVIVABT(C) :
+  Public 185: VALOR(N) :0
+  Public 186: VALOR2(N) :0
+  Public 187: VALOR3(N) :0
+  Public 188: VALOR4(N) :0
+  Public 189: VALOR5(N) :0
+  Public 190: CUSTO(C) :
+  Public 191: DEBITO(C) :
+  Public 192: CREDITO(C) :
+  Public 193: VARIACAO(N) :0
+  Public 194: __NQUANTAS(U) :NIL
+  Public 195: LGSPINUSE(L) :.F.
+  Public 196: LFISCAL(L) :.F.
+  Public 197: LGAVETA(L) :.F.
+  Public 198: LUSACMC7(L) :.F.
+  Public 199: LUSATEF(L) :.F.
+  Public 200: LTEFOK(L) :.F.
+  Public 201: CTIPTEF(U) :NIL
+  Public 202: NHDLECF(N) :-1
+  Public 203: NHDLCH(N) :-1
+  Public 204: NHDLPINPAD(N) :-1
+  Public 205: NHDLCMC7(N) :-1
+  Public 206: NHDLGAVETA(N) :-1
+  Public 207: NHDLCUPOM(N) :-1
+  Public 208: NHDLLEITOR(N) :-1
+  Public 209: NHDLDISPLAY(N) :-1
+  Public 210: LINICIALIZOU(L) :.F.
+  Public 211: CESTACAO(C) :001
+  Public 212: LIMPCUP(U) :NIL
+  Public 213: LUSACH(U) :NIL
+  Public 214: LUSALEITOR(U) :NIL
+  Public 215: LUSADISPLAY(U) :NIL
+  Public 216: LLAYAWAY(L) :.F.
+  Public 217: NTDATA(N) :8
+  Public 218: CCANCEL(C) :Cancelado pelo Operador !!
+  Public 219: CCANCELA(C) :Cancelado pelo Operador !!
+  Public 220: NVALOROR(N) :0
+  Public 221: NVALORDP(N) :0
+  Public 222: NVALORCO(N) :0
+  Public 223: NVALORCD(N) :0
+  Public 224: NVALBXOR(N) :0
+  Public 225: NVALBXDP(N) :0
+  Public 226: NVALBXCO(N) :0
+  Public 227: NVALBXCD(N) :0
+  Public 228: CUSTBEMCTB(C) :
+  Public 229: CCCORRCTB(C) :
+  Public 230: CCDESPCTB(C) :
+  Public 231: CCCDESCTB(C) :
+  Public 232: CCCDEPCTB(C) :
+  Public 233: SUBCCONCTB(C) :
+  Public 234: SUBCCORCTB(C) :
+  Public 235: SUBCDESCTB(C) :
+  Public 236: SUBCDEPCTB(C) :
+  Public 237: SUBCCDECTB(C) :
+  Public 238: CLVLCONCTB(C) :
+  Public 239: CLVLCORCTB(C) :
+  Public 240: CLVLDESCTB(C) :
+  Public 241: CLVLDEPCTB(C) :
+  Public 242: CLVLCDECTB(C) :
+  Public 243: CTABEM(U) :NIL
+  Public 244: DESPDEPR(U) :NIL
+  Public 245: DEPREACUM(U) :NIL
+  Public 246: CORREDEPR(U) :NIL
+  Public 247: CORREBEM(U) :NIL
+  Public 248: MV_MODFOL(C) :
+
+STACK SIGACFG(APLIB000.PRW) 30/12/2022 14:25:04
+
+  Param 1: PAR01(U) : NIL
+  Local 1: PAR01(U) :NIL
+
+STACK MSAPP:ACTIVATE(FWAPP.PRW) 30/12/2022 14:25:06
+
+  Param 1: BACTION(U) : NIL
+  Param 2: OUSERAUTH(U) : NIL
+  Param 3: OPARAM(U) : NIL
+  Local 1: BACTION(U) :NIL
+  Local 2: OUSERAUTH(U) :NIL
+  Local 3: OPARAM(U) :NIL
+  Local 4: SELF(O) :O
+  Local 5: CMSG(C) :
+  Local 6: CTITLE(C) :TOTVS Manufatura (TOTVS) 02.9.0099
+  Local 7: CSEGMENTO(C) :Manufatura
+  Local 8: BCLOSE(B) :{|| IF(INLOGIN(),FINAL(FWI18NLANG("FWAPP","STR0004",4)),FINAL(FWI18NLANG("FWAPP","STR0005",5),, .T. ))}
+  Local 9: BINIT(B) :{|| ODESKTOP:ACTIVATE(), APPINIT(), IF(LCLIENTRELOADAUTO, ( FWCLIENTRELOADAUTO(ODESKTOP), LCLIENTRELOADAUTO:= .F. ), SELF:GETLOGIN(ODESKTOP, , OUSERAUTH, OPARAM))}
+  Local 10: ODESKTOP(O) :O
+  Local 11: OBTN(O) :O
+  Local 12: LCLIENTRELOADAUTO(L) :.F.
+  Local 13: LCONSOLEMSGRES(L) :.F.
+  Local 14: ASCREENRES(A) :
+  Local 15: AREMOTE(A) :
+  Local 16: NRESTOTAL(N) :2073600
+
+STACK ::TWINDOW:ACTIVATE
+
+  Local 1: SELF(O) :O
+
+STACK {|OPARAM|OPARAM:=FWUSERPARAM():NEW(),OPARAM:CUSER:=CGETUSER,OPARAM:CPSW:=CGETPSW,OPARAM:LCHKSSO:=LCHKSSO,IF(EVAL(BVALID,ODESKTOP,@OUSERAUTH,OPARAM),(EVAL(BNEXT,ODESKTOP,@OUSERAUTH)),),IF(LCANCHGIDIOM,FWSAVEANDCHGIDIOM(CIDIOMA),)}(FWUISKIN.PRW) 30/12/2022 14:25:06
+
+  Param 1: OPARAM(O) : O
+  Local CodeBlock 1: OPARAM(O) :O
+
+STACK {|ODESKTOP,OUSERAUTH| APPGETENV(ODESKTOP,@OUSERAUTH)}(FWAPP.PRW) 30/12/2022 14:25:06
+
+  Param 1: ODESKTOP(O) : O
+  Param 2: @OUSERAUTH(O) : O
+  Local CodeBlock 1: ODESKTOP(O) :O
+  Local CodeBlock 2: OUSERAUTH(O) :O
+
+STACK APPGETENV(FWAPP.PRW) 30/12/2022 14:25:06
+
+  Param 1: ODESKTOP(O) : O
+  Param 2: @OUSERAUTH(O) : O
+  Param 3: LSSO(L) : .F.
+  Param 4: OENVPARAM(U) : NIL
+  Private 1: __ERRO(B) :
+  Private 2: __CLASSNAME(C) :TABLESTRUCT
+  Local 1: ODESKTOP(O) :O
+  Local 2: OUSERAUTH(O) :O
+  Local 3: LSSO(L) :.F.
+  Local 4: OENVPARAM(U) :NIL
+  Local 5: AEMPFIL(U) :NIL
+  Local 6: AGETMODULOS(U) :NIL
+  Local 7: AMODULOS(U) :NIL
+  Local 8: ALIBMOD(U) :NIL
+  Local 9: BVALID(U) :NIL
+  Local 10: BNEXT(U) :NIL
+  Local 11: CID(U) :NIL
+  Local 12: CSSO(U) :NIL
+  Local 13: LCONTINUE(L) :.T.
+  Local 14: NASCAN(U) :NIL
+  Local 15: NMOD(U) :NIL
+  Local 16: NTYPE(U) :NIL
+
+STACK FWGETUSREMPR(FWAPP.PRW) 30/12/2022 14:25:06
+
+  Param 1: OUSERAUTH(O) : O
+  Local 1: OUSERAUTH(O) :O
+  Local 2: AGRPEMPRESAS(U) :NIL
+  Local 3: AFILIAIS(U) :NIL
+  Local 4: AEMPFIL(U) :NIL
+  Local 5: NI(U) :NIL
+  Local 6: NX(U) :NIL
+  Local 7: CSAVEALIAS(C) :MP_CUSTMET
+  Local 8: LALLEMP(U) :NIL
+
+STACK OPENSM0(APLIB100.PRW) 30/12/2022 14:25:04
+
+  Param 1: CEMPRESA(U) : NIL
+  Param 2: LONLYSM0(L) : .F.
+  Local 1: CEMPRESA(U) :NIL
+  Local 2: LONLYSM0(L) :.F.
+  Local 3: XDRIVER(C) :DBFCDX
+  Local 4: CARQ(C) :SIGAMAT.EMP
+  Local 5: CINDICE(U) :NIL
+  Local 6: LOPENED(L) :.F.
+  Local 7: LINDB(L) :.T.
+
+STACK MPSYSOPENTABLES(MPSYSOPENTABLES.PRW) 30/12/2022 14:25:06
+
+  Param 1: @ATABLES(A) : 
+  Param 2: AALIAS(A) : 
+  Param 3: OMETER(U) : NIL
+  Param 4: ATABLESCREATED(A) : 
+  Param 5: LSHARED(L) : .T.
+  Param 6: LEXCEPTION(L) : .T.
+  Param 7: CEMPRESA(U) : NIL
+  Param 8: OLOGFILE(U) : NIL
+  Param 9: LALTER(L) : .F.
+  Param 10: NCOUNT(N) : 0
+  Param 11: OSTRTABLE(U) : NIL
+  Local 1: ATABLES(A) :
+  Local 2: AALIAS(A) :
+  Local 3: OMETER(U) :NIL
+  Local 4: ATABLESCREATED(A) :
+  Local 5: LSHARED(L) :.T.
+  Local 6: LEXCEPTION(L) :.T.
+  Local 7: CEMPRESA(U) :NIL
+  Local 8: OLOGFILE(U) :NIL
+  Local 9: LALTER(L) :.F.
+  Local 10: NCOUNT(N) :0
+  Local 11: OSTRTABLE(U) :NIL
+  Local 12: NX(N) :1
+  Local 13: CTABLE(C) :SM0
+  Local 14: CALIAS(C) :SM0
+  Local 15: OSTRUCT(O) :O
+  Local 16: LRET(L) :.F.
+  Local 17: OCACHEMODEL(U) :NIL
+  Local 18: AAREA(A) :
+  Local 19: LMETER01(L) :.F.
+  Local 20: LMETER02(L) :.F.
+  Local 21: LALLOWALTER(L) :.F.
+
+STACK FWTABLEDDL:OPENTABLE(FWTABLEDDL.PRX) 30/12/2022 14:25:06
+
+  Param 1: LSHARED(L) : .T.
+  Param 2: LHOLD(L) : .F.
+  Param 3: LTRYAGAIN(L) : .F.
+  Local 1: LSHARED(L) :.T.
+  Local 2: LHOLD(L) :.F.
+  Local 3: LTRYAGAIN(L) :.F.
+  Local 4: SELF(O) :O
+  Local 5: AAUX(A) :
+  Local 6: AINDEX(A) :
+  Local 7: NMAXX(N) :0
+  Local 8: NX(N) :61
+  Local 9: NMAXY(N) :0
+  Local 10: NY(N) :0
+  Local 11: CAUX(C) :
+  Local 12: CKEY(C) :
+  Local 13: CORDNAME(C) :
+  Local 14: CTABLE(C) :SYS_COMPANY
+  Local 15: CALIAS(C) :SM0
+  Local 16: CDRIVE(C) :TOPCONN
+  Local 17: CORDEM(U) :NIL
+  Local 18: LDBCONNECT(L) :.T.
+
+STACK { | E | ERRORDIALOG( E ) }(APLIB240.PRW) 30/12/2022 14:25:04
+
+  Param 1: E(O) : O
+  Local CodeBlock 1: E(O) :O
+
+STACK ERRORDIALOG(APLIB240.PRW) 30/12/2022 14:25:04
+
+  Param 1: E(O) : O
+  Local 1: E(O) :O
+  Local 2: LINSIGA(L) :.T.
+  Local 3: CMSG(U) :NIL
+  Local 4: NI(U) :NIL
+  Local 5: CX(U) :NIL
+  Local 6: CERROR(U) :NIL
+  Local 7: LSKIPERROR(L) :.F.
+  Local 8: AOBJLOG(A) :
+  Local 9: NX(U) :NIL
+  Local 10: URETURN(U) :NIL
+
+STACK ERRORDLG(APLIB240.PRW) 30/12/2022 14:25:04
+
+  Param 1: OERR(O) : O
+  Param 2: CMSG(U) : NIL
+  Local 1: OERR(O) :O
+  Local 2: CMSG(U) :NIL
+  Local 3: ODLG(U) :NIL
+  Local 4: OFONT(U) :NIL
+  Local 5: OBMP(U) :NIL
+  Local 6: OPANEL(U) :NIL
+  Local 7: OPANELBMP(U) :NIL
+  Local 8: ODETAIL(U) :NIL
+  Local 9: OSEND(U) :NIL
+  Local 10: OCLOSE(U) :NIL
+  Local 11: OSAVE(U) :NIL
+  Local 12: OERROR(U) :NIL
+
+Files
+  SYS_BCAST_KEYSTAGE; Rdd:TOPCONN; Alias:MP_BCASTKEYSTAGE; Filter :; Recno:5000; Total Recs:0; Order:1
+     Index (0) :**SYS_BCAST_KEYSTAGE1  ST_ID+KEY_NAME
+    Field 1: ST_ID(C) :      
+    Field 2: KEY_NAME(C) :                    
+    Field 3: KEY_CONT(C) :                              
+    Field 4: KEY_TYPE(C) : 
+  SYS_BCAST_STAGE; Rdd:TOPCONN; Alias:MP_BCASTSTAGE; Filter :; Recno:5000; Total Recs:0; Order:1
+     Index (0) :**SYS_BCAST_STAGE1  ST_ID
+     Index (1) :SYS_BCAST_STAGE2  ST_DESC
+    Field 1: ST_ID(C) :      
+    Field 2: ST_DESC(C) :                                                                                                    
+    Field 3: ST_OBS(C) :
+  SYS_ADDRESS; Rdd:TOPCONN; Alias:MP_ADDRESS; Filter :; Recno:5000; Total Recs:0; Order:1
+     Index (0) :**SYS_ADDRESS1  ADD_COD
+     Index (1) :SYS_ADDRESS2  ADD_IP+STR(ADD_PORT, 5, 0)+ADD_NAME+ADD_CATEGO
+    Field 1: ADD_COD(C) :      
+    Field 2: ADD_IP(C) :               
+    Field 3: ADD_PORT(N) :0
+    Field 4: ADD_NAME(C) :                              
+    Field 5: ADD_CATEGO(C) :          
+  SYS_BCAST_ENVR; Rdd:TOPCONN; Alias:MP_BCASTENVR; Filter :; Recno:5000; Total Recs:0; Order:1
+     Index (0) :**SYS_BCAST_ENVR1  EN_ENVR
+     Index (1) :SYS_BCAST_ENVR2  EN_STAGE
+    Field 1: EN_ENVR(C) :                                                                                                                                                                                                                                                               
+    Field 2: EN_STAGE(C) :      
+  MP_CUSTOM_METRICS_EXP; Rdd:TOPCONN; Alias:MP_CUSTMET; Filter :; Recno:1019852; Total Recs:1019863; Order:1
+     Index (0) :**MP_CUSTOM_METRICS_EXP1  MP_FEDERID+STR(MP_MODULO, 3, 0)+MP_ROTINA+MP_SUBROT+MP_IDMETRI+MP_TPMETRI
+     Index (1) :MP_CUSTOM_METRICS_EXP2  MP_FEDERID+STR(MP_MODULO, 3, 0)+MP_ROTINA+MP_SUBROT+MP_IDMETRI+MP_TPMETRI+MP_VALUE
+     Index (2) :MP_CUSTOM_METRICS_EXP3  MP_TPMETRI+DTOS(MP_DTSEND)
+    Field 1: MP_FEDERID(C) :43553668000179
+    Field 2: MP_MODULO(N) :2
+    Field 3: MP_ROTINA(C) :mata103                                           
+    Field 4: MP_USER(C) :000518
+    Field 5: MP_SUBROT(C) :mata103-inc-tela-clas-n-a103atuse2                
+    Field 6: MP_IDMETRI(C) :compras-protheus_total-documento-de-entrada-por-funcao_total                                                                                                                                                                                                  
+    Field 7: MP_VALUE(C) :1                                                                                                   
+    Field 8: MP_LAPTIME(N) :0
+    Field 9: MP_DTCREAT(D) :2023/03/02
+    Field 10: MP_DTSEND(D) :2023/03/31
+    Field 11: MP_TPMETRI(C) :SUM
+  MPMENU_MENU; Rdd:TOPCONN; Alias:MPMENU_MENU; Filter :; Recno:12; Total Recs:79; Order:1
+     Index (0) :**MPMENU_MENU1  M_ID
+     Index (1) :MPMENU_MENU2  M_NAME
+     Index (2) :MPMENU_MENU3  M_MODULE
+    Field 1: M_ID(C) :04EC18DD5EC34D1191DA0050568D3F5F
+    Field 2: M_NAME(C) :SIGAHSP                                           
+    Field 3: M_VERSION(C) :10.1      
+    Field 4: M_MODULE(N) :51
+    Field 5: M_MD5_FILE(C) :e0b06d3390ef9a12fa6971215f0719ba
+    Field 6: M_DEFAULT(C) :1
+    Field 7: M_ARQMENU(C) :\SYSTEM\SIGAHSP.XNU                                                             
+  MPMENU_I18N; Rdd:TOPCONN; Alias:MPMENU_I18N; Filter :; Recno:8639; Total Recs:41866; Order:1
+     Index (0) :**MPMENU_I18N1  N_PAREN_TP+N_PAREN_ID+N_LANG
+     Index (1) :MPMENU_I18N2  N_DESC
+     Index (2) :MPMENU_I18N3  N_PAREN_ID+N_LANG
+    Field 1: N_PAREN_TP(C) :1
+    Field 2: N_PAREN_ID(C) :04EC18DD5EC34D1191DA0050568D3F5F
+    Field 3: N_LANG(C) :1
+    Field 4: N_DESC(C) :Gestão Hospitalar                                                                                                                                                                                                                                         
+    Field 5: N_DEFAULT(C) :1
+  MPMENU_ITEM; Rdd:TOPCONN; Alias:MPMENU_ITEM; Filter :; Recno:2022; Total Recs:13929; Order:1
+     Index (0) :**MPMENU_ITEM1  I_ID_MENU+I_ID+I_ID_FUNC
+     Index (1) :MPMENU_ITEM2  I_ID_MENU+I_DEFAULT+I_ITEMID
+     Index (2) :MPMENU_ITEM3  I_ID_MENU+I_FATHER+I_TP_MENU
+    Field 1: I_ID_MENU(C) :04EC18DD5EC34D1191DA0050568D3F5F
+    Field 2: I_ID(C) :003011E35EC34D1191DA0050568D3F5F
+    Field 3: I_FATHER(C) :D72F11E35EC34D11A1DA0050568D3F5F
+    Field 4: I_ORDER(N) :221
+    Field 5: I_ITEMID(C) :0000008703                      
+    Field 6: I_TP_MENU(C) :2
+    Field 7: I_STATUS(C) :1
+    Field 8: I_ID_FUNC(C) :023011E35EC34D11B1DA0050568D3F5F
+    Field 9: I_RESNAME(C) :          
+    Field 10: I_TYPE(N) :1
+    Field 11: I_TABLES(C) :GH3;GHF                                                                                                                                                                                                                                                       
+    Field 12: I_TABLE_M(C) :GH3;GHF
+    Field 13: I_ACCESS(C) :xxxxxxxxxx
+    Field 14: I_OWNER(C) :0         
+    Field 15: I_MODULE(N) :51
+    Field 16: I_DEFAULT(C) :1
+  MPMENU_KEY_WORDS; Rdd:TOPCONN; Alias:MPMENU_KEY_WORDS; Filter :; Recno:2679; Total Recs:8266; Order:1
+     Index (0) :**MPMENU_KEY_WORDS1  K_ID_ITEM+K_LANG
+     Index (1) :MPMENU_KEY_WORDS2  K_DESC
+    Field 1: K_ID_ITEM(C) :0013DB0C5FC34D1191DA0050568D3F5F
+    Field 2: K_LANG(C) :1
+    Field 3: K_DESC(C) :Demonstrativos,reavaliações                                                                                                                                                                                                                               
+    Field 4: K_DEFAULT(C) :1
+  MPMENU_FUNCTION; Rdd:TOPCONN; Alias:MPMENU_FUNCTION; Filter :; Recno:2807; Total Recs:8387; Order:1
+     Index (0) :**MPMENU_FUNCTION1  F_ID
+     Index (1) :MPMENU_FUNCTION2  F_DEFAULT+F_FUNCTION
+    Field 1: F_ID(C) :0000FAF45EC34D1191DA0050568D3F5F
+    Field 2: F_FUNCTION(C) :GFEA046                                           
+    Field 3: F_DEFAULT(C) :1
+  MPMENU_RW; Rdd:TOPCONN; Alias:MPMENU_RESERVED_WORD; Filter :; Recno:3; Total Recs:4; Order:1
+     Index (0) :**MPMENU_RW1  R_LANG+R_DESC
+    Field 1: R_LANG(C) :1
+    Field 2: R_DESC(C) :                                                                                                                                                                                                                                                          
+    Field 3: R_DEFAULT(C) :1
