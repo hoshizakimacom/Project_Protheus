@@ -1,0 +1,348 @@
+#INCLUDE "MATR620.CH"
+#INCLUDE "PROTHEUS.CH" 
+
+/*ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Programa  ³ M05R11   ³ Autor ³ Cleber Maldonado      ³ Data ³ 22/08/17 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Gerencial - Orçamentos			                          ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³ SIGAFAT                                                    ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
+User Function M05R12()
+
+Local oReport
+
+If FindFunction("TRepInUse") .And. TRepInUse()
+	//-- Interface de impressao
+	oReport := ReportDef()
+	oReport:PrintDialog()
+EndIf
+
+Return
+
+/*ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Programa  ³ReportDef ³ Autor ³ Cleber Maldonado      ³ Data ³ 22/08/17 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³A funcao estatica ReportDef devera ser criada para todos os ³±±
+±±³          ³relatorios que poderao ser agendados pelo usuario.          ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Retorno   ³ExpO1: Objeto do relatório                                  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Parametros³Nenhum                                                      ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³   DATA   ³ Programador   ³Manutencao efetuada                         ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³          ³               ³                                            ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+Static Function ReportDef()
+
+Local oReport
+Local oVenProd
+Local cAliasQry := GetNextAlias()
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Criacao do componente de impressao                                      ³
+//³                                                                        ³
+//³TReport():New                                                           ³
+//³ExpC1 : Nome do relatorio                                               ³
+//³ExpC2 : Titulo                                                          ³
+//³ExpC3 : Pergunte                                                        ³
+//³ExpB4 : Bloco de codigo que sera executado na confirmacao da impressao  ³
+//³ExpC5 : Descricao                                                       ³
+//³                                                                        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+oReport := TReport():New("M05R12","Gerencial - Orçamentos","M05R12", {|oReport| ReportPrint(oReport,cAliasQry,oVenProd)},"Este relatorio emite a relacao de orçamentos em aberto." + " " + " Não será apresentado orçamentos com status Cancelado ou Baixado.")
+oReport:SetTotalInLine(.F.)
+
+Pergunte(oReport:uParam,.F.)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Criacao da secao utilizada pelo relatorio                               ³
+//³                                                                        ³
+//³TRSection():New                                                         ³
+//³ExpO1 : Objeto TReport que a secao pertence                             ³
+//³ExpC2 : Descricao da seçao                                              ³
+//³ExpA3 : Array com as tabelas utilizadas pela secao. A primeira tabela   ³
+//³        sera considerada como principal para a seção.                   ³
+//³ExpA4 : Array com as Ordens do relatório                                ³
+//³ExpL5 : Carrega campos do SX3 como celulas                              ³
+//³        Default : False                                                 ³
+//³ExpL6 : Carrega ordens do Sindex                                        ³
+//³        Default : False                                                 ³
+//³                                                                        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Criacao da celulas da secao do relatorio                                ³
+//³                                                                        ³
+//³TRCell():New                                                            ³
+//³ExpO1 : Objeto TSection que a secao pertence                            ³
+//³ExpC2 : Nome da celula do relatório. O SX3 será consultado              ³
+//³ExpC3 : Nome da tabela de referencia da celula                          ³
+//³ExpC4 : Titulo da celula                                                ³
+//³        Default : X3Titulo()                                            ³
+//³ExpC5 : Picture                                                         ³
+//³        Default : X3_PICTURE                                            ³
+//³ExpC6 : Tamanho                                                         ³
+//³        Default : X3_TAMANHO                                            ³
+//³ExpL7 : Informe se o tamanho esta em pixel                              ³
+//³        Default : False                                                 ³
+//³ExpB8 : Bloco de código para impressao.                                 ³
+//³        Default : ExpC2                                                 ³
+//³                                                                        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+oVenProd := TRSection():New(oReport,"GERENCIAL - ORÇAMENTOS",{"SCJ","SCK"},/*{Array com as ordens do relatório}*/,/*Campos do SX3*/,/*Campos do SIX*/)		// "Relacao de Pedidos por Produto"
+oVenProd:SetTotalInLine(.F.)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Define celulas da secao                                                 ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+TRCell():New(oVenProd,"NUM"			,/*Tabela*/	,"Numero"			 ,PesqPict("SCK","CK_NUM")		,TamSx3("CK_NUM")[1]		,/*lPixel*/,{|| cNum	})		// Numero do Pedido
+TRCell():New(oVenProd,"EMISSAO"		,/*Tabela*/ ,"Emissao"			 ,PesqPict("SCJ","CJ_EMISSAO")	,TamSx3("CJ_EMISSAO")[1]	,/*lPixel*/,{|| dEmissao})		// Data de Emissão do Orçamento
+TRCell():New(oVenProd,"ITEM"		,/*Tabela*/	,"Item"		 		 ,PesqPict("SCK","CK_ITEM")		,TamSx3("CK_ITEM")[1]		,/*lPixel*/,{|| cItem	})		// Item do Orçamento
+TRCell():New(oVenProd,"FAMILIA"		,/*Tabela*/	,"Familia"			 ,PesqPict("SB1","B1_XFAMILI")	,TamSx3("B1_XFAMILI")[1]	,/*lPixel*/,{|| cXFami  })		// Familia
+TRCell():New(oVenProd,"PRODUTO"		,/*Tabela*/ ,"Cod.Produto"		 ,PesqPict("SCK","CK_PRODUTO")	,TamSx3("CK_PRODUTO")[1]	,/*lPixel*/,{|| cProd	})		// Código do Produto
+TRCell():New(oVenProd,"UM"			,/*Tabela*/	,"Un.Medida"	 	 ,PesqPict("SCK","CK_UM")		,TamSx3("CK_UM")[1]			,/*lPixel*/,{|| cUM		})		// Unidade de Medida
+TRCell():New(oVenProd,"DESCRI"		,/*Tabela*/	,"Descriçao"		 ,PesqPict("SCK","CK_DESCRI")	,TamSx3("CK_DESCRI")[1]		,/*lPixel*/,{|| cDescr	})		// Descrição do Produto
+TRCell():New(oVenProd,"QUANT"		,/*Tabela*/	,"Quantidade"		 ,PesqPict("SCK","CK_QTDVEN")	,TamSx3("CK_QTDVEN")[1]		,/*lPixel*/,{|| nQtdVen	})		// Quantidade
+TRCell():New(oVenProd,"PRCVEN"		,/*Tabela*/	,"Prc.Venda"		 ,PesqPict("SCK","CK_PRCVEN")	,TamSx3("CK_PRCVEN")[1]		,/*lPixel*/,{|| nPrcUnit})		// Preço Unitário
+TRCell():New(oVenProd,"VALTOT"		,/*Tabela*/ ,"Total"			 ,PesqPict("SCK","CK_VALOR")	,TamSx3("CK_VALOR")[1]		,/*lPixel*/,{|| nValTot	})		// Valor Total do Item
+TRCell():New(oVenProd,"ENTREGA"		,/*Tabela*/	,"Dt.Entrega"		 ,PesqPict("SCJ","CJ_XFECENT")	,TamSx3("CJ_XFECENT")[1]	,/*lPixel*/,{|| dDtEntr	})		// Data de Entrega
+TRCell():New(oVenProd,"TES"			,/*Tabela*/ ,"TES"				 ,PesqPict("SCK","CK_TES")		,TamSx3("CK_TES")[1]		,/*lPixel*/,{|| cTES	})		// Código de TES
+TRCell():New(oVenProd,"XTPVEN"		,/*Tabela*/ ,"Tipo Venda"		 ,PesqPict("SCJ","CJ_XTPVEN")	,TamSx3("CJ_XTPVEN")[1]		,/*lPixel*/,{|| cXTpVen })		// Tipo de Venda
+TRCell():New(oVenProd,"CODCLI"		,/*Tabela*/	,"Cod.Cliente"		 ,PesqPict("SCK","CK_CLIENTE")	,TamSx3("CK_CLIENTE")[1]	,/*lPixel*/,{|| cCodCli	})		// Código do Cliente
+TRCell():New(oVenProd,"LOJACLI"		,/*Tabela*/	,"Loja"				 ,PesqPict("SCK","CK_LOJA")		,TamSx3("CK_LOJA")[1]		,/*lPixel*/,{|| cCodLoj	})		// Código da Loja
+TRCell():New(oVenProd,"NOMECLI"		,/*Tabela*/ ,"Nome"				 ,PesqPict("SA1","A1_NOME")		,TamSx3("A1_NOME")[1]		,/*lPixel*/,{|| cNome	})		// Nome do Cliente
+TRCell():New(oVenProd,"REGIAO"		,/*Tabela*/	,"Região"			 ,PesqPict("SA1","A1_DSCREG")	,TamSx3("A1_DSCREG")[1]		,/*lPixel*/,{|| cRegiao	})		// Região do Cliente
+TRCell():New(oVenProd,"ESTADO"		,/*Tabela*/	,"Estado"			 ,PesqPict("SA1","A1_EST")		,TamSx3("A1_EST")[1]		,/*lPixel*/,{|| cEstado })		// Estado do Cliente
+TRCell():New(oVenProd,"GERENCIA"	,/*Tabela*/	,"Gerência"			 ,PesqPict("SA1","A3_NOME")		,TamSx3("A3_NOME")[1]		,/*lPixel*/,{|| cNomGer })		// Nome do Gerente
+TRCell():New(oVenProd,"DESCONT"		,/*Tabela*/	,"%Desconto"		 ,PesqPict("SCK","CK_DESCONT")	,TamSx3("CK_DESCONT")[1]	,/*lPixel*/,{|| nDesc 	})		// Percentual de Desconto
+TRCell():New(oVenProd,"PRCUNIT"		,/*Tabela*/	,"Prc Lista"		 ,PesqPict("SCK","CK_PRUNIT")	,TamSx3("CK_PRUNIT")[1]		,/*lPixel*/,{|| nPrcList})		// Preço de Lista
+TRCell():New(oVenProd,"CLASFIS"		,/*Tabela*/	,"Sit.Tribut."		 ,PesqPict("SCK","CK_CLASFIS")	,TamSx3("CK_CLASFIS")[1]	,/*lPixel*/,{|| cPosIpi	})		// Pos.IPI (N.C.M.)
+TRCell():New(oVenProd,"DT1VEN"		,/*Tabela*/	,"1.Vencimento"		 ,PesqPict("SCK","CK_DT1VEN")	,TamSx3("CK_DT1VEN")[1]		,/*lPixel*/,{|| dDt1Ven	})		// Data de Primeiro Vencimento
+TRCell():New(oVenProd,"ITEMPLANT"	,/*Tabela*/	,"Item Planta"		 ,PesqPict("SCK","CK_XITEMP")	,TamSx3("CK_XITEMP")[1]		,/*lPixel*/,{|| cItemP	})		// Item da Planta
+TRCell():New(oVenProd,"VLUTAB"		,/*Tabela*/	,"Vlr Tabela"		 ,PesqPict("SCK","CK_XVLUTAB")	,TamSx3("CK_XVLUTAB")[1]	,/*lPixel*/,{|| nVluTab	})		// Valor de Tabela
+TRCell():New(oVenProd,"VLTBRU"		,/*Tabela*/	,"Vl Tot + IPI"		 ,PesqPict("SCK","CK_XVLTBRU")	,TamSx3("CK_XVLTBRU")[1]	,/*lPixel*/,{|| nVltBru	})		// Valor Total + IPI
+TRCell():New(oVenProd,"ACRES"		,/*Tabela*/	,"Acresc %"			 ,PesqPict("SCK","CK_XACRESC")	,TamSx3("CK_XACRESC")[1]	,/*lPixel*/,{|| nAcres	})		// % de Acrescimo
+TRCell():New(oVenProd,"VLTIPI"		,/*Tabela*/	,"Vlr Tot IPI"		 ,PesqPict("SCK","CK_XVLTIPI")	,TamSx3("CK_XVLTIPI")[1]	,/*lPixel*/,{|| nVltIpi	})		// Valor Total de IPI
+TRCell():New(oVenProd,"ALQPIS"		,/*Tabela*/	,"Aliq PIS"			 ,PesqPict("SCK","CK_XALQPS2")	,TamSx3("CK_XALQPS2")[1]	,/*lPixel*/,{|| nAlqPis	})		// Alíquota de PIS
+TRCell():New(oVenProd,"VLTPIS"		,/*Tabela*/	,"Vlr Tot PIS"		 ,PesqPict("SCK","CK_XVLTPS2")	,TamSx3("CK_XVLTPS2")[1]	,/*lPixel*/,{|| nVltPis	})		// Valor Total de PIS
+TRCell():New(oVenProd,"ALQCOF"		,/*Tabela*/	,"Aliq COFINS"		 ,PesqPict("SCK","CK_XALQCF2")	,TamSx3("CK_XALQCF2")[1]	,/*lPixel*/,{|| nAlqCof	})		// Alíquota de COFINS
+TRCell():New(oVenProd,"VLTCOF"		,/*Tabela*/	,"Vl.Tot.COFINS"	 ,PesqPict("SCK","CK_XVLTCF2")	,TamSx3("CK_XVLTCF2")[1]	,/*lPixel*/,{|| nVltCof	})		// Valor Total de COFINS
+TRCell():New(oVenProd,"ALQICM"		,/*Tabela*/	,"Aliq.ICM"			 ,PesqPict("SCK","CK_XALQICM")	,TamSx3("CK_XALQICM")[1]	,/*lPixel*/,{|| nAlqICM	})		// Alíquota de ICMS
+TRCell():New(oVenProd,"VLTICM"		,/*Tabela*/	,"Vl.Tot.ICM"		 ,PesqPict("SCK","CK_XVLTICM")	,TamSx3("CK_XVLTICM")[1]	,/*lPixel*/,{|| nVltICM	})		// Valor Total de ICMS
+TRCell():New(oVenProd,"ALQSOL"		,/*Tabela*/	,"Alq.Sol"			 ,PesqPict("SCK","CK_XALQSOL")	,TamSx3("CK_XALQSOL")[1]	,/*lPixel*/,{|| nAlqSol	})		// Alíquota de ICMS-ST
+TRCell():New(oVenProd,"VLTSOL"		,/*Tabela*/	,"Vl.Tot.Sol"		 ,PesqPict("SCK","CK_XVLTSOL")	,TamSx3("CK_XVLTSOL")[1]	,/*lPixel*/,{|| nVltSol	})		// Valor Total de ICMS-ST
+TRCell():New(oVenProd,"VEND1"		,/*Tabela*/ ,"Vendedor 1"		 ,PesqPict("SC5","CJ_XVEND1")	,TamSx3("CJ_XVEND1")[1]		,/*lPixel*/,{|| cVend1	})		// Cod. Vendedor 1
+TRCell():New(oVenProd,"NOMVEND1"	,/*Tabela*/ ,"Nome"				 ,PesqPict("SC5","CJ_XVEND1")	,TamSx3("CJ_XVEND1")[1]		,/*lPixel*/,{|| cNomVen1})		// Nome do Vendedor 1
+TRCell():New(oVenProd,"FECHAMENTO"	,/*Tabela*/ ,"Prev.Fechamento"	 ,PesqPict("ZA9","ZA9_XFUFEC")	,TamSx3("ZA9_XFUFEC")[1]	,/*lPixel*/,{|| dXFuFec })		// Data de Previsão de fechamento da proposta
+TRCell():New(oVenProd,"PROXIMO"		,/*Tabela*/	,"Prox. Contato"	 ,PesqPict("ZA9","ZA9_XFUPRX")	,TamSx3("ZA9_XFUPRX")[1]	,/*lPixel*/,{|| dXFuprx })		// Data de previsão do próximo contato
+TRCell():New(oVenProd,"ULTIMO"		,/*Tabela*/	,"Ult.Contato"		 ,PesqPict("ZA9","ZA9_XFUULT")	,TamSx3("ZA9_XFUULT")[1]	,/*lPixel*/,{|| dXFuUlt })		// Data do ultimo contato realizado   
+TRCell():New(oVenProd,"OBRAS"		,/*Tabela*/ ,"Ref. Obras"		 ,PesqPict("SCJ","CJ_XOBRAS")	,TamSx3("CJ_XOBRAS")[1]		,/*lPixel*/,{|| cXObras })		// Ref. Obras
+TRCell():New(oVenProd,"STATUS"		,/*Tabela*/ ,"Status"		 	 ,PesqPict("SCJ","CJ_STATUS")	,TamSx3("CJ_STATUS")[1]		,/*lPixel*/,{|| cStatus })		// Ref. Obras
+ 
+Return(oReport)
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Programa  ³ReportPrin³ Autor ³ Cleber Maldonado	    ³ Data ³ 11/09/06 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³A funcao estatica ReportDef devera ser criada para todos os ³±±
+±±³          ³relatorios que poderao ser agendados pelo usuario.          ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Retorno   ³Nenhum                                                      ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Parametros³ExpO1: Objeto Report do Relatório                           ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³   DATA   ³ Programador   ³Manutencao efetuada                         ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³          ³               ³                                            ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+Static Function ReportPrint(oReport,cAliasQry,oVenProd)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Filtragem do relatório                                                  ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+dbSelectArea("SCJ")		// Itens do Pedido de Vendas
+dbSetOrder(1)			// Produto,Numero
+#IFDEF TOP
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³Query do relatório da secao 1                                           ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	oReport:Section(1):BeginQuery()	
+
+	BeginSql Alias cAliasQry
+
+		COLUMN CK_DT1VEN AS DATE
+
+		SELECT 
+			CK_FILIAL,CK_ITEM,CK_PRODUTO,CK_UM,CK_QTDVEN,CK_PRCVEN,CK_VALOR,CK_TES,CK_CLIENTE,CK_LOJA,
+			CK_DESCONT,CK_NUM,CK_DESCRI,CK_PRUNIT,CK_CLASFIS,CK_DT1VEN,CK_XITEMP,CK_XVLUTAB,CK_XVLTBRU,CK_XACRESC,
+			CK_XVLTIPI,CK_XALQPS2,CK_XVLTPS2,CK_XALQCF2,CK_XVLTCF2,CK_XALQICM,CK_XVLTICM,CK_XALQSOL,CK_XVLTSOL,
+			CJ_EMISSAO,CJ_XFECENT,CJ_XTPVEN, CJ_XVEND1, CJ_XOBRAS, CJ_XTPVEN, CJ_STATUS,
+			(SELECT SA3.A3_NOME  FROM %Table:SA3% SA3 WHERE SA3.A3_FILIAL = '' AND SA3.A3_COD = SCJ.CJ_XVEND1 AND SA3.D_E_L_E_T_ = '') AS NOMEVEN,
+			(SELECT SA3.A3_GEREN FROM %Table:SA3% SA3 WHERE SA3.A3_FILIAL = '' AND SA3.A3_COD = SCJ.CJ_XVEND1 AND SA3.D_E_L_E_T_ = '') AS CODGEN
+		FROM 
+			%Table:SCK% SCK,
+			%Table:SCJ% SCJ
+		WHERE 
+			SCK.CK_FILIAL = SCJ.CJ_FILIAL AND
+			SCK.CK_NUM    = SCJ.CJ_NUM AND 
+			SCK.CK_CLIENTE= SCJ.CJ_CLIENTE AND
+			SCK.CK_LOJA   = SCJ.CJ_LOJA AND
+			SCJ.CJ_STATUS NOT IN ('C') AND
+			CJ_XTPVEN <> '30' AND
+
+			SCK.CK_FILIAL >= %Exp:MV_PAR01% AND
+			SCK.CK_FILIAL <= %Exp:MV_PAR02% AND
+			SCK.CK_NUM    >= %Exp:MV_PAR03% AND
+			SCK.CK_NUM    <= %Exp:MV_PAR04% AND
+			SCJ.CJ_EMISSAO>= %Exp:MV_PAR05% AND
+			SCJ.CJ_EMISSAO<= %Exp:MV_PAR06% AND
+			SCK.%NotDel% AND
+			SCJ.%NotDel% 
+			
+		ORDER BY
+			%Order:SCK,1%
+	EndSql			
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³Metodo EndQuery ( Classe TRSection )                                    ³
+	//³                                                                        ³
+	//³Prepara o relatório para executar o Embedded SQL.                       ³
+	//³                                                                        ³
+	//³ExpA1 : Array com os parametros do tipo Range                           ³
+	//³                                                                        ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	oReport:Section(1):EndQuery(/*Array com os parametros do tipo Range*/)
+#ENDIF		
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Inicio da impressao do fluxo do relatório                               ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+dbSelectArea("SA1")
+dbSetOrder(1)
+dbSelectArea("ZA9")
+dbSetOrder(1)
+dbSelectArea(cAliasQry)
+dbGoTop()
+oReport:SetMeter((cAliasQry)->(LastRec()))
+oReport:Section(1):Init()
+
+While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
+
+	lPosA1 	:= SA1->(MsSeek(xFilial('SA1')+(cAliasQry)->CK_CLIENTE+(cAliasQry)->CK_LOJA))
+	lPosZA9	:= ZA9->(MsSeek(xFilial('ZA9')+(cAliasQry)->CK_NUM))
+	
+	dEmissao	:= substring(dtos(SCJ->CJ_EMISSAO),7,2)+"/"+SUBSTRING(dtos(SCJ->CJ_EMISSAO),5,2)+"/"+SUBSTRING(dtos(SCJ->CJ_EMISSAO),3,2)
+	cVend1		:= (cAliasQry)->CJ_XVEND1 	//(cAliasQry)->CJ_XVEND1
+	cNomVen1	:= (cAliasQry)->NOMEVEN 	//Posicione('SA3',1,XFILIAL('SA3') +(cAliasQry)->CJ_XVEND1 ,'A3_NOME')
+	cCodGer		:= (cAliasQry)->CODGEN		//Posicione('SA3',1,XFilial('SA3') +(cAliasQry)->CJ_XVEND1 ,'A3_GEREN')
+	cNomGer		:= Posicione('SA3',1,XFilial('SA3') +cCodGer,'A3_NOME')
+	cXFami		:= Posicione('SB1',1,XFilial('SB1') +(cAliasQry)->CK_PRODUTO, 'B1_XFAMILI')
+	dDtEntr		:= substring(dtos((cAliasQry)->CJ_XFECENT),7,2)+"/"+SUBSTRING(dtos((cAliasQry)->CJ_XFECENT),5,2)+"/"+SUBSTRING(dtos((cAliasQry)->CJ_XFECENT),3,2)//SCJ->CJ_XFECENT
+	cXObras		:= (cAliasQry)->CJ_XOBRAS
+		
+		If (cAliasQry)->CJ_XTPVEN == "1"
+			cXTpVen		:= "1 - Projeto"
+		ElseIf (cAliasQry)->CJ_XTPVEN == "2"
+			cXTpVen		:= "2 - Venda Unitaria"
+		ElseIf (cAliasQry)->CJ_XTPVEN == "3"
+			cXTpVen		:= "3 - Dealer"
+		ElseIf (cAliasQry)->CJ_XTPVEN == "4"
+			cXTpVen		:= "4 - E-Commerce"
+		ElseIf (cAliasQry)->CJ_XTPVEN == "5"
+			cXTpVen		:= "5 - Pronta Entrega"
+		ElseIf (cAliasQry)->CJ_XTPVEN == "6"
+			cXTpVen		:= "6 - Projeto-Dealer"
+		Endif	
+
+
+	cVend1		:= (cAliasQry)->CJ_XVEND1
+	cNomVen1	:= (cAliasQry)->NOMEVEN //Posicione('SA3',1,XFILIAL('SA3') +(cAliasQry)->CJ_XVEND1 ,'A3_NOME')
+	cCodGer		:= (cAliasQry)->CODGEN	//Posicione('SA3',1,XFilial('SA3') +(cAliasQry)->CJ_XVEND1 ,'A3_GEREN')
+	cNomGer		:= Posicione('SA3',1,XFilial('SA3') +cCodGer,'A3_NOME')
+	dDtEntr		:= (cAliasQry)->CJ_XFECENT
+	cXObras		:= (cAliasQry)->CJ_XOBRAS	
+	cStatus		:= (cAliasQry)->CJ_STATUS	
+	dEmissao	:= substring(dtos((cAliasQry)->CJ_EMISSAO),7,2)+"/"+SUBSTRING(dtos((cAliasQry)->CJ_EMISSAO),5,2)+"/"+SUBSTRING(dtos((cAliasQry)->CJ_EMISSAO),3,2)//SCJ->CJ_EMISSAO
+	
+	If lPosA1
+		cNome	:= SA1->A1_NOME
+		cRegiao	:= SA1->A1_DSCREG
+		cEstado	:= SA1->A1_EST
+	Else
+		cNome	:= ""
+		cRegiao	:= ""
+		cEstado := ""
+	Endif
+
+	If lPosZA9
+		dXFuFec := substring(dtos(ZA9->ZA9_XFUFEC),7,2)+"/"+SUBSTRING(dtos(ZA9->ZA9_XFUFEC),5,2)+"/"+SUBSTRING(dtos(ZA9->ZA9_XFUFEC),3,2)//ZA9->ZA9_XFUFEC
+		dXFuprx	:= substring(dtos(ZA9->ZA9_XFUPRX),7,2)+"/"+SUBSTRING(dtos(ZA9->ZA9_XFUPRX),5,2)+"/"+SUBSTRING(dtos(ZA9->ZA9_XFUPRX),3,2)//ZA9->ZA9_XFUPRX
+		dXFuUlt := substring(dtos(ZA9->ZA9_XFUULT),7,2)+"/"+SUBSTRING(dtos(ZA9->ZA9_XFUULT),5,2)+"/"+SUBSTRING(dtos(ZA9->ZA9_XFUULT),3,2)//ZA9->ZA9_XFUULT
+	Else
+		dXFuFec := CTOD("  /  /  ")
+		dXFuprx	:= CTOD("  /  /  ")
+		dXFuUlt	:= CTOD("  /  /  ")
+	Endif
+
+	cItem	    := (cAliasQry)->CK_ITEM
+	cProd		:= (cAliasQry)->CK_PRODUTO
+	cUM			:= (cAliasQry)->CK_UM
+	nQtdVen		:= (cAliasQry)->CK_QTDVEN
+	nPrcUnit	:= (cAliasQry)->CK_PRCVEN
+	nValTot		:= (cAliasQry)->CK_VALOR
+	cTES		:= (cAliasQry)->CK_TES
+	cCodCli		:= (cAliasQry)->CK_CLIENTE
+	cCodLoj		:= (cAliasQry)->CK_LOJA
+	nDesc		:= (cAliasQry)->CK_DESCONT
+	cNum		:= (cAliasQry)->CK_NUM
+	cDescr		:= (cAliasQry)->CK_DESCRI
+	nPrcList	:= (cAliasQry)->CK_PRUNIT
+	cPosIpi		:= (cAliasQry)->CK_CLASFIS
+	dDt1Ven		:= substring(dtos((cAliasQry)->CK_DT1VEN),7,2)+"/"+SUBSTRING(dtos((cAliasQry)->CK_DT1VEN),5,2)+"/"+SUBSTRING(dtos((cAliasQry)->CK_DT1VEN),3,2)
+	cItemP		:= (cAliasQry)->CK_XITEMP
+	nVluTab		:= (cAliasQry)->CK_XVLUTAB
+	nVltBru		:= (cAliasQry)->CK_XVLTBRU
+	nAcres		:= (cAliasQry)->CK_XACRESC
+	nVltIpi		:= (cAliasQry)->CK_XVLTIPI
+	nAlqPis		:= (cAliasQry)->CK_XALQPS2
+	nVltPis		:= (cAliasQry)->CK_XVLTPS2
+	nAlqCof		:= (cAliasQry)->CK_XALQCF2
+	nVltCof		:= (cAliasQry)->CK_XVLTCF2
+	nAlqICM		:= (cAliasQry)->CK_XALQICM
+	nVltICM		:= (cAliasQry)->CK_XVLTICM
+	nAlqSol		:= (cAliasQry)->CK_XALQSOL
+	nVltSol		:= (cAliasQry)->CK_XVLTSOL
+		
+	oReport:IncMeter()
+	oReport:Section(1):PrintLine()
+
+	(cAliasQry)->(dbSkip())
+End
+	
+dbSelectArea(cAliasQry)
+
+oReport:SetLandScape()
+oReport:Section(1):Finish()
+
+(cAliasQry)->(DbCloseArea())
+
+Return
