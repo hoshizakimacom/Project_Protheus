@@ -1,0 +1,38 @@
+
+
+SELECT * FROM SPI010 SPI WHERE SPI.D_E_L_E_T_ = ' ' AND SPI.PI_STATUS <> 'B' AND SPI.PI_DATA BETWEEN '20230201' AND '20230228'
+ORDER BY SPI.PI_FILIAL,SPI.PI_MAT,SPI.PI_DATA  ASC
+
+
+
+  13091405001 
+
+  TESU1001001 
+
+	TESU2401001  
+  
+  SIGAADV.PSS
+  
+  Serial do Windows Pro do Note Valdemir
+  GK7MM-VXNRR-JDDQ9-PT66D-DV66Y
+  
+  =================================================
+ 
+ meet.google.com/epo-kvur-fre
+Ou disque: +55 51 4560-7308  PIN: 302173679#  Mais números de telefone
+Agenda
+tp.v.nascimento@totvspartners.com.br
+Quem
+Sim: 2  Não: 0  Talvez: 0  Aguardando: 4  Opcional: 0
+Sim	
+heline.oliveira@totvs.com.br- organizador
+ 	
+tp.marcos.erocha@totvspartners.com.br
+ 	
+arlindo.sobrinho@totvspartners.com.br
+ 	
+valdemir.miranda@falves.com
+ 	
+fernanda.bastos@totvs.com.br
+Sim	
+tp.v.nascimento@totvspartners.com.br
