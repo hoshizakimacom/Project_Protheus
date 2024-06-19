@@ -1,0 +1,96 @@
+
+//Bibliotecas
+#Include "Protheus.ch"
+#Include "TopConn.ch"
+#Include "Totvs.ch"
+
+//+----------------------------------------------------------------------------------------------------------------
+// Relatório Slowmoving
+// Segunda aba poder de terceiros
+//+----------------------------------------------------------------------------------------------------------------
+User function M04R02()
+
+Local cPerg    := "M04RSM"
+Local dDataDe   := GETNEWPAR('MV_PAR01', DATE())
+Local nTipoVi   := GETNEWPAR('MV_PAR02', 1)
+Local _lRet     := .F.
+
+If Pergunte(cPerg)
+    FWMsgRun(, {|| _lRet := U_GeraExcel(dDataDe,nTipoVi)},,'Pesquisando Dados ...')
+Endif
+
+Return(_lRet)
+
+
+User Function GeraExcel(dDataDe,nTipoVi)
+
+Local cQuery    := ""
+Local cArquivo	:= "e:\SlowMoving.xml"
+Local nQtde     := 0
+
+If nTipoVi = 1
+    // Primeira parta da query Entradas 
+    cQuery := "SELECT D3_FILIAL, D3_COD, D3_CF, SUM(D3_QUANT) AS QTDE, D3_LOCAL, D3_EMISSAO, "
+    cQuery += "(SELECT B1_CUSTD FROM SB1010 (nolock) WHERE D3_COD = B1_COD AND SB1010.D_E_L_E_T_ = '') AS CUSUNI "
+    cQuery += "FROM SD3010 (nolock)  SD3 "
+    cQuery += "WHERE D3_FILIAL = '01' "
+    cQuery += "AND D3_DOC <> 'INVENT' "
+    cQuery += "AND D3_ESTORNO != 'S' "
+    cQuery += "AND D3_CF NOT IN ('DE4','RE4') "
+    cQuery += "AND D3_TM NOT IN ('003','005','006','008','508') "
+    cQuery += "AND D3_EMISSAO >= ("+ DTOS(dDataDe)+"-760) "
+    cQuery += "AND D3_EMISSAO <= '"+ DTOS(dDataDe) +"' "
+    cQuery += "AND SD3.D_E_L_E_T_ = '' "
+    cQuery += "GROUP BY D3_FILIAL , D3_COD    , D3_CF , D3_LOCAL, D3_EMISSAO "
+    cQuery += "ORDER BY D3_EMISSAO "
+
+    TcQuery cQuery New Alias (cAlias := GetNextAlias())
+
+    (cAlias)->(DbEval({|| nQtde ++ }))
+    (cAlias)->(DbGoTop())
+
+
+                
+    //Criando o objeto que irá gerar o conteúdo do Excel
+    oFWMsExcel := FWMSExcel():New()
+    //Aba 01 - Teste
+    oFWMsExcel:AddworkSheet("SlowMoving") //Não utilizar número junto com sinal de menos. Ex.: 1-
+    //Criando a Tabela
+    oFWMsExcel:AddTable("SlowMoving","Visão Diretoria")
+    //Criando Colunas
+    oFWMsExcel:AddColumn("SlowMoving","Visão Diretoria","Filial"    ,1,1) 	//1 = Modo Texto
+    oFWMsExcel:AddColumn("SlowMoving","Visão Diretoria","Codigo"    ,1,1) 	//1 = Modo Texto
+    oFWMsExcel:AddColumn("SlowMoving","Visão Diretoria","Tipo Movi" ,1,1) 	//1 = Modo Texto
+    oFWMsExcel:AddColumn("SlowMoving","Visão Diretoria","Quant."    ,1,1)   //1 = Modo Texto
+    oFWMsExcel:AddColumn("SlowMoving","Visão Diretoria","CusUni"    ,3,3)   //1 = Modo Texto    
+    oFWMsExcel:AddColumn("SlowMoving","Visão Diretoria","CusTot"    ,3,3)   //1 = Modo Texto    
+    oFWMsExcel:AddColumn("SlowMoving","Visão Diretoria","Local"     ,1,1)   //1 = Modo Texto
+    oFWMsExcel:AddColumn("SlowMoving","Visão Diretoria","Emissão"   ,1,1)   //1 = Modo Texto
+    // teste de alteração
+    While ! (cAlias)->(Eof())
+        IF (cAlias)->D3_CF = 'RE0'
+            nQtde:= (cAlias)->QTDE * (-1)
+        else
+            nQtde:= (cAlias)->QTDE
+        Endif
+        oFWMsExcel:AddRow("SlowMoving","Visão Diretoria",{(cAlias)->D3_FILIAL,(cAlias)->D3_COD,(cAlias)->D3_CF,nQtde,(cAlias)->CUSUNI,(nQtde*(cAlias)->CUSUNI),(cAlias)->D3_LOCAL,(cAlias)->D3_EMISSAO})
+        (cAlias)->(DbSkip())
+    Enddo
+
+    //Ativando o arquivo e gerando o xml
+    oFWMsExcel:Activate()
+    oFWMsExcel:GetXMLFile(cArquivo)
+                    
+    //Abrindo o excel e abrindo o arquivo xml
+    oExcel := MsExcel():New() 			//Abre uma nova conexão com Excel
+    oExcel:WorkBooks:Open(cArquivo) 	//Abre uma planilha
+    oExcel:SetVisible(.T.) 				//Visualiza a planilha
+    oExcel:Destroy()					//Encerra o processo do gerenciador de tarefas
+
+    (cAlias)->(DbCloseArea())
+
+else
+    FWAlertWarning("Visão Fiscal ainda em desenvolvimento", "Visão Fiscal")
+Endif    
+
+RETURN
