@@ -1,0 +1,519 @@
+#Include 'Protheus.ch'
+#Include 'TBICONN.ch'
+#Include 'Ap5Mail.ch'
+
+Static _cArqOri		:= ''
+Static _cArqLog		:= ''
+Static _lSimulacao	:= .T.
+
+//+------------------------------------------------------------------------
+//	Rotina que recebe um arquivo .csv e importa os dados para a tabela
+//	de itens da tabela de preços.
+//+------------------------------------------------------------------------
+User Function M05D01U()
+	Local	_aSays			:= {}
+	Local	_aButton		:= {}
+	Local	_cTitulo		:= FunName()
+
+	_lSimulacao := MsgYesNo('Deseja executar em modo SIMULAÇÃO?')
+
+	If _lSimulacao
+		AADD(_aSays,OemToAnsi('*** SIMULAÇÃO *** '))
+	EndIf
+
+	AADD(_aSays,OemToAnsi("Rotina de atualização de tabela de preços/produtos informados no arquivo CSV"))
+	AADD(_aSays,OemToAnsi(" "))
+	AADD(_aSays,OemToAnsi("Importante! "))
+	AADD(_aSays,OemToAnsi(" - Os número devem utilizar ponto [.] como separador de casa decimal"))
+	AADD(_aSays,OemToAnsi(" - Os campos dever ser separados por ponto e vírgula [;]"))
+	AADD(_aSays,OemToAnsi(" - A tabela/produto informados devem estar cadastrados no Protheus"))
+
+	aAdd( _aButton, { 1, .T., {|| Processa({||MD01Ok()}),FechaBatch()}}	)
+	aAdd( _aButton, { 2, .T., {|| FechaBatch()					}}	)
+
+	FormBatch( _cTitulo, _aSays, _aButton )
+
+	_cArqOri		:= ''
+	_cArqLog		:= ''
+Return
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01Ok()
+	Local _oDlg			:= Nil
+	Local _cTitle		:= 'Importação de Itens da Tabela de Preço'
+	Local _oArqOri		:= Nil
+	Local _oArqLog		:= Nil
+
+	If _lSimulacao
+		_cTitle += OemToAnsi(' *** SIMULAÇÃO *** ')
+	EndIf
+
+	Define MsDialog _oDlg Title _cTitle Style DS_MODALFRAME From 000,000 To 300,900 Pixel
+
+		@020,020 Say  'Arquivo Origem *.CSV:' Of _oDlg Pixel
+		@017,080 Get _oArqOri Var _cArqOri Size 300,010 Of _oDlg Pixel WHEN .F.
+
+		@017,400 BUTTON "Selec. Arquivo" 	SIZE 040, 015 PIXEL OF _oDlg ACTION ( MD01ArqOri() )
+
+		@040,020 Say  'Arquivo Log:' Of _oDlg Pixel
+		@037,080 Get _oArqLog Var _cArqLog Size 300,010 Of _oDlg Pixel WHEN .F.
+
+		@037,400 BUTTON "Selec. Arquivo" 	SIZE 040, 015 PIXEL OF _oDlg ACTION ( MD01ArqLog() )
+
+		@120,170 BUTTON "Confirmar" 	SIZE 040, 012 PIXEL OF _oDlg ACTION ( MD01Conf() )
+		@120,220 BUTTON "Cancelar" 		SIZE 040, 012 PIXEL OF _oDlg ACTION (_oDlg:End())
+
+	Activate MsDialog _oDlg Centered
+
+	_cArqOri		:= ''
+	 _cArqLog		:= ''
+Return
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01Conf()
+	Local _lValid	:= .T.
+	Local _lErro	:= .F.
+	Local _aItens	:= {}
+	Local _nTotal	:= 0
+	Local _nItem	:= 0
+	Local _nReg		:= 0
+	Local _cLog		:= 'Inicio ' + DToC(Date()) + ' ' + Time() + CRLF + CRLF
+	Local _cMsg		:= ''
+	Local _nAlt		:= 0
+	Local _nInc		:= 0
+	Local _cErro	:= ''
+	Local _cMsgMail	:= ''
+
+	_lValid := MD01Valid()
+
+	If _lValid
+		BeginTran()
+			MD01GetDad(@_aItens,@_nTotal) // carrega dados do arquivo no array
+			_cMsgMail := MD01GetCab()
+
+			// Percorre itens do array
+			For _nItem := 2 To Len(_aItens)
+				FWMsgRun(, {||MD01Exec(_aItens[_nItem],@_cLog,@_nAlt,@_nInc,@_cMsgMail) },,I18N('Importanto item #1 de #2 ...',{++_nReg,_nTotal}))
+			Next
+
+			_cMsg 		:= MD01GetLog(_cArqLog,_cMsg,@_cLog,_nAlt,_nInc)
+			If !_lSimulacao
+				FWMsgRun(, {|| _lErro		:= !MD01Mail(_cMsgMail,@_cErro)},,'Gerando log...')
+			EndIf
+
+		If _lErro
+			DisarmTransaction()
+		Else
+			EndTran()
+		EndIf
+
+		MsUnLockAll()
+
+		If _lErro
+			MsgInfo(I18N('Erro ao atualizar tabela.' + CRLF + 'Entre em contato com o suporte e envie um print dessa tela e arquivo a ser importado' + CRLF + CRLF + '#1',{_cErro}))
+		Else
+			Aviso('Atenção',I18N( _cMsg,{_nTotal,_cArqLog}),{'OK'},3)
+		EndIf
+
+		_cArqOri	:= ''
+		_cArqLog	:= ''
+	EndIf
+Return
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01GetLog(_cArqLog,_cMsg,_cLog,_nAlt,_nInc)
+	Local _nHandle		:= 0
+
+	_nHandle	:= FCREATE(_cArqLog)
+
+	_cLog := CRLF + CRLF + I18N('Registros Incluídos: #1',{_nInc})  +  CRLF + I18N('Registros Atualizados: #1',{_nAlt}) + CRLF + CRLF + _cLog
+	_cLog += CRLF + CRLF + 'Fim ' + DToC(Date()) + ' ' + Time() + CRLF + CRLF
+
+	 If _nHandle = -1
+	 	_cMsg 	+= " Erro ao criar arquivo - ferror " + Str(Ferror())
+    Else
+        _cMsg += ' Verifique arquivo de log gerado: ' + CRLF + '#2 ' + CRLF
+        FWrite(_nHandle, _cLog)
+        FClose(_nHandle)
+    EndIf
+Return _cMsg
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01Exec(_aItem,_cLog,_nAlt,_nInc,_cMsgMail)
+	Local _cCodTab		:= PadR(AllTrim(_aItem[1]),TamSX3('DA0_CODTAB')[1])
+	Local _cProduto 	:= PadR(AllTrim(_aItem[2]),TamSX3('DA1_CODPRO')[1])
+	Local _cItem		:= '    '
+	Local _cMsgLog		:= ''
+	Local _nPrcVen 		:= Val(_aItem[3])
+	Local _dDatVig		:= CTOD(_aItem[4])
+	Local _nPrcVenOld	:= 0
+	Local _lOk			:= .T.
+
+	// Verifica se Tabela existe
+	_lOk := MD01VldDA0(_cCodTab,@_cMsgLog)
+
+
+	// Verifica se Tabela existe
+	If _lOk
+		_lOk := MD01VldSB1(_cProduto,@_cMsgLog)
+	EndIf
+
+	If _lOk
+		MD01PutDA1(_cCodTab,_cProduto,_nPrcVen,@_nPrcVenOld,@_cItem,@_cMsgLog,@_nAlt,@_nInc,_dDatVig)
+	EndIf
+
+	MD01PutLog(_cCodTab,_cProduto,_nPrcVen,_nPrcVenOld,_cItem,_cMsgLog,@_cLog,@_cMsgMail,_dDatVig)
+Return
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01PutDA1(_cCodTab,_cProduto,_nPrcVen,_nPrcVenOld,_cItem,_cMsgLog,_nAlt,_nInc,_dDatVig)
+	Local _nRecDA1	:= 0
+
+	// Verifica se Item existe
+		_nRecDA1 := MD01SelDA1(_cCodTab,_cProduto,@_cItem)
+
+	//Alteração
+	If _nRecDA1 > 0
+
+		DA1->(DbGoTop())
+		DA1->(DbGoTo(_nRecDA1))
+
+		_nPrcVenOld	:= DA1->DA1_PRCVEN
+
+		If !_lSimulacao .and. RetCodUsr() $ "000010|000013|000019|000222|000289|000291|000294"
+			RecLock('DA1',.F.)
+				DA1->DA1_PRCVEN	:= _nPrcVen
+				DA1->DA1_DATVIG	:= _dDatVig
+			DA1->(MsUnLock())
+			_cMsgLog := ' Alteracao efetuada'
+		else
+			_cMsgLog := ' Alteracao nao permitida'
+		EndIf
+
+		
+		++_nAlt
+	Else
+		_cItem 		:= MD01GetDA1(_cCodTab)
+		_nPrcVenOld	:= 0
+
+		If !_lSimulacao
+			RecLock('DA1',.T.)
+				DA1->DA1_FILIAL		:= xFilial('DA1')
+				DA1->DA1_ITEM		:= _cItem
+				DA1->DA1_CODTAB		:= _cCodTab
+				DA1->DA1_CODPRO		:= _cProduto
+				DA1->DA1_GRUPO		:= Posicione('SB1',1,xFilial('SB1') + _cProduto,'B1_GRUPO')
+				DA1->DA1_PRCVEN		:= _nPrcVen
+				DA1->DA1_ATIVO		:= '1'
+				DA1->DA1_TPOPER		:= '4'
+				DA1->DA1_QTDLOT		:= 999999.99
+				DA1->DA1_MOEDA		:= 1
+				DA1->DA1_DATVIG		:= _dDatVig
+			DA1->(MsUnLock())
+		EndIf
+
+		_cMsgLog := ' Incluído'
+		++_nInc
+	EndIf
+Return
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01GetDA1(_cCodTab)
+	Local _cRet		:= '    '
+	Local _cAlias	:= GetNextAlias()
+
+	BeginSql Alias _cAlias
+			SELECT MAX(DA1_ITEM) AS DA1_ITEM
+			FROM %Table:DA1% DA1
+			WHERE DA1.%NotDel%
+			AND DA1_FILIAL = %xFilial:DA1%
+			AND DA1_CODTAB = %Exp:_cCodTab%
+		EndSql
+
+		If (_cAlias)->(!EOF())
+			_cRet := Soma1((_cAlias)->DA1_ITEM)
+		EndIf
+
+		(_cAlias)->(DbCloseArea())
+Return _cRet
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01SelDA1(_cCodTab,_cProduto,_cItem)
+	Local _cAlias 	:= GetNextAlias()
+	Local _nRet		:= 0
+
+	BeginSql Alias _cAlias
+		SELECT DA1.R_E_C_N_O_ AS DA1_RECNO
+			,DA1_ITEM
+			,DA1_CODTAB
+			,DA1_CODPRO
+			,DA1_DATVIG
+			FROM %Table:DA1% DA1
+			WHERE DA1.%NotDel%
+			AND DA1_FILIAL = %xFilial:DA1%
+			AND DA1_CODTAB = %Exp:_cCodTab%
+			AND DA1_CODPRO = %Exp:_cProduto%
+			AND DA1_ATIVO =  '1'
+		ORDER BY DA1_DATVIG DESC
+	EndSql
+
+	If (_cAlias)->(!EOF())
+		_nRet 	:= (_cAlias)->DA1_RECNO
+		_cItem 	:= (_cAlias)->DA1_ITEM
+	EndIf
+
+	(_cAlias)->(DbCloseArea())
+Return _nRet
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01VldSB1(_cProduto,_cMsgLog)
+	Local _lRet := .F.
+
+	SB1->(DbSetOrder(1))
+	SB1->(DbGotop())
+
+	If SB1->(DbSeek( xFilial('SB1') + _cProduto ))
+		_lRet := .T.
+	Else
+		_cMsgLog := I18N('Produto #1 invalido',{_cProduto})
+	EndIf
+
+Return _lRet
+
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01VldDA0(_cCodTab,_cMsgLog)
+	Local _lRet := .T.
+
+	DA0->(DbSetOrder(1))
+	DA0->(DbGoTop())
+
+	If !(_lRet :=  DA0->(DbSeek( xFilial('DA0') + _cCodTab )))
+		_cMsgLog := I18N('Tabela #1 não encontrada',{_cCodTab})
+	EndIf
+
+Return _lRet
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01PutLog(_cCodTab,_cProduto,_nPrcVen,_nPrcVenOld,_cItem,_cMsgLog,_cLog,_cMsgMail,_dDatVig)
+
+	Local _cPrcOld	:= Transform(_nPrcVenOld	,'@E 9,999,999.999999')
+	Local _cPrcNew	:= Transform(_nPrcVen	,'@E 9,999,999.999999')
+	Local _cMsg		:= AllTrim(_cMsgLog)
+
+	_cLog += CRLF
+	_cLog += ' | Tabela: '  		+ _cCodTab
+	_cLog += ' | Item: '  			+ _cItem
+	_cLog += ' | Produto: ' 		+ _cProduto
+	_cLog += ' | Prc Venda: '	 	+ _cPrcOld
+	_cLog += ' | Prc Venda Novo: ' 	+ _cPrcNew
+	_cLog += ' | Data de Vigência: '+ DTOC(_dDatVig)
+	_cLog += ' | STATUS: ' 			+ _cMsg + ' |'
+
+	MD01MailIt(_cCodTab,_cItem,_cProduto,_cPrcOld,_cPrcNew,_cMsg,@_cMsgMail,_dDatVig)
+Return
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01GetDad(_aItens,_nTotal)
+	Local _aLinha	:= {}
+	Local _cLinha	:= ''
+	Local _nArq 	:= FOpen(_cArqOri, 0)
+
+	FT_FUSE(_cArqOri)
+	FT_FGOTOP()
+
+	While !FT_FEOF()
+		_cLinha 	:= FT_FREADLN()
+		_aLinha		:= {}
+		_aLinha 	:= Separa(_cLinha,";",.F.)
+
+		If Len(_aLinha) > 0
+			AAdd(_aItens,_aLinha)
+		EndIf
+
+		FT_FSKIP()
+	EndDo
+
+	 _nTotal := Len(_aItens) -1
+
+	FT_FUse()
+	FClose(_nArq)
+Return
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01Valid()
+	Local _lRet := .T.
+
+	If !(_lRet := !(Empty(_cArqOri) .Or. Empty (_cArqLog)))
+		MsgInfo('Arquivo Origem e Arquivo de Log são obrigatórios.' + CRLF + 'Verifique.')
+	EndIf
+Return _lRet
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01ArqOri()
+	_cArqOri 	:= cGetFile("CSV | *.csv","Selecione arquivo de Produtos",,"",.T.,GETF_NETWORKDRIVE+GETF_LOCALHARD+GETF_LOCALFLOPPY )
+
+Return
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01ArqLog()
+	Local _cArq		:=  cGetFile('*.TXT'	,'Informe diretorio para arquivo de log'	,0,'',.F.			,nOR( GETF_LOCALHARD, GETF_LOCALFLOPPY, GETF_RETDIRECTORY ),.F., .T. )
+
+	_cArqLog := _cArq + DToS(Date()) + '_' + (StrTran(Time(),':','')) + '.TXT'
+Return
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01GetCab()
+	Local _cCabec	:= ''
+
+	_cCabec += '<tr>'
+
+	_cCabec += '<td width=80 align="middle" style="border-top:solid #BBBBBB 1.0pt;border-left:solid #D5D5D5 1.0pt;border-bottom:none;border-right:solid #F2F2F2 1.0pt;background:#DEDEDE;padding:6.0pt 6.0pt 6.0pt 6.0pt">'
+	_cCabec += 'TABELA'
+	_cCabec += '</td>'
+
+	_cCabec += '<td width=80 align="middle" style="border-top:solid #BBBBBB 1.0pt;border-left:solid #D5D5D5 1.0pt;border-bottom:none;border-right:solid #F2F2F2 1.0pt;background:#DEDEDE;padding:6.0pt 6.0pt 6.0pt 6.0pt">'
+	_cCabec += 'ITEM'
+	_cCabec += '</td>'
+
+	_cCabec += '<td width=150 align="middle" style="border-top:solid #BBBBBB 1.0pt;border-left:solid #D5D5D5 1.0pt;border-bottom:none;border-right:solid #F2F2F2 1.0pt;background:#DEDEDE;padding:6.0pt 6.0pt 6.0pt 6.0pt">'
+	_cCabec += 'PRODUTO'
+	_cCabec += '</td>'
+
+	_cCabec += '<td width=100 align="middle" style="border-top:solid #BBBBBB 1.0pt;border-left:solid #D5D5D5 1.0pt;border-bottom:none;border-right:solid #F2F2F2 1.0pt;background:#DEDEDE;padding:6.0pt 6.0pt 6.0pt 6.0pt">'
+	_cCabec += 'TIPO'
+	_cCabec += '</td>'
+
+	_cCabec += '<td width=300 align="middle" style="border-top:solid #BBBBBB 1.0pt;border-left:solid #D5D5D5 1.0pt;border-bottom:none;border-right:solid #F2F2F2 1.0pt;background:#DEDEDE;padding:6.0pt 6.0pt 6.0pt 6.0pt">'
+	_cCabec += 'DESCRICAO'
+	_cCabec += '</td>'
+
+	_cCabec += '<td width=125 align="middle" style="border-top:solid #BBBBBB 1.0pt;border-left:solid #D5D5D5 1.0pt;border-bottom:none;border-right:solid #F2F2F2 1.0pt;background:#DEDEDE;padding:6.0pt 6.0pt 6.0pt 6.0pt">'
+	_cCabec += 'PREÇO ANTIGO'
+	_cCabec += '</td>'
+
+	_cCabec += '<td width=125 align="middle" align="middle" style="border-top:solid #BBBBBB 1.0pt;border-left:solid #D5D5D5 1.0pt;border-bottom:none;border-right:solid #F2F2F2 1.0pt;background:#DEDEDE;padding:6.0pt 6.0pt 6.0pt 6.0pt">'
+	_cCabec += 'PREÇO NOVO'
+	_cCabec += '</td>'
+
+	_cCabec += '<td width=125 align="middle" align="middle" style="border-top:solid #BBBBBB 1.0pt;border-left:solid #D5D5D5 1.0pt;border-bottom:none;border-right:solid #F2F2F2 1.0pt;background:#DEDEDE;padding:6.0pt 6.0pt 6.0pt 6.0pt">'
+	_cCabec += 'DATA DE VIGÊNCIA'
+	_cCabec += '</td>'
+
+	_cCabec += '<td width=250 align="middle" style="border-top:solid #BBBBBB 1.0pt;border-left:solid #D5D5D5 1.0pt;border-bottom:none;border-right:solid #F2F2F2 1.0pt;background:#DEDEDE;padding:6.0pt 6.0pt 6.0pt 6.0pt">'
+	_cCabec += 'STATUS'
+	_cCabec += '</td>'
+
+	_cCabec += '</tr>'
+Return _cCabec
+
+//+-------------------------------------------------------------------------------------------------
+Static Function MD01MailIt(_cCodTab,_cItem,_cProduto,_cPrcOld,_cPrcNew,_cMsg,_cMsgMail,_dDatVig)
+	Local _cTipo	:= Posicione('SB1',1,xFilial('SB1') + PadR(_cProduto,TamSX3('B1_COD')[1]),'B1_TIPO' )
+	Local _cDesc	:= Posicione('SB1',1,xFilial('SB1') + PadR(_cProduto,TamSX3('B1_COD')[1]),'B1_DESC' )
+
+	_cMsgMail += '<tr>'
+
+	_cMsgMail += '<td  width=80 align="middle" style="border-top:solid #DEDEDE 1.0pt;border-left:solid #DEDEDE 1.0pt;border-bottom:solid #DEDEDE 1.0pt;border-right:solid #DEDEDE 1.0pt">'
+	_cMsgMail += _cCodTab
+	_cMsgMail += '</td>'
+
+	_cMsgMail += '<td  width=80 align="middle" style="border-top:solid #DEDEDE 1.0pt;border-left:solid #DEDEDE 1.0pt;border-bottom:solid #DEDEDE 1.0pt;border-right:solid #DEDEDE 1.0pt">'
+	_cMsgMail += _cItem
+	_cMsgMail += '</td>'
+
+	_cMsgMail += '<td  width=150 style="border-top:solid #DEDEDE 1.0pt;border-left:solid #DEDEDE 1.0pt;border-bottom:solid #DEDEDE 1.0pt;border-right:solid #DEDEDE 1.0pt">'
+	_cMsgMail += _cProduto
+	_cMsgMail += '</td>'
+
+	_cMsgMail += '<td  width=100 align="middle" style="border-top:solid #DEDEDE 1.0pt;border-left:solid #DEDEDE 1.0pt;border-bottom:solid #DEDEDE 1.0pt;border-right:solid #DEDEDE 1.0pt">'
+	_cMsgMail += _cTipo
+	_cMsgMail += '</td>'
+
+	_cMsgMail += '<td  width=300 style="border-top:solid #DEDEDE 1.0pt;border-left:solid #DEDEDE 1.0pt;border-bottom:solid #DEDEDE 1.0pt;border-right:solid #DEDEDE 1.0pt">'
+	_cMsgMail += _cDesc
+	_cMsgMail += '</td>'
+
+	_cMsgMail += '<td  width=125 align="right" style="border-top:solid #DEDEDE 1.0pt;border-left:solid #DEDEDE 1.0pt;border-bottom:solid #DEDEDE 1.0pt;border-right:solid #DEDEDE 1.0pt">'
+	_cMsgMail += _cPrcOld
+	_cMsgMail += '</td>'
+
+	_cMsgMail += '<td  width=125 align="right" style="border-top:solid #DEDEDE 1.0pt;border-left:solid #DEDEDE 1.0pt;border-bottom:solid #DEDEDE 1.0pt;border-right:solid #DEDEDE 1.0pt">'
+	_cMsgMail += _cPrcNew
+	_cMsgMail += '</td>'
+
+	_cMsgMail += '<td  width=125 align="right" style="border-top:solid #DEDEDE 1.0pt;border-left:solid #DEDEDE 1.0pt;border-bottom:solid #DEDEDE 1.0pt;border-right:solid #DEDEDE 1.0pt">'
+	_cMsgMail += DTOC(_dDatVig)
+	_cMsgMail += '</td>'
+
+	_cMsgMail += '<td  width=250 style="border-top:solid #DEDEDE 1.0pt;border-left:solid #DEDEDE 1.0pt;border-bottom:solid #DEDEDE 1.0pt;border-right:solid #DEDEDE 1.0pt">'
+	_cMsgMail += _cMsg
+	_cMsgMail += '</td>'
+
+	_cMsgMail += '</tr>' + CRLF
+Return
+
+//+----------------------------------------------------------------------------------------------------------------
+//	Rotina genérica para envio de email
+//+----------------------------------------------------------------------------------------------------------------
+Static Function MD01Mail(_cMsg,_cErro)
+	Local _lOk				:= .T.
+	Local _lDiscon			:= .T.
+	Local  _cData			:= DToC(Date())
+	Local  _cHora			:= Time()
+	Local _cServer			:= ALLTRIM(GetMv('MV_RELSERV',,''))		//|	Nome do servidor de envio de e-mail
+	Local _cAccount			:= ALLTRIM(GetMv('MV_RELACNT',,''))		//|	Conta a ser utilizada no envio de e-mail
+	Local _cPassword		:= ALLTRIM(GetMv('MV_RELPSW',,''))			//|	Senha da conta de e-mail para envio
+	Local _lAuth			:= GetMv('MV_RELAUTH',,'')
+	Local _oProcess			:= Nil
+	Local _oHtml			:= Nil
+	Local _cBody			:= ''
+	Local  _cPara			:= AllTrim(GetMv('AM_05D0101',,''))
+	Local  _cUsuario		:= Upper(UsrRetName(RetCodUsr()))
+	Local _cProcesso		:= 'M05D01'
+	Local _cAssunto			:= 'Atualização de Tabela de Preço'
+
+	Default _cMsg			:= ''
+	Default _cErro			:= ''
+
+	If !Empty(_cPara)
+		_oProcess	:= TWFProcess():New('',_cProcesso)
+		_oProcess:NewTask('Inicio','/WORKFLOW/MACOM/WF_MACOM_GENERICO.HTML')
+
+		_oHtml   	:= _oProcess:oHtml
+
+		_oHtml:Valbyname('PROCESSO'    	,_cProcesso + ' - ' + _cAssunto)
+		_oHtml:Valbyname('USUARIO'    	,_cUsuario)
+		_oHtml:Valbyname('DATA'    		,_cData)
+		_oHtml:Valbyname('HORA'    		,_cHora)
+		_oHtml:Valbyname('MSG'    		,_cMsg)
+
+		_cBody 		:= _oHtml:HtmlCode()
+
+		CONNECT SMTP SERVER _cServer ACCOUNT _cAccount PASSWORD _cPassword RESULT _lOk
+
+		If _lAuth
+			If !MailAuth(_cAccount,_cPassword)
+				_cErro	:= 'Erro ao conectar na conta de e-mail.'
+				DISCONNECT SMTP SERVER
+
+				_lOk := .F.
+			EndIf
+		EndIf
+
+		If _lOk
+			_lOk := MailSend ( _cAccount, {_cPara}, {}, {}, 'Workflow Macom - ' + _cAssunto, _cBody, {''}, .T. )
+		EndIf
+
+		If !_lOk
+			GET MAIL ERROR _cErro
+		Endif
+
+		DISCONNECT SMTP SERVER Result _lDiscon
+
+		//+----------------------------------
+		//|	Libera processo de WF
+		//+----------------------------------
+		_oProcess:Free()
+		_oProcess:= Nil
+	EndIf
+Return _lOk
