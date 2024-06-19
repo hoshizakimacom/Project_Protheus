@@ -1,0 +1,48 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "totvs_language_debug",
+			"request": "launch",
+			"name": "TOTVS Language Debug",
+			"program": "${command:AskForProgramName}",
+			"cwb": "${workspaceFolder}",
+			"smartclientBin": "E:\\MACOM_1227\\TOTVS_12\\Protheus\\bin\\smartclient\\smartclient.exe",
+			"isMultiSession": true,
+			"enableTableSync": true
+		}
+	],
+	"lastPrograms": [
+		{
+			"label": "SIGAMDI"
+		},
+		{
+			"label": "sigacom"
+		},
+		{
+			"label": "sigapcp"
+		},
+		{
+			"label": "sigacfg"
+		},
+		{
+			"label": "sigafat"
+		},
+		{
+			"label": "sigaest"
+		},
+		{
+			"label": "sigafis"
+		},
+		{
+			"args": [
+				"PARAMIXB3"
+			],
+			"label": "MyMATA200"
+		},
+		{
+			"label": "mpsdu"
+		}
+	],
+	"lastProgramExecuted": "SIGAMDI"
+}
