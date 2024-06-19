@@ -1,0 +1,20 @@
+//Bibliotecas
+#Include "TOTVS.ch"
+#Include "TopConn.ch"
+ 
+/*/{Protheus.doc} CFGM01
+Função para alualizar as telas simultaneas dos usuarios
+@author Graziella Bianchin
+@since 22/08/2022
+@version 1.0
+@type function
+/*/
+
+User function  CFGM01()
+
+Local aCfgUser := {}
+
+aCfgUser := AllUsers()
+//AllUsers() -> aPswUsers
+
+Return
