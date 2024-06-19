@@ -1,0 +1,226 @@
+#Include 'Protheus.ch'
+
+//+------------------------------------------------------------------------
+//	Relatório de Pesquisa Fábrica
+//+------------------------------------------------------------------------
+User Function M10R02()
+	Local _oReport		:= Nil
+	Local _cPerg  		:= 'M10R02    '
+	Local _lOk				:= .F.
+
+	AtuSX1(_cPerg)
+
+	_lOk := M0RValid()
+
+	If _lOk .And. FindFunction('TRepInUse') .And. TRepInUse(.F.)	//verifica se relatorios personalizaveis esta disponivel
+		If Pergunte(_cPerg, .T.)
+			_oReport := ReportDef(_oReport, _cPerg)
+			_oReport:PrintDialog()
+		EndIf
+	EndIf
+Return
+
+//+------------------------------------------------------------------------
+Static Function ReportDef(_oReport, _cPerg)
+	Local _cTitle  	:= 'Relatório de Pesquisa Fábrica'
+	Local _cHelp   	:= 'Permite gerar relatório de Pesquisa Fábrica'
+	Local _cAlias  	:= GetNextAlias()
+	Local _oOP			:= Nil
+
+	_oReport	:= TReport():New('M10R02   ',_cTitle,_cPerg,{|_oReport| ReportPrint(_oReport,_cAlias)},_cHelp)
+
+	//+-------------------------------------------
+	//|	Secao dos itens do Pedido de Vendas
+	//+-------------------------------------------
+	_oOP := TRSection():New(_oReport,'PESQUISA FÁBRICA',{_cAlias})
+//	_oOP:lHeaderVisible := .T.
+
+	TRCell():New(_oOP,'OF'				, _cAlias)		// OF
+	TRCell():New(_oOP,'CHAVE'			, _cAlias)		// CHAVE
+	TRCell():New(_oOP,'DATA_'			, _cAlias)		// DATA
+	TRCell():New(_oOP,'TIPO'			, _cAlias)		// TIPO
+	TRCell():New(_oOP,'PEDIDO'			, _cAlias)		// PEDIDO
+	TRCell():New(_oOP,'CLIENTE'			, _cAlias)		// CLIENTE
+	TRCell():New(_oOP,'NOME_FANTASIA'	, _cAlias)		// NOME_FANTASIA
+	TRCell():New(_oOP,'ITEM'			, _cAlias)		// ITEM
+	TRCell():New(_oOP,'CODIGO'			, _cAlias)		// COD
+	TRCell():New(_oOP,'MEDIDAS'			, _cAlias)		// MEDIDAS
+	TRCell():New(_oOP,'DESC'			, _cAlias)		// DESC
+	TRCell():New(_oOP,'DESC_OF'			, _cAlias)		// DESC_OF
+	TRCell():New(_oOP,'QTDE'			, _cAlias)		// QTDE
+	TRCell():New(_oOP,'USR_ENG_SAI'		, _cAlias)		// USR_ENG_SAI
+	TRCell():New(_oOP,'COMPLEMENTO'		, _cAlias)		// COMPLEMENTO
+	TRCell():New(_oOP,'PRAZO'			, _cAlias)		// PRAZO
+	TRCell():New(_oOP,'EMISSAO_OP'		, _cAlias)		// DATA_ENTRADA ALTERADO CHAMADO 975
+	TRCell():New(_oOP,'ENG_S'			, _cAlias)		// DATA_OF ALTERADO CHAMADO 975
+	TRCell():New(_oOP,'PPCP_E'			, _cAlias)		// PPCP_E
+	TRCell():New(_oOP,'PPCP_S'			, _cAlias)		// PPCP_S
+	TRCell():New(_oOP,'PROG_E'			, _cAlias)		// DATA_PRG 
+	TRCell():New(_oOP,'PROG_S'			, _cAlias)		// DATA_LIBERACAO ALTERADO CHAMADO 975
+	TRCell():New(_oOP,'CPC_E'			, _cAlias)		// CPC-E
+	TRCell():New(_oOP,'CPC_S'			, _cAlias)		// CPC-S
+	TRCell():New(_oOP,'MONT_E'			, _cAlias)		// MONT-E
+	TRCell():New(_oOP,'MONT_S'			, _cAlias)		// MONT-S
+	TRCell():New(_oOP,'STATUS'			, _cAlias)		// STATUS
+	TRCell():New(_oOP,'VALOR'			, _cAlias)		// VALOR
+
+	_oOP:oReport:cFontBody 			:= 'Calibri'
+	_oOP:oReport:nFontBody			:= 11
+
+Return(_oReport)
+
+//+------------------------------------------------------------------------
+Static Function ReportPrint(_oReport,_cAlias)
+	Local _oSection 		:= _oReport:Section(1)
+	Local _cChave			:= ''
+
+	_oReport:Section(1):Init()
+	_oReport:IncMeter()
+
+	M10RGetSC2(_cAlias,_oReport)
+	//+-------------------------------------------
+	//|	Inicio da impressao
+	//+-------------------------------------------
+
+	While !_oReport:Cancel() .And. (_cAlias)->(!EOF())
+		_oReport:Section(1):Cell('MEDIDAS'			):SetBlock( {||CValToChar((_cAlias)->B5_COMPRLC) + 'x' + CValToChar((_cAlias)->B5_LARGLC) + 'x' + CValToChar((_cAlias)->B5_ALTURLC)						})
+		_oReport:Section(1):Cell('MEDIDAS'			):SetBlock( {||CValToChar((_cAlias)->B5_COMPRLC) + 'x' + CValToChar((_cAlias)->B5_LARGLC) + 'x' + CValToChar((_cAlias)->B5_ALTURLC)						})
+		_oReport:Section(1):Cell('CHAVE'			):SetBlock( {|| SubStr((_cAlias)->OF,1,6) + ';' + SubStr((_cAlias)->OF,7,2) 						})
+		_oReport:Section(1):Cell('STATUS'			):SetBlock( {|| IIF((_cAlias)->QTDE - (_cAlias)->QUJE == 0,'ENCERRADA','ABERTA')   })
+		_oReport:Section(1):PrintLine()
+
+		_oReport:IncMeter()
+		(_cAlias)->(DbSkip())
+	EndDo
+
+	_oReport:Section(1):Finish()
+
+	(_cAlias)->(dbCloseArea())
+return
+
+//+------------------------------------------------------------------------
+Static Function M10RGetSC2(_cAlias,_oReport)
+	Local _nTotal			:= 0
+
+		BeginSQL Alias _cAlias
+			Column DATA_		 		as Date
+			Column PRAZO		 		as Date
+			Column DATA_ENTRADA 		as Date
+			Column DATA_OF 				as Date
+			Column DATA_PRG 			as Date
+			Column DATA_LIBERACAO 		as Date
+			Column CPC_E 				as Date
+			Column CPC_S 				as Date
+			Column MONT_E 				as Date
+			Column MONT_S 				as Date
+			Column EXPEDICAO 			as Date
+			Column PPCP_E				as Date
+			Column PPCP_S				as Date
+			SELECT
+					 C2_NUM + C2_ITEM + C2_SEQUEN + C2_ITEMGRD 	AS 'OF'
+					,C5_EMISSAO 									AS DATA_
+					,C5_NUM											AS PEDIDO
+					,A1_NOME										AS CLIENTE
+					,A1_NREDUZ										AS NOME_FANTASIA
+					,C2_PRODUTO										AS CODIGO
+					,B1_DESC										AS 'DESC'
+					,C2_QUANT										AS QTDE
+					,C2_QUJE										AS QUJE
+					,C2_DATPRF										AS PRAZO
+					,C2_EMISSAO										AS DATA_ENTRADA
+					,C2_XENGDTS										AS DATA_OF
+					,C2_XPCPDTE										AS DATA_PRG
+					,C2_XPCPDTS										AS DATA_LIBERACAO
+					,C2_XCPCDTE										AS CPC_E
+					,C2_XCPCDTS										AS CPC_S
+					,C2_XPPCDTE										AS PPCP_E
+					,C2_XPPCDTS										AS PPCP_S
+					,C2_XMONDTE										AS MONT_E
+					,C2_XMONDTS										AS MONT_S
+					,C2_XEXPDT										AS EXPEDICAO
+					,'PADRÃO'										AS TIPO
+					,C6_ITEM
+					,C5_NUM
+					,B5_COMPRLC
+					,B5_LARGLC
+					,B5_ALTURLC
+					,CK_XITEMP										
+					,C2_ITEM										AS ITEM
+					,C2_XOBSENG                                     AS DESC_OF
+					,C2_XENGUSS										AS USR_ENG_SAI
+					,C6_VALOR										AS VALOR
+			FROM %Table:SC2% SC2
+			LEFT JOIN %Table:SC6% SC6
+					ON SC6.%NotDel%
+					AND C6_FILIAL = %xFilial:SC6%
+					AND C6_NUM = C2_PEDIDO
+					AND C6_ITEM = C2_ITEMPV
+			LEFT JOIN %Table:SC5% SC5
+					ON SC5.%NotDel%
+					AND C5_FILIAL = %xFilial:SC5%
+					AND C5_NUM = C6_NUM
+			LEFT JOIN %Table:SA1% SA1
+					ON SA1.%NotDel%
+					AND A1_FILIAL = %xFilial:SA1%
+					AND A1_COD    = C5_CLIENTE
+					AND A1_LOJA	= C5_LOJACLI
+			LEFT JOIN %Table:SB1% SB1
+					ON SB1.%NotDel%
+					AND B1_FILIAL = %xFilial:SB1%
+					AND B1_COD    = C2_PRODUTO
+			LEFT JOIN %Table:SB5% SB5
+					ON SB5.%NotDel%
+					AND B5_FILIAL  = %xFilial:SB5%
+					AND B5_COD = C2_PRODUTO
+			LEFT JOIN %Table:SCK% SCK
+					ON SCK.%NotDel%
+					AND CK_FILIAL = %xFilial:ZCK%
+					AND CK_NUMPV   = C5_NUM
+					AND CK_PRODUTO = C2_PRODUTO
+					AND CK_XITEMP  = C6_XITEMP
+					AND C6_ITEM    = CK_ITEM
+			WHERE 	SC2.%NotDel%
+				AND C2_FILIAL    = %xFilial:SC2%
+				AND C2_NUM + C2_ITEM + C2_SEQUEN + C2_ITEMGRD 		BETWEEN %Exp:MV_PAR01% AND %Exp:MV_PAR02%
+				AND C2_EMISSAO 	BETWEEN %Exp:MV_PAR03% AND %Exp:MV_PAR04%
+				ORDER BY 'OF'
+		EndSql
+
+	// Atualiza regua de processamento
+	(_cAlias)->( dbEval( {|| _nTotal++ } ) )
+	(_cAlias)->( dbGoTop() )
+
+	_oReport:SetMeter(_nTotal)
+Return
+
+//+------------------------------------------------------------------------
+Static Function M0RValid()
+	Local _lExit 			:= .F.
+	Local _aCpSC2			:= {'C2_XENGDTS','C2_XPCPDTE','C2_XPCPDTS','C2_XMONDTS','C2_XMONDTE','C2_XCPCDTS','C2_XCPCDTE','C2_XEXPDT'}
+	Local _nX				:= 0
+
+
+	For _nX := 1 To Len(_aCpSC2)
+		If (_lExit := SC2->(FieldPos(_aCpSC2[_nX])) == 0 )
+			MsgStop('Campo customizado ' + _aCpSC2[_nX] + ' não encontrado.' + CRLF + 'Relatório não pode ser executado!')
+			Exit
+		EndIf
+	Next
+
+Return !_lExit
+//+------------------------------------------------------------------------
+Static Function AtuSX1(_cPerg)
+	Local _aAreaSX1 	:= SX1->(GetArea())
+
+	SX1->(DbGoTop())
+	SX1->(DbSetOrder(1))
+
+	If !SX1->(DbSeek(_cPerg))
+		PutSX1(_cPerg,'01','OP De ?'		,'OP De ?'			,'OP De ?'			,'mv_ch1','C',13,0, ,'G','','SC2',,,'mv_par01',,,,Space(13))
+		PutSX1(_cPerg,'02','OP Ate ?'		,'OP Ate ?'			,'OP Ate ?'			,'mv_ch2','C',13,0, ,'G','','SC2',,,'mv_par02',,,,Replicate('Z',13))
+		PutSX1(_cPerg,'03','Data De ?'		,'Data De ?'		,'Data De ?'		,'mv_ch3','D',08,0, ,'G','','   ',,,'mv_par03',,,,)
+		PutSX1(_cPerg,'04','Data Ate ?'		,'Data Ate ?'		,'Data Ate ?'		,'mv_ch4','D',08,0, ,'G','','   ',,,'mv_par04',,,,)
+	EndIf
+
+	RestArea(_aAreaSX1)
+Return
