@@ -1,0 +1,268 @@
+#INCLUDE "MATR225.CH"
+#INCLUDE "PROTHEUS.CH"
+#Include "TopConn.ch"
+#Include 'RptDef.ch'
+#Include 'FWPrintSetup.ch
+
+//Constantes
+#Define STR_PULA    Chr(13)+Chr(10)
+ 
+User function M04R02()
+
+Local cPerg    := "M04RSM"
+Local dDataDe   := GETNEWPAR('MV_PAR01', DATE())
+Local nTipoVi   := GETNEWPAR('MV_PAR02', 1)
+Local _lRet     := .F.
+
+If Pergunte(cPerg)
+    FWMsgRun(, {|| _lRet := U_GeraExc1(dDataDe,nTipoVi)},,'Gerando Slowmoving_Entradas.csv  ...')
+    FWMsgRun(, {|| _lRet := U_GeraExc2(dDataDe,nTipoVi)},,'Gerando Slowmoving_Saidas.csv ...')
+    FWMsgRun(, {|| _lRet := U_GeraExc3(dDataDe,nTipoVi)},,'Gerando Slowmoving_Mov_Entradas ...')
+    FWMsgRun(, {|| _lRet := U_GeraExc4(dDataDe,nTipoVi)},,'Gerando Slowmoving_Mov_saidas...')
+Endif
+
+Return(_lRet)
+
+User Function GeraExc1(dDataDe,nTipoVi)
+    local cArq := "c:\Temp\Slowmoving_Entradas.csv"
+    Local nH
+    Local nTotal := 0
+    Local nQtde := 0
+
+    nH := fCreate(cArq)
+
+    If nH == -1
+        MsgStop("Falha ao criar arquivo - erro "+str(ferror()))
+        Return
+    Endif
+
+
+    // Primeira parte da query Entradas SD1
+    cQuery := "SELECT D1_FILIAL, D1_COD, D1_TES,D1_UM, D1_QUANT,D1_LOCAL, D1_DTDIGIT,
+    cQuery += "(SELECT B1_CUSTD FROM SB1010 WHERE D1_COD = B1_COD AND D_E_L_E_T_ = '') AS D1_CUSTO "
+    cQuery += "FROM " + RetsqlName("SD1") + " (nolock) "
+    cQuery += "INNER JOIN " + RetsqlName("SF4") + " (nolock) ON F4_CODIGO = D1_TES AND F4_ESTOQUE = 'S' AND SF4010.D_E_L_E_T_ = '' "
+    cQuery += "WHERE D1_TES IN (" + GETNEWPAR('MV_XSLOWE1') + GETNEWPAR('MV_XSLOWE2') + GETNEWPAR('MV_XSLOWE3') +") "
+    cQuery += "AND D1_DTDIGIT <= '"+ DTOS(dDataDe)+"' "
+    cQuery += "AND D1_FILIAL = '"+FWxFilial("SD1")+"' "
+    cQuery += "AND D1_QUANT <> 0 "
+    cQuery += "AND SD1010.D_E_L_E_T_ = '' "
+    cQuery += "ORDER BY D1_DTDIGIT, D1_COD "
+
+    TcQuery cQuery New Alias (cAlias := GetNextAlias())
+
+    (cAlias)->(DbEval({|| nQtde ++ }))
+    (cAlias)->(DbGoTop())
+     
+    // Escreve o texto mais a quebra de linha CRLF
+    fWrite(nH,"Filial;Codigo;Tipo Movi;Unidade;Quant.;Local;Dt.Digitação;Custo Unit.;Custo Total"+ chr(13)+chr(10) )        
+    While ! (cAlias)->(Eof())
+        nTotal := ((cAlias)->D1_CUSTO * (cAlias)->D1_QUANT )
+        //Criando as Linhas
+        //fWrite(nH,"Segunda linha"+chr(13)+chr(10))
+        fWrite(nH,  (cAlias)->D1_FILIAL+";"+;
+                    (cAlias)->D1_COD+";"+;
+                    (cAlias)->D1_TES+";"+;
+                    (cAlias)->D1_UM+";"+;
+                    STRZERO((cAlias)->D1_QUANT)+";"+;
+                    (cAlias)->D1_LOCAL+";"+;
+                    SUBSTRING((cAlias)->D1_DTDIGIT,7,2)+"/"+SUBSTRING((cAlias)->D1_DTDIGIT,5,2)+"/"+SUBSTRING((cAlias)->D1_DTDIGIT,1,4)+";"+;
+                    Transform((cAlias)->D1_CUSTO,"@E 999999999.99")+";"+;
+                    Transform(nTotal,"@E 999999999.99")  + chr(13)+chr(10))
+        (cAlias)->(DbSkip())
+    Enddo
+
+    //FWAlertInfo("Planilha gerada com Sucesso em " + cArq, "Geração de arquivos")
+    
+    (cAlias)->(DbCloseArea())
+
+Return
+
+
+User Function GeraExc2(dDataDe,nTipoVi)
+    local cArq := "c:\Temp\Slowmoving_Saidas.csv"
+    Local nH
+    Local nTotal := 0
+    Local nQtde := 0
+
+    nH := fCreate(cArq)
+
+    If nH == -1
+        MsgStop("Falha ao criar arquivo - erro "+str(ferror()))
+        Return
+    Endif
+
+
+        // Segunda parte da query Entradas SD2
+        cQuery := ""    
+        cQuery := "SELECT D2_FILIAL, D2_COD, D2_TES,D2_UM, D2_QUANT,D2_LOCAL, D2_EMISSAO, "
+        cQuery += "(SELECT B1_CUSTD FROM SB1010 WHERE D2_COD = B1_COD AND D_E_L_E_T_ = '') AS D2_CUSTO1 "
+        cQuery += "FROM " + RetsqlName("SD2") + " (nolock) "
+        cQuery += "INNER JOIN  " + RetsqlName("SF4") + "  ON F4_CODIGO = D2_TES    AND F4_ESTOQUE = 'S'    AND SF4010.D_E_L_E_T_ = '' "
+        cQuery += "WHERE D2_TES IN (" + GETNEWPAR('MV_XSLOWS1') + GETNEWPAR('MV_XSLOWS2') + GETNEWPAR('MV_XSLOWS3') + GETNEWPAR('MV_XSLOWS4') +") "
+        cQuery += "AND D2_EMISSAO <= '"+ DTOS(dDataDe)+"' "
+        cQuery += "AND D2_QUANT <> 0 "
+        cQuery += "AND D2_FILIAL = '"+FWxFilial("SD1")+"' "
+        cQuery += "AND SD2010.D_E_L_E_T_ = '' "
+        cQuery += "ORDER BY D2_EMISSAO, D2_COD "
+
+        TcQuery cQuery New Alias (cAlias := GetNextAlias())
+
+        (cAlias)->(DbEval({|| nQtde ++ }))
+        (cAlias)->(DbGoTop())
+
+    TcQuery cQuery New Alias (cAlias := GetNextAlias())
+
+    (cAlias)->(DbEval({|| nQtde ++ }))
+    (cAlias)->(DbGoTop())
+     
+    // Escreve o texto mais a quebra de linha CRLF
+    fWrite(nH,"Filial;Codigo;Tipo Movi;Unidade;Quant.;Local;Emissao;Custo Unit.;Custo Total"+ chr(13)+chr(10) )        
+    While ! (cAlias)->(Eof())
+        nTotal := ((cAlias)->D2_CUSTO1 * (cAlias)->D2_QUANT )
+        //Criando as Linhas
+        //fWrite(nH,"Segunda linha"+chr(13)+chr(10))
+        fWrite(nH,  (cAlias)->D2_FILIAL+";"+;
+                    (cAlias)->D2_COD+";"+;
+                    (cAlias)->D2_TES+";"+;
+                    (cAlias)->D2_UM+";"+;
+                    STRZERO((cAlias)->D2_QUANT)+";"+;
+                    (cAlias)->D2_LOCAL+";"+;
+                    SUBSTRING((cAlias)->D2_EMISSAO,7,2)+"/"+SUBSTRING((cAlias)->D2_EMISSAO,5,2)+"/"+SUBSTRING((cAlias)->D2_EMISSAO,1,4)+";"+;
+                    Transform((cAlias)->D2_CUSTO1,"@E 999999999.99")+";"+;
+                    Transform(nTotal,"@E 999999999.99")  + chr(13)+chr(10))
+        (cAlias)->(DbSkip())
+    Enddo
+
+    //FWAlertInfo("Planilha gerada com Sucesso em " + cArq, "Geração de arquivos")
+
+    (cAlias)->(DbCloseArea())
+
+Return
+
+User Function GeraExc3(dDataDe,nTipoVi)
+    local cArq := "c:\Temp\Slowmoving_Movimentos_Entrada.csv"
+    Local nH
+    Local nTotal := 0
+    Local nQtde := 0
+
+    nH := fCreate(cArq)
+
+    If nH == -1
+        MsgStop("Falha ao criar arquivo - erro "+str(ferror()))
+        Return
+    Endif
+
+
+        //Terceira parte da query Entradas SD3
+        cQuery := ""    
+        cQuery += "SELECT D3_FILIAL, D3_COD, D3_CF, D3_UM, D3_QUANT, D3_LOCAL, D3_EMISSAO, "
+        cQuery += "(SELECT B1_CUSTD FROM SB1010 WHERE D3_COD = B1_COD AND D_E_L_E_T_ = '') AS D3_CUSTO1 "
+        cQuery += "FROM " + RetsqlName("SD3") + " (nolock) "
+        cQuery += "WHERE D3_FILIAL = '"+FWxFilial("SD1")+"' "
+        cQuery += "AND D3_CF IN ('PR0','DE0','DE6') "
+        cQuery += "AND D3_QUANT <> 0 "
+        cQuery += "AND D3_DOC <> 'INVENT' "
+        cQuery += "AND D3_ESTORNO = '' "
+        cQuery += "AND D3_TM IN ("+ GETNEWPAR('MV_XSLOME1') + ") "
+        cQuery += "AND D3_EMISSAO <= '"+ DTOS(dDataDe)+"' "
+        cQuery += "AND D3_CF <> 'DE4' "
+        cQuery += "AND SD3010.D_E_L_E_T_ = '' "
+        cQuery += "ORDER BY D3_EMISSAO DESC "
+
+        TcQuery cQuery New Alias (cAlias := GetNextAlias())
+
+        (cAlias)->(DbEval({|| nQtde ++ }))
+        (cAlias)->(DbGoTop())
+
+    TcQuery cQuery New Alias (cAlias := GetNextAlias())
+
+    (cAlias)->(DbEval({|| nQtde ++ }))
+    (cAlias)->(DbGoTop())
+     
+    // Escreve o texto mais a quebra de linha CRLF
+    fWrite(nH,"Filial;Codigo;Tipo Movi;Unidade;Quant.;Local;Dt.Emissão;Custo Unit.;Custo Total"+ chr(13)+chr(10) )        
+    While ! (cAlias)->(Eof())
+        nTotal := ((cAlias)->D3_CUSTO1 * (cAlias)->D3_QUANT )
+        //Criando as Linhas
+        //fWrite(nH,"Segunda linha"+chr(13)+chr(10))
+        fWrite(nH,  (cAlias)->D3_FILIAL+";"+;
+                    (cAlias)->D3_COD+";"+;
+                    (cAlias)->D3_CF+";"+;
+                    (cAlias)->D3_UM+";"+;
+                    STRZERO((cAlias)->D3_QUANT)+";"+;
+                    (cAlias)->D3_LOCAL+";"+;
+                    SUBSTRING((cAlias)->D3_EMISSAO,7,2)+"/"+SUBSTRING((cAlias)->D3_EMISSAO,5,2)+"/"+SUBSTRING((cAlias)->D3_EMISSAO,1,4)+";"+;
+                    Transform((cAlias)->D3_CUSTO1,"@E 999999999.99")+";"+;
+                    Transform(nTotal,"@E 999999999.99")  + chr(13)+chr(10))
+        (cAlias)->(DbSkip())
+    Enddo
+
+    //FWAlertInfo("Planilha gerada com Sucesso em " + cArq, "Geração de arquivos")
+
+    (cAlias)->(DbCloseArea())
+
+Return
+
+User Function GeraExc4(dDataDe,nTipoVi)
+    local cArq := "c:\Temp\Slowmoving_Movimentos_Saida.csv"
+    Local nH
+    Local nTotal := 0
+    Local nQtde := 0
+
+    nH := fCreate(cArq)
+
+    If nH == -1
+        MsgStop("Falha ao criar arquivo - erro "+str(ferror()))
+        Return
+    Endif
+
+        //Quarta parte da query Saídas SD3
+        cQuery := ""    
+        cQuery += "SELECT D3_FILIAL, D3_COD, D3_CF, D3_UM, D3_QUANT, D3_LOCAL, D3_EMISSAO, "
+        cQuery += "(SELECT B1_CUSTD FROM SB1010 WHERE D3_COD = B1_COD AND D_E_L_E_T_ = '') AS D3_CUSTO1 "
+        cQuery += "FROM " + RetsqlName("SD3") + " (nolock) "
+        cQuery += "WHERE D3_FILIAL = '"+FWxFilial("SD1")+"' "
+        cQuery += "AND D3_CF IN ('RE0','RE1','RE6') "
+        cQuery += "AND D3_CF <> 'RE4' "
+        cQuery += "AND D3_DOC <> 'INVENT' "
+        cQuery += "AND D3_TM IN ("+ GETNEWPAR('MV_XSLOMS1') +") "
+        cQuery += "AND D3_ESTORNO = '' "
+        cQuery += "AND D3_QUANT <> 0 "
+        cQuery += "AND D3_EMISSAO <= '"+ DTOS(dDataDe)+"' "
+        cQuery += "AND D_E_L_E_T_ = '' "
+
+        TcQuery cQuery New Alias (cAlias := GetNextAlias())
+
+        (cAlias)->(DbEval({|| nQtde ++ }))
+        (cAlias)->(DbGoTop())
+
+    TcQuery cQuery New Alias (cAlias := GetNextAlias())
+
+    (cAlias)->(DbEval({|| nQtde ++ }))
+    (cAlias)->(DbGoTop())
+     
+    // Escreve o texto mais a quebra de linha CRLF
+    fWrite(nH,"Filial;Codigo;Tipo Movi;Unidade;Quant.;Local;Dt.Emissão;Custo Unit.;Custo Total"+ chr(13)+chr(10) )        
+    While ! (cAlias)->(Eof())
+        nTotal := ((cAlias)->D3_CUSTO1 * (cAlias)->D3_QUANT )
+        //Criando as Linhas
+        //fWrite(nH,"Segunda linha"+chr(13)+chr(10))
+        fWrite(nH,  (cAlias)->D3_FILIAL+";"+;
+                    (cAlias)->D3_COD+";"+;
+                    (cAlias)->D3_CF+";"+;
+                    (cAlias)->D3_UM+";"+;
+                    STRZERO((cAlias)->D3_QUANT)+";"+;
+                    (cAlias)->D3_LOCAL+";"+;
+                    SUBSTRING((cAlias)->D3_EMISSAO,7,2)+"/"+SUBSTRING((cAlias)->D3_EMISSAO,5,2)+"/"+SUBSTRING((cAlias)->D3_EMISSAO,1,4)+";"+;
+                    Transform((cAlias)->D3_CUSTO1,"@E 999999999.99")+";"+;
+                    Transform(nTotal,"@E 999999999.99")  + chr(13)+chr(10))
+        (cAlias)->(DbSkip())
+    Enddo
+
+    //FWAlertInfo("Planilha gerada com Sucesso em " + cArq, "Geração de arquivos")
+
+    (cAlias)->(DbCloseArea())
+
+Return
+
