@@ -8,11 +8,12 @@ Local lRet  	:= .T.
 Local aArea     := GetArea()
 Local aAreaSD3  := SD3->(GetArea())
 Local cFamili	:= Posicione("SB1",1, xFilial("SB1") + M->D3_COD, "B1_XFAMILI")
+//Local cTiPo		:= Posicione("SB1",1, xFilial("SB1") + M->D3_COD, "B1_TIPO")
 
 //+---------------------------------------+
 //|| Efetua validação de quantidade única |
 //+---------------------------------------+
-If M->D3_QUANT <> 1 .And. cFamili $ "000001|000002|000004"
+If M->D3_QUANT <> 1 .And. cFamili $ "000001|000002|000004" //.And. cTipo # "BN"
 	MsgStop("Quantidade apontada deve ser igual a 1","ATENÇÃO")
 	lRet := .F.
 Endif
@@ -188,7 +189,7 @@ EndIf
 // Grava tabela de número de Serie como apontado
 dbSelectArea("ZAB")
 dbSetOrder(1)
-If ZAB->(MsSeek(xFilial("ZAB")+ M->D3_XNSERIE)) .And. lRet
+If ZAB->(MsSeek(xFilial("ZAB")+ M->D3_XNSERIE)) .And. lRet //cTipo # "BN" .And. lRet
      If ZAB->ZAB_APONTA == "X"
 		MsgAlert("Numero de série já apontado !","ATENÇÃO")
 		lRet := .F.
