@@ -80,6 +80,7 @@ _nRegZAB := 0
 			_cOp		:= (cAlias)->C2_NUM
 			_cItem		:= (cAlias)->C2_ITEM
 			_cSequen	:= (cAlias)->C2_SEQUEN
+			_cTipo		:= (cAlias)->C2_XTIPO
 
 			DbSelectArea("ZAB")
 			DbSetOrder(2)
@@ -129,7 +130,7 @@ _nRegZAB := 0
 Return
 
 
-User Function M10A061(cProduto,_nQtdOP,_nQtdJE, _cOp, _cItem, _cSequen)
+User Function M10A061(cProduto,_nQtdOP,_nQtdJE, _cOp, _cItem, _cSequen, _cTipo)
 Local _cNumSer 	:= ""
 Local _cAno		:= ""
 Local _cMes		:= ""
@@ -137,6 +138,7 @@ Local _nSerial 	:= GetMV("AM_NUMSER")
 Local _nAno		:= year(ddatabase)
 Local _nMes		:= month(ddatabase)
 Local _cFamilia := Posicione("SB1",1, xFilial("SB1") + cProduto,"B1_XFAMILI")
+
 
 Local _nX		:= 0
 Local _lRet		:= .T.
@@ -150,7 +152,7 @@ If _nQtdJE <> 0
 	MsgStop("-Não é possível a geração de Número(s) de Série, para Ordem de Produção Encerrada ou Iniciada ", "Atenção")
 	_lRet := .F.
 Else
-	If ! _cFamilia $ "000001|000002|000003|000004"
+	If ! _cFamilia $ "000001|000002|000003|000004" .or. ! _cTipo $ "BN"
 		MsgStop("Só é possível gerar Número(s) de Série para as Famílias Cocção, Mobiliário e Refrigeração ", "Atenção")
 	Else
 		Do Case
