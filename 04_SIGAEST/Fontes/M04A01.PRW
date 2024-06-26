@@ -2,7 +2,7 @@
 #Include 'FwMVCDef.ch'
 
 //+------------------------------------------------------------------------------------------------
-//| Cadastro de Valores de Rateio de Chapas por mês
+//| Cadastro de Valores de Rateio de Chapas por mês Marcao
 //| Utilizado para ratear os valores de consumo de chamas nas Ordens de Producao
 //+------------------------------------------------------------------------------------------------
 User Function M04A01()
