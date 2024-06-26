@@ -3,7 +3,7 @@
 
 //+------------------------------------------------------------------------------------------------
 //| Cadastro de Valores de Rateio de Chapas por mês
-//| Utilizado para ratear os valores de consumo de chamas nas Ordens de Producao
+//| Utilizado para ratear os valores de consumo de chamas nas Ordens de Producao xx
 //+------------------------------------------------------------------------------------------------
 User Function M04A01()
     Local _oBrowse  := FwMBrowse():New()
