@@ -385,7 +385,7 @@ Return
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 Static Function MR05Cab1(oPrinter,oFont14B,oFont12,nRow)
-    Local cNome         := 'AÇOS MACOM INDÚSTRIA E COMERCIO LTDA'
+    Local cNome         := 'HOSHIZAKI MACOM LTDA'
     Local cEndC         := 'Av Julia Gaiolli, 474, Bonsucesso, Guarulhos-SP, CEP 07251-500'
     Local cCGC          := 'CNPJ: 43.553.668/0001-79 I.E.: 336.179.661.113'
     Local cTel          := 'Telefone: 55 11 2085-7000'
@@ -650,7 +650,7 @@ Static Function MR05Rod(oPrinter,oFont12,oFont12B,oFont14B,nRow,nPage,cData)
 
     nRow += nRowStep
     nRow += nRowStep
-    oPrinter:Say(nRow += nRowStep     ,2450    , 'AÇOS MACOM INDÚSTRIA E COMERCIO LTDA'         ,oFont12B)
+    oPrinter:Say(nRow += nRowStep     ,2450    , 'HOSHIZAKI MACOM LTDA'         ,oFont12B)
 
 	aArea := SA3->(GetArea())
     oPrinter:Say(nRow += nRowStep     ,2450    , 'GERÊNCIA: ' + AllTrim(Posicione("SA3",1,xFilial("SA3")+SA3->A3_GEREN,"SA3->A3_NOME"))          ,oFont12)
