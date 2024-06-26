@@ -1,7 +1,7 @@
 #Include 'Protheus.ch'
 
 //+-------------------------------------------------------------------------------------------------------------------
-//| Cadastro de item contabil por fornecedor
+//| Cadastro de item contabil por fornecedores
 //| Chamado do PE MT20FOPOS
 //+-------------------------------------------------------------------------------------------------------------------
 User Function M02A01()
