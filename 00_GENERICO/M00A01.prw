@@ -1,8 +1,8 @@
 #Include 'Protheus.ch'
 
 //+-------------------------------------------------------------------------------------------------------
-//  FunÁ„o que recebe o(s) cÛdigo(s) do(s) grupo(s) e retorna .T. se o usuario fizer parte do grupo ou
-//  .F., caso o usu·rio n„o esteja no grupo
+//  Fun√ß√£o que recebe o(s) c√≥digo(s) do(s) grupo(s) e retorna .T. se o usuario fizer parte do grupo ou
+//  .F., caso o usu√°rio n√£o esteja no time
 //+-------------------------------------------------------------------------------------------------------
 User Function M00A01(_cGrupo)
     Local _lRet         := .F.
