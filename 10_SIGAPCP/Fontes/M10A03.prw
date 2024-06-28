@@ -1,33 +1,33 @@
 #Include 'Protheus.ch'
-
+#INCLUDE "TopConn.ch"
+#Include "TOTVS.ch"
 User Function M10A03()
 
 Local _lOpc := .F.
 Local _lRet   := .T.
 Local _cUsers := GETMV("MV_XPALB06")//"000247|000228|000131|000151|000024|000259|000325|000305|000486" 
 
-If ! RetCodUsr() $ _cUsers
+If .F. //!RetCodUsr() $ _cUsers
 	_lRet := .T.	
 	MsgAlert("Geração de número(s) de Série não Permitida para este usuário !","ATENÇÃO")
-
-
-Return(_lRet)
+	Return(_lRet)
 
 Else 
 
-_lOpc := msgyesno("Deseja gerar os números de série para a ordem de produção : " + SC2->C2_NUM, "Geração de Números de Série")
+	_lOpc := MsgYesNo("Deseja gerar os números de série para a ordem de produção : " + SC2->C2_NUM +" ? ", "Geração de Números de Série")
 
 	If _lOpc
 		Fwmsgrun(,{|| U_M10A03B()},"Números de Série", "Processando...")
 	EndIf 
+
 EndIf
 
 Return
+
 //+----------------------------------------------------------------------------------------------------------------
 // Rotina de impressão de etiqueta térmica (ZEBRA GC420t)
 //	Substitui utilização da planilha SP02 / Etiqueta Identificação (Pedido/Seq)
 //+----------------------------------------------------------------------------------------------------------------
-
 User Function M10A03B()
 Local _cNumSer 	:= ""
 Local _cAno		:= ""
@@ -51,7 +51,7 @@ Else
 		MsgStop("Só é possível gerar Número(s) de Série para as Famílias Cocção, Mobiliário e Refrigeração ", "Atenção")
 	Else
 		If ZAB->(MSSeek(xFILIAL("ZAB")+SC2->C2_NUM+SC2->C2_ITEM+SC2->C2_SEQUEN))
-			MsgInfo("Número(s) de Série já gerados para esta Ordem de Produção","Atenção")
+			MsgInfo("Número(s) de Série já gerados para esta Ordem de Produção - Número de Serie : "+ZAB->ZAB_NUMSER,"Atenção")
 		Else
 			Do Case
 				Case _nAno == 2015
@@ -137,23 +137,46 @@ Else
 			
 			DBSelectArea("ZAB")
 			DBSetOrder(1)
-	//		dbGoBottom()
-			dbGoTo(Lastrec())
-				
-			If Substr(ZAB->ZAB_NUMSER, 9,1) <> _cMes
-				_nSerial := "0"
-			EndIf
 
-			_nSerial := Val(_nSerial)
-					
+//			dbGoTo(Lastrec())
+//			If Substr(ZAB->ZAB_NUMSER, 9,1) <> _cMes
+//				_nSerial := "0"
+//			EndIf
+//			GetMV("AM_NUMSER"+_cMes)
+
+			// Busca Ultimo Número de Série no Mês e Ano 
+			cQuery := "SELECT MAX(ZAB_NUMSER) NUMSER"
+			cQuery += " FROM "+RetSqlName("ZAB")+" ZAB "
+			cQuery += " WHERE ZAB_FILIAL = '"+xFilial("ZAB")+"'"
+			cQuery += " AND LEFT(ZAB_NUMSER,2) = '1"+_cAno+"' "
+			cQuery += " AND SUBSTRING(ZAB_NUMSER,9,1) = '"+_cMes+"' "
+			cQuery += " AND D_E_L_E_T_ <> '*' "
+
+			TcQuery cQuery New Alias "QUERY"
+			dbSelectArea("QUERY")
+			QUERY->(dbGoTop())
+
+			_nSerial := 0
+			While !Eof() 
+				_nSerial := Val(SubStr(QUERY->NUMSER,3,6))
+
+				dbSkip()
+			EndDo
+			dbCloseArea()
+
 			For _nX:=1 to _nQtdOP
+
 				Sleep(500)				
 				_nSerial ++ 
-				_cNumSer := "1" + _cAno + strzero(_nSerial,6) + _cMes
+				_cNumSer := "1" + _cAno + StrZero(_nSerial,6) + _cMes
+
 				If ZAB->(MSSeek(xFILIAL("ZAB")+ _cNumSer))
-					MsgStop("Problemas na geração do Número de Série, entre em contato com o TI","Atenção")
+					MsgStop("Problemas na geração do Número de Série, entre em contato com o TI - "+ _cNumSer,"Atenção")
 					_lErro := .T.
 				Else
+
+					MsgStop("Número de Série Gerado ! "+_cNumSer, "Atenção")
+
 					Reclock("ZAB",.T.)
 					ZAB->ZAB_FILIAL := xFilial("ZAB")
 					ZAB->ZAB_NUMSER	:= _cNumSer
@@ -165,8 +188,10 @@ Else
 				
 					DBSelectArea("SX6")
 					GetMV("AM_NUMSER")
+					//PutSX6("AM_NUMSER",lltrim(STR(_nSerial)))
+
 					RecLock("SX6",.F.)
-					X6_CONTEUD := Alltrim(STR(_nSerial))
+					SX6->X6_CONTEUD := Alltrim(STR(_nSerial))
 					MsUnlock()
 				EndIf
 			Next _nX

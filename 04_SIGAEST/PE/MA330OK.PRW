@@ -26,13 +26,15 @@ If a330ParamZX[1] > LastDay(dInicio)
    lRet := .F.
 EndIf
 
-MsgStop("Inicio do Ponto de Entrada MA330OK - Atualização D3_RATEIO ! ")
+//MsgStop("Inicio do Ponto de Entrada MA330OK - Atualização D3_RATEIO ! ")
+
+//MV_PRODPR0 == '2'  - Usa a Proporcao de Rateio do Campo D3_RATEIO  
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Realiza Query para calcular os rateios subentendendo que tudo é requisitado de uma vez. ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 
-cQry := " SELECT D3_RATEIO, OP, D3_EMISSAO, RECSD3, QUANT_PROD, QTD_OP, QTD_PROD_MES_ANT, QTD_PROD_MES, "+CRLF
+cQry := " SELECT OP, D3_EMISSAO, RECSD3, QUANT_PROD, QTD_OP, QTD_PROD_MES_ANT, QTD_PROD_MES, "+CRLF
 cQry += " (CASE WHEN QUANT_PROD >= QTD_OP THEN 100 "+CRLF
 cQry += " WHEN QTD_PROD_MES >= QTD_OP THEN (QUANT_PROD / QTD_PROD_MES) * 100 "+CRLF
 cQry += " WHEN (QTD_PROD_MES_ANT + QTD_PROD_MES) >= QTD_OP THEN (QUANT_PROD / QTD_PROD_MES) * 100 "+CRLF
@@ -122,7 +124,7 @@ If Select("TRB_SD3") > 0
 	dbCloseArea()
 EndIf
 
-MsgStop("Final do Ponto de Entrada MA330OK - Atualização D3_RATEIO ! ")
+//MsgStop("Final do Ponto de Entrada MA330OK - Atualização D3_RATEIO ! ")
 
 RestArea(aArea)
 

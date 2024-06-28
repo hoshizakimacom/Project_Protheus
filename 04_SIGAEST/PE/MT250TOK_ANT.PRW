@@ -4,8 +4,6 @@ Local lRet  	:= .T.
 Local aArea 	:= {}
 Local cFamili	:= Posicione("SB1",1, xFilial("SB1") + M->D3_COD, "B1_XFAMILI")
 
-
-
 //+---------------------------------------+
 //|| Efetua validação de quantidade única |
 //+---------------------------------------+

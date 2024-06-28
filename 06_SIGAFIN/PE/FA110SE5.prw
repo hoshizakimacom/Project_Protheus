@@ -20,7 +20,7 @@ User Function FA110SE5()
 	// Rotina que atualiza saldo a compensar de titulos com
 	// prefixo PVA
 	//+-------------------------------------------------------
-	If SE5->E5_PREFIXO == _cRAPre .AND. SE5->E5_MOTBX $ "NOR/CAC"
+	If SE5->E5_PREFIXO == _cRAPre .AND. SE5->E5_MOTBX $ "NOR/CAC/BND/FIN"
 		If !Empty(_cFilter)
 			SE1->(DbClearFilter())
 		EndIf
