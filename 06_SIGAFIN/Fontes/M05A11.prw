@@ -2,7 +2,7 @@
 
 //+---------------------------------------------------------------------------------------------------------------------------------
 //| Atualiza campos ao incluir/copiar pedido de venda
-//| Chamado do PE executado ao clicar no botão OK do pedido de venda
+//| Chamado do PE executado ao clicar no botão OK do pedido de venda sada
 //+---------------------------------------------------------------------------------------------------------------------------------
 User Function M05A11(_nOpc)
     Local _lRet     := .T.
