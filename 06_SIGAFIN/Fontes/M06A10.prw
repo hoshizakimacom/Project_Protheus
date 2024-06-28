@@ -27,11 +27,17 @@ Local aHeadMBrow := {}
 //Variaveis Private
 Private cCadastro	:= "Titulos Financeiro - Receber"
 Private c_Perg	:= "M06A10"
+Private aCores    := {}
+
 
 //Private aRotina 	:= MenuDef()
 
 //Menudef()
 //CriaSX1()
+
+aAdd(aCores,{"TRB->SALDO >  0", "BLACK",  "Cobranca"  })
+aAdd(aCores,{"TRB->SALDO == 0", "RED",    "Encerrado" })
+
 
 If !Pergunte('M06A10',.T.)
 	Return nil
@@ -44,7 +50,7 @@ MsgRun("Criando coluna para MBrowse...",,{|| aHeadMBrow := HeadBrow() } )
 dbSelectArea("TRB")
 dbSetOrder(1)
 
-MBrowse(6,1,22,75,"TRB",aHeadMBrow)
+MBrowse(6,1,22,75,"TRB",aHeadMBrow,,,,,aCores)
 
 //Fecha a área
 TRB->(dbCloseArea())
@@ -76,6 +82,8 @@ ADD OPTION aRotina TITLE 'Visualiza'	ACTION 'U_M06V10()'	 OPERATION 2 ACCESS 0 /
 ADD OPTION aRotina TITLE 'Follow-up'	ACTION 'U_M06F10(TRB->FILIAL,TRB->CLIENTE,TRB->LOJA,TRB->PREFIXO,TRB->NUMERO,TRB->PARCELA,TRB->EMISSAO,TRB->VENCTO,TRB->VALOR,TRB->SALDO)'  	 OPERATION 2 ACCESS 0 // 'Consulta Cli'
 
 Return aRotina
+
+
 
 /*ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
@@ -109,8 +117,14 @@ AADD( aHead , { "VENCTO"		,{|| TRB->VENCTO 		}, "D", 10                  , 0, ""
 AADD( aHead , { "VALOR"		 	,{|| TRB->VALOR			}, "N", 19					, 2, "@E 999,999,999.99" })
 AADD( aHead , { "VALORPED"		,{|| TRB->VALORPED		}, "N", 19					, 2, "@E 999,999,999.99" })
 AADD( aHead , { "SALDO"		 	,{|| TRB->SALDO			}, "N", 19					, 2, "@E 999,999,999.99" })
+AADD( aHead , { "CONDPAG"		,{|| TRB->CONDPAG		}, "C", Len(TRB->CONDPAG )  , 0, "" })
 AADD( aHead , { "PEDIDO"		,{|| TRB->PEDIDO		}, "C", Len(TRB->PEDIDO	 )  , 0, "" })
-
+AADD( aHead , { "GERENCIA"		,{|| TRB->GERENCIA		}, "C", Len(TRB->GERENCIA )  , 0, "" })
+AADD( aHead , { "REPRESEN"	 	,{|| TRB->REPRESEN		}, "C", Len(TRB->REPRESEN )  , 0, "" })
+AADD( aHead , { "CONTATO"	 	,{|| TRB->CONTATO		}, "C", Len(TRB->CONTATO )   , 0, "" })
+//AADD( aHead , { "NOMECONT"	 	,{|| TRB->NOMECONT		}, "C", Len(TRB->NOMECONT )  , 0, "" })
+AADD( aHead , { "EMAIL"			,{|| TRB->EMAIL			}, "C", Len(TRB->EMAIL )  	 , 0, "" })
+//AADD( aHead , { "ENCERRADO"	 	,{|| TRB->ENCERRADO		}, "C", Len(TRB->ENCERRADO )   , 0, "" })
 
 
 Return( aHead )
@@ -153,7 +167,14 @@ AADD( aStruct , { "VENCTO" 	 	, "D" , 08 , 0 } )
 AADD( aStruct , { "VALOR" 		, "N" , 20 , 2 } )
 AADD( aStruct , { "VALORPED"	, "N" , 20 , 2 } )
 AADD( aStruct , { "SALDO" 		, "N" , 20 , 2 } )
+AADD( aStruct , { "CONDPAG" 	, "C" , 03 , 0 } )
 AADD( aStruct , { "PEDIDO" 	 	, "C" , 06 , 0 } )
+AADD( aStruct , { "REPRESEN" 	, "C" , 06 , 0 } )
+AADD( aStruct , { "GERENCIA" 	, "C" , 06 , 0 } )
+AADD( aStruct , { "CONTATO" 	, "C" , 06 , 0 } )
+//AADD( aStruct , { "NOMECONT"	, "C" , 20 , 0 } )
+//AADD( aStruct , { "ENCERRADO" 	, "C" , 01 , 0 } )
+AADD( aStruct , { "EMAIL" 	 	, "C" , 200 , 0 } )
 
 AADD( aStruct , { "RECNO" 		 , "N" , 20 , 0 } )
 AADD( aStruct , { "RECSA1" 		 , "N" , 20 , 0 } )
@@ -180,28 +201,40 @@ dbSetIndex( cInd2 + OrdBagExt() )
 // Carregar os dados  em TRB.
 If MV_PAR01 == 1
 	
-	cQuery += " SELECT E1_FILIAL FILIAL, E1_PREFIXO PREFIXO, E1_NUM NUMERO, E1_PARCELA PARCELA, E1_PEDIDO PEDIDO, " 									+CRLF
-	cQuery += " E1_TIPO TIPO, E1_CLIENTE CLIENTE, E1_LOJA LOJA, A1_NOME NOME, E1_NOMCLI CLI_FANT, A1_CGC CNPJ, "  														+CRLF
-	cQuery += " E1_EMISSAO EMISSAO, E1_VENCREA VENCTO, E1_VLCRUZ VALOR, F2_VALFAT VALORPED, E1_SALDO SALDO, SE1.R_E_C_N_O_ RECNO, SA1.R_E_C_N_O_ RECSA1 " 	+CRLF
+	cQuery += " SELECT E1_FILIAL FILIAL, E1_PREFIXO PREFIXO, E1_NUM NUMERO, E1_PARCELA PARCELA, E1_PEDIDO PEDIDO, " 										+CRLF
+	cQuery += " E1_TIPO TIPO, E1_CLIENTE CLIENTE, E1_LOJA LOJA, A1_NOME NOME, E1_NOMCLI CLI_FANT, A1_CGC CNPJ, C5_CONDPAG CONDPAG, " 						+CRLF
+	cQuery += " C5_VEND1 REPRESEN, C5_VEND1 GERENCIA, C5_XEMAILC EMAIL, C5_XCONT CONTATO, " +CRLF // C5_XNCONT NOMECONT,"  										+CRLF
+	cQuery += " E1_EMISSAO EMISSAO, E1_VENCREA VENCTO, E1_VALOR VALOR, E1_VLCRUZ VALORPED, E1_SALDO SALDO, SE1.R_E_C_N_O_ RECNO, SA1.R_E_C_N_O_ RECSA1 " 	+CRLF
 	cQuery += " FROM  "+RetSqlName('SE1')+"  SE1 
 	cQuery += "  INNER JOIN "+RetSqlName('SA1')+" SA1 ON   A1_FILIAL = '"+xFilial('SA1')+"' AND E1_CLIENTE = A1_COD     AND E1_LOJA  = A1_LOJA AND SA1.D_E_L_E_T_ <> '*' "	+CRLF
-	cQuery += "  INNER JOIN "+RetSqlName('SF2')+" SF2 ON   F2_FILIAL = '"+xFilial('SF2')+"' AND E1_CLIENTE = F2_CLIENTE AND E1_LOJA  = F2_LOJA AND E1_NUM = F2_DOC AND E1_PREFIXO = F2_SERIE  AND SF2.D_E_L_E_T_ <> '*' "	+CRLF
+	//cQuery += "  INNER JOIN "+RetSqlName('SF2')+" SF2 ON   F2_FILIAL = '"+xFilial('SF2')+"' AND E1_CLIENTE = F2_CLIENTE AND E1_LOJA  = F2_LOJA AND E1_NUM = F2_DOC AND E1_PREFIXO = F2_SERIE  AND SF2.D_E_L_E_T_ <> '*' "	+CRLF
+
+//	cQuery += "  INNER JOIN "+RetSqlName('SC5')+" SC5 ON   C5_FILIAL = '"+xFilial('SC5')+"' AND E1_CLIENTE = C5_CLIENTE AND E1_LOJA  = C5_LOJACLI AND E1_NUM = C5_NOTA AND E1_PREFIXO = C5_SERIE  AND SC5.D_E_L_E_T_ <> '*' "	+CRLF
+	cQuery += "  INNER JOIN "+RetSqlName('SC5')+" SC5 ON   C5_FILIAL = '"+xFilial('SC5')+"' AND E1_CLIENTE = C5_CLIENTE AND E1_LOJA  = C5_LOJACLI AND E1_PEDIDO = C5_NUM AND SC5.D_E_L_E_T_ <> '*' "	+CRLF
+
 	cQuery += " WHERE E1_VENCREA BETWEEN '"+DTOS(MV_PAR02)+"' AND '"+DTOS(MV_PAR03)+"'"															+CRLF
-	cQuery += " AND E1_CLIENTE BETWEEN '"+MV_PAR04+"' AND '"+MV_PAR05+"'"																		+CRLF
-	cQuery += " AND E1_SALDO > 0 "																												+CRLF
+	cQuery += " AND E1_CLIENTE BETWEEN '"+MV_PAR04+"' AND '"+MV_PAR05+"'"	+CRLF
+	
+	If mv_par06 == 1	// Exibe Titulos Encerrados com Hist."
+		cQuery += " AND (E1_SALDO > 0 OR ( SELECT COUNT(*) FROM "+RetSqlName('ZAI')+" ZAI WHERE ZAI_FILIAL = '"+xFilial("ZAI")+"' AND ZAI_PREFIX = E1_PREFIXO AND ZAI_NUM = E1_NUM AND ZAI_PARCEL = E1_PARCELA AND ZAI_TIPO = E1_TIPO AND ZAI.D_E_L_E_T_ <> '*' ) > 0)
+	Else
+		cQuery += " AND E1_SALDO > 0
+	EndIf
+	cQuery += " AND E1_TIPO IN ('NF ','BOL') "
 	cQuery += " AND SE1.D_E_L_E_T_<>'*'"																										+CRLF
 	
-
 
 Elseif MV_PAR01 == 2
 
 	cQuery +=" SELECT DISTINCT E1_FILIAL FILIAL, E1_PREFIXO PREFIXO, E1_NUM NUMERO, E1_PARCELA PARCELA, E1_PEDIDO PEDIDO, " 									+CRLF
-	cQuery +=" E1_TIPO TIPO, E1_CLIENTE CLIENTE, E1_LOJA LOJA, A1_NOME NOME, E1_NOMCLI CLI_FANT, A1_CGC CNPJ, "  																+CRLF
-	cQuery +=" E1_EMISSAO EMISSAO, E1_VENCREA VENCTO, E1_VLCRUZ VALOR, F2_VALFAT VALORPED, E1_SALDO SALDO, SE1.R_E_C_N_O_ RECNO, SA1.R_E_C_N_O_ RECSA1 " 			+CRLF
+	cQuery +=" E1_TIPO TIPO, E1_CLIENTE CLIENTE, E1_LOJA LOJA, A1_NOME NOME, E1_NOMCLI CLI_FANT, A1_CGC CNPJ,  C5_CONDPAG CONDPAG, " 							+CRLF
+	cQuery +=" C5_VEND1 REPRESEN, C5_VEND1 GERENCIA, C5_XEMAILC EMAIL,  C5_XCONT CONTATO, " +CRLF // C5_XNCONT NOMECONT,"  											
+	cQuery +=" E1_EMISSAO EMISSAO, E1_VENCREA VENCTO, E1_VALOR VALOR, E1_VLCRUZ VALORPED, E1_SALDO SALDO, SE1.R_E_C_N_O_ RECNO, SA1.R_E_C_N_O_ RECSA1 " 		+CRLF
 	cQuery +=" FROM  "+RetSqlName('ZAI')+"  ZAI 
-	cQuery +=" 	INNER JOIN "+RetSqlName('SE1')+" SE1 ON   E1_FILIAL = ZAI_FILIAL AND E1_CLIENTE = ZAI_CLIENT AND E1_LOJA = ZAI_LOJA	AND E1_PREFIXO = ZAI_PREFIX	AND E1_NUM = ZAI_NUM AND E1_PARCELA = ZAI_PARCEL AND SE1.D_E_L_E_T_ <> '*'"		+CRLF
-	cQuery +=" 	INNER JOIN "+RetSqlName('SA1')+" SA1 ON   A1_FILIAL = '"+xFilial('SA1')+"' AND E1_CLIENTE = A1_COD AND E1_LOJA  = A1_LOJA AND SA1.D_E_L_E_T_ <> '*'"		+CRLF
-	cQuery +=" 	INNER JOIN "+RetSqlName('SF2')+" SF2 ON   F2_FILIAL = ZAI_FILIAL AND F2_CLIENTE = ZAI_CLIENT AND F2_LOJA = ZAI_LOJA	AND F2_SERIE = ZAI_PREFIX	AND F2_DOC = ZAI_NUM AND SF2.D_E_L_E_T_ <> '*'"		+CRLF
+	cQuery +=" 	INNER JOIN "+RetSqlName('SE1')+" SE1 ON   E1_FILIAL = ZAI_FILIAL AND E1_CLIENTE = ZAI_CLIENT AND E1_LOJA = ZAI_LOJA	AND E1_PREFIXO = ZAI_PREFIX	AND E1_NUM = ZAI_NUM AND E1_PARCELA = ZAI_PARCEL AND ZAI_TIPO = E1_TIPO AND SE1.D_E_L_E_T_ <> '*'"		+CRLF
+	cQuery +=" 	INNER JOIN "+RetSqlName('SA1')+" SA1 ON   A1_FILIAL = '"+xFilial('SA1')+"' AND E1_CLIENTE = A1_COD AND E1_LOJA  = A1_LOJA AND SA1.D_E_L_E_T_ <> '*'"																			+CRLF
+	//cQuery +=" 	INNER JOIN "+RetSqlName('SF2')+" SF2 ON   F2_FILIAL = ZAI_FILIAL AND F2_CLIENTE = ZAI_CLIENT AND F2_LOJA = ZAI_LOJA	AND F2_SERIE = ZAI_PREFIX	AND F2_DOC = ZAI_NUM AND SF2.D_E_L_E_T_ <> '*'"									+CRLF
+	cQuery += " INNER JOIN "+RetSqlName('SC5')+" SC5 ON   C5_FILIAL = '"+xFilial('SC5')+"' AND ZAI_CLIENT = C5_CLIENTE AND ZA1_LOJA = C5_LOJACLI AND ZAI_NUM = C5_NOTA AND ZAI_PREFIX = C5_SERIE  AND SC5.D_E_L_E_T_ <> '*' "					+CRLF
 	cQuery +=" WHERE ZAI_AGEN BETWEEN '"+DTOS(MV_PAR02)+"' AND '"+DTOS(MV_PAR03)+"'"																	+CRLF
 	cQuery +=" AND ZAI_CLIENT BETWEEN '"+MV_PAR04+"' AND '"+MV_PAR05+"'"																				+CRLF
 	cQuery +=" AND E1_SALDO > 0 "																														+CRLF
@@ -293,6 +326,7 @@ aAdd(aRegs,{c_Perg,"02","Vencto/Agend. de ?"	,'','',"mv_ch2","D",8,0, ,"G","",""
 aAdd(aRegs,{c_Perg,"03","Vencto/Agend. até?"	,'','',"mv_ch3","D",8,0, ,"G","","","","","mv_par03","","","","","","","",""	,"","","","","","","","",""  })
 aAdd(aRegs,{c_Perg,"04","Cliente de?"			,'','',"mv_ch4","C",TamSx3("A1_COD")[1],0, ,"G","","SA1","","","mv_par04","","","","","","","",""	,"","","","","","","","",""  })
 aAdd(aRegs,{c_Perg,"05","Cliente Até?"			,'','',"mv_ch5","C",TamSx3("A1_COD")[1],0, ,"G","","SA1","","","mv_par05","","","","","","","",""	,"","","","","","","","","" })
+aAdd(aRegs,{c_Perg,"06","Follow Up Ja Encerrado?","","","mv_ch06"	,"N", 01,0,0,"C","","mv_par06","Sim            "	,"Sim            "	,"Sim            "	,""				,"               "	,"Nao            "	,"Nao            "	,"Nao            "	,"","","               "	,"               "	,"               "	,"","","","","","","","","","","",""  		,"","","",""})
 
 
 For i:=1 to Len(aRegs)

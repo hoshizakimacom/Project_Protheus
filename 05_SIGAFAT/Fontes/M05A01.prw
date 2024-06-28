@@ -1,7 +1,7 @@
 #Include 'Protheus.ch'
 
 //------------------------------------------------------------------------------
-//	Rotina de calculo de preço teste
+//	Rotina de calcualo de preço
 //------------------------------------------------------------------------------
 User Function M05A01(_cFunc,lAtuOper)
     Local _nPrecoVend	:= 0

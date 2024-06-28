@@ -16,7 +16,7 @@ User Function SACI008()
 	U_M06A01('+',nValPadrao)
 
 	/*
-	If SE1->E1_PREFIXO == "PVA" .And. SE1->E1_TIPO == "BOL" .And. SE5->E5_MOTBX  $ "NOR/CAC" .And. SE5->E5_TIPODOC $ "VL/V2/BA"
+	If SE1->E1_PREFIXO == "PVA" .And. SE1->E1_TIPO == "BOL" .And. SE5->E5_MOTBX  $ "NOR/CAC/BND/FIN" .And. SE5->E5_TIPODOC $ "VL/V2/BA"
 
 		oTituloCRA := ClassTituloCRA():New()
 		If !oTituloCRA:Inclui()

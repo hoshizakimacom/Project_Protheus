@@ -53,7 +53,7 @@ Local aFin040 := {}
 Private lMsErroAuto := .F. // variavel interna da rotina automatica	   	
 Private lMsHelpAuto := .F.
 
-If SE1->E1_TIPO == "BOL" .And. SE1->E1_PREFIXO == "PVA" .And. SE5->E5_MOTBX $ "NOR/CAC" .And. SE5->E5_TIPODOC $ "VL/V2/BA"
+If SE1->E1_TIPO == "BOL" .And. SE1->E1_PREFIXO == "PVA" .And. SE5->E5_MOTBX $ "NOR/CAC/BND/FIN" .And. SE5->E5_TIPODOC $ "VL/V2/BA"
 
     dbSelectArea("SE1")
 	dbSetOrder(1)
@@ -111,7 +111,7 @@ Local aFina040 := {}
 Private lMsErroAuto := .F. // variavel interna da rotina automatica	   	
 Private lMsHelpAuto := .F.	
 
-If SE1->E1_TIPO == "BOL" .And. SE1->E1_PREFIXO == "PVA" .And. SE5->E5_MOTBX  $ "NOR/CAC"
+If SE1->E1_TIPO == "BOL" .And. SE1->E1_PREFIXO == "PVA" .And. SE5->E5_MOTBX  $ "NOR/CAC/BND/FIN"
 
     dbSelectArea("SE1")
 	dbSetOrder(1)

@@ -37,7 +37,7 @@ User Function M05A08()
 		FWMsgRun(, {|| MA08GetTot(SC5->(Recno()),@_nTotal,@_nFrete,@_nSeguro,@_nDesp,@_nFreteA,@_nAcrFin,@_cCondPag) },,'Carregando totais do pedido...')
 
 
-		_nSE1		:= MA08GetSE1(SC5->C5_NUM,_cRAPre)
+		_nSE1		:= MA08GetSE1(SC5->C5_NUM,_cRAPre,SC5->C5_CLIENTE,SC5->C5_LOJACLI)
 		_nRecAnt	:= _nTotal - _nSE1
 	EndIf
 
@@ -337,7 +337,7 @@ Return _cRet
 //+--------------------------------------------------------------------------------------------
 //|	Rotina responsável pelo retorno do total de títulos de recebimento antecipados do pedido
 //+--------------------------------------------------------------------------------------------
-Static Function MA08GetSE1(_cPedido,_cRAPre)
+Static Function MA08GetSE1(_cPedido,_cRAPre,_cCodCli,_cLojCli)
 	Local _nRet	:= 0
 	Local _cAlias	:= GetNextAlias()
 
@@ -348,7 +348,10 @@ Static Function MA08GetSE1(_cPedido,_cRAPre)
 			AND E1_FILIAL = %xFilial:SE1%
 			AND E1_PEDIDO = %Exp:_cPedido%
 			AND E1_PREFIXO = %Exp:_cRAPre%
-//			AND E1_TITPED = %Exp:_cRAPre% + %Exp:_cPedido%
+			AND E1_CLIENTE = %Exp:_cCodCli%
+			AND E1_LOJA    = %Exp:_cLojCli%
+			AND E1_TIPO NOT IN ('CRA')
+			//AND E1_TIPOPED = %Exp:_cRAPre% + %Exp:_cPedido%
 	EndSql
 
 	If (_cAlias)->(!EOF())
