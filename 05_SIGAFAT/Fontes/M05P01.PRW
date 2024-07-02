@@ -363,7 +363,7 @@ Static Function emailHistorico(cIDHistorico,aConsultaHistorico)
     EndIf
 
     /*
-        Atribui dados dos itens ao modelo html
+        Atribui dados dos itens ao modelo HTML
     */
     cHTMLItens := ""
 
