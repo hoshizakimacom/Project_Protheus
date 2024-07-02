@@ -8,7 +8,7 @@ User Function M05A11(_nOpc)
     Local _lRet     := .T.
     Local _cAlias   := GetNextAlias()
     Local _cPicture := '@E 9,999,999,999,999.99'
-    Local _cMsg     := 'Não é possível excluir o pedido #1 pois possui títulos a receber vinculados.' + CRLF + 'Exclua os títulos antes de excluir o pedido.' + CRLF + CRLF + ' #2'
+    Local _cMsg     := 'Não é possível excluir o pedido #2 pois possui títulos a receber vinculados.' + CRLF + 'Exclua os títulos antes de excluir o pedido.' + CRLF + CRLF + ' #2'
     Local _cTitulos := ''
     Local _cPedido  := SC5->C5_NUM
 
