@@ -1,9 +1,5 @@
 #Include 'Protheus.ch'
 
-//+-------------------------------------------------------------------------------------------------------
-//  Função que recebe o(s) código(s) do(s) grupo(s) e retorna .T. se o usuario fizer parte do grupo ou
-//  .F., caso o usuário não esteja no grupo
-//+-------------------------------------------------------------------------------------------------------
 User Function M00A01(_cGrupo)
     Local _lRet         := .F.
     Local _aGrpUser     := UsrRetGrp(UsrRetName(RetCodUsr()))
