@@ -322,6 +322,23 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	//cUm		 := (cAliasQry)->B1_UM
 	nSldEst	 := (cAliasQry)->B2_QATU
 	nPrvEntr := (cAliasQry)->QTD_PRV_PROD
+<<<<<<< Updated upstream
+=======
+	cProd	 := (cAliasQry)->B1_XPROD
+
+	Do Case
+    	Case (cAliasQry)->B1_XPROD == "1" //Chamado 6578
+    		 cProd   := "CPC"
+    	Case (cAliasQry)->B1_XPROD == "2"
+    	 	 cProd   := "Coccao"
+    	Case (cAliasQry)->B1_XPROD == "3"
+    		 cProd   := "Refrigeracao"
+		Case (cAliasQry)->B1_XPROD == "4"
+    		 cProd   := "Mobiliario"
+		Case (cAliasQry)->B1_XPROD == "5"
+    		 cProd   := "Periferico"	 
+    End Case
+>>>>>>> Stashed changes
 
 	cXFamil	 := POSICIONE("ZA1",1,xFilial("ZA1")+(cAliasQry)->B1_XFAMILI,"ZA1_DESC")
 	If MV_PAR03 == 1
