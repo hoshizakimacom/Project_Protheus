@@ -324,7 +324,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cProd	 := (cAliasQry)->B1_XPROD
 
 	Do Case
-    	Case (cAliasQry)->B1_XPROD == "1" // Chamado 6578
+    	Case (cAliasQry)->B1_XPROD == "1" // #6578
     		 cProd   := "CPC"
     	Case (cAliasQry)->B1_XPROD == "2"
     	 	 cProd   := "Coccao"
