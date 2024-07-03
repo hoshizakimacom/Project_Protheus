@@ -322,8 +322,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	//cUm		 := (cAliasQry)->B1_UM
 	nSldEst	 := (cAliasQry)->B2_QATU
 	nPrvEntr := (cAliasQry)->QTD_PRV_PROD
-<<<<<<< Updated upstream
-=======
+
 	cProd	 := (cAliasQry)->B1_XPROD
 
 	Do Case
@@ -338,7 +337,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		Case (cAliasQry)->B1_XPROD == "5"
     		 cProd   := "Periferico"	 
     End Case
->>>>>>> Stashed changes
+
 
 	cXFamil	 := POSICIONE("ZA1",1,xFilial("ZA1")+(cAliasQry)->B1_XFAMILI,"ZA1_DESC")
 	If MV_PAR03 == 1
