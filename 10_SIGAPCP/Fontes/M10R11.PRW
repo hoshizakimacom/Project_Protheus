@@ -43,7 +43,6 @@ Static Function ReportDef()
 	TRCell():New(oVenProd,"DESC"		,/*Tabela*/ ,"Descriçao"		 ,PesqPict("SB1","B1_DESC")		,TamSx3("B1_DESC")[1]		,/*lPixel*/,{|| cDesc	})	// Descrição do Produto
 	TRCell():New(oVenProd,"TIPO"        ,/*Tabela*/ ,"Tipo"              ,PesqPict("SB1","B1_TIPO")     ,TamSx3("B1_TIPO")[1]       ,/*lPixel*/,{|| cTipo   })  // Tipo do Produto
 	TRCell():New(oVenProd,"FAMILIA"     ,/*Tabela*/ ,"Familia"           ,PesqPict("SB1","B1_XFAMILI")  ,TamSx3("B1_XFAMILI")[1]    ,/*lPixel*/,{|| cFamilia})  // Familia de Produtos
-	TRCell():New(oVenProd,"PRODUZIDO"   ,/*Tabela*/ ,"Produzido em"      ,PesqPict("SB1","B1_XPROD")  	,TamSx3("B1_XPROD")[1]	    ,/*lPixel*/,{|| cProd})		// Produzido em
 	TRCell():New(oVenProd,"ARMAZEM"		,/*Tabela*/ ,"Armazem"			 ,PesqPict("SD3","D3_LOCAL")	,TamSx3("D3_LOCAL")[1]		,/*lPixel*/,{|| cLocal	})	// Armazem
 	TRCell():New(oVenProd,"QTDAPON"		,/*Tabela*/ ,"Qtd. Apontada"	 ,PesqPict("SD3","D3_QUANT")	,TamSx3("D3_QUANT")[1]		,/*lPixel*/,{|| nQtdApon})	// Quantidade apontada (produzida)
 	TRCell():New(oVenProd,"EMISSAO"		,/*Tabela*/ ,"Dt.Apontamento"	 ,PesqPict("SD3","D3_EMISSAO")  ,TamSx3("D3_EMISSAO")[1]	,/*lPixel*/,{|| dDtEmiss})	// Data de Emissão da O.P.
@@ -52,6 +51,7 @@ Static Function ReportDef()
 	TRCell():New(oVenProd,"NUMSER"		,/*Tabela*/ ,"Numero Serie"		 ,PesqPict("SD3","D3_XNSERIE")	,TamSx3("D3_XNSERIE")[1]	,/*lPixel*/,{|| cNumSer})	// Numero de Serie
 	TRCell():New(oVenProd,"NUMNF"		,/*Tabela*/ ,"Numero da NF"		 ,PesqPict("SC6","C6_NOTA")		,TamSx3("C6_NOTA")[1]		,/*lPixel*/,{|| cNumNF})	// Numero da NF #3791
 	TRCell():New(oVenProd,"DTFAT"		,/*Tabela*/ ,"Data Ult. FAt"	 ,PesqPict("SC6","C6_DATFAT")	,TamSx3("C6_DATFAT")[1]		,/*lPixel*/,{|| dDtFat})	// Data do último Faturamento #3791
+	TRCell():New(oVenProd,"PRODUZIDO"   ,/*Tabela*/ ,"Produzido em"      ,PesqPict("SB1","B1_XPROD")  	,TamSx3("B1_XPROD")[1]	    ,/*lPixel*/,{|| cProd})		// Produzido em
 Return(oReport)
 // FIM DA APRESENTAÇÃO DE DADOS
 /*-----------------------------------------------------------------------------------------*/
@@ -132,17 +132,27 @@ Static Function ReportPrint(oReport,cAliasQry,oVenProd)
 		Endif		
 		
 		Do Case
-    		Case (cAliasQry)->B1_XPROD == "1" // #6578
-    		 	cProd   := "CPC"
-    		Case (cAliasQry)->B1_XPROD == "2"
-    	 	 	cProd   := "Coccao"
-    		Case (cAliasQry)->B1_XPROD == "3"
-    		 	cProd   := "Refrigeracao"
-			Case (cAliasQry)->B1_XPROD == "4"
-    		 	cProd   := "Mobiliario"
-			Case (cAliasQry)->B1_XPROD == "5"
-    		 	cProd   := "Periferico"	 
-    	End Case
+    	Case (cAliasQry)->B1_XPROD == "1" //Chamado 6578
+    		 cProd   := "CPC"
+    	Case (cAliasQry)->B1_XPROD == "2"
+    	 	 cProd   := "Coccao"
+    	Case (cAliasQry)->B1_XPROD == "3"
+    		 cProd   := "Refrigeracao"
+		Case (cAliasQry)->B1_XPROD == "4"
+    		 cProd   := "Mobiliario"
+		Case (cAliasQry)->B1_XPROD == "5"
+    		 cProd   := "Periferico"	
+		Case (cAliasQry)->B1_XPROD == "6"
+    	 	 cProd   := "Embalagem"
+    	Case (cAliasQry)->B1_XPROD == "7"
+    		 cProd   := "Revenda"
+		Case (cAliasQry)->B1_XPROD == "8"
+    		 cProd   := "Sup.Tecnico"
+		Case (cAliasQry)->B1_XPROD == "9"
+    		 cProd   := "Transf.Fabrica" 
+		Case (cAliasQry)->B1_XPROD == "10"
+    		 cProd   := "Transf.Acabada" 
+    End Case
 
 		cNumOP      := (cAliasQry)->D3_OP
 		cCodProd    := (cAliasQry)->D3_COD
