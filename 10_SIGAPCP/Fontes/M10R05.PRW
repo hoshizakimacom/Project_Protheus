@@ -145,6 +145,7 @@ TRCell():New(oVenProd,"FRETE"		,/*Tabela*/ ,"Tp.Frete"			 ,PesqPict("SC5","C5_TP
 TRCell():New(oVenProd,"TRANSP"		,/*Tabela*/	,"Transportadora" 	 ,PesqPict("SC5","C5_TRANSP")	,TamSx3("C5_TRANSP")[1]		,/*lPixel*/,{|| cNomTran})				// Nome da Transportadora
 TRCell():New(oVenProd,"ATRASADO"	,/*Tabela*/	,"Atrasado?"		 ,PesqPict("SB1","B1_FAMILIA")	,TamSx3("B1_FAMILIA")[1]	,/*lPixel*/,{|| cAtraso	})				// Atrasado ? Sim/N�o
 TRCell():New(oVenProd,"CLASSE"		,/*Tabela*/	,"Classe"			 ,PesqPict("SB1","B1_COD")		,TamSX3("B1_COD")[1]		,/*lPixel*/,{|| cClasse	})				// Classe
+TRCell():New(oVenProd,"PRODUZIDO"	,/*Tabela*/	,"Produzido em"		 ,PesqPict("SB1","B1_XPROD")	,TamSx3("B1_XPROD")[1]		,/*lPixel*/,{|| cProd	})				// Produzido em
 /*rever*/TRCell():New(oVenProd,"ANOMES"		,/*Tabela*/ ,"Ano/Mes"			 ,PesqPict("SC6","C6_NUM")		,TamSx3("C6_NUM")[1]		,/*lPixel*/,{|| cAnoMes })				// Ano/M�s da data de entrega
 TRCell():New(oVenProd,"LIBREV"      ,/*Tabela*/ ,"Lib. Revenda"      ,PesqPict("SC5","C5_XLIBREV")  ,TamSx3("C5_XLIBREV")[1]    ,/*lPixel*/,{|| cXLibRev})              // Status de Liberacao do Financeiro Para Revenda
 TRCell():New(oVenProd,"MOTIVO"      ,/*Tabela*/ ,"Motivo"            ,PesqPict("SC5","C5_XMOTLIB")  ,TamSx3("C5_XMOTLIB")[1]    ,/*lPixel*/,{|| cXMotLib})              // Motivo de Liberacao do Financeiro Para Revenda
@@ -170,7 +171,6 @@ TRCell():New(oVenProd,"DTLIBPROD"	,/*Tabela*/ ,"Dt.Lib.Producao"	 ,PesqPict("SC5
 TRCell():New(oVenProd,"ITDESE"		,/*Tabela*/ ,"Item Desenv?"		 ,PesqPict("SB1","B1_XITDESE")	,TamSx3("B1_XITDESE")[1]	,/*lPixel*/,{|| cXItDese})				// Item em Desenvolvimento
 TRCell():New(oVenProd,"DTITDS"		,/*Tabela*/ ,"Dt.Item Desenv"	 ,PesqPict("SB1","B1_XDTITDS")	,TamSx3("B1_XDTITDS")[1]	,/*lPixel*/,{|| dXDtItDs})				// Data que o item foi colocado em desenvolvimento
 TRCell():New(oVenProd,"QTD_PRV_PROD",/*Tabela*/	,"Prev.Entr.(OP)"	 ,PesqPict("SC2","C2_QUANT")		,TamSx3("C2_QUANT")[1]		,/*lPixel*/,{|| nPrvEntr })				// Saldo em Estoque
-//TRCell():New(oVenProd,"UM"		  ,/*Tabela*/	,"Un.Medida"		 ,PesqPict("SB1","B1_UM")		,TamSx3("B1_UM")[1]+10		,/*lPixel*/,{|| cUm		})			// Unidade de Medida
 //TRCell():New(oVenProd,"PRONTA"	  ,/*Tabela*/	,"Pronta Entrega?"	 ,PesqPict("SB1","B1_FAMILIA")	,TamSx3("B1_FAMILIA")[1]+10	,/*lPixel*/,{|| cPronta	})			// Pronta Entrega ?
 
 // Valor Frete 
@@ -247,7 +247,7 @@ dbSetOrder(2)			// Produto,Numero
 			C5_XDTPCP6,C5_XOBS6,C5_XDTPCP7,C5_XOBS7,C5_XDTPCP8,C5_XOBS8, 
 			C5_XLIBPRO,C5_XDLIBPR,C5_CLIENTE, C5_LOJACLI, C5_FRETE,
 			A1_NOME, A1_NREDUZ, A1_EST, 
-			B1_XFABRIC,B1_TIPO,B1_LOCPAD,B1_XFAMILI, B1_FAMILIA, B1_XITDESE, B1_XDTITDS,B1_DESC,
+			B1_XFABRIC,B1_TIPO,B1_LOCPAD,B1_XFAMILI, B1_FAMILIA, B1_XITDESE, B1_XDTITDS,B1_DESC,B1_XPROD,
 			B5_CEME,
 			A3_GEREN,A3_NOME,A3_EMAIL,
 			B2_QATU,
@@ -319,9 +319,22 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cLocal	 := (cAliasQry)->C6_LOCAL
 	cXItDese := (cAliasQry)->B1_XITDESE
 	dXDtItDs := (cAliasQry)->B1_XDTITDS
-	//cUm		 := (cAliasQry)->B1_UM
 	nSldEst	 := (cAliasQry)->B2_QATU
 	nPrvEntr := (cAliasQry)->QTD_PRV_PROD
+	cProd	 := (cAliasQry)->B1_XPROD
+
+	Do Case
+    	Case (cAliasQry)->B1_XPROD == "1"
+    		 cProd   := "CPC"
+    	Case (cAliasQry)->B1_XPROD == "2"
+    	 	 cProd   := "Coccao"
+    	Case (cAliasQry)->B1_XPROD == "3"
+    		 cProd   := "Refrigeracao"
+		Case (cAliasQry)->B1_XPROD == "4"
+    		 cProd   := "Mobiliario"
+		Case (cAliasQry)->B1_XPROD == "5"
+    		 cProd   := "Periferico"	 
+    End Case
 
 	cXFamil	 := POSICIONE("ZA1",1,xFilial("ZA1")+(cAliasQry)->B1_XFAMILI,"ZA1_DESC")
 	If MV_PAR03 == 1
