@@ -36,7 +36,7 @@ Static Function ReportDef()
 	oVenProd:SetTotalInLine(.F.)
 
 	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
-	//ЁDefine celulas da secao                                                 Ё
+	//ЁDefine celulas da Secao                                                 Ё
 	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
 	TRCell():New(oVenProd,"NUMOP"		,/*Tabela*/	,"Num.OP"	 		 ,PesqPict("SD3","D3_OP")		,TamSx3("D3_OP")[1]			,/*lPixel*/,{|| cNumOP	})	// Numero da Ordem de ProduГЦo
 	TRCell():New(oVenProd,"PRODUTO"		,/*Tabela*/ ,"Codigo Produto"	 ,PesqPict("SD3","D3_COD")		,TamSx3("D3_COD")[1]		,/*lPixel*/,{|| cCodProd})	// CСdigo do Produto
