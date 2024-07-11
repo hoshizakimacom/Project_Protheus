@@ -3,7 +3,7 @@
                 
 
 /*-----------------------------------------------------------------------------------------*/
-// FUNÇÃO PRINCIPAL
+// FUNÃ‡ÃƒO PRINCIPAL
 User Function M10R11()
 
 	Local oReport
@@ -15,11 +15,11 @@ User Function M10R11()
 	EndIf
 
 Return
-// FIM DA FUNÇÃO PRINCIPAL
+// FIM DA FUNÃ‡ÃƒO PRINCIPAL
 /*-----------------------------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------------------------*/
-// APRESENTAÇÃO DE DADOS
+// APRESENTAÃ‡ÃƒO DE DADOS
 Static Function ReportDef()
 
 	Local oReport
@@ -27,33 +27,33 @@ Static Function ReportDef()
 	Local cAliasQry := GetNextAlias()
 
 
-	oReport := TReport():New("M10R11","Relacao Dos Apontamentos de Produção","M10R11", {|oReport| ReportPrint(oReport,cAliasQry,oVenProd)},"Este relatorio emite a relacao dos apontamentos das " + " " + "Ordens de Produção. ")
+	oReport := TReport():New("M10R11","Relacao Dos Apontamentos de ProduÃ§Ã£o","M10R11", {|oReport| ReportPrint(oReport,cAliasQry,oVenProd)},"Este relatorio emite a relacao dos apontamentos das " + " " + "Ordens de ProduÃ§Ã£o. ")
 	oReport:SetTotalInLine(.F.)
 
 	Pergunte(oReport:uParam,.F.)
 
-	oVenProd := TRSection():New(oReport,"APONTAMENTOS DE OPs",{"SD3","SB1"},/*{Array com as ordens do relatório}*/,/*Campos do SX3*/,/*Campos do SIX*/)		// "Relacao das Ordens de Produção"
+	oVenProd := TRSection():New(oReport,"APONTAMENTOS DE OPs",{"SD3","SB1"},/*{Array com as ordens do relatÃ³rio}*/,/*Campos do SX3*/,/*Campos do SIX*/)		// "Relacao das Ordens de ProduÃ§Ã£o"
 	oVenProd:SetTotalInLine(.F.)
 
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³Define celulas da secao                                                 ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	TRCell():New(oVenProd,"NUMOP"		,/*Tabela*/	,"Num.OP"	 		 ,PesqPict("SD3","D3_OP")		,TamSx3("D3_OP")[1]			,/*lPixel*/,{|| cNumOP	})	// Numero da Ordem de Produção
-	TRCell():New(oVenProd,"PRODUTO"		,/*Tabela*/ ,"Codigo Produto"	 ,PesqPict("SD3","D3_COD")		,TamSx3("D3_COD")[1]		,/*lPixel*/,{|| cCodProd})	// Código do Produto
-	TRCell():New(oVenProd,"DESC"		,/*Tabela*/ ,"Descriçao"		 ,PesqPict("SB1","B1_DESC")		,TamSx3("B1_DESC")[1]		,/*lPixel*/,{|| cDesc	})	// Descrição do Produto
+	//ÃšÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â¿
+	//Â³Define celulas da Secao                                                 Â³
+	//Ã€Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã™
+	TRCell():New(oVenProd,"NUMOP"		,/*Tabela*/	,"Num.OP"	 		 ,PesqPict("SD3","D3_OP")		,TamSx3("D3_OP")[1]			,/*lPixel*/,{|| cNumOP	})	// Numero da Ordem de ProduÃ§Ã£o
+	TRCell():New(oVenProd,"PRODUTO"		,/*Tabela*/ ,"Codigo Produto"	 ,PesqPict("SD3","D3_COD")		,TamSx3("D3_COD")[1]		,/*lPixel*/,{|| cCodProd})	// CÃ³digo do Produto
+	TRCell():New(oVenProd,"DESC"		,/*Tabela*/ ,"DescriÃ§ao"		 ,PesqPict("SB1","B1_DESC")		,TamSx3("B1_DESC")[1]		,/*lPixel*/,{|| cDesc	})	// DescriÃ§Ã£o do Produto
 	TRCell():New(oVenProd,"TIPO"        ,/*Tabela*/ ,"Tipo"              ,PesqPict("SB1","B1_TIPO")     ,TamSx3("B1_TIPO")[1]       ,/*lPixel*/,{|| cTipo   })  // Tipo do Produto
 	TRCell():New(oVenProd,"FAMILIA"     ,/*Tabela*/ ,"Familia"           ,PesqPict("SB1","B1_XFAMILI")  ,TamSx3("B1_XFAMILI")[1]    ,/*lPixel*/,{|| cFamilia})  // Familia de Produtos
 	TRCell():New(oVenProd,"ARMAZEM"		,/*Tabela*/ ,"Armazem"			 ,PesqPict("SD3","D3_LOCAL")	,TamSx3("D3_LOCAL")[1]		,/*lPixel*/,{|| cLocal	})	// Armazem
 	TRCell():New(oVenProd,"QTDAPON"		,/*Tabela*/ ,"Qtd. Apontada"	 ,PesqPict("SD3","D3_QUANT")	,TamSx3("D3_QUANT")[1]		,/*lPixel*/,{|| nQtdApon})	// Quantidade apontada (produzida)
-	TRCell():New(oVenProd,"EMISSAO"		,/*Tabela*/ ,"Dt.Apontamento"	 ,PesqPict("SD3","D3_EMISSAO")  ,TamSx3("D3_EMISSAO")[1]	,/*lPixel*/,{|| dDtEmiss})	// Data de Emissão da O.P.
+	TRCell():New(oVenProd,"EMISSAO"		,/*Tabela*/ ,"Dt.Apontamento"	 ,PesqPict("SD3","D3_EMISSAO")  ,TamSx3("D3_EMISSAO")[1]	,/*lPixel*/,{|| dDtEmiss})	// Data de EmissÃ£o da O.P.
 	TRCell():New(oVenProd,"OPERADOR"	,/*Tabela*/ ,"Operador"	         ,PesqPict("SD3","D3_USUARIO")  ,TamSx3("D3_USUARIO")[1]	,/*lPixel*/,{|| cUsuario})	// Operador que efetuou o apontamento
 	TRCell():New(oVenProd,"PARCTOT"		,/*Tabela*/ ,"Parcial/Total"	 ,PesqPict("SD3","D3_PARCTOT")	,TamSx3("D3_PARCTOT")[1]	,/*lPixel*/,{|| cParcTot})	// Parcial Total
 	TRCell():New(oVenProd,"NUMSER"		,/*Tabela*/ ,"Numero Serie"		 ,PesqPict("SD3","D3_XNSERIE")	,TamSx3("D3_XNSERIE")[1]	,/*lPixel*/,{|| cNumSer})	// Numero de Serie
 	TRCell():New(oVenProd,"NUMNF"		,/*Tabela*/ ,"Numero da NF"		 ,PesqPict("SC6","C6_NOTA")		,TamSx3("C6_NOTA")[1]		,/*lPixel*/,{|| cNumNF})	// Numero da NF #3791
-	TRCell():New(oVenProd,"DTFAT"		,/*Tabela*/ ,"Data Ult. FAt"	 ,PesqPict("SC6","C6_DATFAT")	,TamSx3("C6_DATFAT")[1]		,/*lPixel*/,{|| dDtFat})	// Data do último Faturamento #3791
-	TRCell():New(oVenProd,"PRODUZIDO"   ,/*Tabela*/ ,"Produzido em"      ,PesqPict("SB1","B1_XPROD")  	,TamSx3("B1_XPROD")[1]	    ,/*lPixel*/,{|| cProd})		// Produzido em
+	TRCell():New(oVenProd,"DTFAT"		,/*Tabela*/ ,"Data Ult. FAt"	 ,PesqPict("SC6","C6_DATFAT")	,TamSx3("C6_DATFAT")[1]		,/*lPixel*/,{|| dDtFat})	// Data do Ãºltimo Faturamento #3791
+	TRCell():New(oVenProd,"PRODEM"		,/*Tabela*/ ,"Produzido em"	 	 ,PesqPict("SB1","B1_XPROD")	,TamSx3("B1_XPROD")[1]		,/*lPixel*/,{|| cProd})		// Produzido em
 Return(oReport)
-// FIM DA APRESENTAÇÃO DE DADOS
+// FIM DA APRESENTAÃ‡ÃƒO DE DADOS
 /*-----------------------------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------------------------*/
@@ -62,34 +62,35 @@ Static Function ReportPrint(oReport,cAliasQry,oVenProd)
 
 	Local lPosB1	:= .F.
 
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³Filtragem do relatório                                                  ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	//ÃšÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â¿
+	//Â³Filtragem do relatÃ³rio                                                  Â³
+	//Ã€Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã™
 	dbSelectArea("SB1")		// Cadastro do Produt
-	dbSetOrder(1)			// Filial+Produto - Índice da tabela
+	dbSetOrder(1)			// Filial+Produto - Ãndice da tabela
 
 	#IFDEF TOP
 		
-		// INÍCIO DA QUERY                                       
+		// INÃCIO DA QUERY                                       
 		/*-------------------------------------------------------------------------------*/
 
 		oReport:Section(1):BeginQuery()	
 
 		BeginSql Alias cAliasQry
 		
-			SELECT DISTINCT 
+			SELECT  
 				D3_FILIAL,D3_COD,D3_QUANT,D3_CF,D3_LOCAL,D3_DOC
 				,D3_EMISSAO,D3_PARCTOT,D3_OP,D3_USUARIO,D3_XNSERIE
 				,C6_DATFAT,C6_NOTA
 				,B1_XPROD
+
 			FROM 
 				%Table:SD3% SD3
 				LEFT JOIN SC6010 SC6 //#3791
 					ON SD3.D_E_L_E_T_ = ' '
 					AND D3_COD = C6_PRODUTO
 					AND LEFT (D3_OP,8) = (C6_NUMOP + C6_ITEMOP)//#3791
-			INNER JOIN %Table:SB1% SB1 ON B1_FILIAL = %xFilial:SB1% AND B1_COD = C6_PRODUTO AND SB1.%NotDel%
-			
+				INNER JOIN %Table:SB1% SB1 ON B1_FILIAL = %xFilial:SB1% AND B1_COD = D3_COD AND SB1.%NotDel%
+				
 			WHERE 
 				SD3.D3_FILIAL = '01' AND
 				SD3.D3_EMISSAO >= %Exp:MV_PAR01% AND 
@@ -105,9 +106,9 @@ Static Function ReportPrint(oReport,cAliasQry,oVenProd)
 		oReport:Section(1):EndQuery(/*Array com os parametros do tipo Range*/)
 	#ENDIF		
 
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³Inicio da impressao do fluxo do relatório                               ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	//ÃšÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â¿
+	//Â³Inicio da impressao do fluxo do relatÃ³rio                               Â³
+	//Ã€Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã™
 	dbSelectArea(cAliasQry)
 	dbGoTop()
 	oReport:SetMeter((cAliasQry)->(LastRec()))
@@ -128,10 +129,9 @@ Static Function ReportPrint(oReport,cAliasQry,oVenProd)
 			cDesc	 := "Nao cadastrado"
 			cFamilia := "Nao cadastrado"
 			cTipo    := "Nao cadastrado"
-			cProd	 := "Nao cadastrado"
 		Endif		
 		
-		Do Case
+	Do Case
     	Case (cAliasQry)->B1_XPROD == "1" //Chamado 6578
     		 cProd   := "CPC"
     	Case (cAliasQry)->B1_XPROD == "2"
@@ -153,7 +153,7 @@ Static Function ReportPrint(oReport,cAliasQry,oVenProd)
 		Case (cAliasQry)->B1_XPROD == "10"
     		 cProd   := "Transf.Acabada" 
     End Case
-
+		
 		cNumOP      := (cAliasQry)->D3_OP
 		cCodProd    := (cAliasQry)->D3_COD
 		cLocal      := (cAliasQry)->D3_LOCAL
@@ -163,7 +163,7 @@ Static Function ReportPrint(oReport,cAliasQry,oVenProd)
 		cParcTot    := IIF((cAliasQry)->D3_PARCTOT == "T","TOTAL","PARCIAL")
 		cNumSer		:= (cAliasQry)->D3_XNSERIE
 
-		cNumNF 		:= IIF((cAliasQry)->C6_NOTA != " ",C6_NOTA,"NF NÃO EMITIDA") //#3791
+		cNumNF 		:= IIF((cAliasQry)->C6_NOTA != " ",C6_NOTA,"NF NÃƒO EMITIDA") //#3791
 		dDtFat		:= (cAliasQry)->C6_DATFAT //#3791
 		
 
