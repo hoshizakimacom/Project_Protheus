@@ -277,7 +277,7 @@ If lRet
     oPrinter:Say(nRow                 ,2876    , "QUANTIDADE = " + AllTrim(Str(SC2->C2_QUANT)),oFont14B)
 
     oPrinter:Say(nRow += nRowStep     ,0100    , AllTrim(Posicione("SB1",1,xFilial("SB1")+SC2->C2_PRODUTO,"B1_DESC"))        ,oFont14B)
-    oPrinter:Say(nRow                 ,2876    , "FGQ-011_rev00", oFont12)  
+    oPrinter:Say(nRow                 ,2876    , "FGQ-AL-011 Rev.01", oFont12)   //#6748 - De FGQ-011_rev00 para FGQ-AL-011 Rev.01  
 
     nRow += nRowStep 
     oPrinter:Line(nRow, 0100,nRow, 3200)
