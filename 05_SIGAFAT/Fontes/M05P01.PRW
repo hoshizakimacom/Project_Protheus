@@ -2,7 +2,7 @@
 #Include "TopConn.ch"
 
 /*/{Protheus.doc} M05P01
-Ponto de Entrada antes da gravação do Pedido de Venda. 
+Ponto de Entrada antes da gravaÃ§Ã£o do Pedido de Venda. 
 
 @type function
 @author	Jorge Heitor T. de Oliveira
@@ -29,7 +29,7 @@ User Function M05P01(nOpcao)
 Return
 
 /*
-    Valida se a personalização pode ser executada
+    Valida se a personalizaÃ§Ã£o pode ser executada
 */
 Static Function podeExecutar(nOpcao)
     Local lReturn       as logical
@@ -43,12 +43,12 @@ Static Function podeExecutar(nOpcao)
 
         EndIf
         
-        If nOpcao == 1 //Inclusão de Pedido não monitora
+        If nOpcao == 1 //InclusÃ£o de Pedido nÃ£o monitora
             Break
 
         EndIf
 
-        If nOpcao == 3 //Exclusão de Pedido não monitora
+        If nOpcao == 3 //ExclusÃ£o de Pedido nÃ£o monitora
             Break
 
         EndIf
@@ -60,7 +60,7 @@ Static Function podeExecutar(nOpcao)
 Return lReturn
 
 /*
-    Processa avaliação dos dados e possível geração de Log
+    Processa avaliaÃ§Ã£o dos dados e possÃ­vel geraÃ§Ã£o de Log
 */
 Static Function processaDados(nOpcao)
     Local aSC5CamposLog         as array
@@ -115,15 +115,15 @@ Static Function processaDados(nOpcao)
     aHistorico[x][7] -> Valor Historico (Antigo)
     aHistorico[x][8] -> Data
     aHistorico[x][9] -> Hora
-    aHistorico[x][10] -> ID de Usuário
-    aHistorico[x][11] -> Status Modificação
-    aHistorico[x][12] -> Código do Produto
+    aHistorico[x][10] -> ID de UsuÃ¡rio
+    aHistorico[x][11] -> Status ModificaÃ§Ã£o
+    aHistorico[x][12] -> CÃ³digo do Produto
     */
 
-    //Verificação de campos do cabeçalho
+    //VerificaÃ§Ã£o de campos do cabeÃ§alho
     If Len(aSC5CamposLog) > 0
         For nCampo := 1 To Len(aSC5CamposLog)
-            //Faz comparações para avaliar modificações
+            //Faz comparaÃ§Ãµes para avaliar modificaÃ§Ãµes
             cCampo := aSC5CamposLog[nCampo]
             cAliasCampo := "SC5"
             cFilialRegistro := M->C5_FILIAL
@@ -139,7 +139,7 @@ Static Function processaDados(nOpcao)
 
             EndIf
 
-            If AllTrim(cNovoValor) <> AllTrim(cAntigoValor) //Houve modificação
+            If AllTrim(cNovoValor) <> AllTrim(cAntigoValor) //Houve modificaÃ§Ã£o
                 aAdd(aHistorico,{;
                                     cAliasCampo,;
                                     cFilialRegistro,;
@@ -161,7 +161,7 @@ Static Function processaDados(nOpcao)
 
     EndIf
 
-    //Verificação de campos dos itens
+    //VerificaÃ§Ã£o de campos dos itens
     If Len(aSC6CamposLog) > 0
         For nItem := 1 To Len(aCols)
             cNovoProduto := ""
@@ -169,11 +169,11 @@ Static Function processaDados(nOpcao)
             lIncluiuItem := .F.
 
             If nOpcao == 1
-                cStatusModificacao := "INC" //Inclusão do Pedido
+                cStatusModificacao := "INC" //InclusÃ£o do Pedido
 
             Else
-                If aCols[nItem][Len(aHeader)+1] //Valida pela exclusão da linha do grid
-                        cStatusModificacao := "EXC" //Item excluído do Pedido de Venda
+                If aCols[nItem][Len(aHeader)+1] //Valida pela exclusÃ£o da linha do grid
+                        cStatusModificacao := "EXC" //Item excluÃ­do do Pedido de Venda
                         lExcluiuItem := .T.
 
                 Else
@@ -192,7 +192,7 @@ Static Function processaDados(nOpcao)
             EndIf
 
             For nCampo := 1 To Len(aSC6CamposLog)
-                //Faz comparações para avaliar modificações
+                //Faz comparaÃ§Ãµes para avaliar modificaÃ§Ãµes
                 cCampo := aSC6CamposLog[nCampo]
                 cAliasCampo := "SC6"
                 cFilialRegistro := M->C5_FILIAL
@@ -201,7 +201,7 @@ Static Function processaDados(nOpcao)
                 cNovoValor := cValToChar(GDFieldGet(cCampo,nItem,/*lReadvar*/,/*aHeaderpastpar*/,/*aColspastpar*/))
                 cAntigoValor := cValToChar(IIf(INCLUI,"",cValToChar(Posicione("SC6",1, cFilialRegistro + cPedido + cItemPedido,cCampo))))
 
-                If AllTrim(cNovoValor) <> AllTrim(cAntigoValor) .Or. lExcluiuItem .Or. lIncluiuItem//Houve modificação, ou a linha foi excluída
+                If AllTrim(cNovoValor) <> AllTrim(cAntigoValor) .Or. lExcluiuItem .Or. lIncluiuItem//Houve modificaÃ§Ã£o, ou a linha foi excluÃ­da
                     aAdd(aHistorico,{;
                                         cAliasCampo,;
                                         cFilialRegistro,;
@@ -217,7 +217,7 @@ Static Function processaDados(nOpcao)
                                         cNovoProduto;
                                     })
 
-                    //Grava apenas uma vez o log (nao percorre todos os campos) quando for inclusão ou exclusão de itens
+                    //Grava apenas uma vez o log (nao percorre todos os campos) quando for inclusÃ£o ou exclusÃ£o de itens
                     If lExcluiuItem .Or. lIncluiuItem
                         Exit
                     
@@ -242,7 +242,7 @@ Static Function processaDados(nOpcao)
 Return 
 
 /*
-    Efetua gravação do Histórico na tabela SZ0
+    Efetua gravaÃ§Ã£o do HistÃ³rico na tabela SZ0
 */
 Static Function gravaHistorico(aHistorico)
     Local nItemHistorico        as numeric
@@ -272,7 +272,7 @@ Static Function gravaHistorico(aHistorico)
 Return cIDHistorico
 
 /*
-    Envia e-mail com Log de Modificações do Pedido
+    Envia e-mail com Log de ModificaÃ§Ãµes do Pedido
 */
 Static Function emailHistorico(cIDHistorico,aConsultaHistorico)
     Local aHistorico            as array
@@ -300,13 +300,14 @@ Static Function emailHistorico(cIDHistorico,aConsultaHistorico)
     aDadosCabecalho := {}
     aDadosItens := {}
     cBody := ""
-    cDestinatarios := GetNewPar("AM_LOGPVEM","jorgeg@acosmacom.com.br; sferreira@acosmacom.com.br; gbarbosa@acosmacom.com.br") //E-mails que receberão o Log. 
+    cDestinatarios := GetNewPar("AM_LOGPVEM") //E-mails que receberÃ£o o Log. 
+
     cAssunto := "MACOM - Sales Order Modification"
     cArquivoHTML := GetNewPar("AM_LOGPVHT","\html\m05p01.html")
     cItemDescricao := ""
     
     /*
-        Separa informações do LOG por Alias
+        Separa informaÃ§Ãµes do LOG por Alias
     */
     For nItem := 1 To Len(aHistorico)
         If aHistorico[nItem][1] == "SC5"
@@ -328,7 +329,7 @@ Static Function emailHistorico(cIDHistorico,aConsultaHistorico)
     Next nItem
 
     /*
-        Carrega o HTML em memória para edição
+        Carrega o HTML em memÃ³ria para ediÃ§Ã£o
     */
     oProcess := TWFProcess():New("ALTPV",cAssunto)
     oProcess:NewTask("Log PV por Email",cArquivoHTML)
@@ -342,7 +343,7 @@ Static Function emailHistorico(cIDHistorico,aConsultaHistorico)
     oHTML:ValByName("FRASE1" , "You can see more details bellow:")
 
     /*
-        Atribui dados do cabeçalho ao modelo html
+        Atribui dados do cabeÃ§alho ao modelo html
     */
     If Len(aDadosCabecalho) > 0
         For nItem := 1 to Len(aDadosCabecalho)
@@ -354,7 +355,7 @@ Static Function emailHistorico(cIDHistorico,aConsultaHistorico)
         Next nItem
 
     Else
-        //Caso não existam campos do cabeçalho modificados gera em branco.
+        //Caso nÃ£o existam campos do cabeÃ§alho modificados gera em branco.
         aAdd((oHTML:ValByName("cab.Z0_CAMPO")), "")
         aAdd((oHTML:ValByName("cab.Z0_VALHIST")), "")
         aAdd((oHTML:ValByName("cab.Z0_VALNOVO")), "")
@@ -363,7 +364,9 @@ Static Function emailHistorico(cIDHistorico,aConsultaHistorico)
     EndIf
 
     /*
+
         Atribui dados dos itens ao modelo html
+
     */
     cHTMLItens := ""
 
@@ -443,7 +446,7 @@ Static Function pegaProduto(cFilialPedido,cPedido,cItem,aConsultaHistorico)
 Return cRetorno
 
 /*
-    Carrega dados do histórico para o array 
+    Carrega dados do histÃ³rico para o array 
 */
 Static Function carregaHistorico(cIDHistorico,cFilialPedido,cPedido,cNomeCliente,cUsuarioModificacao,cDataModificacao,cHoraModificacao)
     Local aArea             as array
