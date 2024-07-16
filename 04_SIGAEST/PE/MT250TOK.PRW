@@ -39,16 +39,16 @@ If lRet
 	dbSelectArea("ZAB")
     dbSetOrder(1)
     If MsSeek(xFilial("ZAB")+M->D3_XNSERIE)
-    	If Empty(ZAB->ZAB_OPTRAN) .and. M->D3_OP <> ZAB->ZAB_NUMOP
-    		Reclock("ZAB",.F.)
-    		ZAB->ZAB_OPTRAN := Substr(M->D3_OP,1,6)
-    		ZAB->ZAB_ITTRAN := Substr(M->D3_OP,7,2)
-    		ZAB->ZAB_SQTRAN := Substr(M->D3_OP,9,3)
-    		ZAB->(MsUnlock())
-    	Else
-    		MsgStop("Numero de série já transformado ou OP de origem igual !","ATENÇÃO")
-    		lRet := .F.
-    	EndIf
+    	//If Empty(ZAB->ZAB_OPTRAN) .and. M->D3_OP <> ZAB->ZAB_NUMOP
+    	//	Reclock("ZAB",.F.)
+    	//	ZAB->ZAB_OPTRAN := Substr(M->D3_OP,1,6)
+    	//	ZAB->ZAB_ITTRAN := Substr(M->D3_OP,7,2)
+    	//	ZAB->ZAB_SQTRAN := Substr(M->D3_OP,9,3)
+    	//	ZAB->(MsUnlock())
+    	//Else
+    		//MsgStop("Numero de série já transformado ou OP de origem igual !","ATENÇÃO")
+    		//lRet := .F.
+    	//EndIf
 
     ElseIf cFamili $ "000001|000002|000003|000004"
     	MsgStop("Número de série não encontrado !","ATENÇÃO")
