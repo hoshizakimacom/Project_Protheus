@@ -7,6 +7,7 @@ User Function MT250TOK()
 Local lRet  	:= .T.
 Local aArea     := GetArea()
 Local aAreaSD3  := SD3->(GetArea())
+Local aAreaZAB  := ZAB->(GetArea())
 Local cFamili	:= Posicione("SB1",1, xFilial("SB1") + M->D3_COD, "B1_XFAMILI")
 
 //+---------------------------------------+
@@ -23,18 +24,39 @@ Endif
 //+----------------------------------------------+ 
 dbSelectArea("SD3")
 dbSetOrder(18) // ZA0_FILIAL+ZA0_SERIE
-If Len(RTRIM(M->D3_XNSERIE)) <> 9 .and. cFamili $ "000001|000002|000004"
+If Len(RTRIM(M->D3_XNSERIE)) <> 9 .And. cFamili $ "000001|000002|000003|000004"
 	MsgAlert("Numero de digitos do numero de série incompatível. Verifique se foi digitado numeros a mais, a menos ou espaços em branco !.","Atenção")
 	lRet := .F.	
 Endif
 
-If  cFamili $ "000001|000002|000004" .and. Empty(M->D3_XNSERIE)
+If  cFamili $ "000001|000002|000003|000004" .And. Empty(M->D3_XNSERIE)
 	MsgAlert("Para produtos da Família Refrigeração, Cocção e Maquina de Gelo fabricação Macom, deve ser informado o número de série","Atenção")
 	lRet := .F.
 EndIf
 
-///////////////////////// Bloqueio de Apontamento de OPs
+If lRet
 
+	dbSelectArea("ZAB")
+    dbSetOrder(1)
+    If MsSeek(xFilial("ZAB")+M->D3_XNSERIE)
+    	//If Empty(ZAB->ZAB_OPTRAN) .and. M->D3_OP <> ZAB->ZAB_NUMOP
+    	//	Reclock("ZAB",.F.)
+    	//	ZAB->ZAB_OPTRAN := Substr(M->D3_OP,1,6)
+    	//	ZAB->ZAB_ITTRAN := Substr(M->D3_OP,7,2)
+    	//	ZAB->ZAB_SQTRAN := Substr(M->D3_OP,9,3)
+    	//	ZAB->(MsUnlock())
+    	//Else
+    		//MsgStop("Numero de série já transformado ou OP de origem igual !","ATENÇÃO")
+    		//lRet := .F.
+    	//EndIf
+
+    ElseIf cFamili $ "000001|000002|000003|000004"
+    	MsgStop("Número de série não encontrado !","ATENÇÃO")
+    	lRet := .F.
+    Endif
+EndIf
+
+///////////////////////// Bloqueio de Apontamento de OPs
 DEFINE FONT oFont1 NAME "ARIAL" SIZE 8,14 BOLD
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -185,24 +207,29 @@ If lRet
 
 EndIf
 
-// Grava tabela de número de Serie como apontado
-dbSelectArea("ZAB")
-dbSetOrder(1)
-If ZAB->(MsSeek(xFilial("ZAB")+ M->D3_XNSERIE)) .And. lRet
-     If ZAB->ZAB_APONTA == "X"
-		MsgAlert("Numero de série já apontado !","ATENÇÃO")
-		lRet := .F.
+If lRet .And. cFamili $ "000001|000002|000003|000004"
+
+	// Grava tabela de número de Serie como apontado
+	dbSelectArea("ZAB")
+	dbSetOrder(1)
+	If ZAB->(MsSeek(xFilial("ZAB")+ M->D3_XNSERIE)) .And. lRet
+		If ZAB->ZAB_APONTA == "X"
+			MsgAlert("Numero de série já apontado !","ATENÇÃO")
+			lRet := .F.
+		EndIf
 	EndIf
+
+	If lRet
+		If MsSeek(xFilial("ZAB")+M->D3_XNSERIE)
+			Reclock("ZAB",.F.)
+			ZAB->ZAB_APONTA := "X"
+			ZAB->(MsUnlock())
+		Endif
+	Endif
+
 EndIf
 
-If lRet
-    If MsSeek(xFilial("ZAB")+M->D3_XNSERIE)
-    	Reclock("ZAB",.F.)
-    	ZAB->ZAB_APONTA := "X"
-    	ZAB->(MsUnlock())
-    Endif
-Endif
-
+RestArea(aAreaZAB)
 RestArea(aAreaSD3)
 RestArea(aArea)
 
