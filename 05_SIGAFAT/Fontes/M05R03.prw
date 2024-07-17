@@ -9,36 +9,54 @@ User Function M05R03(nTpImpr)
 
 Private lImprVlr := nTpImpr == 1
 
-FWMsgRun(, {|| U_M05R03A() },,'Gerando relatório...')
+FWMsgRun(, {|| U_M05R03A(.F.) },,'Gerando relatório...')
 
 Return
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
-User Function M05R03A()
+User Function M05R03A(lAuto)
 
-    Local oPrinter     := Nil
+    Local oPrinter       := Nil
     //Local _oBrush      := TBrush():New( , RGB( 240 ,240 ,240))
-    Local oFont14B     := Nil
-    Local oFont12      := Nil
-    Local oFont12B     := Nil
-    Local oFont18T     := Nil
-    Local oFont9       := Nil
-    Local nRow         := -0080
-    Local cData        := DtoC(Date()) + ' ' + Time()
+    Local oFont14B       := Nil
+    Local oFont12        := Nil
+    Local oFont12B       := Nil
+    Local oFont18T       := Nil
+    Local oFont9         := Nil
+    Local nRow           := -0080
+    Local cData          := DtoC(Date()) + ' ' + Time()
     //Local _cAliasSA1   := GetNextAlias()
     //Local _cNumOrc     := SC5->C5_NUM
     //Local _lOk         := .T.
-    Local nPage        := 1
+    Local nPage          := 1
     //Local nRowStep     := 45
+    Local cFilePDF       := 'PV' + SC5->C5_NUM + ".pdf" // '_' + SubStr(DToS(Date()),7,2) + '_' + StrTran(Time(),":","") + ".pdf"
+    Local cPathInServer  := ""
+    Local cBarra         := if(isSrvUnix(),"/","\")
+
+    If lAuto
+        cPathInServer  := cBarra + "temp" + cBarra
+    
+        If File(cPathInServer+cFilePDF) //Apaga arquivo gerado anteriormente para criar um novo
+            FERASE(cPathInServer+cFilePDF)
+        EndIf
+    EndIf
 
     M05RFont(@oFont9,@oFont12,@oFont12B,@oFont14B,@oFont18T)
 
-    oPrinter := FWMSPrinter():New('PV' + SC5->C5_NUM + '_' + SubStr(DToS(Date()),7,2) + '_' + StrTran(Time(),":",""), IMP_PDF, .T./*_lAdjustToLegacy*/, /*cPathInServer*/, .T.)
+    oPrinter := FWMsPrinter():New( cFilePDF /*< cFilePrintert >*/, IMP_PDF/*[ nDevice]*/, .T./*[ lAdjustToLegacy]*/,;
+                   cPathInServer/*[ cPathInServer]*/, .T./*[ lDisabeSetup ]*/, /*[ lTReport]*/, /*[ @oPrintSetup]*/,;
+                /*[ cPrinter]*/, IIF(lAuto,.T.,.F.) /*[ lServer]*/, /*[ lPDFAsPNG]*/, /*[ lRaw]*/, IIF(lAuto,.F.,.T.) /*[ lViewPDF]*/,;
+                /*[ nQtdCopy]*/ )
 
     oPrinter:SetResolution(78)
     oPrinter:SetLandscape()
     oPrinter:SetMargin(0,0,0,0)
-
+    If lAuto
+        oPrinter:lServer := .T.
+        oPrinter:nDevice := IMP_PDF
+        oPrinter:cPathPDF := cPathInServer
+    EndIf
     oPrinter:StartPage()
 
 
@@ -87,7 +105,7 @@ User Function M05R03A()
         // Condições Gerais
         //+----------------------------------------------------------------------------------------
     EndIf
-Return
+Return cFilePDF
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 Static Function M05RICabIt(oPrinter,oFont12B,nRow)
@@ -859,7 +877,7 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
 //    Local aParcelas     := {}
     Local aPedCli       := {}
     Local aC5Rodape     := {}
-    Local aRelImp       := MaFisRelImp("MT100",{"SF2","SD2"})
+    //Local aRelImp       := MaFisRelImp("MT100",{"SF2","SD2"})
     Local aFisGet       := Nil
     Local aFisGetSC5    := Nil
 //    Local cKey          := ""
@@ -913,6 +931,8 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
             ,SC5.C5_NUM             AS _NUM
             ,SC5.C5_CLIENTE         AS _CLIENTE
             ,SC5.C5_LOJACLI         AS _LOJA
+            ,SC5.C5_CLIENT          AS _CLIENT
+            ,SC5.C5_LOJAENT         AS _LOJAENT
             ,SC5.C5_TIPO            AS _TIPO
             ,SC5.C5_TIPOCLI         AS _TIPOCLI
             ,SC5.C5_DESC1           AS _DESC1
@@ -1000,16 +1020,32 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
     cCliEnt := (cAliasPed)->_CLIENTE
     aCabPed := {}
 
-    MaFisIni(cCliEnt,;                      // 1-Codigo Cliente/Fornecedor
-    (cAliasPed)->_LOJA,;                    // 2-Loja do Cliente/Fornecedor
-    If((cAliasPed)->_TIPO$'DB',"F","C"),;   // 3-C:Cliente , F:Fornecedor
-        (cAliasPed)->_TIPO,;                // 4-Tipo da NF
-        (cAliasPed)->_TIPOCLI,;             // 5-Tipo do Cliente/Fornecedor
-        aRelImp,;                           // 6-Relacao de Impostos que suportados no arquivo
-        ,;                                  // 7-Tipo de complemento
-        ,;                                  // 8-Permite Incluir Impostos no Rodape .T./.F.
-        "SB1",;                             // 9-Alias do Cadastro de Produtos - ("SBI" P/ Front Loja)
-        "MATA461")                          // 10-Nome da rotina que esta utilizando a funcao
+    MaFisIni(Iif(Empty((cAliasPed)->_CLIENT),(cAliasPed)->_CLIENTE,(cAliasPed)->_CLIENT),;                      // 1-Codigo Cliente/Fornecedor
+            (cAliasPed)->_LOJAENT,;		                                                                        // 2-Loja do Cliente/Fornecedor
+            If((cAliasPed)->_TIPO$'DB',"F","C"),;                                                               // 3-C:Cliente , F:Fornecedor
+            (cAliasPed)->_TIPO,;                                                                                // 4-Tipo da NF
+            (cAliasPed)->_TIPOCLI,;                                                                             // 5-Tipo do Cliente/Fornecedor
+            Nil,;                                                                                               // 6-Relacao de Impostos que suportados no arquivo
+            Nil,;                                                                                               // 7-Tipo de complemento
+            Nil,;                                                                                               // 8-Permite Incluir Impostos no Rodape .T./.F.
+            Nil,;                                                                                               // 9-Alias do Cadastro de Produtos - ("SBI" P/ Front Loja)
+            "MATA461",;                                                                                         //10-Nome da rotina que esta utilizando a funcao
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            (cAliasPed)->_TPFRETE)
 
         nFrete      := (cAliasPed)->_FRETE
         nSeguro     := (cAliasPed)->_SEGURO

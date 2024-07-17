@@ -10,6 +10,7 @@ User Function MA410MNU()
 	Local cGrpExc       := GetMv('AM_05ACOM ',,'')
 	Local _lAprov       := U_M00A01(_cGrpApr)
     Local _lBloq        := U_M00A01(_cGrpBlq)
+	Local aSubRotina    := {}
 
     If type('__lComerc') <> 'L'
         Public __lComerc    := U_M00A01(cGrpExc)
@@ -20,7 +21,7 @@ User Function MA410MNU()
         Public __cEst       := '  '
     EndIf
 
-	aAdd( aRotina,{ 'Compensacao de Recebebimento'		,'U_M05A12(1)'		,0 ,6 ,0 ,Nil})
+	aAdd( aRotina,{ 'Compensacao de Recebimento'		,'U_M05A12(1)'		,0 ,6 ,0 ,Nil})
 	aAdd( aRotina,{ 'Inclui Receb. Antecipado'	        ,'U_M05A08'		    ,0 ,6 ,0 ,Nil})
 	aAdd( aRotina,{ 'Imprimir'	                        ,'U_M05R03(1)'      ,0 ,1 ,0 ,Nil})
 	aAdd( aRotina,{ 'Imprimir Sem Valor'	            ,'U_M05R03(2)'	    ,0 ,1 ,0 ,Nil})
@@ -36,6 +37,11 @@ User Function MA410MNU()
 	If _lAprov
 	   AAdd( aRotina,{ "Crédito - Desbloquear"         ,"U_M05A09_B(2)"     ,0 ,2 ,0 ,Nil})
 	EndIf
+
+	aSubRotina := { { OemtoAnsi('Parametros')   ,'Pergunte("M06A11",.T.)'  , 0 ,2 },;
+					{ OemtoAnsi('Envio e-mail') ,'U_M06A11()'              , 0 ,2 }}
+	Aadd( aRotina,{ 'Env.Confirm.Pedido'               ,aSubRotina         ,0 ,2 ,0 ,Nil})
+
 
 	RestArea(_aArea)
 Return

@@ -815,7 +815,10 @@ Return(Alltrim(cDig))
 //+----------------------------------------------------------------------------------------
 User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 	Local oFont8
+	Local oFont9
 	Local oFont10
+	Local oFont11
+
 	Local oFont11c
 	Local oFont14
 	Local oFont14n
@@ -823,6 +826,7 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 	Local oFont15n
 	Local oFont16n
 	Local oFont20
+	Local oFont19n
 	Local oFont21
 	Local oFont24
 	Local nLin				:= 0
@@ -850,40 +854,51 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 	cBmp	:= cStartPath+aDadBco[9]
 
 	// Define as fontes a serem utilizadas
-	oFont8			:= TFont():New("Arial",			9,08,.T.,.F.,5,.T.,5,.T.,.F.)
-	oFont10		:= TFont():New("Arial",			9,09,.T.,.T.,5,.T.,5,.T.,.F.)
-	oFont11c		:= TFont():New("Courier New",	9,11,.T.,.T.,5,.T.,5,.T.,.F.)
+	oFont8		:= TFont():New("Arial",			9,08,.T.,.F.,5,.T.,5,.T.,.F.)
+	oFont9		:= TFont():New("Arial",			9,09,.T.,.F.,5,.T.,5,.T.,.F.)
+
+//	oFont10		:= TFont():New("Arial",			9,09,.T.,.T.,5,.T.,5,.T.,.F.)
+	oFont10		:= TFont():New("Arial",			9,10,.T.,.T.,5,.T.,5,.T.,.F.)
+	oFont11		:= TFont():New("Arial",			9,11,.T.,.T.,5,.T.,5,.T.,.F.)
+
+	oFont11c	:= TFont():New("Courier New",	9,11,.T.,.T.,5,.T.,5,.T.,.F.)
 	oFont14		:= TFont():New("Arial",			9,14,.T.,.T.,5,.T.,5,.T.,.F.)
-	oFont14n		:= TFont():New("Arial",			9,14,.T.,.F.,5,.T.,5,.T.,.F.)
+	oFont14n	:= TFont():New("Arial",			9,14,.T.,.F.,5,.T.,5,.T.,.F.)
 	oFont15		:= TFont():New("Arial",			9,15,.T.,.T.,5,.T.,5,.T.,.F.)
-	oFont15n		:= TFont():New("Arial",			9,15,.T.,.F.,5,.T.,5,.T.,.F.)
-	oFont16n		:= TFont():New("Arial",			9,16,.T.,.F.,5,.T.,5,.T.,.F.)
+	oFont15n	:= TFont():New("Arial",			9,15,.T.,.F.,5,.T.,5,.T.,.F.)
+	oFont16n	:= TFont():New("Arial",			9,16,.T.,.F.,5,.T.,5,.T.,.F.)
 	oFont20		:= TFont():New("Arial",			9,20,.T.,.T.,5,.T.,5,.T.,.F.)
+	oFont19n	:= TFont():New("Arial",			9,19,.T.,.F.,5,.T.,5,.T.,.F.)
 	oFont21		:= TFont():New("Arial",			9,21,.T.,.T.,5,.T.,5,.T.,.F.)
 	oFont24		:= TFont():New("Arial",			9,24,.T.,.T.,5,.T.,5,.T.,.F.)
 
 	// Inicia uma nova página
 	oPrint:StartPage()
 
+	nAjuste := 30
+
 	// Define o Primeiro Bloco - Recibo de Entrega
-	oPrint:Line(nLin+0150,0500,nLin+0070,0500)															// Quadro
-	oPrint:Line(nLin+0150,0710,nLin+0070,0710)												   			// Quadro
+	oPrint:Line(nLin+0150-nAjuste,0500,nLin+0070-nAjuste,0500)															// Quadro
+	oPrint:Line(nLin+0150-nAjuste,0710,nLin+0070-nAjuste,0710)												   			// Quadro
 
 	If !Empty(aDadBco[9])
 		oPrint:SayBitMap(nLin+0084,0100,cBmp,350,060)													// Logotipo do Banco
 	Else
-		oPrint:Say	(nLin+0084,0100,	aDadBco[8],											oFont14)	// Nome do Banco
+		oPrint:Say	(nLin+0084,0100,	aDadBco[8],											oFont19n)	// Nome do Banco
 	EndIf
 
-	oPrint:Say(nLin+0075,0513,	aDadBco[1]+"-"+aDadBco[2],								oFont21)	// Número do Banco + Dígito
-	oPrint:Say(nLin+0045,1940,	"Comprovante de Entrega",								oFont10)	// Texto Fixo
-	oPrint:Say(nLin+0085,0755,	aBarra[2],								oFont15n)	// Linha Digitavel do Codigo de Barras
-	oPrint:Line(nLin+0150,0100,nLin+0150,2300)															// Quadro
+	oPrint:Say(nLin+0085,0513,	aDadBco[1]+"-"+aDadBco[2],								oFont21)	// Número do Banco + Dígito
+	oPrint:Say(nLin+0042,1940,	"Comprovante de Entrega",								oFont10)	// Texto Fixo
 
-	oPrint:Say(nLin+0150,0100,	"Beneficiário",												oFont8)		// Texto Fixo
+//	oPrint:Say(nLin+0085,0755,	aBarra[2],								oFont19n)	// Linha Digitavel do Codigo de Barras
+	oPrint:Say(nLin+0090,0755,	aBarra[2],								oFont19n)	// Linha Digitavel do Codigo de Barras
+
+	oPrint:Line(nLin+0150-nAjuste,0100,nLin+0150-nAjuste,2300)															// Quadro
+
+	oPrint:Say(nLin+0150,0100,	"Beneficiário",												oFont9)		// Texto Fixo
 	oPrint:Say(nLin+0200,0100,	aDadEmp[1],												oFont10)	// Nome da Empresa
 
-	oPrint:Say(nLin+0150,1060,	"Agência/Código Beneficiário",								oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0150,1060,	"Agência/Código Beneficiário",								oFont9)		// Texto Fixo
 
 	If aDadBco[01] == "341"
 		oPrint:Say(nLin+0200,1110,	Alltrim(aDadBco[3]) +"-"+ Alltrim(aDadBco[4])+"/"+Alltrim(aDadBco[5])+"-"+Alltrim(aDadBco[6]),	oFont10)	// Agencia + Cód.Cedente
@@ -891,13 +906,13 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 		oPrint:Say(nLin+0200,1110,	AllTrim(aDadBco[15]),									oFont10)	// Agencia + Cód.Cedente
 	EndIf
 
-	oPrint:Say(nLin+0150,1510,	"Nro.Documento",										oFont8)		// Texto fixo
+	oPrint:Say(nLin+0150,1510,	"Nro.Documento",										oFont9)		// Texto fixo
 	oPrint:Say(nLin+0200,1560,	aDadTit[1]+aDadTit[2]+aDadTit[3],						oFont10)	// Prefixo + Numero + Parcela
 
-	oPrint:Say(nLin+0250,0100,	"Pagador",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0250,0100,	"Pagador",												oFont9)		// Texto Fixo
 	oPrint:Say(nLin+0300,0100,	SubStr(_cSacado,1,IIf( Len(_cSacado) > 40,40,Len(_cSacado) )),		oFont10)	// Nome do Cliente
 
-	oPrint:Say(nLin+0250,1060,	"Vencimento",											oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0250,1060,	"Vencimento",											oFont9)		// Texto Fixo
 
 	If aDadBco[01] == "341" .AND. DToC(aDadTit[5]) $ DToC(aDadTit[6])
 		oPrint:Say(nLin+0300,1110,	"A VISTA",										oFont10)	// Data de Vencimento
@@ -905,35 +920,35 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 		oPrint:Say(nLin+0300,1110,	DToC(aDadTit[6]),										oFont10)	// Data de Vencimento
 	Endif
 
-	oPrint:Say(nLin+0250,1510,	"Valor do Documento",									oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0250,1510,	"Valor do Documento",									oFont9)		// Texto Fixo
 	oPrint:Say(nLin+0300,1560,	Transform(aDadTit[8],"@E 9999,999,999.99"),				oFont10)	// Valor do Título
 
 	oPrint:Say(nLin+0400,0100,	"Recebi(emos) o bloqueto/título",						oFont10)	// Texto Fixo
 	oPrint:Say(nLin+0450,0100,	"com as características acima.",						oFont10)	// Texto Fixo
-	oPrint:Say(nLin+0350,1060,	"Data",													oFont8)		// Texto Fixo
-	oPrint:Say(nLin+0350,1410,	"Assinatura",											oFont8)		// Texto Fixo
-	oPrint:Say(nLin+0450,1060,	"Data",													oFont8)		// Texto Fixo
-	oPrint:Say(nLin+0450,1410,	"Entregador",											oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0350,1060,	"Data",													oFont9)		// Texto Fixo
+	oPrint:Say(nLin+0350,1410,	"Assinatura",											oFont9)		// Texto Fixo
+	oPrint:Say(nLin+0450,1060,	"Data",													oFont9)		// Texto Fixo
+	oPrint:Say(nLin+0450,1410,	"Entregador",											oFont9)		// Texto Fixo
 
-	oPrint:Line(nLin+0250,0100,nLin+0250,1900 )														// Quadro
-	oPrint:Line(nLin+0350,0100,nLin+0350,1900 )														// Quadro
-	oPrint:Line(nLin+0450,1050,nLin+0450,1900 )														// Quadro
-	oPrint:Line(nLin+0550,0100,nLin+0550,2300 )														// Quadro
+	oPrint:Line(nLin+0250-nAjuste,0100,nLin+0250-nAjuste,1900 )														// Quadro
+	oPrint:Line(nLin+0350-nAjuste,0100,nLin+0350-nAjuste,1900 )														// Quadro
+	oPrint:Line(nLin+0450-nAjuste,1050,nLin+0450-nAjuste,1900 )														// Quadro
+	oPrint:Line(nLin+0550-nAjuste,0100,nLin+0550-nAjuste,2300 )														// Quadro
 
-	oPrint:Line(nLin+0550,1050,nLin+0150,1050 )														// Quadro
-	oPrint:Line(nLin+0550,1400,nLin+0350,1400 )														// Quadro
-	oPrint:Line(nLin+0350,1500,nLin+0150,1500 )														// Quadro
-	oPrint:Line(nLin+0550,1900,nLin+0150,1900 )														// Quadro
+	oPrint:Line(nLin+0550-nAjuste,1050,nLin+0150-nAjuste,1050 )														// Quadro
+	oPrint:Line(nLin+0550-nAjuste,1400,nLin+0350-nAjuste,1400 )														// Quadro
+	oPrint:Line(nLin+0350-nAjuste,1500,nLin+0150-nAjuste,1500 )														// Quadro
+	oPrint:Line(nLin+0550-nAjuste,1900,nLin+0150-nAjuste,1900 )														// Quadro
 
-	oPrint:Say(nLin+0165,1910,	"(  ) Mudou-se",										oFont8)		// Texto Fixo
-	oPrint:Say(nLin+0205,1910,	"(  ) Ausente",											oFont8)		// Texto Fixo
-	oPrint:Say(nLin+0245,1910,	"(  ) Não existe nº indicado",							oFont8)		// Texto Fixo
-	oPrint:Say(nLin+0285,1910,	"(  ) Recusado",			 							oFont8)		// Texto Fixo
-	oPrint:Say(nLin+0325,1910,	"(  ) Não procurado",		 							oFont8)		// Texto Fixo
-	oPrint:Say(nLin+0365,1910,	"(  ) Endereço insuficiente",							oFont8)		// Texto Fixo
-	oPrint:Say(nLin+0405,1910,	"(  ) Desconhecido",		 							oFont8)		// Texto Fixo
-	oPrint:Say(nLin+0445,1910,	"(  ) Falecido",										oFont8)		// Texto Fixo
-	oPrint:Say(nLin+0485,1910,	"(  ) Outros(anotar no verso)",							oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0165,1910,	"(  ) Mudou-se",										oFont9)		// Texto Fixo
+	oPrint:Say(nLin+0205,1910,	"(  ) Ausente",											oFont9)		// Texto Fixo
+	oPrint:Say(nLin+0245,1910,	"(  ) Não existe nº indicado",							oFont9)		// Texto Fixo
+	oPrint:Say(nLin+0285,1910,	"(  ) Recusado",			 							oFont9)		// Texto Fixo
+	oPrint:Say(nLin+0325,1910,	"(  ) Não procurado",		 							oFont9)		// Texto Fixo
+	oPrint:Say(nLin+0365,1910,	"(  ) Endereço insuficiente",							oFont9)		// Texto Fixo
+	oPrint:Say(nLin+0405,1910,	"(  ) Desconhecido",		 							oFont9)		// Texto Fixo
+	oPrint:Say(nLin+0445,1910,	"(  ) Falecido",										oFont9)		// Texto Fixo
+	oPrint:Say(nLin+0485,1910,	"(  ) Outros(anotar no verso)",							oFont9)		// Texto Fixo
 
 	oPrint:Say(nLin+0570,0100,   "Pedido: " + Padr( aDadTit[18], 30 ),		 			oFont10)	// Número dos Pedidos
 	oPrint:Say(nLin+0610,0100,   "Referente a : " + cHist,					oFont10)	// Número dos Vendedores
@@ -942,39 +957,39 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 	nLin+= 0200
 
 	For nLoop := 100 to 2300 Step 50
-		oPrint:Line(nLin+0580, nLoop,nLin+0580, nLoop+30)												// Linha pontilhada
+		oPrint:Line(nLin+0580-nAjuste, nLoop,nLin+0580-nAjuste, nLoop+30)												// Linha pontilhada
 	Next nI
 
 	// Define o Segundo Bloco - Recibo do Sacado
-	oPrint:Line (nLin+0710,0100,nLin+0710,2300)														// Quadro
-	oPrint:Line (nLin+0710,0500,nLin+0630,0500)														// Quadro
-	oPrint:Line (nLin+0710,0710,nLin+0630,0710)														// Quadro
+	oPrint:Line (nLin+0710-nAjuste,0100,nLin+0710-nAjuste,2300)														// Quadro
+	oPrint:Line (nLin+0710-nAjuste,0500,nLin+0630-nAjuste,0500)														// Quadro
+	oPrint:Line (nLin+0710-nAjuste,0710,nLin+0630-nAjuste,0710)														// Quadro
 
 	If !Empty(aDadBco[9])
 		oPrint:SayBitMap(nLin+0644,0100,cBmp,350,060)													// Logotipo do Banco
 	Else
-		oPrint:Say(nLin+0644,0100,	aDadBco[8],											oFont14)	// Nome do Banco
+		oPrint:Say(nLin+0644,0100,	aDadBco[8],											oFont19n)	// Nome do Banco
 	EndIf
 
-	oPrint:Say(nLin+0635,0513,	aDadBco[1]+"-"+aDadBco[2],								oFont21)	// Numero do Banco + Dígito
-	oPrint:Say(nLin+0610,1940,	"Recibo do Sacado",										oFont10)	// Texto Fixo
-	oPrint:Say(nLin+0650,0755,	aBarra[2],												oFont15n)	// Linha Digitavel do Codigo de Barras
+	oPrint:Say(nLin+0650,0513,	aDadBco[1]+"-"+aDadBco[2],								oFont21)	// Numero do Banco + Dígito
+	oPrint:Say(nLin+0607,1940,	"Recibo do Sacado",										oFont10)	// Texto Fixo
+	oPrint:Say(nLin+0655,0755,	aBarra[2],												oFont19n)	// Linha Digitavel do Codigo de Barras
 
-	oPrint:Line(nLin+0810,0100,nLin+0810,2300)														// Quadro
-	oPrint:Line(nLin+0910,0100,nLin+0910,2300)														// Quadro
-	oPrint:Line(nLin+0980,0100,nLin+0980,2300)														// Quadro
-	oPrint:Line(nLin+1050,0100,nLin+1050,2300)														// Quadro
+	oPrint:Line(nLin+0810-nAjuste,0100,nLin+0810-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+0910-nAjuste,0100,nLin+0910-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+0980-nAjuste,0100,nLin+0980-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+1050-nAjuste,0100,nLin+1050-nAjuste,2300)														// Quadro
 
-	oPrint:Line(nLin+0910,0500,nLin+1050,0500)														// Quadro
-	oPrint:Line(nLin+0980,0750,nLin+1050,0750)														// Quadro
-	oPrint:Line(nLin+0910,1000,nLin+1050,1000)														// Quadro
-	oPrint:Line(nLin+0910,1300,nLin+0980,1300)														// Quadro
-	oPrint:Line(nLin+0910,1480,nLin+1050,1480)														// Quadro
+	oPrint:Line(nLin+0910-nAjuste,0500,nLin+1050-nAjuste,0500)														// Quadro
+	oPrint:Line(nLin+0980-nAjuste,0750,nLin+1050-nAjuste,0750)														// Quadro
+	oPrint:Line(nLin+0910-nAjuste,1000,nLin+1050-nAjuste,1000)														// Quadro
+	oPrint:Line(nLin+0910-nAjuste,1300,nLin+0980-nAjuste,1300)														// Quadro
+	oPrint:Line(nLin+0910-nAjuste,1480,nLin+1050-nAjuste,1480)														// Quadro
 
-	oPrint:Say(nLin+0710,0100 ,	"Local de Pagamento",									oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0710,0100 ,	"Local de Pagamento",									oFont9)		// Texto Fixo
 	oPrint:Say(nLin+0725,0400 ,	"ATÉ O VENCIMENTO, PREFERENCIALMENTE NO "+Upper(aDadBco[8]),oFont10)	// 1a. Linha de Local Pagamento
 	oPrint:Say(nLin+0765,0400 ,	"APÓS O VENCIMENTO, SOMENTE NO "+Upper(aDadBco[8]),oFont10)	// 2a. Linha de Local Pagamento
-	oPrint:Say(nLin+0710,1810,	"Vencimento",											oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0710,1810,	"Vencimento",											oFont9)		// Texto Fixo
 
 	If aDadBco[01] == "341" .AND. DToC(aDadTit[5]) $ DToC(aDadTit[6])
 		oPrint:Say  (nLin+0750,2000,	"A VISTA",										oFont11c)	// Data de Vencimento
@@ -982,9 +997,9 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 		oPrint:Say(nLin+0750,2000,	StrZero(Day(aDadTit[6]),2) +"/"+ StrZero(Month(aDadTit[6]),2) +"/"+ StrZero(Year(aDadTit[6]),4),					 		oFont11c)	// Vencimento
 	Endif
 
-	oPrint:Say(nLin+0810,0100,	"Beneficiário",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0810,0100,	"Beneficiário",												oFont9)		// Texto Fixo
 	oPrint:Say(nLin+0850,0100,	AllTrim(aDadEmp[1])+" - CNPJ: "+Transform(aDadEmp[9], "@R 99.999.999/9999-99"), oFont10)	// Nome + CNPJ
-	oPrint:Say(nLin+0810,1810,	"Agência/Código Beneficiário",								oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0810,1810,	"Agência/Código Beneficiário",								oFont9)		// Texto Fixo
 
 	If aDadBco[01] == "341"
 		oPrint:Say(nLin+0850,1900,	Alltrim(aDadBco[3]) +"-"+ Alltrim(aDadBco[4])+"/"+Alltrim(aDadBco[5])+"-"+Alltrim(aDadBco[6]),	oFont11c)	// Agencia + Cód.Cedente + Dígito
@@ -992,13 +1007,13 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 		oPrint:Say(nLin+0850,1900,	AllTrim(aDadBco[15]),									oFont11c)	// Agencia + Cód.Cedente + Dígito
 	EndIf
 
-	oPrint:Say(nLin+0910,0100,	"Data do Documento",									oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0910,0100,	"Data do Documento",									oFont9)		// Texto Fixo
 	oPrint:Say(nLin+0940,0150,	StrZero(Day(aDadTit[5]),2)+"/"+ StrZero(Month(aDadTit[5]),2)+"/"+ Right(Str(Year(aDadTit[5])),4),						oFont10)	// Data do Documento
 
-	oPrint:Say(nLin+0910,0505,	"Nro.Documento",										oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0910,0505,	"Nro.Documento",										oFont9)		// Texto Fixo
 	oPrint:Say(nLin+0940,0605,	aDadTit[1]+aDadTit[2]+aDadTit[3],						oFont10)	// Prefixo + Numero + Parcela
 
-	oPrint:Say(nLin+0910,1005,	"Espécie Doc.",											oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0910,1005,	"Espécie Doc.",											oFont9)		// Texto Fixo
 
 	If aDadBco[01] $ "422"
 	   oPrint:Say(nLin+0940,1055,	"DM",											oFont10)	// Tipo do Titulo
@@ -1006,31 +1021,31 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 	   oPrint:Say(nLin+0940,1055,	aDadBco[14],											oFont10)	// Tipo do Titulo
 	Endif
 
-	oPrint:Say(nLin+0910,1305,	"Aceite",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0910,1305,	"Aceite",												oFont9)		// Texto Fixo
 	oPrint:Say(nLin+0940,1400,	"N",													oFont10)	// Texto Fixo
 
-	oPrint:Say(nLin+0910,1485,	"Data do Processamento",								oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0910,1485,	"Data do Processamento",								oFont9)		// Texto Fixo
 	oPrint:Say(nLin+0940,1550,	StrZero(Day(dDataBase),2)+"/"+ StrZero(Month(dDataBase),2)+"/"+ StrZero(Year(dDataBase),4),								oFont10)	// Data impressao
 
-	oPrint:Say(nLin+0910,1810,	"Nosso Número",											oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0910,1810,	"Nosso Número",											oFont9)		// Texto Fixo
 	oPrint:Say(nLin+0940,1900,	aBarra[4],												oFont11c)	// Nosso Número
 
-	oPrint:Say(nLin+0980,0100,	"Uso do Banco",											oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0980,0100,	"Uso do Banco",											oFont9)		// Texto Fixo
 	oPrint:Say(nLin+1010,0150,	aDadBco[13],											oFont10)	// Texto Fixo
 
-	oPrint:Say(nLin+0980,0505,	"Carteira",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0980,0505,	"Carteira",												oFont9)		// Texto Fixo
 	oPrint:Say(nLin+1010,0555,	aDadTit[10],											oFont10)	// Carteira
 
-	oPrint:Say(nLin+0980,0755,	"Espécie",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0980,0755,	"Espécie",												oFont9)		// Texto Fixo
 	oPrint:Say(nLin+1010,0805,	"R$",													oFont10)	// Texto Fixo
 
-	oPrint:Say(nLin+0980,1005,	"Quantidade",											oFont8)		// Texto Fixo
-	oPrint:Say(nLin+0980,1485,	"Valor",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0980,1005,	"Quantidade",											oFont9)		// Texto Fixo
+	oPrint:Say(nLin+0980,1485,	"Valor",												oFont9)		// Texto Fixo
 
-	oPrint:Say(nLin+0980,1810,	"Valor do Documento",								oFont8)		// Texto Fixo
+	oPrint:Say(nLin+0980,1810,	"Valor do Documento",								oFont9)		// Texto Fixo
 	oPrint:Say(nLin+1010,1900,	Transform(aDadTit[8],"@E 9999,999,999.99"),		oFont11c)	// Valor do Título
 
-	oPrint:Say(nLin+1050,0100,	"Instruções (Todas informações deste bloqueto são de exclusiva responsabilidade do cedente)",oFont8)		// Texto Fixo
+	oPrint:Say(nLin+1050,0100,	"Instruções (Todas informações deste bloqueto são de exclusiva responsabilidade do cedente)",oFont9)		// Texto Fixo
 
 	oPrint:Say(nLin+1100,0100,	"Após Vencimento: ",									oFont10)	// 1a Linha Instrução
 	oPrint:Say(nLin+1100,0405,	aDadTit[11],											oFont10)	// 1a Linha Instrução
@@ -1041,19 +1056,19 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 	oPrint:Say(nLin+1300,0100,	aDadTit[15],											oFont10)	// 5a. Linha Instrução
 	oPrint:Say(nLin+1350,0100,	aDadTit[16],											oFont10)	// 6a. Linha Instrução
 
-	oPrint:Say(nLin+1050,1810,	"(-)Desconto/Abatimento",								oFont8)		// Texto Fixo
+	oPrint:Say(nLin+1050,1810,	"(-)Desconto/Abatimento",								oFont9)		// Texto Fixo
 	oPrint:Say(nLin+1074,1900,	Transform(aDadTit[21],"@E 9999,999,999.99"),		    oFont11c)	// Desconto
-	oPrint:Say(nLin+1120,1810,	"(-)Outras Deduções",									oFont8)		// Texto Fixo
-	oPrint:Say(nLin+1190,1810,	"(+)Mora/Multa",										oFont8)		// Texto Fixo
+	oPrint:Say(nLin+1120,1810,	"(-)Outras Deduções",									oFont9)		// Texto Fixo
+	oPrint:Say(nLin+1190,1810,	"(+)Mora/Multa",										oFont9)		// Texto Fixo
 	oPrint:Say(nLin+1218,1900,	Transform(aDadTit[22],"@E 9999,999,999.99"),		    oFont11c)	// Juros
-	oPrint:Say(nLin+1260,1810,	"(+)Outros Acréscimos",									oFont8)		// Texto Fixo
+	oPrint:Say(nLin+1260,1810,	"(+)Outros Acréscimos",									oFont9)		// Texto Fixo
 	oPrint:Say(nLin+1285,1900,	Transform(aDadTit[23],"@E 9999,999,999.99"),		    oFont11c)	// Acrescimo
-	oPrint:Say(nLin+1330,1810,	"(=)Valor Cobrado",										oFont8)		// Texto Fixo
+	oPrint:Say(nLin+1330,1810,	"(=)Valor Cobrado",										oFont9)		// Texto Fixo
 	oPrint:Say(nLin+1354,1900,	Transform(aDadTit[24],"@E 9999,999,999.99"),		    oFont11c)	// Valor Cobrado
 
 	oPrint:Say(nLin+1350,0100,   "Pedido: " + Padr( aDadTit[18], 30 ),		 			oFont10)	// Número dos Pedidos
 
-	oPrint:Say(nLin+1400,0100,	"Pagador",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+1400,0100,	"Pagador",												oFont9)		// Texto Fixo
 	oPrint:Say(nLin+1430,0200,	SubStr(_cSacado,1,IIf( Len(_cSacado) > 80,80,Len(_cSacado) )),		oFont10)	// Código + Nome do Cliente
 
 	If aDadCli[6] = "J"
@@ -1067,58 +1082,58 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 	oPrint:Say(nLin+1589,1850,	aBarra[4],												oFont10)	// Nosso Número
 
 	If aDadBco[1] == "422"
-	   oPrint:Say(nLin+1605,0100,	"Pagador/Avalista: " + SPACE(30) + " - CNPJ: " + SPACE(14),oFont8)//Sacador
+	   oPrint:Say(nLin+1605,0100,	"Pagador/Avalista: " + SPACE(30) + " - CNPJ: " + SPACE(14),oFont9)//Sacador
 	Else
-	   oPrint:Say(nLin+1605,0100,	"Pagador/Avalista: " + SM0->M0_NOMECOM + " - CNPJ: " + SM0->M0_CGC, oFont8) //Sacador
+	   oPrint:Say(nLin+1605,0100,	"Pagador/Avalista: " + SM0->M0_NOMECOM + " - CNPJ: " + SM0->M0_CGC, oFont9) //Sacador
 	EndIf
 
-	oPrint:Say(nLin+1645,1500,	"Autenticação Mecânica",								oFont8)		// Texto Fixo
+	oPrint:Say(nLin+1645,1500,	"Autenticação Mecânica",								oFont9)		// Texto Fixo
 
-	oPrint:Line(nLin+0710,1800,nLin+1400,1800)														// Quadro
-	oPrint:Line(nLin+1120,1800,nLin+1120,2300)														// Quadro
-	oPrint:Line(nLin+1190,1800,nLin+1190,2300)														// Quadro
-	oPrint:Line(nLin+1260,1800,nLin+1260,2300)														// Quadro
-	oPrint:Line(nLin+1330,1800,nLin+1330,2300)														// Quadro
-	oPrint:Line(nLin+1400,0100,nLin+1400,2300)														// Quadro
-	oPrint:Line(nLin+1640,0100,nLin+1640,2300)														// Quadro
+	oPrint:Line(nLin+0710-nAjuste,1800,nLin+1400-nAjuste,1800)														// Quadro
+	oPrint:Line(nLin+1120-nAjuste,1800,nLin+1120-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+1190-nAjuste,1800,nLin+1190-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+1260-nAjuste,1800,nLin+1260-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+1330-nAjuste,1800,nLin+1330-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+1400-nAjuste,0100,nLin+1400-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+1640-nAjuste,0100,nLin+1640-nAjuste,2300)														// Quadro
 
 	// Pontilhado separador
 	nLin	:= 100
 
 	For nLoop := 100 To 2300 Step 50
-		oPrint:Line(nLin+1880, nLoop, nLin+1880, nLoop+30)												// Linha Pontilhada
+		oPrint:Line(nLin+1880-nAjuste, nLoop, nLin+1880-nAjuste, nLoop+30)												// Linha Pontilhada
 	Next nI
 
 	// Define o Terceiro Bloco - Ficha de Compensação
-	oPrint:Line(nLin+2000,0100,nLin+2000,2300)														// Quadro
-	oPrint:Line(nLin+2000,0500,nLin+1920,0500)														// Quadro
-	oPrint:Line(nLin+2000,0710,nLin+1920,0710)														// Quadro
+	oPrint:Line(nLin+2000-nAjuste,0100,nLin+2000-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+2000-nAjuste,0500,nLin+1920-nAjuste,0500)														// Quadro
+	oPrint:Line(nLin+2000-nAjuste,0710,nLin+1920-nAjuste,0710)														// Quadro
 
 	If !Empty(aDadBco[9])
 		oPrint:SayBitMap(nLin+1934,0100,cBmp,350,060)													// Logotipo do Banco
 	Else
-		oPrint:Say(nLin+1934,100,	aDadBco[8],												oFont14)	// Nome do Banco
+		oPrint:Say(nLin+1934,100,	aDadBco[8],												oFont19n)	// Nome do Banco
 	EndIf
 
-	oPrint:Say(nLin+1925,0513,	aDadBco[1]+"-"+aDadBco[2],								oFont21)	// Numero do Banco + Dígito
-	oPrint:Say(nLin+1934,0755,	aBarra[2],												oFont15n)	// Linha Digitavel do Codigo de Barras
+	oPrint:Say(nLin+1934,0513,	aDadBco[1]+"-"+aDadBco[2],								oFont21)	// Numero do Banco + Dígito
+	oPrint:Say(nLin+1939,0755,	aBarra[2],												oFont19n)	// Linha Digitavel do Codigo de Barras
 
-	oPrint:Line(nLin+2100,100,nLin+2100,2300 )														// Quadro
-	oPrint:Line(nLin+2200,100,nLin+2200,2300 )														// Quadro
-	oPrint:Line(nLin+2270,100,nLin+2270,2300 )														// Quadro
-	oPrint:Line(nLin+2340,100,nLin+2340,2300 )														// Quadro
+	oPrint:Line(nLin+2100-nAjuste,100,nLin+2100-nAjuste,2300 )														// Quadro
+	oPrint:Line(nLin+2200-nAjuste,100,nLin+2200-nAjuste,2300 )														// Quadro
+	oPrint:Line(nLin+2270-nAjuste,100,nLin+2270-nAjuste,2300 )														// Quadro
+	oPrint:Line(nLin+2340-nAjuste,100,nLin+2340-nAjuste,2300 )														// Quadro
 
-	oPrint:Line(nLin+2200,0500,nLin+2340,0500)														// Quadro
-	oPrint:Line(nLin+2270,0750,nLin+2340,0750)														// Quadro
-	oPrint:Line(nLin+2200,1000,nLin+2340,1000)														// Quadro
-	oPrint:Line(nLin+2200,1300,nLin+2270,1300)														// Quadro
-	oPrint:Line(nLin+2200,1480,nLin+2340,1480)														// Quadro
+	oPrint:Line(nLin+2200-nAjuste,0500,nLin+2340-nAjuste,0500)														// Quadro
+	oPrint:Line(nLin+2270-nAjuste,0750,nLin+2340-nAjuste,0750)														// Quadro
+	oPrint:Line(nLin+2200-nAjuste,1000,nLin+2340-nAjuste,1000)														// Quadro
+	oPrint:Line(nLin+2200-nAjuste,1300,nLin+2270-nAjuste,1300)														// Quadro
+	oPrint:Line(nLin+2200-nAjuste,1480,nLin+2340-nAjuste,1480)														// Quadro
 
-	oPrint:Say(nLin+2000,0100,	"Local de Pagamento",									oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2000,0100,	"Local de Pagamento",									oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2015,0400,	"ATÉ O VENCIMENTO, PREFERENCIALMENTE NO "+aDadBco[8],	oFont10)	// Texto Fixo
 	oPrint:Say(nLin+2055,0400 ,	"APÓS O VENCIMENTO, SOMENTE NO "+aDadBco[8],			oFont10)	// Texto Fixo
 
-	oPrint:Say(nLin+2000,1810,	"Vencimento",											oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2000,1810,	"Vencimento",											oFont9)		// Texto Fixo
 
 	If aDadBco[01] == "341" .AND. DToC(aDadTit[5]) $ DToC(aDadTit[6])
 		oPrint:Say(nLin+2040,1900,	"A VISTA",										oFont11c)	// Data de Vencimento
@@ -1126,10 +1141,10 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 		oPrint:Say(nLin+2040,1900,	StrZero(Day(aDadTit[6]),2)+"/"+ StrZero(Month(aDadTit[6]),2)+"/"+ StrZero(Year(aDadTit[6]),4),							oFont11c)	// Vencimento
 	Endif
 
-	oPrint:Say(nLin+2100,0100,	"Beneficiário",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2100,0100,	"Beneficiário",												oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2140,0100,	AllTrim(aDadEmp[1])+" - "+Transform(aDadEmp[9],"@R 99.999.999/9999-99"), oFont10)	// Nome + CNPJ
 
-	oPrint:Say(nLin+2100,1810,	"Agência/Código Beneficiário",								oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2100,1810,	"Agência/Código Beneficiário",								oFont9)		// Texto Fixo
 
 	If aDadBco[01] == "341"
 		oPrint:Say(nLin+2140,1900,	Alltrim(aDadBco[3]) +"-"+ Alltrim(aDadBco[4])+"/"+Alltrim(aDadBco[5])+"-"+Alltrim(aDadBco[6]),	oFont11c)	// Agencia + Cód.Cedente + Dígito
@@ -1137,13 +1152,13 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 		oPrint:Say(nLin+2140,1900,	AllTrim(aDadBco[15]),									oFont11c)	// Agencia + Cód.Cedente + Dígito
 	EndIf
 
-	oPrint:Say(nLin+2200,0100,	"Data do Documento",									oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2200,0100,	"Data do Documento",									oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2230,0100, 	StrZero(Day(aDadTit[5]),2)+"/"+ StrZero(Month(aDadTit[5]),2)+"/"+ StrZero(Year(aDadTit[5]),4),		 					oFont10)	// Vencimento
 
-	oPrint:Say(nLin+2200,0505,	"Nro.Documento",										oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2200,0505,	"Nro.Documento",										oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2230,0605,	aDadTit[1]+aDadTit[2]+aDadTit[3],						oFont10)	// Prefixo + Numero + Parcela
 
-	oPrint:Say(nLin+2200,1005,	"Espécie Doc.",						   					oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2200,1005,	"Espécie Doc.",						   					oFont9)		// Texto Fixo
 
 	If aDadBco[01] == "422"
 	   oPrint:Say(nLin+2230,1050,	"DM",											oFont10)	//Tipo do Titulo
@@ -1151,31 +1166,31 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 	   oPrint:Say(nLin+2230,1050,	aDadBco[14],											oFont10)	//Tipo do Titulo
 	Endif
 
-	oPrint:Say(nLin+2200,1305,	"Aceite",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2200,1305,	"Aceite",												oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2230,1400,	"N",													oFont10)	// Texto Fixo
 
-	oPrint:Say(nLin+2200,1485,	"Data do Processamento",								oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2200,1485,	"Data do Processamento",								oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2230,1550,	StrZero(Day(dDataBase),2)+"/"+ StrZero(Month(dDataBase),2)+"/"+ StrZero(Year(dDataBase),4),								oFont10)	// Data impressao
 
-	oPrint:Say(nLin+2200,1810,	"Nosso Número",											oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2200,1810,	"Nosso Número",											oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2230,1900,	aBarra[4],												oFont11c)	// Nosso Número
 
-	oPrint:Say(nLin+2270,0100,	"Uso do Banco",											oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2270,0100,	"Uso do Banco",											oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2300,0150,	aDadBco[13],											oFont10)	// Texto Fixo
 
-	oPrint:Say(nLin+2270,0505,	"Carteira",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2270,0505,	"Carteira",												oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2300,0555,	aDadTit[10],											oFont10)
 
-	oPrint:Say(nLin+2270,0755,	"Espécie",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2270,0755,	"Espécie",												oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2300,0805,	"R$",													oFont10)	// Texto Fixo
 
-	oPrint:Say(nLin+2270,1005,	"Quantidade",											oFont8)		// Texto Fixo
-	oPrint:Say(nLin+2270,1485,	"Valor",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2270,1005,	"Quantidade",											oFont9)		// Texto Fixo
+	oPrint:Say(nLin+2270,1485,	"Valor",												oFont9)		// Texto Fixo
 
-	oPrint:Say(nLin+2270,1810,	"Valor do Documento",									oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2270,1810,	"Valor do Documento",									oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2300,1900,	Transform(aDadTit[8], "@E 9999,999,999.99"),			oFont11c)	// Valor do Documento
 
-	oPrint:Say(nLin+2340,0100,	"Instruções (Todas informações deste bloqueto são de exclusiva responsabilidade do cedente)",oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2340,0100,	"Instruções (Todas informações deste bloqueto são de exclusiva responsabilidade do cedente)",oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2400,0100,	'Após vencimento:',									oFont10)	// 1a Linha Instrução
 	oPrint:Say(nLin+2400,0405,	aDadTit[11],											oFont10)	// 1a Linha Instrução
 	oPrint:Say(nLin+2450,0405,	aDadTit[12],											oFont10)	// 2a. Linha Instrução
@@ -1185,19 +1200,19 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 	oPrint:Say(nLin+2600,0100,	aDadTit[15],											oFont10)	// 5a. Linha Instrução
 	oPrint:Say(nLin+2650,0100,	aDadTit[16],											oFont10)	// 6a. Linha Instrução
 
-	oPrint:Say(nLin+2340,1810,	"(-)Desconto/Abatimento",								oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2340,1810,	"(-)Desconto/Abatimento",								oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2365,1900,	Transform(aDadTit[21],"@E 9999,999,999.99"),		    oFont11c)	// Desconto
-	oPrint:Say(nLin+2410,1810,	"(-)Outras Deduções",									oFont8)		// Texto Fixo
-	oPrint:Say(nLin+2480,1810,	"(+)Mora/Multa",										oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2410,1810,	"(-)Outras Deduções",									oFont9)		// Texto Fixo
+	oPrint:Say(nLin+2480,1810,	"(+)Mora/Multa",										oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2508,1900,	Transform(aDadTit[22],"@E 9999,999,999.99"),		    oFont11c)	// Juros
-	oPrint:Say(nLin+2550,1810,	"(+)Outros Acréscimos",									oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2550,1810,	"(+)Outros Acréscimos",									oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2578,1900,	Transform(aDadTit[23],"@E 9999,999,999.99"),		    oFont11c)	// Acrescimo
-	oPrint:Say(nLin+2620,1810,	"(=)Valor Cobrado",										oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2620,1810,	"(=)Valor Cobrado",										oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2644,1900,	Transform(aDadTit[24],"@E 9999,999,999.99"),		    oFont11c)	// Valor Cobrado
 
 	oPrint:Say(nLin+2650,0100,   "Pedido: " + Padr( aDadTit[18], 30 ),		 			oFont10)	// Número dos Pedidos
 
-	oPrint:Say(nLin+2690,0100,	"Pagador",												oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2690,0100,	"Pagador",												oFont9)		// Texto Fixo
 	oPrint:Say(nLin+2700,0200,	SubStr(_cSacado,1,IIf( Len(_cSacado) > 80,80,Len(_cSacado) )),		oFont10)	// Nome Cliente + Código
 
 	If aDadCli[6] = "J"
@@ -1212,23 +1227,24 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 	oPrint:Say(nLin+2806,1850,	aBarra[4],												oFont10)	// Carteira + Nosso Número
 
 	If aDadBco[1] == "422"
-	   oPrint:Say(nLin+2855,0100,	"Pagador/Avalista: " + SPACE(30) + " - CNPJ: " + SPACE(14),oFont8)//Sacador
+	   oPrint:Say(nLin+2855,0100,	"Pagador/Avalista: " + SPACE(30) + " - CNPJ: " + SPACE(14),oFont9)//Sacador
 	Else
-	   oPrint:Say(nLin+2855,0100,	"Pagador/Avalista: " + SM0->M0_NOMECOM + " - CNPJ: " + SM0->M0_CGC, oFont8) //Sacador
+	   oPrint:Say(nLin+2855,0100,	"Pagador/Avalista: " + SM0->M0_NOMECOM + " - CNPJ: " + SM0->M0_CGC, oFont9) //Sacador
 	EndIf
 
-	oPrint:Say(nLin+2895,1500,	"Autenticação Mecânica - Ficha de Compensação",			oFont8)		// Texto Fixo
+	oPrint:Say(nLin+2895,1500,	"Autenticação Mecânica - Ficha de Compensação",			oFont9)		// Texto Fixo
 
-	oPrint:Line(nLin+2000,1800,nLin+2690,1800)														// Quadro
-	oPrint:Line(nLin+2410,1800,nLin+2410,2300)														// Quadro
-	oPrint:Line(nLin+2480,1800,nLin+2480,2300)														// Quadro
-	oPrint:Line(nLin+2550,1800,nLin+2550,2300)														// Quadro
-	oPrint:Line(nLin+2620,1800,nLin+2620,2300)														// Quadro
-	oPrint:Line(nLin+2690,0100,nLin+2690,2300)														// Quadro
-	oPrint:Line(nLin+2890,0100,nLin+2890,2300)														// Quadro
+	oPrint:Line(nLin+2000-nAjuste,1800,nLin+2690-nAjuste,1800)														// Quadro
+	oPrint:Line(nLin+2410-nAjuste,1800,nLin+2410-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+2480-nAjuste,1800,nLin+2480-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+2550-nAjuste,1800,nLin+2550-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+2620-nAjuste,1800,nLin+2620-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+2690-nAjuste,0100,nLin+2690-nAjuste,2300)														// Quadro
+	oPrint:Line(nLin+2890-nAjuste,0100,nLin+2890-nAjuste,2300)														// Quadro
 
 	// Se Impressão em polegadas
 	// Guarabira
+	/*
 	If nTpImp == 1
 		MSBAR(	"INT25",;
 				13.7,;
@@ -1262,6 +1278,10 @@ User Function TCImpBol(oPrint,aDadEmp,aDadBco,aDadTit,aDadCli,aBarra,nTpImp)
 				"A",;				// String com o modo do código de barras
 				.F.)				// ??
 	EndIf
+	*/
+//	oPrint:FWMSBAR("INT25",72.8/*66.8*/,1.8/*2.0*/,aBarra[1],oPrint,.F.,,,,1.0,,,,.F.)
+//	oPrint:FWMSBAR("INT25",70/*66.8*/,1.8/*2.0*/,aBarra[1],oPrint,.F.,,,,1.0,,,,.F.)
+	oPrint:FWMSBAR("INT25",71/*66.8*/,1.8/*2.0*/,aBarra[1],oPrint,.F.,,,,1.0,,,,.F.)
 
 	oPrint:EndPage() // Finaliza a página
 Return(Nil)
