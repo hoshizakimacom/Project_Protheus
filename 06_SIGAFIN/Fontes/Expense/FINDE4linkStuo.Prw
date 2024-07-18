@@ -158,23 +158,25 @@ End WsRestFul
 
 WsMethod Post WsReceive cIdRotina WsService PostDespesa
 
-	Local cBody     := ::GetContent()
-	Local nValTot	:= 0
-	Local _nErro	:= 0
-	Local aContas	:= {}
-	Local aPercs	:= {}
-	Local aRecs		:= {}
-	Local cJson     := ""
-	Local aSE2      := {}
-	Local nZ        := 0
-	Local cCusto	:= ""
+Local cBody     := ::GetContent()
+Local nValTot	:= 0
+Local _nErro	:= 0
+Local aContas	:= {}
+Local aPercs	:= {}
+Local aRecs		:= {}
+Local cJson     := ""
+Local aSE2      := {}
+Local nZ        := 0
+Local nH 		:= 0
+Local cCusto	:= ""
+Local dDtGuard	:= dDataBase
 
-	Private lMsHelpAuto		:= .T.
-	Private lMsErroAuto 	:= .F.
-	Private lAutoErrNoFile 	:= .T.
-	Private nValor      := 0
-	Private aRatAll     := {}
-	Private oJsoAux
+Private lMsHelpAuto		:= .T.
+Private lMsErroAuto 	:= .F.
+Private lAutoErrNoFile 	:= .T.
+Private nValor      := 0
+Private aRatAll     := {}
+Private oJsoAux
 
 	If Empty(cBody)
 		cJson := '{"error": "Conteudo Json invalido.","lret":false}'
@@ -197,6 +199,8 @@ WsMethod Post WsReceive cIdRotina WsService PostDespesa
 		::SetResponse( cJson )
 		Return(.T.)
 	EndIf
+
+	dDataBase := CTOD(oJsoAux:emissao)
 
 	dbSelectArea("SA2")
 	SA2->(dbSetOrder(3))
@@ -238,56 +242,111 @@ WsMethod Post WsReceive cIdRotina WsService PostDespesa
 				aadd( aAuxEv ,{"EV_PERC" 	, nPercent								, Nil })//percentual do rateio na natureza
 				aadd( aAuxEv ,{"EV_RATEICC" , "1"									, Nil })//indicando que hÃ¡ rateio por centro de custo
 
-				cAux	:= StrTran(oJsoAux:despesas[nZ]:CENTROCUSTO, ";" ,"")
-				cCusto	:= SUBSTR(cAux, 1, at('-', cAux) - 1)
+				aCusto := Strtokarr2( oJsoAux:despesas[nZ]:CENTROCUSTO, ";", .T.)
 
-				aAuxEz := {}
+				lPassou := .F.
+				
+				For nH := 1 to len(aCusto)
 
-				aadd( aAuxEz ,{"EZ_CONTA"	, oJsoAux:despesas[nZ]:CONTACONTABIL										, Nil })//conta contÃ¡bil na natureza   322020019 ,322020017 ,322020006
-				aadd( aAuxEz ,{"EZ_CCUSTO"	, SUBSTR(cAux, 1, at('-', cAux) - 1)										, Nil })//centro de custo na natureza 50502001, 50502001, 50502001
-				aadd( aAuxEz ,{"EZ_VALOR"	, oJsoAux:despesas[nZ]:VALORDESPESA											, Nil })//valor do rateio neste centro de custo
-				aadd( aAuxEz ,{"CHAVE"		, oJsoAux:despesas[nZ]:CONTACONTABIL + SUBSTR(cAux, 1, at('-', cAux) - 1)	, Nil })//Chave auxiliar para não repetir entidades
-
-				If AttIsMemberOf(oJsoAux:despesas[nZ], "ITEM")
-					
-					If !Empty(oJsoAux:despesas[nZ]:ITEM)
-						aadd( aAuxEz ,{"EZ_ITEMCTA"	, oJsoAux:despesas[nZ]:ITEM	, Nil }) //item contabil
+					If Empty(aCusto[nH])
+						Loop
 					EndIf
+				
+					cAux		:= StrTran(aCusto[nH], ";" ,"")
+					cCusto		:= SUBSTR(cAux, 1, at('-', cAux) - 1)
+					nRatPerc	:= Val(SUBSTR(cAux, at('-', cAux) + 1, Len(cAux)))
 
-				EndIf
+					aAuxEz := {}
 
-				aadd(aRatEz,aAuxEz)
+					aadd( aAuxEz ,{"EZ_CONTA"	, oJsoAux:despesas[nZ]:CONTACONTABIL										, Nil })//conta contÃ¡bil na natureza   322020019 ,322020017 ,322020006
+					aadd( aAuxEz ,{"EZ_CCUSTO"	, SUBSTR(cAux, 1, at('-', cAux) - 1)										, Nil })//centro de custo na natureza 50502001, 50502001, 50502001
 
-				If len(aRatEvEz) > 0
+					If nRatPerc <> 100	
+						aadd( aAuxEz ,{"EZ_VALOR"	, oJsoAux:despesas[nZ]:VALORDESPESA * (nRatPerc / 100) , Nil })//valor do rateio neste centro de custo
+					Else
+						aadd( aAuxEz ,{"EZ_VALOR"	, oJsoAux:despesas[nZ]:VALORDESPESA, Nil })//valor do rateio neste centro de custo
+					EndIf
+					
+					aadd( aAuxEz ,{"CHAVE"		, oJsoAux:despesas[nZ]:CONTACONTABIL + SUBSTR(cAux, 1, at('-', cAux) - 1)	, Nil })//Chave auxiliar para não repetir entidades
 
-					nPosNat := aScan(aRatEvEz, {|x| Alltrim(x[1][2]) == oJsoAux:despesas[nZ]:natureza})
-
-					If nPosNat > 0
-
-						aRatEvEz[nPosNat][2][2] += oJsoAux:despesas[nZ]:VALORDESPESA
-						aRatEvEz[nPosNat][3][2] += nPercent
-
-						nPosChv := aScan(aRatEvEz[nPosNat][5][2], {|x| Alltrim(x[4][2]) == oJsoAux:despesas[nZ]:CONTACONTABIL + SUBSTR(cAux, 1, at('-', cAux) - 1) })
-
-						If nPosChv > 0
-							aRatEvEz[nPosNat][5][2][nPosChv][3][2] += oJsoAux:despesas[nZ]:VALORDESPESA
-						Else
-							AADD(aRatEvEz[nPosNat][5][2], aAuxEz)
+					If AttIsMemberOf(oJsoAux:despesas[nZ], "ITEM")
+						
+						If !Empty(oJsoAux:despesas[nZ]:ITEM)
+							
+							aItem := Strtokarr2( oJsoAux:despesas[nZ]:ITEM, ";", .T.)
+							
+							aadd( aAuxEz ,{"EZ_ITEMCTA"	, aItem[nH], Nil }) //item contabil
+							
 						EndIf
 
-						aRatEz := {}
+					EndIf
+
+					aadd(aRatEz,aAuxEz)
+
+					If len(aRatEvEz) > 0
+
+						nPosNat := aScan(aRatEvEz, {|x| Alltrim(x[1][2]) == oJsoAux:despesas[nZ]:natureza})
+
+						If nPosNat > 0
+
+							//Se for uma posição só não pode passar novamente
+							If nZ > 1
+							
+								If nRatPerc <> 100
+									aRatEvEz[nPosNat][2][2] += oJsoAux:despesas[nZ]:VALORDESPESA * (nRatPerc / 100)
+								Else	
+									aRatEvEz[nPosNat][2][2] += oJsoAux:despesas[nZ]:VALORDESPESA
+								EndIf
+
+							EndIf
+							
+							If !lPassou
+								aRatEvEz[nPosNat][3][2] += nPercent
+								lPassou := .T.
+							EndIf
+
+							nPosChv := aScan(aRatEvEz[nPosNat][5][2], {|x| Alltrim(x[4][2]) == oJsoAux:despesas[nZ]:CONTACONTABIL + SUBSTR(cAux, 1, at('-', cAux) - 1) })
+
+							If nPosChv > 0
+								If nRatPerc <> 100
+									aRatEvEz[nPosNat][5][2][nPosChv][3][2] += oJsoAux:despesas[nZ]:VALORDESPESA * (nRatPerc / 100)
+								Else	
+									aRatEvEz[nPosNat][5][2][nPosChv][3][2] += oJsoAux:despesas[nZ]:VALORDESPESA
+								EndIf
+							Else
+								AADD(aRatEvEz[nPosNat][5][2], aAuxEz)
+							EndIf
+
+							aRatEz := {}
+
+						Else
+							
+							aadd(aAuxEv,{"AUTRATEICC" , aRatEz, Nil })
+							
+							If nRatPerc <> 100	
+								
+								nValNat := aScan(aAuxEv, {|x| Alltrim(x[1]) == "EV_VALOR"})
+
+								aAuxEv[nValNat][2] := aAuxEv[nValNat][2] * (nRatPerc / 100)
+
+							EndIf
+
+							aAdd(aRatEvEz,aAuxEv)
+
+							lPassou := .T.
+
+							aRatEz := {}
+
+						EndIf
 
 					Else
 						aadd(aAuxEv,{"AUTRATEICC" , aRatEz, Nil })
 						aAdd(aRatEvEz,aAuxEv)
 						aRatEz := {}
+						lPassou := .T.
 					EndIf
 
-				Else
-					aadd(aAuxEv,{"AUTRATEICC" , aRatEz, Nil })
-					aAdd(aRatEvEz,aAuxEv)
-					aRatEz := {}
-				EndIf
+				Next nH
 
 				cAuxNat := oJsoAux:despesas[nZ]:natureza
 
@@ -307,7 +366,7 @@ WsMethod Post WsReceive cIdRotina WsService PostDespesa
 		aAdd(aSE2, {"E2_FORNECE", SA2->A2_COD               					, Nil})
 		aAdd(aSE2, {"E2_LOJA"   , SA2->A2_LOJA              					, Nil})
 		aAdd(aSE2, {"E2_NOMFOR" , SA2->A2_NOME              					, Nil})
-		aAdd(aSE2, {"E2_EMISSAO", dDataBase                  					, Nil})
+		aAdd(aSE2, {"E2_EMISSAO", CTOD(oJsoAux:emissao)        					, Nil})
 		aAdd(aSE2, {"E2_VENCTO" , ctod(oJsoAux:vencimento)     					, Nil})
 		aAdd(aSE2, {"E2_VENCREA", DataValida(ctod(oJsoAux:vencimento), .T.)		, Nil})
 		aAdd(aSE2, {"E2_VALOR"  , nValTot                     					, Nil})
@@ -376,6 +435,8 @@ WsMethod Post WsReceive cIdRotina WsService PostDespesa
 	EndIf
 
 	::SetResponse( cJson )
+
+	dDataBase := dDtGuard
 
 Return(.T.)
 
@@ -492,32 +553,31 @@ Return(.T.)
 
 
 User Function TestaDespesa()
-	Local cBody     := GetBody()
-	Local nValTot	:= 0
-	Local _nErro	:= 0
-	Local aContas	:= {}
-	Local aPercs	:= {}
-	Local aRecs		:= {}
-	Local cJson     := ""
-	Local aSE2      := {}
-	Local nZ        := 0
-	Local cCusto	:= ""
+	
+Local cBody     := GetBody()
+Local nValTot	:= 0
+Local _nErro	:= 0
+Local aContas	:= {}
+Local aPercs	:= {}
+Local aRecs		:= {}
+Local cJson     := ""
+Local aSE2      := {}
+Local nZ        := 0
+Local nH 		:= 0
+Local cCusto	:= ""
 
-	Private lMsHelpAuto		:= .T.
-	Private lMsErroAuto 	:= .F.
-	Private lAutoErrNoFile 	:= .T.
-	Private nValor      := 0
-	Private aRatAll     := {}
-	Private oJsoAux
-	cString := 'reembolso ANDRÃ‰ LOPES GUERRA           '
-
-	DecodeUtf8(cString)
+Private lMsHelpAuto		:= .T.
+Private lMsErroAuto 	:= .F.
+Private lAutoErrNoFile 	:= .T.
+Private nValor      := 0
+Private aRatAll     := {}
+Private oJsoAux
 
 	RpcSetEnv("01","01")
 
 	If Empty(cBody)
 		cJson := '{"error": "Conteudo Json invalido.","lret":false}'
-		//::SetResponse( cJson )
+		::SetResponse( cJson )
 		Return .T.
 	EndIf
 
@@ -527,13 +587,15 @@ User Function TestaDespesa()
 	MV_PAR01 := 2
 	MV_PAR04 := 2
 
+	dDataBase := CTOD(oJsoAux:emissao)
+
 	DbSelectArea("SE2")
 	SE2->(DbSetOrder(1))
 
 	//Se ja existir titulo aborta o processo
 	If SE2->(DbSeek(xFilial("SE2") + oJsoAux:prefixo  + cvaltochar(oJsoAux:idRelatorio) ))
 		cJson := '{"message": "Titulo já incluso.","lret":true}'
-		//::SetResponse( cJson )
+		::SetResponse( cJson )
 		Return(.T.)
 	EndIf
 
@@ -577,48 +639,111 @@ User Function TestaDespesa()
 				aadd( aAuxEv ,{"EV_PERC" 	, nPercent								, Nil })//percentual do rateio na natureza
 				aadd( aAuxEv ,{"EV_RATEICC" , "1"									, Nil })//indicando que hÃ¡ rateio por centro de custo
 
-				cAux	:= StrTran(oJsoAux:despesas[nZ]:CENTROCUSTO, ";" ,"")
-				cCusto	:= SUBSTR(cAux, 1, at('-', cAux) - 1)
+				aCusto := Strtokarr2( oJsoAux:despesas[nZ]:CENTROCUSTO, ";", .T.)
 
-				aAuxEz := {}
+				lPassou := .F.
+				
+				For nH := 1 to len(aCusto)
 
-				aadd( aAuxEz ,{"EZ_CONTA"	, oJsoAux:despesas[nZ]:CONTACONTABIL										, Nil })//conta contÃ¡bil na natureza   322020019 ,322020017 ,322020006
-				aadd( aAuxEz ,{"EZ_CCUSTO"	, SUBSTR(cAux, 1, at('-', cAux) - 1)										, Nil })//centro de custo na natureza 50502001, 50502001, 50502001
-				aadd( aAuxEz ,{"EZ_VALOR"	, oJsoAux:despesas[nZ]:VALORDESPESA											, Nil })//valor do rateio neste centro de custo
-				aadd( aAuxEz ,{"CHAVE"		, oJsoAux:despesas[nZ]:CONTACONTABIL + SUBSTR(cAux, 1, at('-', cAux) - 1)	, Nil })//Chave auxiliar para não repetir entidades
+					If Empty(aCusto[nH])
+						Loop
+					EndIf
+				
+					cAux		:= StrTran(aCusto[nH], ";" ,"")
+					cCusto		:= SUBSTR(cAux, 1, at('-', cAux) - 1)
+					nRatPerc	:= Val(SUBSTR(cAux, at('-', cAux) + 1, Len(cAux)))
 
-				aadd(aRatEz,aAuxEz)
+					aAuxEz := {}
 
-				If len(aRatEvEz) > 0
+					aadd( aAuxEz ,{"EZ_CONTA"	, oJsoAux:despesas[nZ]:CONTACONTABIL										, Nil })//conta contÃ¡bil na natureza   322020019 ,322020017 ,322020006
+					aadd( aAuxEz ,{"EZ_CCUSTO"	, SUBSTR(cAux, 1, at('-', cAux) - 1)										, Nil })//centro de custo na natureza 50502001, 50502001, 50502001
 
-					nPosNat := aScan(aRatEvEz, {|x| Alltrim(x[1][2]) == oJsoAux:despesas[nZ]:natureza})
+					If nRatPerc <> 100	
+						aadd( aAuxEz ,{"EZ_VALOR"	, oJsoAux:despesas[nZ]:VALORDESPESA * (nRatPerc / 100) , Nil })//valor do rateio neste centro de custo
+					Else
+						aadd( aAuxEz ,{"EZ_VALOR"	, oJsoAux:despesas[nZ]:VALORDESPESA, Nil })//valor do rateio neste centro de custo
+					EndIf
+					
+					aadd( aAuxEz ,{"CHAVE"		, oJsoAux:despesas[nZ]:CONTACONTABIL + SUBSTR(cAux, 1, at('-', cAux) - 1)	, Nil })//Chave auxiliar para não repetir entidades
 
-					If nPosNat > 0
-
-						aRatEvEz[nPosNat][2][2] += oJsoAux:despesas[nZ]:VALORDESPESA
-						aRatEvEz[nPosNat][3][2] += nPercent
-
-						nPosChv := aScan(aRatEvEz[nPosNat][5][2], {|x| Alltrim(x[4][2]) == oJsoAux:despesas[nZ]:CONTACONTABIL + SUBSTR(cAux, 1, at('-', cAux) - 1) })
-
-						If nPosChv > 0
-							aRatEvEz[nPosNat][5][2][nPosChv][3][2] += oJsoAux:despesas[nZ]:VALORDESPESA
-						Else
-							AADD(aRatEvEz[nPosNat][5][2], aAuxEz)
+					If AttIsMemberOf(oJsoAux:despesas[nZ], "ITEM")
+						
+						If !Empty(oJsoAux:despesas[nZ]:ITEM)
+							
+							aItem := Strtokarr2( oJsoAux:despesas[nZ]:ITEM, ";", .T.)
+							
+							aadd( aAuxEz ,{"EZ_ITEMCTA"	, aItem[nH], Nil }) //item contabil
+							
 						EndIf
 
-						aRatEz := {}
+					EndIf
+
+					aadd(aRatEz,aAuxEz)
+
+					If len(aRatEvEz) > 0
+
+						nPosNat := aScan(aRatEvEz, {|x| Alltrim(x[1][2]) == oJsoAux:despesas[nZ]:natureza})
+
+						If nPosNat > 0
+
+							//Se for uma posição só não pode passar novamente
+							If nZ > 1
+							
+								If nRatPerc <> 100
+									aRatEvEz[nPosNat][2][2] += oJsoAux:despesas[nZ]:VALORDESPESA * (nRatPerc / 100)
+								Else	
+									aRatEvEz[nPosNat][2][2] += oJsoAux:despesas[nZ]:VALORDESPESA
+								EndIf
+
+							EndIf
+							
+							If !lPassou
+								aRatEvEz[nPosNat][3][2] += nPercent
+								lPassou := .T.
+							EndIf
+
+							nPosChv := aScan(aRatEvEz[nPosNat][5][2], {|x| Alltrim(x[4][2]) == oJsoAux:despesas[nZ]:CONTACONTABIL + SUBSTR(cAux, 1, at('-', cAux) - 1) })
+
+							If nPosChv > 0
+								If nRatPerc <> 100
+									aRatEvEz[nPosNat][5][2][nPosChv][3][2] += oJsoAux:despesas[nZ]:VALORDESPESA * (nRatPerc / 100)
+								Else	
+									aRatEvEz[nPosNat][5][2][nPosChv][3][2] += oJsoAux:despesas[nZ]:VALORDESPESA
+								EndIf
+							Else
+								AADD(aRatEvEz[nPosNat][5][2], aAuxEz)
+							EndIf
+
+							aRatEz := {}
+
+						Else
+							
+							aadd(aAuxEv,{"AUTRATEICC" , aRatEz, Nil })
+							
+							If nRatPerc <> 100	
+								
+								nValNat := aScan(aAuxEv, {|x| Alltrim(x[1]) == "EV_VALOR"})
+
+								aAuxEv[nValNat][2] := aAuxEv[nValNat][2] * (nRatPerc / 100)
+
+							EndIf
+
+							aAdd(aRatEvEz,aAuxEv)
+
+							lPassou := .T.
+
+							aRatEz := {}
+
+						EndIf
 
 					Else
 						aadd(aAuxEv,{"AUTRATEICC" , aRatEz, Nil })
 						aAdd(aRatEvEz,aAuxEv)
 						aRatEz := {}
+						lPassou := .T.
 					EndIf
 
-				Else
-					aadd(aAuxEv,{"AUTRATEICC" , aRatEz, Nil })
-					aAdd(aRatEvEz,aAuxEv)
-					aRatEz := {}
-				EndIf
+				Next nH
 
 				cAuxNat := oJsoAux:despesas[nZ]:natureza
 
@@ -638,7 +763,7 @@ User Function TestaDespesa()
 		aAdd(aSE2, {"E2_FORNECE", SA2->A2_COD               					, Nil})
 		aAdd(aSE2, {"E2_LOJA"   , SA2->A2_LOJA              					, Nil})
 		aAdd(aSE2, {"E2_NOMFOR" , SA2->A2_NOME              					, Nil})
-		aAdd(aSE2, {"E2_EMISSAO", dDataBase                  					, Nil})
+		aAdd(aSE2, {"E2_EMISSAO", CTOD(oJsoAux:emissao)        					, Nil})
 		aAdd(aSE2, {"E2_VENCTO" , ctod(oJsoAux:vencimento)     					, Nil})
 		aAdd(aSE2, {"E2_VENCREA", DataValida(ctod(oJsoAux:vencimento), .T.)		, Nil})
 		aAdd(aSE2, {"E2_VALOR"  , nValTot                     					, Nil})
@@ -653,9 +778,7 @@ User Function TestaDespesa()
 		EndIf
 
 		aSE2 := FWVetByDic(aSE2,"SE2",.F.)
-
 		//Execução da operação de inclusão no FINA050
-		lMsErroAuto 	:= .F.
 		MsExecAuto( { |x,y,z| FINA050(x,y,z)}, aSE2,, 3)
 
 		If lMsErroAuto
@@ -714,8 +837,8 @@ Return(.T.)
 
 Static Function GetBody()
 
-	cBody := '{"natureza":"51030182","historico":"reembolso ANDRÉ LOPES GUERRA","prefixo":"DES","idRelatorio":"3767612","cpf":"33945693888","empresa":"0101","parcela":"1","tipo":"DP","vencimento":"22/08/2023","solicitante":"000014","despesas":[{"url":" ","codigoDespesa":33270873,"contaContabil":"51030906","centroCusto":"201001-100;","natureza":"51030182","valorDespesa":15},{"url":" ","codigoDespesa":33270887,"contaContabil":"51030910","centroCusto":"201001-100;","natureza":"51030119","valorDespesa":20}]}''
-
+	cBody := '{"vencimento":"08/07/2024","solicitante":"000014","prefixo":"EXP","natureza":"2000141","idRelatorio":"4316765","cpf":"42404467832","parcela":"1","tipo":"DES","historico":"FELIPE WESLEY DOS REIS MOREIRA","emissao":"26/06/2024","despesas":[{"url":"https://s3.amazonaws.com/expenseimagens/bb86d6e6-dc94-4af4-aa9e-daa54979b664.jpg","codigoDespesa":39663758,"contaContabil":"3110400058","centroCusto":"20901-100;","natureza":"2000141","valorDespesa":20,"item":"40000002830;"},{"url":"https://s3.amazonaws.com/expenseimagens/7eada02b-9293-4fd7-9589-5e82bf6fb9a9.jpg","codigoDespesa":39684744,"contaContabil":"3110400024","centroCusto":"10901-33;10901-33;20901-33;","natureza":"2000169","valorDespesa":25,"item":"40000002290;40000002290;40000002830;"},{"url":"https://s3.amazonaws.com/expenseimagens/23852a6a-3f28-4369-a4d8-2f43cedd6b57.jpg","codigoDespesa":39719065,"contaContabil":"3110400024","centroCusto":"20901-50;20901-50;","natureza":"2000169","valorDespesa":39,"item":"40000001924;40000002830;"},{"url":"https://s3.amazonaws.com/expenseimagens/acf4a52e-7d4c-4063-9783-9e7fb634082b.jpg","codigoDespesa":39719098,"contaContabil":"3110400024","centroCusto":"20901-50;20901-50;","natureza":"2000169","valorDespesa":65.5,"item":"40000002830;40000001924;"}]}'
+	
 	CtESTE := 'reembolso ANDRÃ‰ LOPES GUERRA           '
 	CTESTE2 := 'reembolso ANDRÉ LOPES GUERRA'
 
