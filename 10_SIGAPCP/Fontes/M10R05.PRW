@@ -186,6 +186,9 @@ TRCell():New(oVenProd,"SLDEST"	    ,/*Tabela*/	,"Sld Estoque"	     ,PesqPict("SB
 TRCell():New(oVenProd,"QTD_EMP"	    ,/*Tabela*/	,"Qtd.Est.Empen."	 ,PesqPict("SB2","B2_QATU")		,TamSx3("B2_QATU")[1]		,/*lPixel*/,{|| nSldLib })				// Saldo em Estoque
 TRCell():New(oVenProd,"QTD_DISP"    ,/*Tabela*/	,"Qtd.Est.Disp."	 ,PesqPict("SB2","B2_QATU")		,TamSx3("B2_QATU")[1]		,/*lPixel*/,{|| nSldDisp })				// Saldo em Estoque
 
+TRCell():New(oVenProd,"RAT_FRETE"	,/*Tabela*/	,"Rat.Frete"		 ,PesqPict("SC5","C5_XFRETE")	,TamSx3("C5_XFRETE")[1]	    ,/*lPixel*/,{||	nRatFre})				// Rateio Frete #6805
+
+
 //	nPvLib   := 0
 //  nSldLib  := 0
 //	nSldDisp := 0
@@ -244,7 +247,7 @@ dbSetOrder(2)			// Produto,Numero
 			C5_EMISSAO,C5_XTPVEN,C5_VEND1,C5_XSTSFIN,C5_XDTAPRV,C5_TPFRETE,C5_TRANSP,
 			C5_XLIBREV,C5_XMOTLIB,C5_XDTPCP1,C5_XOBS1,C5_XDTPCP2,C5_XOBS2,
 			C5_XDTPCP3,C5_XOBS3,C5_XDTPCP4,C5_XOBS4,C5_XDTPCP5,C5_XOBS5,
-			C5_XDTPCP6,C5_XOBS6,C5_XDTPCP7,C5_XOBS7,C5_XDTPCP8,C5_XOBS8, 
+			C5_XDTPCP6,C5_XOBS6,C5_XDTPCP7,C5_XOBS7,C5_XDTPCP8,C5_XOBS8, C5_XFRETE, 
 			C5_XLIBPRO,C5_XDLIBPR,C5_CLIENTE, C5_LOJACLI, C5_FRETE,
 			A1_NOME, A1_NREDUZ, A1_EST, 
 			B1_XFABRIC,B1_TIPO,B1_LOCPAD,B1_XFAMILI, B1_FAMILIA, B1_XITDESE, B1_XDTITDS,B1_DESC,B1_XPROD,
@@ -422,7 +425,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	nPvLib   := (cAliasQry)->PV_QT_LIB
     nSldLib  := (cAliasQry)->QTD_EMP
 	nSldDisp := nSldEst - (cAliasQry)->QTD_EMP
-
+  	RatFre  := (cAliasQry)->C5_XFRETE
 //Pedido
 //TRCell():New(oVenProd,"PV_QUANT"	 ,/*Tabela*/	,"PV.Quantidade"	 ,PesqPict("SC6","C6_QTDVEN")	,TamSx3("C6_QTDVEN")[1]		,/*lPixel*/,{|| nQuant	})				// Quantidade
 //TRCell():New(oVenProd,"PV_SALDO"	 ,/*Tabela*/	,"PV A Entregar"	 ,PesqPict("SC6","C6_QTDVEN")	,TamSx3("C6_QTDVEN")[1]		,/*lPixel*/,{|| nSaldo	})				// Saldo
