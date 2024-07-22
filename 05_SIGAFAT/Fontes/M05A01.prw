@@ -1,7 +1,7 @@
 #Include 'Protheus.ch'
 
 //------------------------------------------------------------------------------
-//	Rotina de calcualo de preÁo
+//	Rotina de calcualo de pre√ßo
 //------------------------------------------------------------------------------
 User Function M05A01(_cFunc,lAtuOper)
     Local _nPrecoVend	:= 0
@@ -33,10 +33,10 @@ User Function M05A01(_cFunc,lAtuOper)
 
     Default lAtuOper    := .T.
 
-    SetPrcTab(_cFunc)		// Atualiza preÁo de tabela
+    SetPrcTab(_cFunc)		// Atualiza pre√ßos de tabela
 
     If lAtuOper
-        SetOper(_cFunc)			// Atualiza tipo de operaÁ„o
+        SetOper(_cFunc)			// Atualiza tipo de opera√ß√£o
     EndIf
 
     If lAtuOper
@@ -372,9 +372,9 @@ Static Function GetIPI(_cRef,_nICMS,_nICMOri,_nICMDes,_nAliqFCP,_cTES,_cProduto,
 
         If MaFisRet(1,'IT_VALIPI') > 0
             If _cTipoCli == 'F' .And. _cIncide == 'F' .and. _cOrigem == "0"
-                _nRet := (_nICMS + _nICMOri + _nICMDes + _nAliqFCP) * (MaFisRet(1,'IT_ALIQIPI')/100)  // IPI e REDU«√O DE IPI NACIONAL
+                _nRet := (_nICMS + _nICMOri + _nICMDes + _nAliqFCP) * (MaFisRet(1,'IT_ALIQIPI')/100)  // IPI e REDU√á√ÉO DE IPI NACIONAL
             ElseIf _cTipoCli == 'F' .And. _cIncide == 'F' .and. _cOrigem <> "0"
-                _nRet := (_nICMS + _nICMOri + _nICMDes + _nAliqFCP) * (MaFisRet(1,'IT_ALIQIPI')/100)  // IPI e REDU«√O DE IPI IMPORTADO VDA
+                _nRet := (_nICMS + _nICMOri + _nICMDes + _nAliqFCP) * (MaFisRet(1,'IT_ALIQIPI')/100)  // IPI e REDU√á√ÉO DE IPI IMPORTADO VDA
             EndIf
         EndIf
     Else
@@ -387,7 +387,7 @@ Return _nRet
 
 
 //+------------------------------------------------------------------------------------------------
-// Atualiza campo C6_XPRCTAB/CK_XPRCTAB com preÁo de tabela
+// Atualiza campo C6_XPRCTAB/CK_XPRCTAB com pre√ßo de tabela
 //+------------------------------------------------------------------------------------------------
 Static Function SetPrcTab(_cFunc)
 
@@ -404,7 +404,7 @@ Static Function SetPrcTab(_cFunc)
     	If _dDataVig >= dDataBase .Or. RetCodUsr() $ _cCodUsr 
     		_nPrcTab	:= Posicione('DA1',1,xFilial('DA1') + M->C5_TABELA + GdFieldGet('C6_PRODUTO',n),'DA1_PRCVEN')
         Else
-        	MsgAlert("Produto fora da vigÍncia ! Entre em contato com o departamento comercial. Valor unit·rio n„o atualizado !","AtenÁ„o!")
+        	MsgAlert("Produto fora da vig√™ncia ! Entre em contato com o departamento comercial. Valor unit√°rio n√£o atualizado !","Aten√ß√£o!")
     	Endif
 
         GdFieldPut('C6_XVLUTAB'	,_nPrcTab	,n)
@@ -418,7 +418,7 @@ Static Function SetPrcTab(_cFunc)
 Return
 
 //+------------------------------------------------------------------------------------------------
-//	Respons·vel pelo peenchimento do tipo de operaÁ„o
+//	Respons√°vel pelo peenchimento do tipo de opera√ß√£o
 //+------------------------------------------------------------------------------------------------
 Static Function SetOper(_cFunc)
     Local _cProduto		:= ''
@@ -475,15 +475,15 @@ Return
 
 
 //------------------------------------------------------------------------------
-//  Rotina de calcualo de preÁo operacoes 03 04 e 36
+//  Rotina de calcualo de pre√ßo operacoes 03 04 e 36
 //------------------------------------------------------------------------------
-User Function M05A01_A(_cFunc)
-    Local _nPrecoVend   := 0
+//User Function M05A01_A(_cFunc)
+//    Local _nPrecoVend   := 0
 
-    CalcPrcA(_cFunc,@_nPrecoVend)     // Busca valor do pedido original
-    SetTES(_cFunc)                      // Atualiza TES
-    SetPrcVen(_cFunc,_nPrecoVend,.T.)   // Atualiza valores do pedido
-Return
+//    CalcPrcA(_cFunc,@_nPrecoVend)     // Busca valor do pedido original
+//    SetTES(_cFunc)                      // Atualiza TES
+//    SetPrcVen(_cFunc,_nPrecoVend,.T.)   // Atualiza valores do pedido
+//Return
 
 //+--------------------------------------------------------------------------------------------------------------------
 Static Function CalcPrcA(_cFunc,_nPrecoVend)
@@ -499,7 +499,7 @@ Static Function CalcPrcA(_cFunc,_nPrecoVend)
 Return
 
 //------------------------------------------------------------------------------
-//  Rotina de calcualo de preÁo operacoes 27 E 44
+//  Rotina de calcualo de pre√ßo operacoes 27 E 44
 //------------------------------------------------------------------------------
 User Function M05A01_B(_cFunc)
     Local _nPrecoVend   := 0
