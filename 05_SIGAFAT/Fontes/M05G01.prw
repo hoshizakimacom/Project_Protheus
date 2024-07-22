@@ -176,9 +176,9 @@ User Function M05G01(_cField)
             Case _xRet $ "|27|44|38"
                 U_M05A01_B('PV')
 
-            OtherWise
-                SetFldClr('PV')     // Limpa campos de valores
-                U_M05A01('PV',.F.)      // Atualiza preço do produto
+            //OtherWise
+            //    SetFldClr('PV')     // Limpa campos de valores
+            //    U_M05A01('PV',.F.)      // Atualiza preço do produto
             EndCase
 
         Case _cField == 'CK_OPER'
@@ -187,8 +187,8 @@ User Function M05G01(_cField)
             TMP1->(FieldPut(FieldPos('CK_XOPER')  ,_xRet))
 
             Do Case
-            Case _xRet $ "03|04|36|"
-                U_M05A01_A('OV')
+           // Case _xRet $ "03|04|36|"
+           //     U_M05A01_A('OV')
 
             Case _xRet $ "|27|44"
                 U_M05A01_B('OV')
