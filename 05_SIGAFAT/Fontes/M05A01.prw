@@ -33,7 +33,7 @@ User Function M05A01(_cFunc,lAtuOper)
 
     Default lAtuOper    := .T.
 
-    SetPrcTab(_cFunc)		// Atualiza preço de tabela
+    SetPrcTab(_cFunc)		// Atualiza preços de tabela
 
     If lAtuOper
         SetOper(_cFunc)			// Atualiza tipo de operação

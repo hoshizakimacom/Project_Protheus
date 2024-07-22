@@ -16,7 +16,7 @@ User Function M05G01(_cField)
 		Case _cField == 'C6_PRODUTO'
 			_xRet	:= GdFieldGet(_cField,n)
 			SetFldClr('PV')		 // Limpa campos de valores
-			U_M05A01('PV')		 // Atualiza preço do produto
+			U_M05A01('PV')		 // Atualiza preços do produto
 			SetTpProd('PV')      // Atualiza campo virtual com tipo do produto
 			SetFCI('PV')         // Atualiza campo com FCI
 
