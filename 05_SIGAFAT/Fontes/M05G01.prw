@@ -1,7 +1,7 @@
 #Include 'Protheus.ch'
 
 //+------------------------------------------------------------------------------------------------
-//	Função chamada de gatilhos na SC6
+//	FunÃ§Ã£o chamada de gatilhos na SC6
 //+------------------------------------------------------------------------------------------------
 User Function M05G01(_cField)
 
@@ -16,14 +16,17 @@ User Function M05G01(_cField)
 		Case _cField == 'C6_PRODUTO'
 			_xRet	:= GdFieldGet(_cField,n)
 			SetFldClr('PV')		 // Limpa campos de valores
-			U_M05A01('PV')		 // Atualiza preços do produto
+
+=======
+			U_M05A01('PV')		 // Atualiza preÃ§os do produto
+
 			SetTpProd('PV')      // Atualiza campo virtual com tipo do produto
 			SetFCI('PV')         // Atualiza campo com FCI
 
 		Case _cField == 'CK_PRODUTO'
 			_xRet	:= TMP1->(FieldGet(FieldPos(_cField)))
 			SetFldClr('OV')		// Limpa campos de valores
-			U_M05A01('OV')		// Atualiza preço do produto
+			U_M05A01('OV')		// Atualiza preÃ§o do produto
             SetFCI('OV')         // Atualiza campo com FCI
 
 		//+------------------------------------------------------macom-
@@ -43,20 +46,20 @@ User Function M05G01(_cField)
 			U_M05A03('OV') // Atualiza totais
 
 		//+-------------------------------------------------------
-		//	Tabela de Preços
+		//	Tabela de PreÃ§os
 		//+-------------------------------------------------------
 		Case _cField == 'C5_TABELA'
 			If M->C5_TABELA <> 'DEV'
 				_xRet := M->C5_TABELA
-				SetPrcTab('PV')		// Atualiza preço da nova tabela
+				SetPrcTab('PV')		// Atualiza preÃ§o da nova tabela
 			Endif
 
 		Case _cField == 'CJ_TABELA'
 			_xRet := M->CJ_TABELA
-			SetPrcTab('OV')		// Atualiza preço da nova tabela
+			SetPrcTab('OV')		// Atualiza preÃ§o da nova tabela
 
 		//+-------------------------------------------------------
-		//	Descontos Cabeçalho
+		//	Descontos CabeÃ§alho
 		//+-------------------------------------------------------
 		Case _cField $ '|C5_DESC1|C5_DESC2|C5_DESC3|C5_DESC4|C5_XACRESC|C5_XFRETE|C5_XINSTA|C5_CONDPAG|'
 			_xRet := &('M->'+_cField)
@@ -133,7 +136,7 @@ User Function M05G01(_cField)
 
 
         //+-------------------------------------------------------
-        //  Tabela de Preços
+        //  Tabela de PreÃ§os
         //+-------------------------------------------------------
         Case _cField == 'C5_FECENT'
             _xRet := &('M->'+_cField)
@@ -144,20 +147,20 @@ User Function M05G01(_cField)
             SetFecEnt('OV')
 
         //+-------------------------------------------------------
-        //  Tabela de Preços
+        //  Tabela de PreÃ§os
         //+-------------------------------------------------------
         Case _cField == 'C6_OPER'
             _xRet := &('M->'+_cField)
             GdFieldPut('C6_XOPER' ,_xRet              ,n)
             
             //+---------------------------------------------------------+
-            //|  Ajuste efetuado atentendo solicitação da usuária       |
-            //|  Cibele para ajuste automático do valor unitário        |
-            //|  nas operações :                                        |
+            //|  Ajuste efetuado atentendo solicitaÃ§Ã£o da usuÃ¡ria       |
+            //|  Cibele para ajuste automÃ¡tico do valor unitÃ¡rio        |
+            //|  nas operaÃ§Ãµes :                                        |
             //|  03 - Venda Entrega Futura                              |
             //|  04 - Revenda Entrega Futura                            |
-            //|  27 - Lançamento a Título de Simples Faturamento        |
-            //|  44 - Simples Faturamento - Operação Revenda            |
+            //|  27 - LanÃ§amento a TÃ­tulo de Simples Faturamento        |
+            //|  44 - Simples Faturamento - OperaÃ§Ã£o Revenda            |
             //+---------------------------------------------------------+
 //            If _xRet $ "03|04|27|44"
 //            	GdFieldPut('C6_DESCONT', 0 , n)
@@ -178,7 +181,9 @@ User Function M05G01(_cField)
 
             //OtherWise
             //    SetFldClr('PV')     // Limpa campos de valores
-            //    U_M05A01('PV',.F.)      // Atualiza preço do produto
+
+            //    U_M05A01('PV',.F.)      // Atualiza preÃ§o do produto
+
             EndCase
 
         Case _cField == 'CK_OPER'
@@ -195,7 +200,7 @@ User Function M05G01(_cField)
 
             OtherWise
                 SetFldClr('OV')     // Limpa campos de valores
-                U_M05A01('OV',.F.)      // Atualiza preço do produto
+                U_M05A01('OV',.F.)      // Atualiza preÃ§o do produto
             EndCase
 
         //+-------------------------------------------------------
@@ -219,7 +224,7 @@ User Function M05G01(_cField)
 
             M->C5_XCLINOM := U_M05A32('NOME')
 
-			// Caso o cliente for Arcos Dourados, efetua a liberação financeira.
+			// Caso o cliente for Arcos Dourados, efetua a liberaÃ§Ã£o financeira.
 			If M->C5_CLIENTE == AllTrim(GetMv("AM_CLIMCD"))   //'002953'
 				M->C5_XSTSFIN := '2'
 			Else
@@ -231,7 +236,7 @@ User Function M05G01(_cField)
 Return _xRet
 
 //+------------------------------------------------------------------------------------------------
-// Aplica desconto de cabeçalho
+// Aplica desconto de cabeÃ§alho
 //+------------------------------------------------------------------------------------------------
 Static Function SetFecEnt(_cFunc)
 
@@ -272,7 +277,7 @@ Static Function SetFecEnt(_cFunc)
 Return
 
 //+------------------------------------------------------------------------------------------------
-// Aplica desconto de cabeçalho
+// Aplica desconto de cabeÃ§alho
 //+------------------------------------------------------------------------------------------------
 Static Function SetDescAcr(_cFunc)
 	Local _nBkp	 := 0
@@ -309,7 +314,7 @@ Return
 
 
 //+------------------------------------------------------------------------------------------------
-//	Responsável pela atualização dos preços e impostos de acordo com a nova tabela informada
+//	ResponsÃ¡vel pela atualizaÃ§Ã£o dos preÃ§os e impostos de acordo com a nova tabela informada
 //+------------------------------------------------------------------------------------------------
 Static Function SetPrcTab(_cFunc)
 	Local _nBkp			:= 0
@@ -336,7 +341,7 @@ Static Function SetPrcTab(_cFunc)
 			EndIf
 
 		//+-----------------------------------------------------------
-		//	Orçamento de Vendas
+		//	OrÃ§amento de Vendas
 		//+-----------------------------------------------------------
 		Case _cFunc == 'OV'
 			TMP1->(DbGotop())
@@ -359,7 +364,7 @@ Static Function SetPrcTab(_cFunc)
 Return
 
 //+------------------------------------------------------------------------------------------------
-//	Função responsável pela limpeza dos campos de valores
+//	FunÃ§Ã£o responsÃ¡vel pela limpeza dos campos de valores
 //+------------------------------------------------------------------------------------------------
 Static Function SetFldClr(_cFunc,lQuant)
     Default lQuant := .T.
@@ -481,7 +486,7 @@ Static Function SetFldClr(_cFunc,lQuant)
 Return
 
 //+------------------------------------------------------------------------------------------------
-//	Função responsável pela inclusão do tipo do produto
+//	FunÃ§Ã£o responsÃ¡vel pela inclusÃ£o do tipo do produto
 //+------------------------------------------------------------------------------------------------
 Static Function SetFCI(_cFunc)
     Local aAreaSB1  := SB1->(GetArea())
@@ -506,7 +511,7 @@ Static Function SetFCI(_cFunc)
 Return
 
 //+------------------------------------------------------------------------------------------------
-//	Função responsável pela inclusão do tipo do produto
+//	FunÃ§Ã£o responsÃ¡vel pela inclusÃ£o do tipo do produto
 //+------------------------------------------------------------------------------------------------
 Static Function SetTpProd(_cFunc)
     Local cTipo := ''
