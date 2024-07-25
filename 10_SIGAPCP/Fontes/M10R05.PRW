@@ -425,7 +425,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	nPvLib   := (cAliasQry)->PV_QT_LIB
     nSldLib  := (cAliasQry)->QTD_EMP
 	nSldDisp := nSldEst - (cAliasQry)->QTD_EMP
-  	RatFre  := (cAliasQry)->C5_XFRETE
+  	nRatFre  := (cAliasQry)->C5_XFRETE 			//#6805
 //Pedido
 //TRCell():New(oVenProd,"PV_QUANT"	 ,/*Tabela*/	,"PV.Quantidade"	 ,PesqPict("SC6","C6_QTDVEN")	,TamSx3("C6_QTDVEN")[1]		,/*lPixel*/,{|| nQuant	})				// Quantidade
 //TRCell():New(oVenProd,"PV_SALDO"	 ,/*Tabela*/	,"PV A Entregar"	 ,PesqPict("SC6","C6_QTDVEN")	,TamSx3("C6_QTDVEN")[1]		,/*lPixel*/,{|| nSaldo	})				// Saldo
