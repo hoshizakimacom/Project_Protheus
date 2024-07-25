@@ -422,7 +422,7 @@ Static Function MR02Cab2(oPrinter,oFont12,oFont18T,nRow,oFont14B)
         oPrinter:Say(nRow += nRowStep     ,0100    , "PRODUTO : "    + _cCodProd, oFont14B)
         oPrinter:Say(nRow                 ,2876    , "QUANTIDADE = " + _nQuant, oFont14B)
         oPrinter:Say(nRow += nRowStep     ,0100    , _cDesc,oFont14B)
-        oPrinter:Say(nRow                 ,2876    , "FGQ-011_rev00", oFont12)  
+        oPrinter:Say(nRow                 ,2876    , "FGQ-AL-011-Rev01", oFont12)  //#6748
 
         nRow += nRowStep 
 
