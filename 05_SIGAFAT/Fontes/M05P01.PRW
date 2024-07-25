@@ -92,6 +92,7 @@ Static Function processaDados(nOpcao)
     cHora := Time()
     cIDUsuario := RetCodUsr()
 
+    
     cNomeUser := UsrFullName(cIDUsuario) //NICOLAS
 
     cIDHistorico := ""
@@ -295,12 +296,14 @@ Static Function emailHistorico(cIDHistorico,aConsultaHistorico)
     Local cDataModificacao      as character
     Local cHoraModificacao      as character
     Local cItemDescricao        as character
-    
+
+       
     aHistorico := carregaHistorico(cIDHistorico,@cFilialPedido,@cPedido,@cNomeCliente,@cUsuarioModificacao,@cDataModificacao,@cHoraModificacao)
     aDadosCabecalho := {}
     aDadosItens := {}
     cBody := ""
-    cDestinatarios := GetNewPar("AM_LOGPVEM") //E-mails que receberão o Log. 
+    cDestinatarios := "wmanzini@hoshizakimacom.com.br; kmarin@hoshizakimacom.com.br; bribeiro@hoshizakimacom.com.br; lcordeiro@hoshizakimacom.com.br; jcarlos@hoshizakimacom.com.br; tmorais@hoshizakimacom.com.br" //#6825
+    //cDestinatarios := GetNewPar("AM_LOGPVEM") //E-mails que receberão o Log. 
     cAssunto := "MACOM - Sales Order Modification"
     cArquivoHTML := GetNewPar("AM_LOGPVHT","\html\m05p01.html")
     cItemDescricao := ""
@@ -500,7 +503,7 @@ Static Function carregaHistorico(cIDHistorico,cFilialPedido,cPedido,cNomeCliente
         cFilialPedido := aRetorno[1][2]
         cPedido := aRetorno[1][3]
         cNomeCliente := pegaNomeCliente(cFilialPedido,cPedido)
-        cUsuarioModificacao := aRetorno[1][10]
+        cUsuarioModificacao := ALLTRIM(USRFULLNAME(__CUSERID)) //#6825
         cDataModificacao := DtoC(aRetorno[1][8])
         cHoraModificacao := aRetorno[1][9]
 
