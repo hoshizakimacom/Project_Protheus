@@ -50,6 +50,10 @@ Method Inclui() Class ClassTituloCRA
 
 Local lRet    := .F.
 Local aFin040 := {}
+Local cNumTit  := ""
+Local cParcTit := ""
+Local dDtTit   := Ctod("  /  /  ")
+
 Private lMsErroAuto := .F. // variavel interna da rotina automatica	   	
 Private lMsHelpAuto := .F.
 
@@ -57,7 +61,11 @@ If SE1->E1_TIPO == "BOL" .And. SE1->E1_PREFIXO == "PVA" .And. SE5->E5_MOTBX $ "N
 
     dbSelectArea("SE1")
 	dbSetOrder(1)
-				
+
+	cNumTit  := SE1->E1_NUM
+	cParcTit := SE1->E1_PARCELA
+	dDtTit   := SE5->E5_DATA
+
     aFin040 := { {"E1_PREFIXO"   ,"PVA"          ,nil},;
 					{"E1_NUM"    ,SE1->E1_NUM    ,nil},;
 					{"E1_PARCELA",SE1->E1_PARCELA,nil},;
@@ -67,6 +75,7 @@ If SE1->E1_TIPO == "BOL" .And. SE1->E1_PREFIXO == "PVA" .And. SE5->E5_MOTBX $ "N
 					{"E1_LOJA"   ,SE1->E1_LOJA   ,nil},;
 					{"E1_PEDIDO" ,SE1->E1_PEDIDO ,nil},;
 					{"E1_EMISSAO",SE5->E5_DATA   ,nil},;
+					{"E1_HIST"   ,SE1->E1_HIST   ,nil},;
 					{"E1_VENCTO" ,SE5->E5_DATA   ,nil},;
 					{"E1_VENCREA",SE5->E5_DATA   ,nil},;
 					{"E1_VALOR"  ,SE1->E1_VALOR  ,nil} } //Considera valor do PVA na geração do CRA não considera desconto ou acréscimo
@@ -91,6 +100,22 @@ If SE1->E1_TIPO == "BOL" .And. SE1->E1_PREFIXO == "PVA" .And. SE5->E5_MOTBX $ "N
 			Endtran()
 		EndIf
 	EndIf
+
+	iF lRet
+		// Verifica se Gerou Movimentação Bancária do CRA e Exclue
+		cQrySE5 := "UPDATE "+RetSqlName("SE5")
+		cQrySE5 += " SET R_E_C_D_E_L_ = R_E_C_N_O_, D_E_L_E_T_ = '*' "
+		cQrySE5 += " WHERE E5_FILIAL = '"+xFilial("SE5")+"'"
+		cQrySE5 += " AND E5_PREFIXO = 'PVA' "
+		cQrySE5 += " AND E5_NUMERO = '"+cNumTit+"'"
+		cQrySE5 += " AND E5_PARCELA = '"+cParcTit+"'"
+		cQrySE5 += " AND E5_DATA = '"+Dtos(dDtTit)+"'"
+		cQrySE5 += " AND E5_TIPO = 'CRA' "
+		cQrySE5 += " AND E5_TIPODOC = 'VL' "
+		cQrySE5 += " AND D_E_L_E_T_ <> '*' "
+		nErro := TcSqlExec(cQuery)
+	EndIf
+
 EndIf
 
 Return lRet
