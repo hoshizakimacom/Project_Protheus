@@ -33,7 +33,9 @@ User Function M05A01(_cFunc,lAtuOper)
 
     Default lAtuOper    := .T.
 
-    SetPrcTab(_cFunc)		// Atualiza preços de tabela
+
+    SetPrcTab(_cFunc)		// Atualiza preço de tabela
+
 
     If lAtuOper
         SetOper(_cFunc)			// Atualiza tipo de operação
@@ -477,13 +479,13 @@ Return
 //------------------------------------------------------------------------------
 //  Rotina de calcualo de preço operacoes 03 04 e 36
 //------------------------------------------------------------------------------
-//User Function M05A01_A(_cFunc)
-//    Local _nPrecoVend   := 0
+User Function M05A01_A(_cFunc)
+    Local _nPrecoVend   := 0
 
-//    CalcPrcA(_cFunc,@_nPrecoVend)     // Busca valor do pedido original
-//    SetTES(_cFunc)                      // Atualiza TES
-//    SetPrcVen(_cFunc,_nPrecoVend,.T.)   // Atualiza valores do pedido
-//Return
+    CalcPrcA(_cFunc,@_nPrecoVend)     // Busca valor do pedido original
+    SetTES(_cFunc)                      // Atualiza TES
+    SetPrcVen(_cFunc,_nPrecoVend,.T.)   // Atualiza valores do pedido
+Return
 
 //+--------------------------------------------------------------------------------------------------------------------
 Static Function CalcPrcA(_cFunc,_nPrecoVend)
