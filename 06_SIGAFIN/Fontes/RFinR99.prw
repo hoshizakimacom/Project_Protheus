@@ -1,12 +1,15 @@
 #INCLUDE "Protheus.ch"
 #INCLUDE "TopConn.ch"
 #INCLUDE "Font.ch"
+#Include 'RptDef.ch'
+#Include 'FWPrintSetup.ch'
 
 //+----------------------------------------------------------------------------------------
-User Function RFINR99(cPrefixo,cNumero,cParcela,cCliente,cLoja,cBanco,cAgencia,cConta,nDias,cCarga,dEmissao)
-	Local aRegs			:= {}
+User Function RFINR99(cPrefixo,cNumero,cParcela,cCliente,cLoja,cBanco,cAgencia,cConta,nDias,cCarga,dEmissao,cCarteira)
+	Local aRegs			    := {}
 	Local aTamSX3			:= {}
-	Private lEnd				:= .F.
+	Local cFilePDF          := ""
+	Private lEnd			:= .F.
 	Private lAuto			:= .F.
 	Private nLastKey		:= 0
 	Private Tamanho			:= "P"
@@ -86,12 +89,11 @@ User Function RFINR99(cPrefixo,cNumero,cParcela,cCliente,cLoja,cBanco,cAgencia,c
 
 		If !dbSeek(xFilial("SA6")+cBanco+cAgencia+cConta,.f.)
 			Aviso("Impressao de Boletos","Configuraçao de banco nao encontrada para o banco "+Alltrim(cbanco)+", agencia "+Alltrim(cAgencia)+", conta "+Alltrim(cConta)+" do cliente "+Alltrim(SA1->A1_NOME)+". Verifique o cadastro de parametros de bancos para que a rotina possa ser gerada.",{"OK"},,"Atencao:")
-			DbSelectArea("QUERY")
 			Return(Nil)
 		EndIf
 
-		cCarteira := SEE->EE_SUBCTA
-		cConvenio := Alltrim(SEE->EE_CODEMP)
+		//cCarteira := "109" //SEE->EE_SUBCTA
+		//cConvenio := Alltrim(SEE->EE_CODEMP)
 
 		dbSelectArea("SX1")
 		dbSeTorder(1)
@@ -126,7 +128,7 @@ User Function RFINR99(cPrefixo,cNumero,cParcela,cCliente,cLoja,cBanco,cAgencia,c
 			ElseIf SX1->X1_ORDEM == "13"
 				SX1->X1_CNT01	:= SA6->A6_NUMCON
 			ElseIf SX1->X1_ORDEM == "14"
-				SX1->X1_CNT01	:= SEE->EE_SUBCTA
+				SX1->X1_CNT01	:= cCarteira
 			ElseIf SX1->X1_ORDEM == "15"
 				SX1->X1_PRESEL	:= 2
 			ElseIf SX1->X1_ORDEM == "16'"
@@ -136,9 +138,9 @@ User Function RFINR99(cPrefixo,cNumero,cParcela,cCliente,cLoja,cBanco,cAgencia,c
 			ElseIf SX1->X1_ORDEM == "18"
 				SX1->X1_CNT01	:= Str( nDias, 3 )
 			ElseIf SX1->X1_ORDEM == "19"
-				SX1->X1_CNT01	:= dEmissao
+				SX1->X1_CNT01	:= Dtos(dEmissao)
 			ElseIf SX1->X1_ORDEM == "20"
-				SX1->X1_CNT01	:= dEmissao
+				SX1->X1_CNT01	:= Dtos(dEmissao)
 			EndIf
 
 			SX1->(MsUnLock())
@@ -152,16 +154,27 @@ User Function RFINR99(cPrefixo,cNumero,cParcela,cCliente,cLoja,cBanco,cAgencia,c
 		EndIf
 	EndIf
 
-	//Chama a rotina para carregar os dados a serem processados
-	Processa( { |lEnd| CallLst() }, "Selecionando dados a processar", Titulo )
+	If !lAuto
+		//Chama a rotina para carregar os dados a serem processados
+		Processa( { |lEnd| CallLst() }, "Selecionando dados a processar", Titulo )
 
-	// Verifica se há dados a serem exibidos
-	If Len(aLst) > 0
-		Processa( { |lEnd| CallMark() }, "Selecionando dados a processar", Titulo )
+		// Verifica se há dados a serem exibidos
+		If Len(aLst) > 0
+			Processa( { |lEnd| cFilePDF := CallMark() }, "Selecionando dados a processar", Titulo )
+		Else
+			Aviso(	Titulo,"Não existem dados a serem impressos. Verifique os parâmetros.",{"&Fechar"},,"Sem Dados" )
+		EndIf
 	Else
-		Aviso(	Titulo,"Não existem dados a serem impressos. Verifique os parâmetros.",{"&Fechar"},,"Sem Dados" )
+		//Chama a rotina para carregar os dados a serem processados
+		CallLst()
+
+		// Verifica se há dados a serem exibidos
+		If Len(aLst) > 0
+			cFilePDF := CallMark()
+		EndIf
 	EndIf
-Return
+
+Return cFilePDF
 
 //+----------------------------------------------------------------------------------------
 //	Carrega os registros a serem processados
@@ -188,16 +201,18 @@ Static Function CallLst()
 	cQry	+= " AND SE1.E1_VENCTO <= '"+Dtos(dDataMax)+"'"
 	cQry	+= " AND SE1.E1_EMISSAO BETWEEN '" + Dtos(mv_par19) + "' AND '" + Dtos(mv_par20) + "'"
 
-	If mv_par15 == 1    //Verifica se eh reimpressao.
-		cQry	+= " AND SE1.E1_NUMBCO <> '"+Space(TAMSX3("E1_NUMBCO")[1])+"'"
-		If SE1->(FieldPos("E1_BCOBOL")) > 0
-			cQry	+= " AND SE1.E1_BCOBOL = '"+mv_par11+"'"
+	If !lAuto
+		If mv_par15 == 1    //Verifica se eh reimpressao.
+			cQry	+= " AND SE1.E1_NUMBCO <> '"+Space(TAMSX3("E1_NUMBCO")[1])+"'"
+			If SE1->(FieldPos("E1_BCOBOL")) > 0
+				cQry	+= " AND SE1.E1_BCOBOL = '"+mv_par11+"'"
+			Else
+				cQry	+= " AND SE1.E1_PORTADO = '"+mv_par11+"'"
+			EndIf
 		Else
-			cQry	+= " AND SE1.E1_PORTADO = '"+mv_par11+"'"
+			cQry	+= " AND SE1.E1_NUMBCO = '"+Space(TAMSX3("E1_NUMBCO")[1])+"'"
 		EndIf
-	Else
-		cQry	+= " AND SE1.E1_NUMBCO = '"+Space(TAMSX3("E1_NUMBCO")[1])+"'"
-	Endif
+	EndIf
 
 	cQry	+= " AND SE1.D_E_L_E_T_ = '' "
 	cQry	+= " ORDER BY SE1.E1_CLIENTE,SE1.E1_LOJA,SE1.E1_PREFIXO,SE1.E1_NUM,SE1.E1_PARCELA,SE1.E1_TIPO"
@@ -281,68 +296,73 @@ Static Function CallMark()
 	Local nLoop		:= 0
 	Local lChk      := .F.
 	Local oChk
+	Local cFilePDF  := ""
 
-	// Monta interface com usuário para efetuar a marcação dos títulos
-	DEFINE MSDIALOG oDlg TITLE "Seleção de Títulos" FROM 000,000 TO 400,700 OF oDlg PIXEL
-		@ 005,003	LISTBOX oLst ;
-					FIELDS HEADER	" ",;
-									"Prefixo",;
-									"Número",;
-									"Parcela",;
-									"Tipo",;
-									"Cliente",;
-									"Loja",;
-									"Nome",;
-									"Emissão",;
-									"Vencimento",;
-									"Venc.Real",;
-									"Valor",;
-									"Portador",;
-									"Renegociação";
-									"Carga" ;
-					COLSIZES	GetTextWidth(0,"BB"),;
-								GetTextWidth(0,"BBBB"),;
-								GetTextWidth(0,"BBBBB"),;
-								GetTextWidth(0,"BB"),;
-								GetTextWidth(0,"BB"),;
-								GetTextWidth(0,"BBBB"),;
-								GetTextWidth(0,"BB"),;
-								GetTextWidth(0,"BBBBBBBBBBBB"),;
-								GetTextWidth(0,"BBBB"),;
-								GetTextWidth(0,"BBBB"),;
-								GetTextWidth(0,"BBBB"),;
-								GetTextWidth(0,"BBBBBBBBB"),;
-								GetTextWidth(0,"BBB"),;
-								GetTextWidth(0,"BBBBBBB"),;
-								GetTextWidth(0,"BBBB") ;
-					ON DBLCLICK(	aLst[oLst:nAt,1] := !aLst[oLst:nAt,1],;
-									oLst:Refresh() ) ;
-					SIZE 345,170 OF oDlg PIXEL
+	If !lAuto
+		// Monta interface com usuário para efetuar a marcação dos títulos
+		DEFINE MSDIALOG oDlg TITLE "Seleção de Títulos" FROM 000,000 TO 400,700 OF oDlg PIXEL
+			@ 005,003	LISTBOX oLst ;
+						FIELDS HEADER	" ",;
+										"Prefixo",;
+										"Número",;
+										"Parcela",;
+										"Tipo",;
+										"Cliente",;
+										"Loja",;
+										"Nome",;
+										"Emissão",;
+										"Vencimento",;
+										"Venc.Real",;
+										"Valor",;
+										"Portador",;
+										"Renegociação";
+										"Carga" ;
+						COLSIZES	GetTextWidth(0,"BB"),;
+									GetTextWidth(0,"BBBB"),;
+									GetTextWidth(0,"BBBBB"),;
+									GetTextWidth(0,"BB"),;
+									GetTextWidth(0,"BB"),;
+									GetTextWidth(0,"BBBB"),;
+									GetTextWidth(0,"BB"),;
+									GetTextWidth(0,"BBBBBBBBBBBB"),;
+									GetTextWidth(0,"BBBB"),;
+									GetTextWidth(0,"BBBB"),;
+									GetTextWidth(0,"BBBB"),;
+									GetTextWidth(0,"BBBBBBBBB"),;
+									GetTextWidth(0,"BBB"),;
+									GetTextWidth(0,"BBBBBBB"),;
+									GetTextWidth(0,"BBBB") ;
+						ON DBLCLICK(	aLst[oLst:nAt,1] := !aLst[oLst:nAt,1],;
+										oLst:Refresh() ) ;
+						SIZE 345,170 OF oDlg PIXEL
 
-		oLst:SetArray(aLst)
-		oLst:bLine := { || {	If(aLst[oLst:nAt,01], oOk, oNo),;					//Marca
-								aLst[oLst:nAt,02],;									//Prefixo
-								aLst[oLst:nAt,03],;									//Numero
-								aLst[oLst:nAt,04],;									//Parcela
-								aLst[oLst:nAt,05],;									//Tipo
-								aLst[oLst:nAt,06],;									//Cliente
-								aLst[oLst:nAt,07],;									//Loja
-								aLst[oLst:nAt,08],;									//Nome
-								DToC(aLst[oLst:nAt,09]),;				   			//Emissao
-								DToC(aLst[oLst:nAt,10]),;							//Vencimento
-								DToC(aLst[oLst:nAt,11]),;							//Vencimento real
-								Transform(aLst[oLst:nAt,12], "@E 999,999,999.99"),;//Valor
-								aLst[oLst:nAt,13],;									//Portador
-								DToC(aLst[oLst:nAt,14]),;							//Renegociação
-								aLst[oLst:nAt,15] ;									//Carga
-								} }
-		@ 185 , 005 CHECKBOX oChk VAR lChk PROMPT "Marca/Desmarca Todos" SIZE 70,10 PIXEL OF oDlg;
-		        ON CLICK(Iif(lChk,Marca(lChk,oLst),Marca(lChk,oLst)))
+			oLst:SetArray(aLst)
+			oLst:bLine := { || {	If(aLst[oLst:nAt,01], oOk, oNo),;					//Marca
+									aLst[oLst:nAt,02],;									//Prefixo
+									aLst[oLst:nAt,03],;									//Numero
+									aLst[oLst:nAt,04],;									//Parcela
+									aLst[oLst:nAt,05],;									//Tipo
+									aLst[oLst:nAt,06],;									//Cliente
+									aLst[oLst:nAt,07],;									//Loja
+									aLst[oLst:nAt,08],;									//Nome
+									DToC(aLst[oLst:nAt,09]),;				   			//Emissao
+									DToC(aLst[oLst:nAt,10]),;							//Vencimento
+									DToC(aLst[oLst:nAt,11]),;							//Vencimento real
+									Transform(aLst[oLst:nAt,12], "@E 999,999,999.99"),;//Valor
+									aLst[oLst:nAt,13],;									//Portador
+									DToC(aLst[oLst:nAt,14]),;							//Renegociação
+									aLst[oLst:nAt,15] ;									//Carga
+									} }
+			@ 185 , 005 CHECKBOX oChk VAR lChk PROMPT "Marca/Desmarca Todos" SIZE 70,10 PIXEL OF oDlg;
+					ON CLICK(Iif(lChk,Marca(lChk,oLst),Marca(lChk,oLst)))
 
-		DEFINE SBUTTON oBtnOk	FROM 180,310 TYPE 1 ACTION(lExec := .T., oDlg:End()) ENABLE OF oDlg
-		DEFINE SBUTTON oBtnCan	FROM 180,275 TYPE 2 ACTION(lExec := .F., oDlg:End()) ENABLE OF oDlg
+			DEFINE SBUTTON oBtnOk	FROM 180,310 TYPE 1 ACTION(lExec := .T., oDlg:End()) ENABLE OF oDlg
+			DEFINE SBUTTON oBtnCan	FROM 180,275 TYPE 2 ACTION(lExec := .F., oDlg:End()) ENABLE OF oDlg
 
-	ACTIVATE DIALOG oDlg CENTERED
+		ACTIVATE DIALOG oDlg CENTERED
+	Else
+		lExec := .T.
+	EndIf
 
 	// Verifica se teclou no botão confirma
 	If lExec
@@ -355,15 +375,21 @@ Static Function CallMark()
 			EndIf
 		Next nLoop
 
-		If !lProc
-			Aviso(	Titulo,"Nenhum título foi marcado. Não há dados a serem impressos.",{"&Fechar"},,"Sem Dados" )
+		If !lAuto
+			If !lProc
+				Aviso(	Titulo,"Nenhum título foi marcado. Não há dados a serem impressos.",{"&Fechar"},,"Sem Dados" )
 
-		// Chama a rotina que irá montar e imprimir o relatório
+			// Chama a rotina que irá montar e imprimir o relatório
+			Else
+				Processa( { |lEnd| cFilePDF := MontaRel() }, "Montando Imagem do Relatório.", Titulo )
+			Endif
 		Else
-			Processa( { |lEnd| MontaRel() }, "Montando Imagem do Relatório.", Titulo )
-		Endif
+			If lProc
+				cFilePDF := MontaRel()
+			EndIf
+		EndIf
 	EndIf
-Return
+Return cFilePDF
 
 //+----------------------------------------------------------------------------------------
 //	Marca e Desmarca todos os itens da MarkBrowse.
@@ -391,18 +417,48 @@ Static Function MontaRel()
 	Local nLoop	:= 0
 	Local nTpImp	:= 0
 
+	Local cBarra       := if(isSrvUnix(),"/","\")
+	Local cFolderFiles := cBarra + "temp" + cBarra //cBarra + "documentos" + cBarra
+
+	Local cTitulo  := IIF(EMPTY(SE1->E1_NFELETR),Alltrim(SE1->E1_NUM),AllTrim(SE1->E1_NFELETR))
+	Local cParcela := IIF(EMPTY(SE1->E1_PARCELA),"","_"+ALLTRIM(SE1->E1_PARCELA))
+	Local cFilePDF := "boleto_"+RTRIM(SM0->M0_CGC)+"_"+RTRIM(cTitulo)+cParcela +".pdf"
+
 	// Define o tipo de configuração a ser utilizado na MSBAR
 	// 1 = Polegadas, 2 = Centímetros
-//	nTpImp	:= Aviso(	Titulo,;
-//	   		  			"Os boletos devem ser impressos com qual definição ?",;
-//						{ "Polegadas", "Centímetros" },,;
-//						"Definição de Tamanho" )
+	//	nTpImp	:= Aviso(	Titulo,;
+	//	   		  			"Os boletos devem ser impressos com qual definição ?",;
+	//						{ "Polegadas", "Centímetros" },,;
+	//						"Definição de Tamanho" )
     nTpImp := 2
-	// Seta as configuração do objeto print
-	oPrint:= TMSPrinter():New( Titulo )
-	oPrint:Setup()
+	
+	If lAuto
+		lDisabeSetup := .T.
+		lServer      := .T.
+		lViewPDF     := .F.
+       	If File(cFolderFiles+cFilePDF) //Apaga arquivo gerado anteriormente para criar um novo
+        	FERASE(cFolderFiles+cFilePDF)
+        EndIf
+	Else
+		lDisabeSetup := .F.
+		lServer      := .F.
+		lViewPDF     := .T.
+	EndIf
+
+	oPrint := FWMSPrinter():New(cFilePDF, IMP_PDF, .T./*lAdjustToLegacy*/,cFolderFiles/*cPathInServer*/,lDisabeSetup,,,,lServer,,,lViewPDF, /*IIF(!EMPTY(cFilePDF),.F.,.T.)*/ )
+
+	oPrint:SetResolution(78) //Tamanho estipulado para a Danfe
 	oPrint:SetPortrait()
-	oPrint:SetSize(215,297)
+	oPrint:SetPaperSize(DMPAPER_A4)
+	oPrint:SetMargin(60,60,60,60)
+	If lAuto
+		oPrint:lServer := .T. 
+		oPrint:nDevice := IMP_PDF
+		oPrint:cPathPrint := cFolderFiles
+		oPrint:cPathPDF := cFolderFiles
+		oPrint:SetViewPDF(.F.)  
+		oPrint:lInJob := .T.
+	EndIf
 
 	// Posiciona no Banco
 	dbSelectArea("SA6")
@@ -486,9 +542,9 @@ Static Function MontaRel()
 			// Atualiza o título com o nosso número
 			DbSelectArea("SE1")
 			RecLock("SE1",.F.)
-
 				SE1->E1_NUMBCO		:= aBarra[3]
-
+				SE1->E1_CODBAR      := aBarra[1]
+				SE1->E1_CODDIG      := STRTRAN(STRTRAN(aBarra[2],".","")," ","")
 				If FieldPos("E1_BCOBOL") > 0
 					SE1->E1_BCOBOL	:= aDadBco[1]
 				EndIf
@@ -500,7 +556,7 @@ Static Function MontaRel()
 	oPrint:Preview()
 
 	MS_FLUSH()
-Return(Nil)
+Return cFilePDF
 
 //+----------------------------------------------------------------------------------------
 // Cria Perguntas no SX1
