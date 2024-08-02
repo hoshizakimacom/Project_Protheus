@@ -567,16 +567,16 @@ Static Function MR05Cab4(oPrinter,oFont12,oFont14B,oFont18T,nRow)
 
     oPrinter:Say(nRow                 ,1700    , 'REDE:'    ,oFont12)
     If !SC5->C5_TIPO $ "DB"
-        oPrinter:Say(nRow                 ,1800    , Posicione('SA1',1,xFilial('SA1') +SC5->C5_CLIENTE + SC5->C5_LOJACLI,'A1_XREDE' ) + " - " + Posicione('ZA6',1,xFilial('ZA6') +SA1->A1_XREDE,'ZA6_DESC' )   ,oFont12)
+        oPrinter:Say(nRow             ,1800    , Posicione('SA1',1,xFilial('SA1') +SC5->C5_CLIENTE + SC5->C5_LOJACLI,'A1_XREDE' ) + " - " + Posicione('ZA6',1,xFilial('ZA6') +SA1->A1_XREDE,'ZA6_DESC' )   ,oFont12)
     EndIf
 
     oPrinter:Say(nRow                 ,2700    , 'LOJA:'    ,oFont12)
     If !SC5->C5_TIPO $ "DB"
-        oPrinter:Say(nRow                 ,2900    , Posicione('SA1',1,xFilial('SA1') +SC5->C5_CLIENTE + SC5->C5_LOJACLI,'A1_XIDLOJA' )        ,oFont12)
+        oPrinter:Say(nRow             ,2900    , Posicione('SA1',1,xFilial('SA1') +SC5->C5_CLIENTE + SC5->C5_LOJACLI,'A1_XIDLOJA' )        ,oFont12)
     EndIf
 
-    oPrinter:Say(nRow += nRowStep     ,0100    , 'COND PAG: '       ,oFont12)
-    oPrinter:Say(nRow                 ,0440    , MR05GetCPg()       ,oFont12)
+    oPrinter:Say(nRow += nRowStep     ,0100    , 'COND PAG (MEDIANTE ANÁLISE DE CRÉDITO): '       ,oFont12) //#6898
+    oPrinter:Say(nRow                 ,800    , MR05GetCPg()       ,oFont12) //440
 
     oPrinter:Say(nRow += nRowStep     ,0100    ,'REFERÊNCIA:'     ,oFont12)
     oPrinter:Say(nRow                 ,0440    ,AllTrim(SC5->C5_XOBRAS)                 ,oFont12)
