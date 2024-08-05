@@ -3,7 +3,7 @@
 
 /*/{Protheus.doc} ClassTituloCRA
 
-Classe  para inclusão/exclusão de titulo de credito CRA quando da baixa/exclusao de baixa de um titulo PVA - (Recebimento Antecipado de Pedido de Venda)
+Classe  para inclusao/exclusão de titulo de credito CRA quando da baixa/exclusao de baixa de um titulo PVA - (Recebimento Antecipado de Pedido de Venda)
 
 @type class
 @author Marcos Antonio Montes
