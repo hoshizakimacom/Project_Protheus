@@ -113,7 +113,7 @@ If SE1->E1_TIPO == "BOL" .And. SE1->E1_PREFIXO == "PVA" .And. SE5->E5_MOTBX $ "N
 		cQrySE5 += " AND E5_TIPO = 'CRA' "
 		cQrySE5 += " AND E5_TIPODOC = 'VL' "
 		cQrySE5 += " AND D_E_L_E_T_ <> '*' "
-		nErro := TcSqlExec(cQuery)
+		nErro := TcSqlExec(cQrySE5)
 	EndIf
 
 EndIf

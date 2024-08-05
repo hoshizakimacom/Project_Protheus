@@ -593,8 +593,8 @@ Static Function MR05Cab4(oPrinter,oFont12,oFont14B,oFont18T,nRow)
         oPrinter:Say(nRow                 ,2900    , Posicione('SA1',1,xFilial('SA1') +SC5->C5_CLIENTE + SC5->C5_LOJACLI,'A1_XIDLOJA' )        ,oFont12)
     EndIf
 
-    oPrinter:Say(nRow += nRowStep     ,0100    , 'COND PAG: '       ,oFont12)
-    oPrinter:Say(nRow                 ,0440    , MR05GetCPg()       ,oFont12)
+    oPrinter:Say(nRow += nRowStep     ,0100    , 'COND PAG (MEDIANTE ANÁLISE DE CRÉDITO): '       ,oFont12) // #6898
+    oPrinter:Say(nRow                 ,800    , MR05GetCPg()       ,oFont12) //440
 
     oPrinter:Say(nRow += nRowStep     ,0100    ,'REFERÊNCIA:'     ,oFont12)
     oPrinter:Say(nRow                 ,0440    ,AllTrim(SC5->C5_XOBRAS)                 ,oFont12)
