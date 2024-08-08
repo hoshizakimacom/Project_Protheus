@@ -175,7 +175,7 @@ RestArea(aArea)
 Return .T.
 
 
-User Function M02A082
+User Function M02A082(nTipo) // ALtera Obs. Interna -> Follow UP  #6854
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Declaracao de variaveis ³
@@ -197,16 +197,33 @@ DEFINE MSDIALOG oDlg TITLE OemToAnsi("Alteração da Observação Interna do Pedido/
 ACTIVATE DIALOG oDlg ON INIT EnchoiceBar( oDlg, {|| nOpca := 1, oDlg:End() }, {||nOpca := 0, oDlg:End()}) CENTERED
 	
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Grava a Nova Data de Envio. ³
+//³ Grava follow up. ³             
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-If nOpca == 1
+If nTipo == 1 //Alt.Obs.Interna PC 
+
+    If nOpca == 1
+        dbSelectArea("SC7")
+    	dbSetOrder(1)
+    	dbSeek(xFilial("SC7")+cPedCompra)
+		While !Eof() .And. SC7->C7_FILIAL+SC7->C7_NUM == xFilial("SC7")+cPedCompra
+            RecLock("SC7", .F.)
+            SC7->C7_XOBSINT := cObsInt
+            MsUnlock()
+
+            DbSkip()
+        EndDo
+
+        Aviso("Atencao !",OemToAnsi("Observação Interna do Item Alterado !"),{"Ok"})
+    EndIf
+EndIf //Alt.Obs.Interna Item
+    If nOpca == 1
 
 	RecLock("SC7",.F.)
 	SC7->C7_XOBSINT := cObsInt
 	MsUnlock()
 
 	Aviso("Atencao !",OemToAnsi("Observação Interna do Item Alterado !"),{"Ok"})
-EndIf
+    EndIf
 
 RestArea(aAreaSC7)
 RestArea(aArea)
