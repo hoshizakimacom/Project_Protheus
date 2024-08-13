@@ -38,6 +38,7 @@ cQuery += " FROM " + RetsqlName("ZG1") + " ZG1 "
 cQuery += " WHERE ZG1_FILIAL = '"+xFilial("ZG1")+"' "
 cQuery += " AND ZG1_DTINCL = '"+Dtos(mv_par01)+"' "
 cQuery += " AND ZG1_COD BETWEEN '"+mv_par02+"' AND '"+mv_par03+"'"
+cQuery += " AND LEFT(ZG1_COD,3) <> 'MO-'
 cQuery += " AND D_E_L_E_T_ <> '*' "
 cQuery += " ORDER BY ZG1_COD, ZG1_COMP "
 
