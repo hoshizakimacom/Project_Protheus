@@ -122,7 +122,7 @@ Static Function M05RICabIt(oPrinter,oFont12B,nRow)
     oPrinter:Box(nRow,1400,nRow + nRowStep * 2.5,1500)                      // QTD
 
     If lImprVlr
-        //  oPrinter:Box(nRow,1500,nRow + nRowStep * 2,1700)                    // VALOR UNITÁRIO
+        //  oPrinter:Box(nRow,1500,nRow + nRowStep * 2,1700)                    // VALOR UNITÝRIO
 
         oPrinter:Box(nRow,1700,nRow + nRowStep * 2.5,1950)                      // IPI
         oPrinter:Box(nRow,1700,nRow + nRowStep * 1.25,1950)                     // IPI
@@ -159,7 +159,7 @@ Static Function M05RICabIt(oPrinter,oFont12B,nRow)
         oPrinter:Say(nRow                ,1420                ,'QTD'           ,oFont12B)
 
         oPrinter:Say(nRow                ,1550                ,'VALOR'         ,oFont12B)
-        oPrinter:Say(nRow + nRowStep     ,1540                ,'UNITÁRIO'      ,oFont12B)
+        oPrinter:Say(nRow + nRowStep     ,1540                ,'UNITÝRIO'      ,oFont12B)
 
         oPrinter:Say(nRow                ,1800                ,'IPI'            ,oFont12B)
         oPrinter:Say(nRow + nRowStep     ,1720                ,'%'              ,oFont12B)
@@ -259,7 +259,7 @@ Static Function MR05ImpItem(_cAlias,oPrinter,nRow,oFont9,oFont12B,nItem)
         oPrinter:Say(nRow - 0008                ,1267                ,Transform((_cAlias)->B1_POSIPI,"@R 9999.99.99")                                                                             ,oFont9)    // NCM
         oPrinter:Say(nRow - 0008                ,1414                ,Transform(NoRound(MaFisRet(nItem,"IT_QUANT")   ,2),"@E 999999.99")                                                          ,oFont9)    // QTD
  
-        oPrinter:Say(nRow - 0008                ,1540                ,Transform(NoRound(MaFisRet(nItem,"IT_PRCUNI"),2),cPicVal)                                                              ,oFont9)    // VALOR UNITÁRIO
+        oPrinter:Say(nRow - 0008                ,1540                ,Transform(NoRound(MaFisRet(nItem,"IT_PRCUNI"),2),cPicVal)                                                              ,oFont9)    // VALOR UNITÝRIO
         oPrinter:Say(nRow - 0008                ,1709                ,Transform(NoRound(MaFisRet( nItem ,"IT_ALIQIPI"),2),cPicAliq)                                                          ,oFont9)    // % IPI
         oPrinter:Say(nRow - 0008                ,1810                ,Transform(NoRound(MaFisRet( nItem ,"IT_VALIPI"),2),cPicVal)                                                            ,oFont9)    // VALOR IPI
         //oPrinter:Say(nRow - 0008                ,1954                ,Transform(NoRound(MaFisRet( nItem ,"IT_ALIQICM"),2),cPicAliq)                                                        ,oFont9)    // % ICMS
@@ -594,7 +594,7 @@ Static Function MR05Cab4(oPrinter,oFont12,oFont14B,oFont18T,nRow)
     EndIf
 
 
-    oPrinter:Say(nRow += nRowStep     ,0100    , 'COND PAG (MEDIANTE ANÁLISE DE CRÉDITO): '       ,oFont12) // #6898
+    oPrinter:Say(nRow += nRowStep     ,0100    , 'COND PAG (MEDIANTE ANÝLISE DE CRÉDITO): '       ,oFont12) // #6898
 
 
     oPrinter:Say(nRow                 ,800    , MR05GetCPg()       ,oFont12) //440
@@ -703,7 +703,8 @@ Static Function M05RTpFret()
     Case SC5->C5_TPFRETE == 'C'
         cRet := 'CIF'
     Case SC5->C5_TPFRETE == 'F'
-        cRet := 'FOB (NÃO INCLUSO)'
+//        cRet := 'FOB (NÃO INCLUSO)'
+        cRet := 'FOB (POR CONTA DO CLIENTE)'
     Case SC5->C5_TPFRETE == 'T'
         cRet := 'Por Conta de Terceiros'
     Case SC5->C5_TPFRETE == 'S'
@@ -722,7 +723,8 @@ Static Function M05RTpIsnt()
     Case SC5->C5_XTPINST == '1'
         cRet := 'Sem Instalação'
     Case SC5->C5_XTPINST == '2'
-        cRet := 'Credenciada (Vide condições gerais de fornecimento)'
+//        cRet := 'Credenciada (Vide condições gerais de fornecimento)'
+        cRet := 'Credenciada (Vide Credenciada Macom) - R$ '+Transform(SC5->C5_XVLRINS,"@E 99,999,999.99")
     Case SC5->C5_XTPINST == '3'
         cRet := 'Macom'
     Case SC5->C5_XTPINST == '4'
