@@ -20,8 +20,10 @@
 /*/
 User Function M06A11(cNumBor)
 
-	Local	aPergs := {}
-    Local   cMarca := GetMark()
+	Local aPergs := {}
+    Local cMarca := GetMark()
+	Local cCaixaCompras := "COMPRAS"
+	Local cCaixaFin     := "FINANCEIRO" 
 
 	PRIVATE lExec      := .F.
 	PRIVATE cIndexName := ''
@@ -35,6 +37,9 @@ User Function M06A11(cNumBor)
 
 	Default cNumBor    := SPACE(6)
 
+	PutMV("MV_WFMLBOX",cCaixaFin) // Altero a caixa
+	//MsgStop("Trocada MV_WFMLBOX para FINANCEIRO")
+
 	If IsInCallStack("MATA410") //Chamado do Pedido de Venda
 
 		lAuto := .T.
@@ -44,39 +49,38 @@ User Function M06A11(cNumBor)
 	cPerg    := PADR("M06A11",LEN(SX1->X1_GRUPO))
 
 	dbSelectArea("SE1")
-
 	aPergs := {}
-	Aadd(aPergs,{"De Prefixo","","","mv_ch1","C",3,0,0,"G","","MV_PAR01","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"Ate Prefixo","","","mv_ch2","C",3,0,0,"G","","MV_PAR02","","","","ZZZ","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"De Numero","","","mv_ch3","C",TamSx3("E1_NUM")[1],0,0,"G","","MV_PAR03","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"Ate Numero","","","mv_ch4","C",TamSx3("E1_NUM")[1],0,0,"G","","MV_PAR04","","","","ZZZZZZ","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"De Parcela","","","mv_ch5","C",1,0,0,"G","","MV_PAR05","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"Ate Parcela","","","mv_ch6","C",1,0,0,"G","","MV_PAR06","","","","Z","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"De Portador","","","mv_ch7","C",3,0,0,"G","","MV_PAR07","","","","","","","","","","","","","","","","","","","","","","","","","BCO","","","",""})
-	Aadd(aPergs,{"Ate Portador","","","mv_ch8","C",3,0,0,"G","","MV_PAR08","","","","ZZZ","","","","","","","","","","","","","","","","","","","","","BCO","","","",""})
-	Aadd(aPergs,{"De Cliente","","","mv_ch9","C",6,0,0,"G","","MV_PAR09","","","","","","","","","","","","","","","","","","","","","","","","","SA1FIL","","","",""})
-	Aadd(aPergs,{"Ate Cliente","","","mv_cha","C",6,0,0,"G","","MV_PAR10","","","","ZZZZZZ","","","","","","","","","","","","","","","","","","","","","SA1FIL","","","",""})
-	Aadd(aPergs,{"De Loja","","","mv_chb","C",2,0,0,"G","","MV_PAR11","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"Ate Loja","","","mv_chc","C",2,0,0,"G","","MV_PAR12","","","","ZZ","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"De Emissao","","","mv_chd","D",8,0,0,"G","","MV_PAR13","","","","01/01/80","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"Ate Emissao","","","mv_che","D",8,0,0,"G","","MV_PAR14","","","","31/12/24","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"De Vencimento","","","mv_chf","D",8,0,0,"G","","MV_PAR15","","","","01/01/80","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"Ate Vencimento","","","mv_chg","D",8,0,0,"G","","MV_PAR16","","","","31/12/24","","","","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"Do Bordero" ,"","","mv_chh","C",6,0,0,"G","","MV_PAR17","","","",""      ,"","","","","","","","","","","","","","","","","","","","","BORNOB","","","",""})
-	Aadd(aPergs,{"Ate Bordero","","","mv_chi","C",6,0,0,"G","","MV_PAR18","","","","ZZZZZZ","","","","","","","","","","","","","","","","","","","","","BORNOB","","","",""})
-	Aadd(aPergs,{"Envia NF?"    ,"","","mv_chj","N",1,0,1,"C","","MV_PAR19","Sim","Sim","Sim","","Nao","Nao","Nao","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"Envia Pedido?","","","mv_chk","N",1,0,1,"C","","MV_PAR20","Sim","Sim","Sim","","Nao","Nao","Nao","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"Envia Boleto?","","","mv_chl","N",1,0,1,"C","","MV_PAR21","Sim","Sim","Sim","","Nao","Nao","Nao","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"De Prefixo ?"    ,"","","mv_ch1","C",3,0,0,"G","","MV_PAR01","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"Ate Prefixo ?"   ,"","","mv_ch2","C",3,0,0,"G","","MV_PAR02","","","","ZZZ","","","","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"De Numero ?"     ,"","","mv_ch3","C",TamSx3("E1_NUM")[1],0,0,"G","","MV_PAR03","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"Ate Numero ?"    ,"","","mv_ch4","C",TamSx3("E1_NUM")[1],0,0,"G","","MV_PAR04","","","","ZZZZZZ","","","","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"De Parcela ?"    ,"","","mv_ch5","C",1,0,0,"G","","MV_PAR05","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"Ate Parcela ?"   ,"","","mv_ch6","C",1,0,0,"G","","MV_PAR06","","","","Z","","","","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"De Portador ?"   ,"","","mv_ch7","C",3,0,0,"G","","MV_PAR07","","","","","","","","","","","","","","","","","","","","","","","","","BCO","","","",""})
+	Aadd(aPergs,{"Ate Portador ?"  ,"","","mv_ch8","C",3,0,0,"G","","MV_PAR08","","","","ZZZ","","","","","","","","","","","","","","","","","","","","","BCO","","","",""})
+	Aadd(aPergs,{"De Cliente ?"    ,"","","mv_ch9","C",6,0,0,"G","","MV_PAR09","","","","","","","","","","","","","","","","","","","","","","","","","SA1FIL","","","",""})
+	Aadd(aPergs,{"Ate Cliente ?"   ,"","","mv_cha","C",6,0,0,"G","","MV_PAR10","","","","ZZZZZZ","","","","","","","","","","","","","","","","","","","","","SA1FIL","","","",""})
+	Aadd(aPergs,{"De Loja ?"       ,"","","mv_chb","C",2,0,0,"G","","MV_PAR11","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"Ate Loja ?"      ,"","","mv_chc","C",2,0,0,"G","","MV_PAR12","","","","ZZ","","","","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"De Emissao ?"    ,"","","mv_chd","D",8,0,0,"G","","MV_PAR13","","","","01/01/80","","","","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"Ate Emissao ?"   ,"","","mv_che","D",8,0,0,"G","","MV_PAR14","","","","31/12/24","","","","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"De Vencimento ?" ,"","","mv_chf","D",8,0,0,"G","","MV_PAR15","","","","01/01/80","","","","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"Ate Vencimento ?","","","mv_chg","D",8,0,0,"G","","MV_PAR16","","","","31/12/24","","","","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"Do Bordero ?"    ,"","","mv_chh","C",6,0,0,"G","","MV_PAR17","","","",""      ,"","","","","","","","","","","","","","","","","","","","","BORNOB","","","",""})
+	Aadd(aPergs,{"Ate Bordero ?"   ,"","","mv_chi","C",6,0,0,"G","","MV_PAR18","","","","ZZZZZZ","","","","","","","","","","","","","","","","","","","","","BORNOB","","","",""})
+	Aadd(aPergs,{"Envia NF ?"      ,"","","mv_chj","N",1,0,1,"C","","MV_PAR19","Sim","Sim","Sim","","Nao","Nao","Nao","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"Envia Pedido ?"  ,"","","mv_chk","N",1,0,1,"C","","MV_PAR20","Sim","Sim","Sim","","Nao","Nao","Nao","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"Envia Boleto ?"  ,"","","mv_chl","N",1,0,1,"C","","MV_PAR21","Sim","Sim","Sim","","Nao","Nao","Nao","","","","","","","","","","","","","","","","","","","","","",""})
 	aTamSX3	:= TAMSX3("EE_CODIGO")
-	Aadd(aPergs,{"Banco Boleto","","","mv_chm",aTamSX3[3],	aTamSx3[1],	aTamSX3[2],	0,"G","","MV_PAR22","",		"",		"",		"",						"","",		"",		"",		"","","","","","","","","","","","","","","","","SA6",	"","007",	"",""})
+	Aadd(aPergs,{"Banco Boleto ?"   ,"","","mv_chm",aTamSX3[3],	aTamSx3[1],	aTamSX3[2],	0,"G","","MV_PAR22","",		"",		"",		"",						"","",		"",		"",		"","","","","","","","","","","","","","","","","SA6",	"","007",	"",""})
 	aTamSX3	:= TAMSX3("EE_AGENCIA")
-	Aadd(aPergs,{"Agencia Boleto","","","mv_chn",aTamSX3[3],aTamSx3[1],	aTamSX3[2],	0,"G","","MV_PAR23","",		"",		"",		"",						"","",		"",		"",		"","","","","","","","","","","","","","","","","",		"","008",	"",""})
+	Aadd(aPergs,{"Agencia Boleto ?" ,"","","mv_chn",aTamSX3[3],aTamSx3[1],	aTamSX3[2],	0,"G","","MV_PAR23","",		"",		"",		"",						"","",		"",		"",		"","","","","","","","","","","","","","","","","",		"","008",	"",""})
 	aTamSX3	:= TAMSX3("EE_CONTA")
-	Aadd(aPergs,{"Conta Boleto","","","mv_cho",aTamSX3[3],	aTamSx3[1],	aTamSX3[2],	0,"G","","MV_PAR24","",		"",		"",		"",						"","",		"",		"",		"","","","","","","","","","","","","","","","","",		"","009",	"",""})
-	Aadd(aPergs,{"Pedido de" ,"","","mv_chp","C",6,0,0,"G","","MV_PAR25","","","",""      ,"","","","","","","","","","","","","","","","","","","","","SC5","","","",""})
-	Aadd(aPergs,{"Pedido ate","","","mv_chq","C",6,0,0,"G","","MV_PAR26","","","","ZZZZZZ","","","","","","","","","","","","","","","","","","","","","SC5","","","",""})
-	Aadd(aPergs,{"Modelo de Email?","","","mv_chr","N",1,0,1,"C","","MV_PAR27","Em aberto","Em aberto","Em aberto","","Em atraso","Em Atraso","Em Atraso","","","","","","","","","","","","","","","","","","","","","",""})
-	Aadd(aPergs,{"Email para ?","","","mv_chs","N",1,0,1,"C","","MV_PAR28","Cliente/Equip.Cobrança","Cliente/Equip.Cobrança","Cliente/Equip.Cobrança","","Equipe Cobrança","Equipe Cobrança","Equipe Cobrança","","Usuário Logado","Usuário Logado","Usuário Logado","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"Conta Boleto ?"   ,"","","mv_cho",aTamSX3[3],	aTamSx3[1],	aTamSX3[2],	0,"G","","MV_PAR24","",		"",		"",		"",						"","",		"",		"",		"","","","","","","","","","","","","","","","","",		"","009",	"",""})
+	Aadd(aPergs,{"Pedido de ?"      ,"","","mv_chp","C",6,0,0,"G","","MV_PAR25","","","",""      ,"","","","","","","","","","","","","","","","","","","","","SC5","","","",""})
+	Aadd(aPergs,{"Pedido ate ?"     ,"","","mv_chq","C",6,0,0,"G","","MV_PAR26","","","","ZZZZZZ","","","","","","","","","","","","","","","","","","","","","SC5","","","",""})
+	Aadd(aPergs,{"Modelo de Email ?","","","mv_chr","N",1,0,1,"C","","MV_PAR27","Em aberto","Em aberto","Em aberto","","Em atraso","Em Atraso","Em Atraso","","","","","","","","","","","","","","","","","","","","","",""})
+	Aadd(aPergs,{"Email para ?"     ,"","","mv_chs","N",1,0,1,"C","","MV_PAR28","Cliente/Equip.Cobrança","Cliente/Equip.Cobrança","Cliente/Equip.Cobrança","","Equipe Cobrança","Equipe Cobrança","Equipe Cobrança","","Usuário Logado","Usuário Logado","Usuário Logado","","","","","","","","","","","","","","","","","",""})
 
 	AjustaPerg(cPerg,aPergs)
 
@@ -156,7 +160,6 @@ User Function M06A11(cNumBor)
 
 		dbSelectArea("SE1")
 		dbGoTop()
-
 		@ 001,001 TO 400,700 DIALOG oDlg TITLE "Seleção de Titulos"
 
 			oPanel := TPanel():New(001,001,'',oDlg,, .T., .T.,, ,350,170)
@@ -187,12 +190,19 @@ User Function M06A11(cNumBor)
 		dbGoTop()
 
 		If lExec
-				Processa({|lEnd|ProcEnv(nTemplate,lAuto)})
+			Processa({|lEnd|ProcEnv(nTemplate,lAuto)})
 		EndIf
 
 	Else
 		ProcEnv(nTemplate,lAuto)
 	EndIf
+
+MsgStop("Voltando Parametro de envio de e-mail para COMPRAS")
+// Ajustar isso depois
+//For nProc := 1 To 5000	
+//	cTeste := "  "
+//Next
+PutMV("MV_WFMLBOX",cCaixaCompras)
 
 Return Nil
 
@@ -219,6 +229,7 @@ Static Function ProcEnv(nTemplate,lAuto)
 	Local lImprime		:= .F.
 	Local cBarra        := if(isSrvUnix(),"/","\")
 	Local cFolderFiles  := cBarra + "temp" + cBarra
+	Local cFileCondF    := cBarra + "workflow" + cBarra + "condicoes_de_fornecimento.pdf"
 	Local cHtml			:= cBarra + "workflow" + cBarra + "enviodedocumentos.htm"
 	Local cAssinatura   := cBarra + "workflow" + cBarra + "assinaturaemail.jpg"
 	Local cTitulo       := ""
@@ -263,10 +274,10 @@ Static Function ProcEnv(nTemplate,lAuto)
 
     BeginSql Alias cAliasQry
         
-        SELECT E1_CLIENTE,E1_LOJA,SE1.R_E_C_N_O_ RECSE1
+        SELECT E1_CLIENTE,E1_LOJA, E1_TIPO, SE1.R_E_C_N_O_ RECSE1
         FROM %table:SE1% SE1
         WHERE   E1_FILIAL = %xfilial:SE1% AND
-				E1_SALDO > 0 AND
+//				E1_SALDO > 0 AND
 	            E1_PREFIXO BETWEEN %Exp:MV_PAR01% AND %Exp:MV_PAR02% AND 
 				E1_NUM BETWEEN %Exp:MV_PAR03% AND %Exp:MV_PAR04% AND 
 				E1_PARCELA BETWEEN %Exp:MV_PAR05% AND %Exp:MV_PAR06% AND
@@ -280,7 +291,7 @@ Static Function ProcEnv(nTemplate,lAuto)
 				E1_TIPO IN ('NF ','BOL') AND 
                 SE1.%notDel%
 				%Exp:cWhere%
-		ORDER BY E1_CLIENTE,E1_LOJA
+		ORDER BY E1_CLIENTE,E1_LOJA, E1_TIPO
    
     EndSql
 
@@ -306,16 +317,27 @@ Static Function ProcEnv(nTemplate,lAuto)
 		cCliente    := (cAliasQry)->E1_CLIENTE
 		cLoja       := (cAliasQry)->E1_LOJA
 		aDuplicatas := {}
+		ltemPVA     := .F.
 
 		//Posiciona o SA1 (Cliente)
 		dbSelectArea("SA1")
 		dbSetOrder(1)
-		dbSeek(xFilial("SA1")+SE1->E1_CLIENTE+SE1->E1_LOJA)
+		dbSeek(xFilial("SA1")+cCliente+cLoja)
 
     	dbSelectArea(cAliasQry)
-	    While (cAliasQry)->(!Eof() .And. cCliente == E1_CLIENTE .And. cLoja == E1_LOJA)
+	    While (cAliasQry)->(!Eof() .And. E1_CLIENTE == cCliente  .And. cLoja == E1_LOJA)
 
     	    SE1->(dbGoTo((cAliasQry)->RECSE1))
+
+			If SE1->E1_PREFIXO = 'PVA'  // Tipo BOL
+				ltemPVA  := .T.
+			EndIf
+
+			//Não Envia Boleto da Nota se Já enviou ou tem PVA
+			If 	ltemPVA .And. AllTrim(SE1->E1_TIPO)  = 'NF'
+				(cAliasQry)->(DbSkip())
+				Loop
+			EndIf
 
 			//Incrementando a régua
     	    nAtual++
@@ -332,7 +354,6 @@ Static Function ProcEnv(nTemplate,lAuto)
 		EndDo
 		
 		AADD(aEnvios,{cCliente,cLoja,ACLONE(aDuplicatas),cEmailEnv})
-
     EndDo
     (cAliasQry)->(DbCloseArea())
 
@@ -353,14 +374,9 @@ Static Function ProcEnv(nTemplate,lAuto)
 		cTitulos  := ""
 		nTitulos  := 0
 		
-		//Retirar linhas após teste
-		//cEmailEnv := "marcos.montes@moovegestao.com.br;marcos.rocha@moovegestao.com.br"
-        //cEmailCC  := "marcos.montes@moovegestao.com.br;marcos.rocha@moovegestao.com.br"
-
 		//cEmailEnv := cEmailCC
 		aAnexos := {}
 		AADD(aAnexos,cAssinatura)
-
 		For nB := 1 To Len(aEnvios[nX][3])
 
 			SE1->(dbGoTo(aEnvios[nX][3][nB][13]))
@@ -371,24 +387,26 @@ Static Function ProcEnv(nTemplate,lAuto)
 			aFileBoleto := {}
 
 			If nEnvNf = 1 //Envia NF
+
+				cSerie := If(Empty(SE1->E1_SERIE),SE1->E1_PREFIXO,SE1->E1_SERIE)
 				dbSelectArea("SF2")
 				dbSetOrder(1)
-				dbSeek(SE1->E1_FILIAL+SE1->E1_NUM+SE1->E1_SERIE)
+				dbSeek(SE1->E1_FILIAL+SE1->E1_NUM+cSerie)
+
 				dbSelectArea("SE1")
-						
 				If RTRIM(SF2->F2_ESPECIE) == "SPED"
-					cFileDanfe := GetDANFE(SD2->D2_FILIAL,SD2->D2_SERIE,SD2->D2_DOC)
-					cFileXML := GetXML(SD2->D2_FILIAL,SD2->D2_SERIE,SD2->D2_DOC)
+					cFileDanfe := GetDANFE(SF2->F2_FILIAL,SF2->F2_SERIE,SF2->F2_DOC)
+					cFileXML := GetXML(SF2->F2_FILIAL,SF2->F2_SERIE,SF2->F2_DOC)
 				EndIf
 			EndIf
 
-			If nEnvBol == 1 //Envia Boleto
+//			If nEnvBol == 1 //Envia Boleto
+			If nEnvBol == 1 .And. SE1->E1_SALDO > 0  // Tras titulos sem saldo na query para demonstrar no email.
 				aFileBoleto := GetBoleto(SE1->E1_FILIAL,SE1->E1_PREFIXO,SE1->E1_NUM,SE1->E1_PARCELA,cParBco,cParAge,cParCta)
 			EndIf
 
 			If nEnvPed == 1 //Envia Pedido
 				SC5->(dbSeek(xFilial("SC5",SE1->E1_FILIAL)+SE1->E1_PEDIDO))
-
 				cFilePedido := U_M05R03A(.T./*lAuto*/)
 			EndIf
 
@@ -410,7 +428,10 @@ Static Function ProcEnv(nTemplate,lAuto)
 
 			If !EMPTY(cFilePedido) .And. ASCAN(aAnexos,{|x|x=cFolderFiles+cFilePedido}) = 0
 				AADD(aAnexos,cFolderFiles+cFilePedido)
+
+				AADD(aAnexos,cFileCondF)   // Envia 
 				lEnvia := .T.
+
 			EndIf
 			If !EMPTY(cFileXML) .And. ASCAN(aAnexos,{|x|x=cFolderFiles+cFileXML}) = 0
 				AADD(aAnexos,cFolderFiles+cFileXML)
@@ -433,8 +454,19 @@ Static Function ProcEnv(nTemplate,lAuto)
 			cTitulos  += '    <tr>'
 			cTitulos  += '      <td style="width: 77px;">'+SE1->E1_NUM+'</td>'
 			cTitulos  += '      <td style="width: 58px;">'+SE1->E1_PARCELA+'</td>'
-			cTitulos  += '      <td style="width: 122px;">'+DTOC(SE1->E1_VENCREA)+'</td>'
-			cTitulos  += '      <td style="width: 122px; text-align: right;">'+TRANSFORM(SE1->E1_SALDO,"@e 999,999,999.99")+'</td>'
+			If SE1->E1_SALDO == 0
+				cTitulos  += '      <td style="width: 122px;">'+"  /  /  "+'</td>'
+				If nTemplate = 1
+					cTitulos  += '      <td style="width: 122px;">'+DTOC(SE1->E1_BAIXA)+'</td>'
+				EndIf
+				cTitulos  += '      <td style="width: 122px; text-align: right;">'+TRANSFORM(SE1->E1_VALOR,"@e 999,999,999.99")+'</td>'
+			Else
+				cTitulos  += '      <td style="width: 122px;">'+DTOC(SE1->E1_VENCREA)+'</td>'
+				If nTemplate = 1
+					cTitulos  += '      <td style="width: 122px;">'+"  /  /  "+'</td>'
+				EndIf
+				cTitulos  += '      <td style="width: 122px; text-align: right;">'+TRANSFORM(SE1->E1_VALOR,"@e 999,999,999.99")+'</td>'
+			EndIf
 			cTitulos  += '      <td style="width: 455px;">'+TRANSFORM(SE1->E1_CODDIG,"@R XXXXX.XXXXX XXXXX.XXXXXX XXXXX.XXXXXX X XXXXXXXXXXXXXX")+'</td>'
 			cTitulos  += '    </tr>'
 
@@ -455,6 +487,10 @@ Static Function ProcEnv(nTemplate,lAuto)
 			cCondicao += '      <td'
 			cCondicao += ' style="font-weight: bold; font-style: italic; text-decoration: underline; width: 122px;">VENCIMENTO</td>'
 			cCondicao += '      <td'
+			If nTemplate = 1
+				cCondicao += ' style="font-weight: bold; font-style: italic; text-decoration: underline; width: 122px;">DATA.PAGTO</td>'
+				cCondicao += '      <td'
+			EndIf
 			cCondicao += ' style="font-weight: bold; font-style: italic; text-decoration: underline; width: 122px; text-align: right;">VALOR</td>'
 			cCondicao += '      <td'
 			cCondicao += ' style="font-weight: bold; font-style: italic; text-decoration: underline; width: 455px;">LINHA DIGITAVEL</td>'
@@ -475,29 +511,41 @@ Static Function ProcEnv(nTemplate,lAuto)
 
 			If !EMPTY(cFilePedido) .And. ASCAN(aAnexos,{|x|x=cFolderFiles+cFilePedido}) = 0
 				AADD(aAnexos,cFolderFiles+cFilePedido)
+
+//				MsgStop("2 : "+cFileCondF)
+				AADD(aAnexos,cFileCondF)   // Envia 
+
 				lEnvia := .T.
 			EndIf
 			//EndIf
 
 		EndIf
 
-		If !EMPTY(cEmailEnv) 
+		If !Empty(cEmailEnv) 
 
 			If lEnvia .And. nTemplate > 0
 
 				If nTemplate = 1
 					cHtml			:= cBarra + "workflow" + cBarra + "enviodedocumentos_template1.htm"
-					cSubject        := "Confirmação de pedido "+SC5->C5_NUM+" - "+AllTrim(SM0->M0_NOMECOM)+"."
+					cSubject        := "Informe - Pedido : "+SC5->C5_NUM+" - "+AllTrim(SA1->A1_NOME)+"."
 				ElseIf nTemplate = 2
 					cHtml			:= cBarra + "workflow" + cBarra + "enviodedocumentos_template2.htm"
-					cSubject        := "Cobrança "+AllTrim(SM0->M0_NOMECOM)+"."
+					If nDiasAtraso > 0
+						cSubject        := "Cobrança - Pedido : "+SC5->C5_NUM+" - "+AllTrim(SA1->A1_NOME)+"."
+					Else
+						cSubject        := "Lembrete Vencto - Pedido : "+SC5->C5_NUM+" - "+AllTrim(SA1->A1_NOME)+"."					
+					EndIf
 				ElseIf nTemplate = 3
 					cHtml			:= cBarra + "workflow" + cBarra + "enviodedocumentos_template3.htm"
-					cSubject        := "Cobrança "+AllTrim(SM0->M0_NOMECOM)+"."
+					If nDiasAtraso > 0
+						cSubject        := "Cobrança - Pedido : "+SC5->C5_NUM+" - "+AllTrim(SA1->A1_NOME)+"."
+					Else
+						cSubject        := "Lembrete Vencto - Pedido : "+SC5->C5_NUM+" - "+AllTrim(SA1->A1_NOME)+"."					
+					EndIf
 				Else
 					cHtml			:= cBarra + "workflow" + cBarra + "enviodedocumentos.htm"
-					cSubject        := "Faturamento "+AllTrim(SM0->M0_NOMECOM)+" - NF "+ALLTRIM(cNumTit)+;
-								IIF(!EMPTY(SE1->E1_PARCELA)," Parcela "+RTRIM(SE1->E1_PARCELA),"")+" - "+AllTrim(SA1->A1_NOME)+" com vencimento em "+DTOC(SE1->E1_VENCTO)+"."
+					cSubject        := "Faturamento - Pedido : "+SC5->C5_NUM+" - "+AllTrim(SA1->A1_NOME)+" - NF "+ALLTRIM(cNumTit)+;
+									IF(!EMPTY(SE1->E1_PARCELA)," Parcela "+RTRIM(SE1->E1_PARCELA),"")+" - "+AllTrim(SA1->A1_NOME)+" com vencimento em "+DTOC(SE1->E1_VENCTO)+"."
 				EndIf
 
 				cFromName := "Financeiro - "+AllTrim(SM0->M0_NOMECOM)
@@ -522,7 +570,7 @@ Static Function ProcEnv(nTemplate,lAuto)
 				oProcess:cFromName  := cFromName
 				//oProcess:cFromAddr	:= cFromAddr
 				oProcess:bReturn  	:= ""
-				
+
 				If Len(aAnexos) > 0
 					// Anexar arquivo
 					For n := 1 To Len(aAnexos)
@@ -532,23 +580,29 @@ Static Function ProcEnv(nTemplate,lAuto)
 
 				oHtml := oProcess:oHTML
 
-				oHtml:ValByName( "CLIENTE"    , SA1->A1_NOME     )
+//				If nEmailPara == 2 .Or. nEmailPara == 3
+//					oHtml:ValByName( "CLIENTE"    , AllTrim(SA1->A1_NOME)+" email(s) "+cEmailEnv)
+//				Else
+					oHtml:ValByName( "CLIENTE"  , SA1->A1_NOME)
+//				Endif
 
-				If nTemplate = 1 
-					oHtml:ValByName( "CCONDICAO"  , cCondicao )
-				Else
-					oHtml:ValByName( "EMPRESA"    , SM0->M0_NOMECOM  )
-					oHtml:ValByName( "CNUMTIT"    , "" /*ALLTRIM(cNumTit)*/ )
-					oHtml:ValByName( "CEMISSAO"   , "" /*DTOC(dEmissao)*/   )
-					oHtml:ValByName( "CVENCTO"    , "" /*DTOC(dVencto)*/    )
-				EndIf
+				oHtml:ValByName( "CCONDICAO"  , cCondicao )
+
+//				If nTemplate = 1 
+//					oHtml:ValByName( "CCONDICAO"  , cCondicao )
+//				Else
+//					oHtml:ValByName( "EMPRESA"    , SM0->M0_NOMECOM  )
+//					oHtml:ValByName( "CNUMTIT"    , "" /*ALLTRIM(cNumTit)*/ )
+//					oHtml:ValByName( "CEMISSAO"   , "" /*DTOC(dEmissao)*/   )
+//					oHtml:ValByName( "CVENCTO"    , "" /*DTOC(dVencto)*/    )
+//				EndIf
 
 				//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 				//³ Função envio de e-mail                                                 ³
 				//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 				oProcess:Start()
 				oProcess:Finish()
-			
+
 			EndIf
 
 		EndIf
@@ -563,19 +617,18 @@ wfsendmail()
 Return nil
 
 /*/
-	±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-	±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-	±±³Fun‡…o    ³ AjustaSx1    ³ Autor ³ Microsiga            	³ Data ³ 13/10/03 ³±±
-	±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-	±±³Descri‡…o ³ Verifica/cria SX1 a partir de matriz para verificacao          ³±±
-	±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-	±±³Uso       ³ Especifico para Clientes Microsiga                    	  		³±±
-	±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-	±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-	ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡…o    ³ AjustaSx1    ³ Autor ³ Microsiga            	³ Data ³ 13/10/03 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Verifica/cria SX1 a partir de matriz para verificacao          ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³ Especifico para Clientes Microsiga                    	  		³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 /*/
 Static Function AjustaPerg(cPerg, aPergs)
-
 
 	Local aCposSX1	:= {}
 	Local nX 		:= 0
@@ -907,8 +960,8 @@ Local aArea        := GetArea()
 Local cSavFil      := cFilAnt
 Local aAreaSM0     := SM0->(GetArea())
 Local aAreaSE1     := SE1->(GetArea())
-Local cBarra       := if(isSrvUnix(),"/","\")
-Local cFolderFiles := cBarra + "temp" + cBarra
+//Local cBarra       := if(isSrvUnix(),"/","\")
+//Local cFolderFiles := cBarra + "temp" + cBarra
 //Local nX           := 0
 Local aFileBoletos := {}
 Local cTitulo      := ""
@@ -920,14 +973,17 @@ SM0->(dbSeek(cEmpAnt+cFilAnt))
 
 dbSelectArea("SE1")
 dbSetOrder(1) //E1_FILIAL+E1_PREFIXO+E1_NUM+E1_PARCELA
-If dbSeek(xFilial("SE1",cFilDoc)+cPrefixo+cNumero+cParcela)
+If dbSeek(xFilial("SE1")+cPrefixo+cNumero+cParcela)
+//	MsgStop(" Não Achou Titulo "+xFilial("SE1")+cPrefixo+cNumero+cParcela)
+//Else
 
-    cTitulo  := IIF(EMPTY(SE1->E1_NFELETR),Alltrim(SE1->E1_NUM),AllTrim(SE1->E1_NFELETR))
+    cTitulo  := IF(EMPTY(SE1->E1_NFELETR),Alltrim(SE1->E1_NUM),AllTrim(SE1->E1_NFELETR))
 	cFileBOL := "boleto_"+RTRIM(SM0->M0_CGC)+"_"+RTRIM(cTitulo)+IIF(!EMPTY(SE1->E1_PARCELA),"_"+ALLTRIM(SE1->E1_PARCELA),"")+".pdf"
 
-	If !FILE(cFolderFiles+cFileBOL)
+//	If !FILE(cFolderFiles+cFileBOL)
+		If !EMPTY(SE1->E1_NUMBCO)  //.Or. IF(SE1->E1_PORTADO==cParBco))
 
-		If (EMPTY(SE1->E1_NUMBCO) .Or. IIF(SE1->(FieldPos("E1_BCOBOL")) > 0,SE1->E1_BCOBOL==cParBco,SE1->E1_PORTADO==cParBco))//;
+//		If (EMPTY(SE1->E1_NUMBCO) //.Or. IF(SE1->E1_PORTADO==cParBco))
 			//.And.!EMPTY(SE1->E1_NUMBOR)
 
 			If !EMPTY(SE1->E1_NUMBCO) //Reimpressão
@@ -935,13 +991,13 @@ If dbSeek(xFilial("SE1",cFilDoc)+cPrefixo+cNumero+cParcela)
 				cAgencia  := IIF(!EMPTY(SE1->E1_AGEDEP),SE1->E1_AGEDEP,cParAge)
 				cConta    := IIF(!EMPTY(SE1->E1_CONTA),SE1->E1_CONTA,cParCta)
 				cCarteira := "109" //SEE->EE_SUBCTA
+
 			Else //Nova Impressão
 				cBanco    := cParBco
 				cAgencia  := cParAge
 				cConta    := cParCta
 				cCarteira := "109" //SEE->EE_SUBCTA
 			EndIf
-
 			cFileBOL := U_RFINR99(cPrefixo,cNumero,cParcela,SE1->E1_CLIENTE,SE1->E1_LOJA,cBanco,cAgencia,cConta,999/*nDias*/,/*cCarga*/,SE1->E1_EMISSAO,cCarteira)
 		
 		Else
@@ -949,10 +1005,10 @@ If dbSeek(xFilial("SE1",cFilDoc)+cPrefixo+cNumero+cParcela)
 			cFileBol := ""
 		EndIf
 
-	EndIf
+//	EndIf
 
-	If !EMPTY(cFileBOL)
-		AADD(aFileBoletos,cFileBOL)
+	If !Empty(cFileBOL)
+		Aadd(aFileBoletos,cFileBOL)
 	EndIf
 
 EndIf
@@ -960,8 +1016,8 @@ EndIf
 cFilAnt := cSavFil
 SM0->(RestArea(aAreaSM0))
 
-RESTAREA(aAreaSE1)
-RESTAREA(aArea)
+RestArea(aAreaSE1)
+RestArea(aArea)
 
 Return aFileBoletos
 
@@ -1002,7 +1058,7 @@ oWS:oWSEMPRESA:cCPF        := IIF(SM0->M0_TPINSC==3,SM0->M0_CGC,"")
 oWS:oWSEMPRESA:cIE         := SM0->M0_INSC
 oWS:oWSEMPRESA:cIM         := SM0->M0_INSCM		
 oWS:oWSEMPRESA:cNOME       := SM0->M0_NOMECOM
-oWS:oWSEMPRESA:cFANTASIA   := SM0->M0_NOME
+oWS:oWSEMPRESA:cFANTASIA   := SM0->M0_NOMECOM   //SM0->M0_NOME
 oWS:oWSEMPRESA:cENDERECO   := FisGetEnd(SM0->M0_ENDENT)[1]
 oWS:oWSEMPRESA:cNUM        := FisGetEnd(SM0->M0_ENDENT)[3]
 oWS:oWSEMPRESA:cCOMPL      := FisGetEnd(SM0->M0_ENDENT)[4]
@@ -1060,9 +1116,9 @@ Executa um Print padronizado
 
 /*/
 //-------------------------------------------------------------------
-static function PRTMSG(cMensagem, nTypeMsg)
+Static Function PRTMSG(cMensagem, nTypeMsg)
 
-	local cDelConout := replicate("-", 78 )
+	Local cDelConout := Replicate("-", 78 )
 
 	default nTypeMsg	:= 1
 	
@@ -1153,30 +1209,36 @@ Email's de contato dos Gerentes, Vendedores e
 //-------------------------------------------------------------------
 Static Function EmailVen(cEmailRet)
 
-Local aArea         := GETAREA()
+Local aArea         := GetArea()
 Local cAliasCont    := GetNextAlias()
 
 BeginSql Alias cAliasCont
 
 	SELECT DISTINCT A3_EMAIL,A3_NOME FROM (
 	
-	SELECT A3_EMAIL, A3_NOME FROM %Table:SA3% SA3
-	WHERE A3_COD IN ('%Exp:SC5->C5_VEND1%','%Exp:SC5->C5_VEND2%','%Exp:SC5->C5_VEND3%','%Exp:SC5->C5_VEND4%','%Exp:SC5->C5_VEND5%') AND SA3.D_E_L_E_T_ = ' '
-	
+	SELECT DISTINCT A3_EMAIL, A3_NOME 
+	FROM %Table:SA3% SA3
+	WHERE A3_FILIAL = %xFilial:SA3% 
+	AND A3_COD IN  (%Exp:SC5->C5_VEND1%,%Exp:SC5->C5_VEND2%,%Exp:SC5->C5_VEND3%,%Exp:SC5->C5_VEND4%,%Exp:SC5->C5_VEND5%) 
+	AND SA3.D_E_L_E_T_ = ' '
+
 	UNION ALL
 	
-	SELECT A3_EMAIL, A3_NOME FROM %Table:SA3% SA3
-	WHERE A3_COD IN (
+	SELECT A3_EMAIL, A3_NOME 
+	FROM %Table:SA3% SA3
+	WHERE A3_FILIAL = %xFilial:SA3% AND A3_COD IN (
 	SELECT DISTINCT A3_GEREN FROM %Table:SA3% SA3GER
-	WHERE SA3GER.A3_COD IN ('%Exp:SC5->C5_VEND1%','%Exp:SC5->C5_VEND2%','%Exp:SC5->C5_VEND3%','%Exp:SC5->C5_VEND4%','%Exp:SC5->C5_VEND5%') AND SA3GER.D_E_L_E_T_ = ' '
+	WHERE SA3GER.A3_FILIAL = %xFilial:SA3% 
+		AND SA3GER.A3_COD IN (%Exp:SC5->C5_VEND1%,%Exp:SC5->C5_VEND2%,%Exp:SC5->C5_VEND3%,%Exp:SC5->C5_VEND4%,%Exp:SC5->C5_VEND5%) AND SA3GER.D_E_L_E_T_ = ' '
 	) AND SA3.D_E_L_E_T_ = ' '
-	
 	) AS TMP
+
 EndSql
 
-While (cAliasCont)->(!EOF())
+(cAliasCont)->(dbGotop())
+While (cAliasCont)->(!Eof())
 
-	If !lower(AllTrim((cAliasCont)->A3_EMAIL)) $ cEmailRet
+	If !Lower(AllTrim((cAliasCont)->A3_EMAIL)) $ cEmailRet
 		cEmailRet += IIF(!EMPTY(cEmailRet),";","")+lower(AllTrim((cAliasCont)->A3_EMAIL))
 	EndIf
 
