@@ -52,7 +52,9 @@ Local _nRegSC2 	:= 0
 Local _cQuery  	:= ""
 Local _nRegZAB  := 0
 Local _cNumSer  := ""
-Private _cOp	:=""
+Private _cOp	 := ""
+Private _cItem	 := ""
+Private _cSequen := ""
 
 _cDeOP   := Alltrim(cGet1)
 _cAteOP  := Alltrim(cGet2)
@@ -110,7 +112,10 @@ _nRegZAB := 0
 
 			cProduto 	:= (cAlias)->ZAB_CODPRO
 			_nQtdOP		:= Posicione("SC2",1, xFilial("SC2") + (cAlias)->ZAB_NUMOP+ (cAlias)->ZAB_ITEMOP+(cAlias)->ZAB_SEQOP,"C2_QUANT")
-			_cOP		:= (cAlias)->(ZAB_NUMOP+ZAB_ITEMOP+ZAB_SEQOP)
+//			_cOP		:= (cAlias)->(ZAB_NUMOP+ZAB_ITEMOP+ZAB_SEQOP)
+			_cOP		:= (cAlias)->(ZAB_NUMOP)
+			_cItem		:= (cAlias)->(ZAB_ITEMOP)
+			_cSequen	:= (cAlias)->(ZAB_SEQOP)
 
 			For _nRegZAB := 1 to _nQtdOP
 				_cNumSer	:= (cAlias)->ZAB_NUMSER
@@ -130,6 +135,7 @@ Return
 
 
 User Function M10A061(cProduto,_nQtdOP,_nQtdJE, _cOp, _cItem, _cSequen)
+
 Local _cNumSer 	:= ""
 Local _cAno		:= ""
 Local _cMes		:= ""
@@ -267,8 +273,8 @@ Else
                 RecLock("SX6",.F.)
                 X6_CONTEUD := Alltrim(STR(_nSerial))
                 MsUnlock()
-				M02EPrin(cProduto,_nQtdOP, _cNumSer)  // 025 - 1X
 
+				M02EPrin(cProduto,_nQtdOP, _cNumSer)  // 025 - 1X
 				M02EPri1(cProduto,_nQtdOP, _cNumSer)  // 008 - 2X
 				M02EPri1(cProduto,_nQtdOP, _cNumSer)
 
@@ -512,7 +518,9 @@ Static Function M02EPrin(_cCodOpi,_nQtd,_cNumSer)
 Return
 
 //+----------------------------------------------------------------------------------------------------------------
+//Static Function M02EPri1(_cCodOpi,_nQtd,_cNumSer,_cItem,_cSequen)
 Static Function M02EPri1(_cCodOpi,_nQtd,_cNumSer)
+
 	Local _oPrinter		:= Nil
 	Local _nRow 		:= 90
 	
@@ -542,7 +550,9 @@ Static Function M02EPri1(_cCodOpi,_nQtd,_cNumSer)
 	Local _cGrProtecao	:= Posicione("SB5",1,xFilial("SB5")+ _cCodOpi, "B5_XGPROT")
 	Local _cCorrente	:= Posicione("SB5",1,xFilial("SB5")+ _cCodOpi, "B5_XCORNT")
 	Local _lRetusr		:= .T.*/
-	Local _cPedido		:= ZAB->ZAB_NUMPV
+	Local _cPedido		:= ZAB->ZAB_NUMPV  //#7032	
+//	Local _cItem		:= ZAB->ZAB_ITEMOP
+//	Local _cSequen	    := ZAB->ZAB_SEQOP
 	
 	_oPrinter := FWMSPrinter():New('M02E01' + StrTran(Time(),':',''), IMP_SPOOL, .T./*_lAdjustToLegacy*/, /*cPathInServer*/, .T.,/*[ lTReport]*/, /*[ @oPrintSetup]*/, /*[ cPrinter]*/, /*[ lServer]*/, /*[ lPDFAsPNG]*/, /*[ lRaw]*/, /*[ lViewPDF]*/,1)
 	_oPrinter:SetResolution(78)
@@ -557,10 +567,12 @@ Static Function M02EPri1(_cCodOpi,_nQtd,_cNumSer)
 	_oPrinter:Say(_nRow + 140 ,70, "Modelo: ",_OFontP)
 	_oPrinter:Say(_nRow + 140 , 250, Alltrim(_cCodOpi),_OFontGG)
 	_oPrinter:Say(_nRow + 510 , 70, "OP.: ",_OFontP)
-	_oPrinter:Say(_nRow + 510 , 150, AllTrim(_cOP) ,_OFontP)
+//	_oPrinter:Say(_nRow + 510 , 150, AllTrim(_cOP) ,_OFontP) //#7032
+	_oPrinter:Say(_nRow + 510 , 150, AllTrim(_cOP+_cItem+_cSequen) ,_OFontP) //#7032
 
 	_oPrinter:Say(_nRow + 390 , 70, "BCode OP: " ,_OFontP)
-	_oPrinter:FWMSBAR('CODE128',12.9/*nRow*/,1.5/*nCol*/,AllTrim(_cOP),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/)
+//	_oPrinter:FWMSBAR('CODE128',12.9/*nRow*/,1.5/*nCol*/,AllTrim(_cOP),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/) //#7032
+	_oPrinter:FWMSBAR('CODE128',12.9/*nRow*/,1.5/*nCol*/,AllTrim(_cOP+_cItem+_cSequen),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/) //#7032
 	
 	_oPrinter:Say(_nRow + 510 , 700, "Pedido.:" ,_OFontP)
 	_oPrinter:Say(_nRow + 510 , 880, AllTrim(_cPedido) ,_OFontP)
