@@ -97,6 +97,7 @@ Private lNegEstr  := GETMV("MV_NEGESTR")
 Private cNegativo := ALLTRIM(STR(MV_PAR10))
 Private cSeqZG1 
 Private cProdPai
+Private nRegGrav := 0
 
 dbSelectArea("ZG1")
 
@@ -243,6 +244,19 @@ While SG1TRB->(!Eof())  //.And. SG1->G1_FILIAL+SG1->G1_COD <= xFilial('SG1')+mv_
 	EndDo
 EndDo
 
+// Grava Parametro de Processamento
+If nRegGrav > 0
+	//	PutMv("AM_PROCZG1", Dtoc(mv_par09) + " - "+Transform(nRegGrav,"999,999,999") + " - Registro(s).")	
+
+	cLogProc := Dtoc(mv_par09) + " - "+Transform(nRegGrav,"999,999,999") + " - Registro(s)."
+	dbSelectArea("SX6")
+	dbSetOrder(1)
+	If dbSeek("  AM_PROCZG1")
+		RecLock("SX6",.F.)
+		SX6->X6_CONTEUD := cLogProc
+	EndIf
+EndIf
+
 dbSelectArea("SG1TRB")
 dbClosearea()
 
@@ -320,6 +334,8 @@ While !Eof() .And. SG1->G1_FILIAL+SG1->G1_COD == xFilial('SG1')+cProduto
 					u_MTR225E2(SG1->G1_COD,nQuantItem,nNivel+1,SB1->B1_OPC,IIf(RetFldProd(SB1->B1_COD,"B1_QB")==0,1,RetFldProd(SB1->B1_COD,"B1_QB")),If(!Empty(cRevEst),cRevEst,mv_par07))
 				EndIf
 				dbGoto(nReg)
+
+				nRegGrav ++
 
 				RecLock("ZG1",.T.)
 				ZG1->ZG1_FILIAL := xFilial("ZG1")
