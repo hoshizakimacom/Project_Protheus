@@ -254,6 +254,7 @@ If nRegGrav > 0
 	If dbSeek("  AM_PROCZG1")
 		RecLock("SX6",.F.)
 		SX6->X6_CONTEUD := cLogProc
+		MsUnlock()
 	EndIf
 EndIf
 
