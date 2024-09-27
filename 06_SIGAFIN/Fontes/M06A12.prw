@@ -3,7 +3,7 @@
 
 /*/{Protheus.doc} ClassTituloCRA
 
-Classe  para inclusao/exclusão de titulo de credito CRA quando da baixa/exclusao de baixa de um titulo PVA - (Recebimento Antecipado de Pedido de Venda)
+Classe  para inclusão/exclusão de titulo de credito CRA quando da baixa/exclusao de baixa de um titulo PVA - (Recebimento Antecipado de Pedido de Venda)
 
 @type class
 @author Marcos Antonio Montes
@@ -64,7 +64,7 @@ If SE1->E1_TIPO == "BOL" .And. SE1->E1_PREFIXO == "PVA" .And. SE5->E5_MOTBX $ "N
 
 	cNumTit  := SE1->E1_NUM
 	cParcTit := SE1->E1_PARCELA
-	dDtTit   := SE5->E5_DATA
+	dDtTit   := dDataBase
 
     aFin040 := { {"E1_PREFIXO"   ,"PVA"          ,nil},;
 					{"E1_NUM"    ,SE1->E1_NUM    ,nil},;
@@ -101,15 +101,15 @@ If SE1->E1_TIPO == "BOL" .And. SE1->E1_PREFIXO == "PVA" .And. SE5->E5_MOTBX $ "N
 		EndIf
 	EndIf
 
-	iF lRet
+	If lRet
 		// Verifica se Gerou Movimentação Bancária do CRA e Exclue
 		cQrySE5 := "UPDATE "+RetSqlName("SE5")
 		cQrySE5 += " SET R_E_C_D_E_L_ = R_E_C_N_O_, D_E_L_E_T_ = '*' "
 		cQrySE5 += " WHERE E5_FILIAL = '"+xFilial("SE5")+"'"
 		cQrySE5 += " AND E5_PREFIXO = 'PVA' "
-		cQrySE5 += " AND E5_NUMERO = '"+cNumTit+"'"
-		cQrySE5 += " AND E5_PARCELA = '"+cParcTit+"'"
-		cQrySE5 += " AND E5_DATA = '"+Dtos(dDtTit)+"'"
+//		cQrySE5 += " AND E5_NUMERO = '"+cNumTit+"'"
+//		cQrySE5 += " AND E5_PARCELA = '"+cParcTit+"'"
+		cQrySE5 += " AND E5_DATA BETWEEN '"+Dtos(dDtTit-10)+"' AND '"+Dtos(dDtTit+10)+"'"
 		cQrySE5 += " AND E5_TIPO = 'CRA' "
 		cQrySE5 += " AND E5_TIPODOC = 'VL' "
 		cQrySE5 += " AND D_E_L_E_T_ <> '*' "
