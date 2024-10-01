@@ -414,6 +414,9 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		cStFup		:= "3 - Em Andamento"
 	ElseIf cXStFup  == "4"
 		cStFup		:= "4 - Substituido"
+	ElseIf cXStatus  == "B"						//#7359
+		cStFup		:= "5 - Aprovado"			//#7359
+
 	Endif
 
 	oReport:IncMeter()
