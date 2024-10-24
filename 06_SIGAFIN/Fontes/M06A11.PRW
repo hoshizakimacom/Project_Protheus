@@ -139,7 +139,7 @@ User Function M06A11(cNumBor)
 			MV_PAR25 := '      '
 			MV_PAR26 := 'ZZZZZZ'
 		EndIf
-		MV_PAR30 := CTOD('01/01/01')
+		MV_PAR30 := CTOD('  /  /  ')
 		MV_PAR31 := CTOD('31/12/49')
 	EndIf
 
