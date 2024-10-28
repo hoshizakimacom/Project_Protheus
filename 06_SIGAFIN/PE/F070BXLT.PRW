@@ -1,4 +1,4 @@
-#Include "Protheus.ch"
+//#Include "Protheus.ch"
 
 /*/{Protheus.doc} F070BXLT
 PE para validação do contas a receber
@@ -6,7 +6,7 @@ PE para validação do contas a receber
 @author Renan Camargo
 @since 18/10/2024
 /*/
-User Function F070BXLT()
+/*/User Function F070BXLT()
 
 Local aArea := GetArea()
 Local cTipo := FwFieldGet("E1_TIPO")
@@ -24,3 +24,4 @@ EndIf
 RestArea(aArea)
 
 Return lRet 
+/*/
