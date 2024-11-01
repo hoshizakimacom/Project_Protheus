@@ -23,7 +23,7 @@ User Function A010TOK()
 
         // Valida URL
         If lRet .And. !Empty(M->B1_XURL)
-            If ! "www.acosmacom.com.br" $ M->B1_XURL
+            If ! "www.hoshizakimacom.com.br" $ M->B1_XURL //#7554 - Chamado Tierre
                 lRet := .F.
                 MsgInfo('URL inválida !','Atenção')
             EndIf
