@@ -78,6 +78,16 @@ Return lReturn
 
 //U_BusTpVen(cTpVen)
 
+//+------------------------------------------------------------------------------------------------
+//  Função chamada de incializador padrão na SB6 - Nome do Vendedor
+//+------------------------------------------------------------------------------------------------
+User Function BuscaVend()
+
+    Local cNomeven   := POSICIONE('SA3',1,XFILIAL('SA3') + POSICIONE('SF2',1,XFILIAL('SF2') + SB6->B6_DOC ,'F2_VEND1'),'A3_NOME')
+
+Return(cNomeven)
+
+
 User Function BusTpVen(cTpVen,cCampo)
 
 Local aArea      := GetArea()
