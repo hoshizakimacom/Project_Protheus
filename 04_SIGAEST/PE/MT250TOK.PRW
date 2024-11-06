@@ -13,7 +13,7 @@ Local cFamili	:= Posicione("SB1",1, xFilial("SB1") + M->D3_COD, "B1_XFAMILI")
 //+---------------------------------------+
 //|| Efetua validação de quantidade única |
 //+---------------------------------------+
-If M->D3_QUANT <> 1 .And. cFamili $ "000001|000002|000004"
+If M->D3_QUANT <> 1 .And. cFamili $ "000001|000002|000003|000004"		//7487 add. Mobiliário
 	MsgStop("Quantidade apontada deve ser igual a 1","ATENÇÃO")
 	lRet := .F.
 Endif
