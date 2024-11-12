@@ -19,7 +19,7 @@ Local cCargo	:= Posicione("SA3",1,xFilial("SA3")+cVende      , "A3_CARGO")  // C
 
 If cUser == cVende
 
-    If cCargo == "000100" .And. cRepre == '2'       // Validação de Representante Comercial #7534
+    If cCargo == "000091" .And. cRepre == '2'       // Validação de Representante Comercial #7534
 
         lRet := .F.
         MsgInfo('Produtonão localizado.' + CRLF + 'Verifique!',{cCodProd},'Atenção')
@@ -29,4 +29,3 @@ If cUser == cVende
 EndIf
 
 Return(lRet)
- 
