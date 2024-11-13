@@ -88,6 +88,28 @@ User Function BuscaVend()
 Return(cNomeven)
 
 
+// +------------------------------------------------------------+
+// | Impede o uso das operações 03 e 04, com uso exclusivo do   |
+// | setor de faturamento - Chamar função no X3_WHEN do campo no|
+// | pedido de vendas - Campos C6_PRODUTO e C6_OPER -           |
+// +------------------------------------------------------------+
+User function BloqProd()
+
+Local _lRet      := .T. //Variável utilizada para controle e validação do item do pedido
+Local cCodOper   := BuscAcols('C6_OPER')
+
+
+    Do Case 
+    Case cCodOper == "03" .and. !RetCodUsr() $ "000000|000131|000241|000690"
+        MsgStop('As operações 03 e 04 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
+		_lRet := .F.
+    Case cCodOper == "04" .and. !RetCodUsr() $ "000000|000131|000241|000690"
+        MsgStop('As operações 03, 04 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
+		_lRet := .F.  
+    EndCase
+Return _lRet
+
+
 User Function BusTpVen(cTpVen,cCampo)
 
 Local aArea      := GetArea()
