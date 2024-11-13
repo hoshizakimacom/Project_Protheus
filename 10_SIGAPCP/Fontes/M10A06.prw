@@ -337,6 +337,8 @@ Static Function M02EPrin(_cCodOpi,_nQtd,_cNumSer)
     	     _cClClima := "ST"
 		Case _cClClima == "4" // #4410
     	     _cClClima := "5" // #4410
+		Case _cClClima == "5" // #7629
+			 _cClClima := "3" // #7629
     EndCase
 
    Do Case 						//6033
