@@ -9,7 +9,7 @@ Static _cArqLog     := ''
 //+-------------------------------------------------------------------------------------------------
 User Function M05D03U()
     Local   _aSays          := {}
-    Local   _aButton        := {}
+    Local   _aButton        := {}   
     Local   _cTitulo        := FunName()
 
     AADD(_aSays,OemToAnsi("Esta rotina tem como objetivo alterar produtos a partir de um arquivo CSV."))
