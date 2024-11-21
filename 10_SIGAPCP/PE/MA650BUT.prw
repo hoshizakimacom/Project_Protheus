@@ -12,6 +12,6 @@ User Function MA650BUT()
 	Aadd(aRotina,{OemToAnsi('Gera Num. de Serie')		,'U_M10A03'		, 0 , 2})
 	Aadd(aRotina,{OemToAnsi('Consulta Num. de Serie')	,'U_M10A04'		, 0 , 2})
 	Aadd(aRotina,{OemToAnsi('Desvincula Op x Pv')       ,'U_M10A08'		, 0 , 2})
+	Aadd(aRotina,{OemToAnsi('Etq. Picking List')        ,'U_M10E06'		, 0 , 2})
 	
 Return AClone(aRotina)
-

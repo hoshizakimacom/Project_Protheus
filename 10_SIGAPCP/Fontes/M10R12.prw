@@ -2,12 +2,23 @@
 #Include 'RptDef.ch'
 #Include 'FWPrintSetup.ch
 #Include "TopConn.ch"
+#INCLUDE "Protheus.ch"
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 //| Relatório Pick - List
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 User Function M10R12()
+   
+   Private aEstru        := {}         //#7459
+   Private nX            := 0
+
     FWMsgRun(, {|| U_M10R12A() },'Picking - List','Gerando relatório...')
+/*
+    For nX:=1 to Len(aEstru)
+        FWMsgRun(, {|| U_M10E05() },'Picking - List','Gerando etiquetas...') //#7459
+    
+    Next nX
+*/
 Return
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -17,10 +28,10 @@ Local oPrinter     := Nil
 
 Local nRow         := -0070
 Local cData        := DtoC(Date()) + ' ' + Time()
-Local _cNumOP      := SC2->C2_NUM
-Local _nQtdOP      := SC2->C2_QUANT
-Local _cCodProd    := SC2->C2_PRODUTO
-Local nPage        := 1
+Private _cNumOP      := SC2->C2_NUM                 //#7459
+Private _nQtdOP      := SC2->C2_QUANT               //#7459
+Private _cCodProd    := SC2->C2_PRODUTO             //#7459
+Private nPage        := 1
 Private oFont9     := TFont():New('Arial',,9)
 Private oFont12    := TFont():New('Arial',,12)
 Private oFont12B   := TFont():New('Arial',,12,.T.,.T.)
@@ -53,14 +64,13 @@ Return
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 Static Function M10RIItens(oPrinter,oFont9,oFont12,oFont12B,nRow,nPage,cData,_cNumOP,_nQtdOP,_cCodProd)
 
-Local aEstru        := {}
-Local cQuery        := ''
-Local _nRegSg1      := 0
-
-Local nColBar       := 2.3    
-Local nRowStep      := 25
-Local nRowBar       := 60 //9.5
-Local nX            := 0
+//Private aEstru    := {}         //#7459
+Private cQuery      := ''         //#7459
+Private _nRegSg1    := 0
+Private nColBar     := 2.3    
+Private nRowStep    := 25
+Private nRowBar     := 60 //9.5
+Private nX          := 0
 Private nEstru      := 0
 Private cAnsul      := " "
 Private nPagina     := 0
@@ -307,3 +317,7 @@ oPrinter:Say(nRow                ,2970                ,'C.B. QTD'             ,o
 //  oPrinter:Say(nRow            ,3060                ,'ANSUL'                ,oFont12B)
 
 Return
+
+//+------------------------------------------------------------------------------------------------------------------------------------------------------
+// Impressão Etiqueta ZEBRA
+//+------------------------------------------------------------------------------------------------------------------------------------------------------
