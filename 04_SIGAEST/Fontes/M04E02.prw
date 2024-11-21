@@ -352,7 +352,7 @@ Static Function M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_c
 		//+-------------------------------------------------------------------------
 
 		_oPrinter:SayBitMap( _nRow - 10, _nColIni + 40,GetSrvProfString("Startpath","") + "M10E001.bmp",60 * 3.5 ,17 * 3.5)
-		_oPrinter:Say(_nRow + 20,_nCol03,'AÇOS MACOM IND. COM. LTDA',_oFontP1)
+		_oPrinter:Say(_nRow + 20,_nCol03,'HOSHIZAKI MACOM LTDA',_oFontP1)
 
 		_nRow += _nNextLin * 1.7
 
@@ -423,7 +423,7 @@ Static Function M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_c
 		_nRow += _nNextLin * 0.8									//#5006
 
 		_oPrinter:Say(_nRow,_nColIni,'FGQ-FB-009',_oFontP1)			//#5006
-		_oPrinter:Say(_nRow,_nCol04 + 150,'REV.:00',_oFontP1)		//#5006
+		_oPrinter:Say(_nRow,_nCol04 + 150,'REV.:01',_oFontP1)		//#5006
 
 		//_oPrinter:FWMSBAR('CODE128',17.5/*nRow*/,1/*nCol*/,_cNum,_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, /*0.025 nWidth*/,0.7/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,0.5,0.5,/*lCmtr2Pix*/)
 

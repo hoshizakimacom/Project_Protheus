@@ -156,11 +156,11 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 	Endif
 	
 	_oPrinter:Say(_nRow + 430,_nCol01 + 70,  DTOC(dDataBase) ,_oFontM)
-	_oPrinter:Say(_nRow + 430,_nCol03 + 56, "Aços Macom Ind. e Com. Ltda",_oFontM)
+	_oPrinter:Say(_nRow + 430,_nCol03 + 56, "HOSHIZAKI MACOM Ltda",_oFontM)
 	_oPrinter:Say(_nRow + 460,_nCol01 + 70,'FGQ-FB-012',_oFontP) // #5006
 
 	//_oPrinter:Say(_nRow + 460,_nCol03 + 415,'FGQ-056',_oFontP)	#5006
-	_oPrinter:Say(_nRow + 460,_nCol03 + 415,'REV.:00',_oFontP) // 	#5006
+	_oPrinter:Say(_nRow + 460,_nCol03 + 415,'REV.:01',_oFontP) // 	#5006
 	
 	_oPrinter:SetDevice(IMP_SPOOL)
 	_oPrinter:cPrinter 		:= 'ZEBRA'

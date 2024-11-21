@@ -208,7 +208,7 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 
 		_oPrinter:SayBitMap( _nRow -40 , 50 ,GetSrvProfString("Startpath","") + "M10E001.bmp", 100 * 4.0 , 30 * 4.0)
 		_oPrinter:Say(_nRow + 100 , 70 , "Grupo HOSHIZAKI",_oFontMI)
-		_oPrinter:Say(_nRow ,800 , "Aços Macom Ind. e Com. Ltda",_oFontP)
+		_oPrinter:Say(_nRow ,800 , "HOSHIZAKI MACOM Ltda",_oFontP)
 		_oPrinter:Say(_nRow += _nNextLin ,800 , "CNPJ: 43.553.668/0001-79",_oFontP)
 		_oPrinter:Say(_nRow + _nNextLin ,800 , "Telefone: (011) 2085-7000",_oFontP)
 		_oPrinter:Say(_nRow + 140 ,70, "Modelo: ",_OFontP)
@@ -226,7 +226,7 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 		_oPrinter:QrCode(625,810,_cQRCode, 070)
 
 		_oPrinter:Say(_nRow + 505 , 270, Alltrim(_cNumSer),_OFontGG) //525
-		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-025 Rev.00", _OFontP)
+		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-025 Rev.01", _OFontP)
 		
 		If _cINMETRO =="1"
 			_oPrinter:SayBitMap( _nRow + 260, 1080 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 60 * 2.5 , 60 * 2.5)

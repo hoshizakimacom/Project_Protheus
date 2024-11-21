@@ -392,7 +392,7 @@ Static Function M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_c
 	//+-------------------------------------------------------------------------
 
 	_oPrinter:SayBitMap( _nRow - 10, _nColIni + 40,GetSrvProfString("Startpath","") + "M10E001.bmp",60 * 3.5 ,17 * 3.5)
-	_oPrinter:Say(_nRow + 20,_nCol03,'AÇOS MACOM IND. COM. LTDA',_oFontP1)
+	_oPrinter:Say(_nRow + 20,_nCol03,'HOSHIZAKI MACOM LTDA',_oFontP1)
 
 	_nRow += _nNextLin * 1.7
 
