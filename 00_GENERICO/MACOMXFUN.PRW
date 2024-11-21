@@ -104,8 +104,14 @@ Local cCodOper   := BuscAcols('C6_OPER')
         MsgStop('As operações 03 e 04 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
 		_lRet := .F.
     Case cCodOper == "04" .and. !RetCodUsr() $ "000000|000131|000241|000690"
-        MsgStop('As operações 03, 04 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
-		_lRet := .F.  
+        MsgStop('As operações 03 e 04 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
+		_lRet := .F.
+    Case cCodOper == "07" .and. !RetCodUsr() $ "000000|000131|000241|000385|000095|000332|000587|000467"
+        MsgStop('As operações 07 e 08 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
+		_lRet := .F.
+    Case cCodOper == "08" .and. !RetCodUsr() $ "000000|000131|000241|000385|000095|000332|000587|000467"
+        MsgStop('As operações 07 e 08 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
+		_lRet := .F.     
     EndCase
 Return _lRet
 
