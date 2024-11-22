@@ -148,8 +148,8 @@ Static Function M04EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 		_oPrinter:Say(_nRow + 85 ,_nCol01 + 150 , "Grupo HOSHIZAKI",_oFontMI)
 		_oPrinter:Say(_nRow + 85 ,_nCol01 + 1550 , "Grupo HOSHIZAKI",_oFontMI)
 	
-		_oPrinter:Say(_nRow ,_nCol02 , "Aços Macom Ind. e Com. Ltda",_oFontM)
-		_oPrinter:Say(_nRow ,_nCol03 + 95 , "Aços Macom Ind. e Com. Ltda",_oFontM)
+		_oPrinter:Say(_nRow ,_nCol02 , "HOSHIZAKI MACOM Ltda",_oFontM)
+		_oPrinter:Say(_nRow ,_nCol03 + 95 , "HOSHIZAKI MACOM Ltda",_oFontM)
 	
 		_oPrinter:Say(_nRow + _nNextLin ,_nCol02 , "CNPJ: 43.553.668/0001-79",_oFontM)
 		_oPrinter:Say(_nRow + _nNextLin ,_nCol03 + 95 , "CNPJ: 43.553.668/0001-79",_oFontM)
@@ -187,8 +187,8 @@ Static Function M04EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 		//_oPrinter:Say(_nRow + _nNextLin + 980 ,_nCol01 + 75 , "FGQ-009 Rev.01",_oFontM)	#5006
 		//_oPrinter:Say(_nRow + _nNextLin + 980 ,_nCol01 + 1520 , "FGQ-009 Rev.01",_oFontM)	#5006
 
-		_oPrinter:Say(_nRow + _nNextLin + 970 ,_nCol01 + 75 , "FGQ-FB-011 Rev.00",_oFontM)		//#5006
-		_oPrinter:Say(_nRow + _nNextLin + 970 ,_nCol01 + 1520 , "FGQ-FB-011 Rev.00",_oFontM)	//#5006
+		_oPrinter:Say(_nRow + _nNextLin + 970 ,_nCol01 + 75 , "FGQ-FB-011 Rev.01",_oFontM)		//#5006
+		_oPrinter:Say(_nRow + _nNextLin + 970 ,_nCol01 + 1520 , "FGQ-FB-011 Rev.01",_oFontM)	//#5006
 
 		_oPrinter:Say(_nRow + _nNextLin + 970 ,_nCol01 + 955 , "MANUAL ONLINE",_oFontP)
 		_oPrinter:Say(_nRow + _nNextLin + 970 ,_nCol01 + 2355 , "MANUAL ONLINE",_oFontP)

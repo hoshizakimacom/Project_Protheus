@@ -128,8 +128,8 @@ Static Function M04EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 	_oPrinter:Say(_nRow + 85 ,_nCol01 + 150 , "Grupo HOSHIZAKI",_oFontMI)
 	_oPrinter:Say(_nRow + 85 ,_nCol01 + 1550 , "Grupo HOSHIZAKI",_oFontMI)
 	
-	_oPrinter:Say(_nRow ,_nCol02 , "Aços Macom Ind. e Com. Ltda",_oFontM)
-	_oPrinter:Say(_nRow ,_nCol03 + 95 , "Aços Macom Ind. e Com. Ltda",_oFontM)
+	_oPrinter:Say(_nRow ,_nCol02 , "HOSHIZAKI MACOM Ltda",_oFontM)
+	_oPrinter:Say(_nRow ,_nCol03 + 95 , "HOSHIZAKI MACOM Ltda",_oFontM)
 	
 	_oPrinter:Say(_nRow + _nNextLin ,_nCol02 , "CNPJ: 43.553.668/0001-79",_oFontM)
 	_oPrinter:Say(_nRow + _nNextLin ,_nCol03 + 95 , "CNPJ: 43.553.668/0001-79",_oFontM)

@@ -149,7 +149,7 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 
 		_oPrinter:SayBitMap( _nRow -40 , 50 ,GetSrvProfString("Startpath","") + "M10E001.bmp", 100 * 4.0 , 30 * 4.0)
 		_oPrinter:Say(_nRow + 100 , 70 , "Grupo HOSHIZAKI",_oFontMI)
-		_oPrinter:Say(_nRow ,800 , "Aços Macom Ind. e Com. Ltda",_oFontP)
+		_oPrinter:Say(_nRow ,800 , "HOSHIZAKI MACOM Ltda",_oFontP)
 		_oPrinter:Say(_nRow += _nNextLin ,800 , "CNPJ: 43.553.668/0001-79",_oFontP)
 		_oPrinter:Say(_nRow + _nNextLin ,800 , "Telefone: (011) 2085-7000",_oFontP)
 		_oPrinter:Say(_nRow + 140 ,70, "Modelo: ",_OFontP)
@@ -180,7 +180,7 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 		_oPrinter:Say(_nRow + 645 , 70, _cDescPro2 ,_OFontP)
 		_oPrinter:Say(_nRow + 685 , 70, "FGQ-FB-008" ,_OFontP) 			//#5006
 		//_oPrinter:Say(_nRow + 685 , 1030, "FGQ-008 Rev.01" ,_OFontP)	//#5006
-		_oPrinter:Say(_nRow + 685 , 1030, "REV.:00" ,_OFontP)			//#5006
+		_oPrinter:Say(_nRow + 685 , 1030, "REV.:01" ,_OFontP)			//#5006
 		/*If _cFamilia == "000001"
 			_oPrinter:Say(_nRow + 605 , 70, "Fluído Refrigerante: " + IIF(_cTpFluido == "1", "R134a", "R404A")  ,_OFontP)
 			_oPrinter:Say(_nRow + 645 , 70, "Carga de Fluído: g", _OFontP)
