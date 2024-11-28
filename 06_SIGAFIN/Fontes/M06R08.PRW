@@ -122,6 +122,8 @@ TRCell():New(oVenProd,"TOTALPG"		,/*Tabela*/	,"Total Pago"	 		,PesqPict("SF2","F
 TRCell():New(oVenProd,"PERCPAG"		,/*Tabela*/	,"% Pago"	 			,PesqPict("SF2","F2_VALBRUT")	,TamSx3("F2_VALBRUT")[1]	,/*lPixel*/,{|| nPerPago })		// Percentual pago do pedido
 TRCell():New(oVenProd,"ENTREGA"		,/*Tabela*/ ,"Data de Embarque"		,PesqPict("SC5","C5_FECENT")	,TamSx3("C5_FECENT")[1]		,/*lPixel*/,{|| dDataEnt })		// Data de embarque
 TRCell():New(oVenProd,"STATUS"		,/*Tabela*/ ,"Status"			 	,PesqPict("SC5","C5_XSTSFIN")	,TamSx3("C5_XSTSFIN")[1]	,/*lPixel*/,{|| cStatus	 })		// Status de Pagamento
+TRCell():New(oVenProd,"APROVADOR"	,/*Tabela*/ ,"Aprovador Data"	 	,PesqPict("SC5","C5_XAPVFIN")	,TamSx3("C5_XAPVFIN")[1]	,/*lPixel*/,{|| cAprovad })		// Aprovador Data 			#7706
+TRCell():New(oVenProd,"DTAPRVFIN"	,/*Tabela*/ ,"DT Aprov. Fin."	 	,PesqPict("SC5","C5_XDTAPFN")	,TamSx3("C5_XDTAPFN")[1]	,/*lPixel*/,{|| dDataApv })		// Data Aprv. Financeira 	#7706
 
 Return(oReport)
 
@@ -164,7 +166,7 @@ dbSelectArea("SC5")		// Pedido de Venda
 dbSetOrder(1)			// Filial+Numero
 #IFDEF TOP
 	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³Query do relatório da secao 1                                           ³
+	//³Query do relatório da secao 01                                           ³
 	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 	oReport:Section(1):BeginQuery()	
 
@@ -172,14 +174,16 @@ dbSetOrder(1)			// Filial+Numero
 
 		SELECT 
 			C5_FILIAL,C5_NUM,C5_CLIENTE,C5_LOJACLI,C5_VEND1,C5_FECENT,C5_EMISSAO,
-			C5_XPCONPG,C5_XSTSFIN,C5_CONDPAG,C5_NOTA,C5_LIBEROK,C5_BLQ
+			C5_XPCONPG,C5_XSTSFIN,C5_XAPVFIN,C5_XDTAPFN,C5_CONDPAG,C5_NOTA,C5_LIBEROK,C5_BLQ
 		FROM 
 			%Table:SC5% SC5
 		WHERE 
 			SC5.C5_EMISSAO >= %Exp:MV_PAR01% AND
 			SC5.C5_EMISSAO <= %Exp:MV_PAR02% AND
-			SC5.C5_NUM >= %Exp:MV_PAR03% AND
-			SC5.C5_NUM <= %Exp:MV_PAR04% AND
+			SC5.C5_XDTAPFN >= %Exp:MV_PAR03% AND
+			SC5.C5_XDTAPFN <= %Exp:MV_PAR04% AND
+			SC5.C5_NUM >= %Exp:MV_PAR07% AND
+			SC5.C5_NUM <= %Exp:MV_PAR08% AND
 			SC5.C5_CLIENTE NOT IN ('002953') AND
 			SC5.%NotDel%
 		ORDER BY SC5.C5_NUM
@@ -259,6 +263,8 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cStatus		:= (cAliasQry)->C5_XSTSFIN
 	dDataEnt	:= (cAliasQry)->C5_FECENT
 	nPerPago	:= (nVlrPago / nVlrPedt) * 100
+	cAprovad	:= (cAliasQry)->C5_XAPVFIN //#7706
+	dDataApv	:= (cAliasQry)->C5_XDTAPFN //#7706
 	cDescPgto	:= Posicione('SE4',1,xFilial('SE4')+(cAliasQry)->C5_CONDPAG,'E4_DESCRI')
 	cCodVend	:= Posicione('SA3',1,xFilial('SA3')+(cAliasQry)->C5_VEND1,'A3_COD')
 	cNomVend 	:= Posicione('SA3',1,xFilial('SA3')+(cAliasQry)->C5_VEND1,'A3_NOME')
