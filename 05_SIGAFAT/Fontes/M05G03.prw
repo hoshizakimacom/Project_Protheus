@@ -141,7 +141,7 @@ Static Function MG04GetCta()
     Case _cTipo == 'BN'         // Beneficiamento
         _cConta := '1140100011'
     
-    Case _cTipo == 'SB'         // Serviço de Beneficiamento/Industrialização   //#7732
+    Case _cTipo == 'SB'         // Serviço de Beneficiamento/Industrialização  //#7732
         _cConta := '1140100011'
 
     Case _cTipo == 'ME'         // Mercadoria
