@@ -140,6 +140,9 @@ Static Function MG04GetCta()
 
     Case _cTipo == 'BN'         // Beneficiamento
         _cConta := '1140100011'
+    
+    Case _cTipo == 'SB'         // Serviço de Beneficiamento/Industrialização   //#7732
+        _cConta := '1140100011'
 
     Case _cTipo == 'ME'         // Mercadoria
         _cConta := '1140100005'
@@ -152,6 +155,9 @@ Static Function MG04GetCta()
 
     Case _cTipo == 'PA'         // Produto Acabado
         _cConta := '1140100007'
+    
+    Case _cTipo == 'PP'         // Produto em Processo
+        _cConta := '1140100007'                                                 //#7732
 
     Case _cTipo == 'PI'         // Produto intermediário
         _cConta := '1140100008'
