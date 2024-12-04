@@ -282,10 +282,10 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		Alert("CFOP inválido : " + (cAliasQry)->D2_CF)
 	Endif
 
-	cXrede	:= SA1->A1_XREDE
-	cXsegm	:= SA1->A1_XSEGM
-	cReddes	:= POSICIONE("ZA6",1,xFilial("ZA6")+SA1->A1_XREDE,"ZA6_DESC")
-	cSegmde	:= POSICIONE("ZA8",1,xFilial("ZA8")+SA1->A1_XSEGM,"ZA8_DESC")
+	//cXrede	:= Posicione("SA1",1,xFilial("SA1")+SA1->A1_XREDE,"A1_XREDE")						//#7746
+	//cXsegm	:= Posicione("SA1",1,xFilial("SA1")+SA1->A1_XSEGM,"A1_XSEGM")						//#7746
+	//cReddes	:= POSICIONE("ZA6",1,XFILIAL("ZA6")+SA1->A1_XREDE,"ZA6_DESC") 	//#7746                                                                     
+	//cSegmde	:= POSICIONE("ZA8",1,xFilial("ZA8")+SA1->A1_XSEGM,"ZA8_DESC")	//#7746
 
 	lPosB1 	:= SB1->(MsSeek(xFilial("SB1")+(cAliasQry)->D2_COD))
 	lPosA1	:= SA1->(MsSeek(xFilial("SA1")+(cAliasQry)->D2_CLIENTE))
@@ -361,9 +361,13 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	If lPosA1
 		cNomeCli    := SA1->A1_NOME
 		cRegiao     := SA1->A1_DSCREG
+		cXrede	    := SA1->A1_XREDE
+		cXsegm      := SA1->A1_XSEGM
 	Else
         cNomeCli    := ""
         cRegiao     := ""
+		cXrede	    := SA1->A1_XREDE
+		cXsegm      := SA1->A1_XSEGM
 	Endif
 
 	If lPosC5
@@ -386,6 +390,8 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
         cNoVend2    := POSICIONE('SA3',1,XFILIAL('SA3') + SC5->C5_VEND2 ,'A3_NOME')
         cDescTab    := POSICIONE('DA0',1,XFILIAL('DA0') + SC5->C5_TABELA,'DA0_DESCRI')
         nPrcTab     := POSICIONE('DA1',2,XFILIAL('DA1') + (cAliasQry)->D2_COD + SC5->C5_TABELA,'DA1_PRCVEN')
+		cReddes	:= POSICIONE("ZA6",1,XFILIAL("ZA6")+SA1->A1_XREDE,"ZA6_DESC")                                                                    
+		cSegmde	:= POSICIONE("ZA8",1,xFilial("ZA8")+SA1->A1_XSEGM,"ZA8_DESC")
 
         /*
         If SC5->C5_XTPVEN == '1'
