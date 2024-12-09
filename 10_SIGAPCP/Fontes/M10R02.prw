@@ -4,15 +4,16 @@
 	//	Relatório de Pesquisa Fábrica
 //+------------------------------------------------------------------------
 User Function M10R02()
-	Local _oReport		:= Nil	
-	Local _cPerg  		:= 'M10R02    '
-	Local _lOk				:= .F.
+	Local _oReport	:= Nil	
+	Local _cPerg  	:= 'M10R02    '
+	Local _lOk		:= .F.
 
 	AtuSX1(_cPerg)
 
 	_lOk := M0RValid()
 
-	If _lOk .And. FindFunction('TRepInUse') .And. TRepInUse(.F.)	//verifica se relatorios personalizaveis esta disponivel
+//	If _lOk .And. FindFunction('TRepInUse') .And. TRepInUse(.F.)	//verifica se relatorios personalizaveis esta disponivel
+	If _lOk    //.And. FindFunction('TRepInUse') .And. TRepInUse(.F.)	//verifica se relatorios personalizaveis esta disponivel
 		If Pergunte(_cPerg, .T.)
 			_oReport := ReportDef(_oReport, _cPerg)
 			_oReport:PrintDialog()
@@ -22,6 +23,7 @@ Return
 
 //+------------------------------------------------------------------------
 Static Function ReportDef(_oReport, _cPerg)
+
 	Local _cTitle  	:= 'Relatório de Pesquisa Fábrica'
 	Local _cHelp   	:= 'Permite gerar relatório de Pesquisa Fábrica'
 	Local _cAlias  	:= GetNextAlias()
@@ -58,37 +60,28 @@ Static Function ReportDef(_oReport, _cPerg)
 	TRCell():New(_oOP,'PCP_S'			, _cAlias)		// PCP_S
 	TRCell():New(_oOP,'PRO_E'			, _cAlias)		// PRO_E 
 	TRCell():New(_oOP,'PRO_S'			, _cAlias)		// DATA_LIBERACAO ALTERADO CHAMADO 975
-	
 	TRCell():New(_oOP,'SEP_E'			, _cAlias)		// SEP-E	#5175
 	TRCell():New(_oOP,'SEP_S'			, _cAlias)		// SEP-S	#5175
-
 	TRCell():New(_oOP,'CPC_E'			, _cAlias)		// CPC-E
 	TRCell():New(_oOP,'CPC_S'			, _cAlias)		// CPC-S
-	
 	TRCell():New(_oOP,'DOB_E'			, _cAlias)		// DOB-E	#5175
 	TRCell():New(_oOP,'DOB_S'			, _cAlias)		// DOB-S	#5175
-	
 	TRCell():New(_oOP,'TRI_E'			, _cAlias)		// PER_E 	#4542	#5175 TRI_E
 	TRCell():New(_oOP,'TRI_S'			, _cAlias)		// PER_S 	#4542	#5175 TRI_S
-	
 	TRCell():New(_oOP,'PER_E'			, _cAlias)		// PER_E 	#5175
 	TRCell():New(_oOP,'PER_S'			, _cAlias)		// PER_S 	#5175
-	
 	TRCell():New(_oOP,'MON_E'			, _cAlias)		// MON-E
 	TRCell():New(_oOP,'MON_S'			, _cAlias)		// MON-S
 	TRCell():New(_oOP,'INS_E'			, _cAlias)		// QUA_E	#4542
 	TRCell():New(_oOP,'INS_S'			, _cAlias)		// QUA_S	#4542
 	TRCell():New(_oOP,'EMB_E'			, _cAlias)		// EMB_E 	#4226
 	TRCell():New(_oOP,'EMB_S'			, _cAlias)		// EMB_S	#4226
-
 	TRCell():New(_oOP,'SUP_E'			, _cAlias)		// SUP_E 	#5175
 	TRCell():New(_oOP,'SUP_S'			, _cAlias)		// SUP_S 	#5175
-
-
 	TRCell():New(_oOP,'STATUS'			, _cAlias)		// STATUS
 	TRCell():New(_oOP,'VALOR'			, _cAlias)		// VALOR
-
 	TRCell():New(_oOP,'PICKINGLIST'		, _cAlias)		// PICKING LIST	#5706	
+	TRCell():New(_oOP,'DTENCER'			, _cAlias)		// DT.ENCERR
 
 	_oOP:oReport:cFontBody 			:= 'Calibri'
 	_oOP:oReport:nFontBody			:= 11
@@ -112,7 +105,8 @@ Static Function ReportPrint(_oReport,_cAlias)
 		_oReport:Section(1):Cell('MEDIDAS'			):SetBlock( {||CValToChar((_cAlias)->B5_COMPRLC) + 'x' + CValToChar((_cAlias)->B5_LARGLC) + 'x' + CValToChar((_cAlias)->B5_ALTURLC)						})
 		_oReport:Section(1):Cell('MEDIDAS'			):SetBlock( {||CValToChar((_cAlias)->B5_COMPRLC) + 'x' + CValToChar((_cAlias)->B5_LARGLC) + 'x' + CValToChar((_cAlias)->B5_ALTURLC)						})
 		_oReport:Section(1):Cell('CHAVE'			):SetBlock( {|| SubStr((_cAlias)->OF,1,6) + ';' + SubStr((_cAlias)->OF,7,2) 						})
-		_oReport:Section(1):Cell('STATUS'			):SetBlock( {|| IIF((_cAlias)->QTDE - (_cAlias)->QUJE == 0,'ENCERRADA','ABERTA')   })
+//		_oReport:Section(1):Cell('STATUS'			):SetBlock( {|| IIF((_cAlias)->QTDE - (_cAlias)->QUJE == 0,'ENCERRADA','ABERTA')   })
+		_oReport:Section(1):Cell('STATUS'			):SetBlock( {|| IF(!Empty((_cAlias)->DTENCER),'ENCERRADA','ABERTA')   })
 		_oReport:Section(1):PrintLine()
 
 		_oReport:IncMeter()
@@ -132,6 +126,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 		BeginSQL Alias _cAlias
 			Column DATA_		 		as Date
 			Column PRAZO		 		as Date
+			Column DTENCER				as Date
 			Column EMISSAO_OP	 		as Date
 			Column ENG_S 				as Date
 			Column DATA_PRG 			as Date
@@ -157,9 +152,8 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 			Column EMB_S				as Date // #4226
 			Column SUP_E 				as Date	//#5175
 			Column SUP_S 				as Date	//#5175
-
 			Column EXPEDICAO 			as Date
-
+			Column DTENCER		 		as Date
 
 			SELECT
 					CASE //0002 #3881
@@ -226,14 +220,13 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,C2_XOBSENG                                     AS DESC_OF
 					,C2_XENGUSS										AS USR_ENG_SAI
 					,C6_VALOR										AS VALOR
-					
+					,C2_DATRF										AS DTENCER
 					
 					,CASE
 						WHEN B1_XPICLIS = '1'THEN '1 - SIM'
 						WHEN B1_XPICLIS = '2' THEN '2 - NÃO'
 						ELSE 'NÃO INDICADO'
 					END AS PICKINGLIST
-
 
 			FROM %Table:SC2% SC2
 
@@ -271,16 +264,19 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				AND C2_NUM + C2_ITEM + C2_SEQUEN + C2_ITEMGRD 		BETWEEN %Exp:MV_PAR01% AND %Exp:MV_PAR02%
 				AND C2_EMISSAO 	BETWEEN %Exp:MV_PAR03% AND %Exp:MV_PAR04%
 				// Abertas
-				AND C2_TPOP = 'F'
+//				AND C2_TPOP = 'F'
 				AND C2_DATRF = ''
-				AND C2_QUJE < C2_QUANT 
+//				AND C2_QUJE < C2_QUANT 
 
 				ORDER BY 'OF'
 		EndSql
+
 	ElseIf MV_PAR05 = 2 // Fechadas
+
 		BeginSQL Alias _cAlias
 			Column DATA_		 		as Date
 			Column PRAZO		 		as Date
+			Column DTENCER				as Date
 			Column EMISSAO_OP	 		as Date
 			Column ENG_S 				as Date
 			Column DATA_PRG 			as Date
@@ -306,10 +302,9 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 			Column EMB_S				as Date // #4226
 			Column SUP_E 				as Date	//#5175
 			Column SUP_S 				as Date	//#5175
-
-
 			Column EXPEDICAO 			as Date
-			
+			Column DTENCER		 		as Date
+
 			SELECT
 					CASE 														//0002 #3881
 						WHEN C5_XTPVEN = '1' THEN '1 - PROJETO'			
@@ -376,7 +371,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,C2_XOBSENG                                     AS DESC_OF
 					,C2_XENGUSS										AS USR_ENG_SAI
 					,C6_VALOR										AS VALOR
-
+					,C2_DATRF										AS DTENCER
 					
 					,CASE
 						WHEN B1_XPICLIS = '1' THEN '1 - SIM'
@@ -421,12 +416,13 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				AND C2_NUM + C2_ITEM + C2_SEQUEN + C2_ITEMGRD 		BETWEEN %Exp:MV_PAR01% AND %Exp:MV_PAR02%
 				AND C2_EMISSAO 	BETWEEN %Exp:MV_PAR03% AND %Exp:MV_PAR04%
 				
-				AND C2_TPOP = 'F'
+//				AND C2_TPOP = 'F'
 				AND C2_DATRF <> ''
-				AND C2_QUANT - C2_QUJE = 0
+//				AND C2_QUANT - C2_QUJE = 0
 
 				ORDER BY 'OF'
 		EndSql
+
 	Else
 		BeginSQL Alias _cAlias
 			
@@ -458,6 +454,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 			Column SUP_E 				as Date	//#5175
 			Column SUP_S 				as Date	//#5175
 			Column EXPEDICAO 			as Date
+			Column DTENCER		 		as Date
 
 			SELECT
 					CASE //0002 #3881
@@ -525,7 +522,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,C2_XOBSENG                                     AS DESC_OF
 					,C2_XENGUSS										AS USR_ENG_SAI
 					,C6_VALOR										AS VALOR
-
+					,C2_DATRF										AS DTENCER
 					
 					,CASE
 						WHEN B1_XPICLIS = '1' THEN '1 - SIM'
