@@ -3,11 +3,12 @@
 #Include 'FWPrintSetup.ch'
 #include 'TBICONN.ch'
 
-User Function A650LGVEN() // Bloqueio da Geração de OP
+User Function A650PRCPV() // Valida marcação de item na tela de pedidos de venda
+
 
 Local aArea         := GetArea()
 Local aAreaSB1      := SB1->(GetArea())
-Local cVermelha     := ""
+Local lRet          := .T.
 Local _cItDese      := ""
 Local _cPdf         := ""
 Local _cDxf         := ""
@@ -27,11 +28,11 @@ _cMaoOb       := SB1->B1_XMDOBRA
 _cTipoPrd     := SB1->B1_TIPO
 
 If _cItDese <> "S" .Or. _cPdf <> "1" .Or. Empty(_cDxf) .Or. _cEstru <> "1" .Or. _cMaoOb <> "1" .Or. _cTipoPrd == "ME"
-    cVermelha := "X"
+    lRet := .F.
     MsgAlert("Produto com pendências da Engenharia", "Aviso")
 EndIf
 
 RestArea(aAreaSB1)
 RestArea(aArea)
 
-Return (cVermelha)
+Return (lRet)
