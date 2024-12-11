@@ -1,4 +1,4 @@
-#INCLUDE "TOTVS.CH"
+#INCLUDE 'TOTVS.CH'
 #Include 'RptDef.ch'
 #Include 'FWPrintSetup.ch'
 #include 'TBICONN.ch'
@@ -15,25 +15,27 @@ Local _cEstru  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESTR")
 Local _cMaoOb  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XMDOBRA")
 Local _cTipoPrd := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_TIPO")
 
-    If( 
-        _cItDese <> "S" .Or. 
-        _cPdf <> "1"    .Or. 
-        Empty(_cDxf)    .Or. 
-        _cEstru <> "1"  .Or. 
-        _cMaoOb <> "1"  .Or. 
-        _cTipoPrd == "ME"  ,' ','X')
+
+/*
+    If  _cItDese <> "S" .Or.     _cPdf <> "1"    .Or.     Empty(_cDxf)    .Or.     _cEstru <> "1"  .Or.     _cMaoOb <> "1"  .Or.     _cTipoPrd == "ME"
 
         MsgAlert("Produto com pendências da Engenharia", "Aviso")
-    
     Endif
-    Return (cVermelha)
+
+    Return (cVermelha) := 'X'
+*/
+
+/*
+    If _cItDese <> "S" .Or. _cPdf <> "1" .Or. Empty(_cDxf) .Or. _cEstru <> "1" .Or. _cMaoOb <> "1" .Or. _cTipoPrd == "ME"
+        // Destacar o item com legenda em vermelho
+        cVermelha := "X"
     
-    /*
-    cVermelha  := "If(_cPdf         <> "1"  ,' ','X')" Return (cVermelha)
-    cVermelha  := "If(Empty(_cDxf)          ,' ','X')" Return (cVermelha)
-    cVermelha  := "If(_cEstru       <> "1"  ,' ','X')" Return (cVermelha)
-    cVermelha  := "If(_cMaoOb       <> "1"  ,' ','X')" Return (cVermelha)
-    cVermelha  := "If(_cTipoPrd     == "ME" ,' ','X')" Return (cVermelha)
+        MsgAlert("Produto com pendências da Engenharia", "Aviso")
+    EndIf
 
     Return (cVermelha)
+*/
 
+
+"C2_PRODUTO"cVermelha  := "If(_cItDese <> 'S',' ','X')"
+Return (cVermelha)
