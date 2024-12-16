@@ -161,7 +161,9 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
     	Case _cPdeGelo == "3"	//6386
     		 _cPdeGelo := "500W" 
 		Case _cPdeGelo == "4"	//6633
-			 _CPdeGelo := "300W"  	
+			 _CPdeGelo := "300W"
+		Case _cPdeGelo == "4"	//7835
+			 _cPdeGelo := "250W"   	
     EndCase
 
 	
@@ -187,6 +189,8 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
     		 _cTensao := "115V ~ 1"
     	Case _cTensao == "6"			//5078
     		 _cTensao := "380V ~ 3N"	//5078
+		Case _cTensao == "7"			//7835
+    		 _cTensao := "220-240V ~ 1"	//7835
     EndCase
 
 	Do Case 
