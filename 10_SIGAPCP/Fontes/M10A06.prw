@@ -342,8 +342,16 @@ Static Function M02EPrin(_cCodOpi,_nQtd,_cNumSer)
     EndCase
 
    Do Case 						//6033
-    	Case _cPdeGelo == "1"
-    		 _cPdeGelo := "150W" 
+   		Case _cPdeGelo == "1"
+    		 _cPdeGelo := "150W"   
+    	Case _cPdeGelo == "2"	//6386
+    		 _cPdeGelo := "400W"    	
+    	Case _cPdeGelo == "3"	//6386
+    		 _cPdeGelo := "500W" 
+		Case _cPdeGelo == "4"	//6633
+			 _CPdeGelo := "300W"
+		Case _cPdeGelo == "5"	//7835
+			 _cPdeGelo := "250W"  
 	EndCase
     
     Do Case
@@ -368,6 +376,8 @@ Static Function M02EPrin(_cCodOpi,_nQtd,_cNumSer)
     		 _cTensao := "115V ~ 1"
 	   	Case _cTensao == "6"			//5078
     		 _cTensao := "380V ~ 3N"	//5078
+		Case _cTensao == "7"			//7835
+    		 _cTensao := "220-240V ~ 1"	//7835
     EndCase
 
 	Do Case 
@@ -411,7 +421,7 @@ Static Function M02EPrin(_cCodOpi,_nQtd,_cNumSer)
 		_oPrinter:Say(_nRow + 450 , 70, "BCode Serial: " ,_OFontP)
 		_oPrinter:FWMSBAR('CODE128',12.4/*nRow*/,6/*nCol*/,AllTrim(_cNumSer),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/)
 		_oPrinter:Say(_nRow + 505 , 270, Alltrim(_cNumSer),_OFontGG)
-		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-025 Rev.01", _OFontP) /**#7666**/
+		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-FB-008 Rev.01", _OFontP) /**#7666**/
 		
 		If _cINMETRO =="1"
 			_oPrinter:SayBitMap( 500, 800 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 30 * 4.0 , 30 * 4.0) // *** Valdemir - 03/03/2023 *** //
