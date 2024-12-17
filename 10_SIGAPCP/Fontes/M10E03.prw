@@ -232,7 +232,7 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 		_oPrinter:QrCode(625,810,_cQRCode, 070)
 
 		_oPrinter:Say(_nRow + 505 , 270, Alltrim(_cNumSer),_OFontGG) //525
-		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-FB-008 Rev.01", _OFontP)
+		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-FB-008 Rev.00", _OFontP)
 		
 		If _cINMETRO =="1"
 			_oPrinter:SayBitMap( _nRow + 260, 1080 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 60 * 2.5 , 60 * 2.5)

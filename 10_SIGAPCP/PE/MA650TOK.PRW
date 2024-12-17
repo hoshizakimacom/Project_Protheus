@@ -468,7 +468,7 @@ Static Function M02EPrin1(_cCodProd,_nQtd,_cNumSer)
 	_oPrinter:Say(_nRow + 605 , 70, _cDescPro1 ,_OFontP)
 	_oPrinter:Say(_nRow + 645 , 70, _cDescPro2 ,_OFontP)
 		
-	_oPrinter:Say(_nRow + 685 , 1030, "FGQ-008 Rev.01" ,_OFontP)
+	_oPrinter:Say(_nRow + 685 , 1030, "FGQ-008 Rev.00" ,_OFontP)
 	
 				
 	_oPrinter:SetDevice(IMP_SPOOL)
