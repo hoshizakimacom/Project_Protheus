@@ -90,7 +90,8 @@ Static Function ReportDef(_oReport, _cPerg)
 
 	TRCell():New(_oOP,'PICKINGLIST'		, _cAlias)		// PICKING LIST	#5706	
 	TRCell():New(_oOP,'TIPO_MOVIMENTO'	, _cAlias)		// #7628	
-	TRCell():New(_oOP,'CUSTO'			, _cAlias)		// #7628	
+	TRCell():New(_oOP,'CUSTO'			, _cAlias)		// #7628
+	TRCell():New(_oOP,'QUANTIDADE'		, _cAlias)		// #7843
 	TRCell():New(_oOP,'DTENCER'			, _cAlias)		// DT.ENCERR
 
 
@@ -236,6 +237,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,C2_DATRF										AS DTENCER
 					,D3_TM											AS TIPO_MOVIMENTO		// #7628	
 					,SUM(D3_CUSTO1)									AS CUSTO				// #7628
+					,SUM(D3_QUANT)									AS QUANTIDADE			// #7843
 
 					
 					,CASE
@@ -337,6 +339,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				,C2_XENGUSS
 				,D3_TM
 				,C2_DATRF
+				//,D3_QUANT		//#7843
 				
 				ORDER BY 'OF'
 		EndSql
@@ -444,6 +447,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,C2_DATRF										AS DTENCER
 					,D3_TM											AS TIPO_MOVIMENTO		// #7628	
 					,SUM(D3_CUSTO1)									AS CUSTO				// #7628
+					,SUM(D3_QUANT)									AS QUANTIDADE			// #7843
 
 					
 					,CASE
@@ -545,6 +549,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				,C2_XENGUSS
 				,D3_TM
 				,C2_DATRF
+				//,D3_QUANT		//#7843
 
 				ORDER BY 'OF'
 		EndSql
@@ -650,6 +655,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,C2_DATRF										AS DTENCER
 					,D3_TM											AS TIPO_MOVIMENTO		// #7628	
 					,SUM(D3_CUSTO1)									AS CUSTO				// #7628
+					,SUM(D3_QUANT)									AS QUANTIDADE			// #7843
 					
 					,CASE
 						WHEN B1_XPICLIS = '1' THEN '1 - SIM'
@@ -745,6 +751,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				,C2_XENGUSS
 				,D3_TM
 				,C2_DATRF
+				//,D3_QUANT	//#7843
 
 				ORDER BY 'OF'
 		EndSql
