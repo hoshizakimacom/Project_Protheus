@@ -42,6 +42,8 @@ Aadd(aPergs, {1, "OP Ate"                 ,REPLICATE('Z',TAMSX3("D3_OP")[1]),"@X
 Aadd(aPergs, {1, "Produto De"             ,REPLICATE(' ',TAMSX3("D3_COD")[1]),"@X","","SB1","",60,.F.})     //4
 Aadd(aPergs, {1, "Produto Ate"            ,REPLICATE('Z',TAMSX3("D3_COD")[1]),"@X","","SB1","",60,.T.})     //5
 Aadd(aPergs, {6, "Local arquivo CSV"      ,SPACE(100),"","","",100,.T.,"Todos os arquivos (*.*) |*.*",,GETF_RETDIRECTORY+GETF_LOCALHARD+GETF_NETWORKDRIVE}) //6
+Aadd(aPergs, {1, "Emissão  De"            ,dDataBase ,"","","","",50,.F.}) //7
+Aadd(aPergs,{ 1, "Emissão  Ate"           ,dDataBase,"","","","",50,.T.})  //8
 
 If !ParamBox(aPergs, "Seleção para Exportação de dados para corte no Metalix", @aRetPar,/*bOk*/,/*aButtons*/,/*lCentered*/,/*nPOSX*/,/*nPOSY*/,/*oDlgWIzard*/,/*cLoad*/,/*lCanSave*/,.T./*lUserSave*/)
     Return 
@@ -182,9 +184,11 @@ User Function M04M11D()
 	cQuery += "C2_NUM+C2_ITEM+C2_SEQUEN+C2_ITEMGRD <= '"+aRetPar[3]+"' AND "
 	cQuery += "C2_PRODUTO >= '"+aRetPar[4]+"' AND "
 	cQuery += "C2_PRODUTO <= '"+aRetPar[5]+"' AND "
+	cQuery += "C2_EMISSAO >= '"+DTOS(aRetPar[7])+"' AND "
+	cQuery += "C2_EMISSAO <= '"+DTOS(aRetPar[8])+"' AND "
 	cQuery += "SC2.C2_TPOP = 'F' AND "
 	cQuery += "SC2.D_E_L_E_T_ = ' ' "
-	
+
     cQuery += "AND ( "
 	cQuery += "(SELECT COUNT(*) "
 	cQuery += "FROM "+RetSqlName('SD4')+" SD4 "
@@ -427,14 +431,16 @@ Local aArea     := GETAREA()
 Local nX        := 0
 Local nY
 Local nH
-Local cArq  := ALLTRIM(aRetPar[6])+"\"+IIF(aRetPar[1]=="1","chapa","tubo")+"_"+DTOS(DATE())+"_"+STRTRAN(TIME(),":","")+".csv"
+Local cArq      := ALLTRIM(aRetPar[6])+"\"+IIF(aRetPar[1]=="1","chapa","tubo")+"_"+DTOS(DATE())+"_"+STRTRAN(TIME(),":","")+".csv"
+Local nDecimais := 1
+Local nQuantMT  := 0
 
 nH := fCreate(cArq)
 
 If nH == -1
     MsgStop("Falha ao criar arquivo - Erro "+str(ferror()))
     Return
-Endif
+EndIf
 
 dbSelectArea("SB1")
 dbSetOrder(1)
@@ -511,9 +517,11 @@ For nX := 1 To Len(aOrdProd)
 				//Dados do componente pra corte
 				If  aRetPar[1] == "1" // Chapa
 
-					fWrite(nH,  "W:\Work\maquinas\dxf-prg\DXF-PDM"+";"+;
+					cLocalDXF := "W:\Work\maquinas\dxf-prg" //"W:\Work\maquinas\dxf-prg\DXF-PDM"
+
+					fWrite(nH,  cLocalDXF+";"+;
 								Alltrim(SC2->C2_PRODUTO)+".DXF"+";"+;
-								Alltrim(Transform(SD4->D4_QUANT,"999999999.999999"))+";"+;
+								Alltrim(Transform(SC2->C2_QUANT/*SD4->D4_QUANT*/,"999999999.9"/*"999999999.999999"*/))+";"+;
 								cEspessura+";"+;
 								cMaterial+";"+;
 								Alltrim(SD4->D4_OP)+";"+;
@@ -528,12 +536,35 @@ For nX := 1 To Len(aOrdProd)
 					ElseIf cSEGUM_MP == "MT"
 						nQuantMT := SD4->D4_QTSEGUM
 					EndIf
+					nQuantMT   := ( nQuantMT / SC2->C2_QUANT ) //Converte para Unitário
+					nQuantMM   := nQuantMT * 1000
+					nQuantMM   := ROUND(nQuantMM,nDecimais)
+					nPercPerda := 0
+ 
+					dbSelectArea("SG1")
+					dbSetOrder(1) // G1_FILIAL+G1_COD+G1_COMP+G1_TRT
+					dbSeek(xFilial("SG1")+SD4->D4_PRODUTO+SD4->D4_COD+SD4->D4_TRT)
+					While !EOF() .And. G1_FILIAL+G1_COD+G1_COMP+G1_TRT == xFilial("SG1")+SD4->D4_PRODUTO+SD4->D4_COD+SD4->D4_TRT
+
+						If SC2->C2_REVISAO >= SG1->G1_REVINI .And. SC2->C2_REVISAO <= SG1->G1_REVFIM .And.;
+						   SD4->D4_DATA >= SG1->G1_INI .And. SD4->D4_DATA <= SG1->G1_FIM
+							nPercPerda := SG1->G1_PERDA
+							Exit
+						EndIf
+
+						dbSkip()
+					EndDo
+					dbSelectArea("SD4")
+
+					If nPercPerda > 0
+						nQuantMM *= ((100-nPercPerda)/100)
+					EndIf
 
 					fWrite(nH,  Alltrim(SC2->C2_PRODUTO)+";"+;
 								RTRIM(cDesc_PI)+";"+;
-								Alltrim(Transform(SC2->C2_QUANT,"999999999.999999"))+";"+;
+								Alltrim(Transform(SC2->C2_QUANT,"999999999.9"/*"999999999.999999"*/))+";"+;
 								RTRIM(cDesc_MP)+";"+;
-								Alltrim(Transform(nQuantMT,"999999999.999999"))+";"+; //Metros - Se o componente for KG necessita conversão
+								Alltrim(Transform(nQuantMM,"999999999.9"/*"999999999.999999"*/))+";"+; 
 								Alltrim(SD4->D4_OP) + chr(13)+chr(10) )
 
 				EndIf
