@@ -10,10 +10,47 @@ Local aAreaZAB  := ZAB->(GetArea())
 Local _lRet     := .T.
 Local _cTipoPrd := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_TIPO")
 
+// Validação de Campos Checklist Engenahria para liberação de Abertura de OP #6839
+
+Local _cItDese := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XITDESE")
+Local _cPdf    := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPDF")
+Local _cDxf    := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XDFX")
+Local _cEstru  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESTR")
+Local _cMaoOb  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XMDOBRA")
+
+//MsgStop("TESTE","TESTE")
+
+If _cItDese <> "S" //Diferente de Sim
+	MsgStop("Não é permitida a inclusão de ordem de produção, Item não está desenvolvido","ATENCAO")
+	 _lRet     := .F.
+EndIf
+
+If _cPdf <> "1" //Diferente de Sim
+	MsgStop("Não é permitida a inclusão de ordem de produção, PDF não está disponível","ATENCAO")
+	 _lRet     := .F.
+Endif
+
+If Empty(_cDxf) //Diferente de Sim
+	MsgStop("Não é permitida a inclusão de ordem de produção, DXF não está disponível","ATENCAO")
+	 _lRet     := .F.	
+Endif
+
+If _cEstru <> "1" //Diferente de Sim
+	MsgStop("Não é permitida a inclusão de ordem de produção, Não há estrutura cadastrada","ATENCAO")
+	 _lRet     := .F.
+Endif
+
+If _cMaoOb <> "1" //Diferente de Sim
+	MsgStop("Não é permitida a inclusão de ordem de produção, Não há Mão de Obra cadastrada","ATENCAO")
+	 _lRet     := .F.
+EndIf
+
 If _cTipoPrd == "ME" 
     MsgStop("Não é permitida a inclusão de ordem de produção para produtos do tipo 'ME'","ATENCAO")
     _lRet     := .F.
-Else
+
+ElseIf _lRet 
+
     DbSelectArea("ZAB")
     dbGotop()
     DbSetOrder(3)
@@ -51,8 +88,8 @@ If _nQtdJE <> 0
 	MsgStop("Não é possível a geração de Número(s) de Série, para Ordem de Produção Encerrada ou Iniciada ", "Atenção")
 	_lRet := .F.
 Else
-	If ! _cFamilia $ "000001|000002|000003|000004"
-		//MsgStop("Só é possível gerar Número(s) de Série para as Famílias Cocção e Refrigeração ", "Atenção")
+	If ! _cFamilia $ "000001|000002|000003|000004|000014"
+		MsgStop("Não é posível gerar Número(s) de Série para as Famílias Cocção, Mobiliário, Refrigeração e Máquinas de Gelo Exportação ", "Atenção")
 	Else
 		Do Case
 			Case _nAno == 2015
@@ -225,8 +262,6 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNumSer)
     	     _cClClima := "ST"
 		Case _cClClima == "4"	//#4410
     	     _cClClima := "5"	//#4410
-		Case _cClClima == "5"   //#7629
-			 _cClClima := "3"   //#7629
     EndCase
     
    Do Case 						//6033
@@ -236,10 +271,8 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNumSer)
     		 _cPdeGelo := "400W"    	
     	Case _cPdeGelo == "3"	//6386
     		 _cPdeGelo := "500W"
-		Case _cPdeGelo == "4"	//6633
-			 _CPdeGelo := "300W"
-		Case _cPdeGelo == "5"	//7835
-			 _cPdeGelo := "250W"
+		Case _cPdeGelo == "4"	//7835
+    		 _cPdeGelo := "250W"	  
     EndCase
 
     Do Case
@@ -265,8 +298,7 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNumSer)
     	Case _cTensao == "6"			//5078
     		 _cTensao := "380V ~ 3N"	//5078
 		Case _cTensao == "7"			//7835
-    		 _cTensao := "220-240V ~ 1"	//7835
-			 
+    		 _cTensao := "220-240V ~ 1"	//7835	 
     EndCase
 
 	Do Case 
@@ -300,7 +332,7 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNumSer)
 		_oPrinter:Say(_nRow + 450 , 70, "BCode Serial: " ,_OFontP)
 		_oPrinter:FWMSBAR('CODE128',12.9/*nRow*/,6/*nCol*/,AllTrim(_cNumSer),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/)
 		_oPrinter:Say(_nRow + 525 , 270, Alltrim(_cNumSer),_OFontGG)
-		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-FB-008 Rev.00", _OFontP)
+		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-025 Rev.00", _OFontP)
 		
 		If _cINMETRO =="1"
 			_oPrinter:SayBitMap( _nRow + 260, 1000 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 60 * 4.0 , 60 * 4.0)
@@ -468,7 +500,7 @@ Static Function M02EPrin1(_cCodProd,_nQtd,_cNumSer)
 	_oPrinter:Say(_nRow + 605 , 70, _cDescPro1 ,_OFontP)
 	_oPrinter:Say(_nRow + 645 , 70, _cDescPro2 ,_OFontP)
 		
-	_oPrinter:Say(_nRow + 685 , 1030, "FGQ-008 Rev.00" ,_OFontP)
+	_oPrinter:Say(_nRow + 685 , 1030, "FGQ-008 Rev.01" ,_OFontP)
 	
 				
 	_oPrinter:SetDevice(IMP_SPOOL)
