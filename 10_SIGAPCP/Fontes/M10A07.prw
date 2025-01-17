@@ -49,176 +49,192 @@ Local lDelLinha := .F.
 
 Public _aCDetSD3 := {}
 
-    _cQuery := "SELECT COUNT(*) AS QTD FROM "+RetSqlName("SD3")+" WHERE D3_FILIAL = '"+xFilial("SD3")+"' AND D3_OP = '"+_cNumOP+"' AND D_E_L_E_T_ = ''"
+    /*
+
+    _cQuery := "SELECT COUNT(*) AS QTD FROM "+RetSqlName("SD3")+" WHERE D3_XOP = '"+_cNumOP+"' AND D_E_L_E_T_ = ''"
     TcQuery _cQuery New Alias (cAlias := GetNextAlias())
     (cAlias)->(DbEval({|| _nRegSg1 ++ }))
     (cAlias)->(DbGoTop())
-
-//    If (cAlias)->QTD > 0 
-//        (cAlias)->(DBCLOSEAREA())
-//        FWAlertError("Favor utilizar a rotina de movimentação múltipla para OPs com apontamentos parciais", "Apontamento Parcial")
-//        Return
-//    Else
 
     If (cAlias)->QTD > 0 
-        FWAlertError("Aviso ! OPs com Apontamentos Parciais", "Apontamento Parcial")
-    EndIf
-    (cAlias)->(dbCloseArea())
+        (cAlias)->(DBCLOSEAREA())
+        FWAlertError("Favor utilizar a rotina de movimentação múltipla para OPs com apontamentos parciais", "Apontamento Parcial")
+        Return
+    Else
 
-    _cQuery := ""
-    _cQuery := "WITH ESTRUT( CODIGO, COD_PAI, COD_COMP, QTD, PERDA, DT_INI, DT_FIM, ANSUL, NIVEL ) AS "
-    _cQuery += "( "
+    */
+        /*
+        _cQuery := ""
+        _cQuery := "WITH ESTRUT( CODIGO, COD_PAI, COD_COMP, QTD, PERDA, DT_INI, DT_FIM, ANSUL, NIVEL ) AS "
+        _cQuery += "( "
 
-    _cQuery += "SELECT G1_COD PAI, G1_COD, G1_COMP, G1_QUANT, G1_PERDA, G1_INI, G1_FIM, G1_XANSUL, 1 AS NIVEL "
-    _cQuery += "FROM "+RetSqlName("SG1")+" SG1 (NOLOCK) "
-    _cQuery += "WHERE SG1.D_E_L_E_T_ = '' "
-    _cQuery += "AND G1_FILIAL = '"+FWxFilial("SG1")+"' " 
-    If mv_par02 == 1  // Ansul Interno
-        _cQuery += "AND G1_XANSUL = '1' " 
-    ElseiF mv_par02 == 2  // Ansul Externo
-        _cQuery += "AND G1_XANSUL = '2' "
-    ElseiF mv_par02 == 3  // Não Ansul
-        _cQuery += "AND G1_XANSUL NOT IN ('1','2') "
-    EndIf
-    _cQuery += "UNION ALL "
+        _cQuery += "SELECT G1_COD PAI, G1_COD, G1_COMP, G1_QUANT, G1_PERDA, G1_INI, G1_FIM, G1_XANSUL, 1 AS NIVEL "
+        _cQuery += "FROM "+RetSqlName("SG1")+" SG1 (NOLOCK) "
+        _cQuery += "WHERE SG1.D_E_L_E_T_ = '' "
+        _cQuery += "AND G1_FILIAL      = '"+FWxFilial("SG1")+"' " 
+        If mv_par02 == 1  // Ansul Interno
+            _cQuery += "AND G1_XANSUL = '1' " 
+        ElseiF mv_par02 == 2  // Ansul Externo
+            _cQuery += "AND G1_XANSUL = '2' "
+        ElseiF mv_par02 == 3  // Não Ansul
+            _cQuery += "AND G1_XANSUL NOT IN ('1','2') "
+        EndIf
+        _cQuery += "UNION ALL "
 
-    _cQuery += "SELECT CODIGO, G1_COD, G1_COMP, QTD * G1_QUANT, G1_PERDA, G1_INI, G1_FIM, G1_XANSUL, NIVEL + 1 "
-    _cQuery += "FROM "+RetSqlName("SG1")+" SG1 (NOLOCK) "
-    _cQuery += "INNER JOIN ESTRUT EST "
-    _cQuery += "ON G1_COD = COD_COMP "
-    _cQuery += "WHERE SG1.D_E_L_E_T_ = '' "
-    _cQuery += "AND SG1.G1_FILIAL = '"+FWxFilial("SG1")+"' "
-    If mv_par02 == 1  // Ansul Interno
-        _cQuery += "AND G1_XANSUL = '1' " 
-    ElseiF mv_par02 == 2  // Ansul Externo
-        _cQuery += "AND G1_XANSUL = '2' "
-    ElseiF mv_par02 == 3  // Não Ansul
-        _cQuery += "AND G1_XANSUL NOT IN ('1','2') "
-    EndIf 
-    _cQuery += ") "
+        _cQuery += "SELECT CODIGO, G1_COD, G1_COMP, QTD * G1_QUANT, G1_PERDA, G1_INI, G1_FIM, G1_XANSUL, NIVEL + 1 "
+        _cQuery += "FROM "+RetSqlName("SG1")+" SG1 (NOLOCK) "
+        _cQuery += "INNER JOIN ESTRUT EST "
+        _cQuery += "ON G1_COD = COD_COMP "
+        _cQuery += "WHERE SG1.D_E_L_E_T_ = '' "
+        _cQuery += "AND SG1.G1_FILIAL = '"+FWxFilial("SG1")+"' "
+        If mv_par02 == 1  // Ansul Interno
+            _cQuery += "AND G1_XANSUL = '1' " 
+        ElseiF mv_par02 == 2  // Ansul Externo
+            _cQuery += "AND G1_XANSUL = '2' "
+        ElseiF mv_par02 == 3  // Não Ansul
+            _cQuery += "AND G1_XANSUL NOT IN ('1','2') "
+        EndIf 
+        _cQuery += ") "
 
-    _cQuery += "SELECT * "
-    _cQuery += "FROM ESTRUT E1 "
-    _cQuery += "WHERE E1.CODIGO = '"+_cCdPro+"' "
-    _cQuery += "AND E1.DT_FIM >= '20471231' "
+        _cQuery += "SELECT * "
+        _cQuery += "FROM ESTRUT E1 "
+        _cQuery += "WHERE E1.CODIGO = '"+_cCdPro+"' "
+        _cQuery += "AND E1.DT_FIM >= '20471231' "
+        */
 
-    TcQuery _cQuery New Alias (cAlias := GetNextAlias())
-    (cAlias)->(DbEval({|| _nRegSg1 ++ }))
-    (cAlias)->(DbGoTop())
+        _cQuery := "SELECT D4_PRODUTO CODIGO, D4_PRODUTO COD_PAI, D4_COD COD_COMP "
+        _cQuery += ",( D4_QUANT - ISNULL(( SELECT SUM(CASE WHEN D3_TM > '500' THEN D3_QUANT ELSE D3_QUANT*-1 END) AS QTD FROM SD3010 SD3 WHERE D3_FILIAL = '01' AND D3_XOP = D4_OP AND D3_COD = D4_COD AND SD3.D_E_L_E_T_ = ' ' ),0) ) QTD "
+        _cQuery += ", 0 PERDA, '' DT_INI, '' DT_FIM, D4_XANSUL ANSUL, 1 AS NIVEL "
+        _cQuery += "FROM "+RetSqlName("SD4")+" SD4 (NOLOCK) "
+        _cQuery += "WHERE SD4.D_E_L_E_T_ = ' ' "
+        _cQuery += "AND D4_FILIAL = '"+FWxFilial("SD4")+"' "
+        _cQuery += "AND D4_OP = '"+_cNumOP+"' "
+        If mv_par02 == 1  // Ansul Interno
+            _cQuery += "AND D4_XANSUL = '1' "
+        ElseiF mv_par02 == 2  // Ansul Externo
+            _cQuery += "AND D4_XANSUL = '2' "
+        ElseiF mv_par02 == 3  // Não Ansul
+            _cQuery += "AND D4_XANSUL NOT IN ('1','2') "
+        EndIf
 
-    While ! (cAlias)->(Eof())
+        TcQuery _cQuery New Alias (cAlias := GetNextAlias())
+        (cAlias)->(DbEval({|| _nRegSg1 ++ }))
+        (cAlias)->(DbGoTop())
 
-        If Posicione("SB1",1,xFilial("SB1")+AllTrim((cAlias)->COD_COMP),"B1_XPICLIS") == "1" 
-            
-            aSaldo  := CalcEst(SB1->B1_COD,SB1->B1_LOCPAD,dDataBase + 1, SB1->B1_FILIAL)
-            nSaldo  := aSaldo[1]
+        While ! (cAlias)->(Eof())
 
-            If nSaldo >= (cAlias)->QTD
-                //Definindo a legenda padrão como preto
-                oBmpAux     := oBmpVerde
-                lDelLinha   := .F.
-            else
-                //Definindo a legenda padrão como preto
-                oBmpAux     := oBmpVerme
-                lDelLinha   := .T.
+            If Posicione("SB1",1,xFilial("SB1")+AllTrim((cAlias)->COD_COMP),"B1_XPICLIS") == "1" 
+                
+                aSaldo  := CalcEst(SB1->B1_COD,SB1->B1_LOCPAD,dDataBase + 1, SB1->B1_FILIAL)
+                nSaldo  := aSaldo[1]
+
+                If nSaldo >= (cAlias)->QTD
+                    //Definindo a legenda padrão como preto
+                    oBmpAux     := oBmpVerde
+                    lDelLinha   := .F.
+                else
+                    //Definindo a legenda padrão como preto
+                    oBmpAux     := oBmpVerme
+                    lDelLinha   := .T.
+                Endif
+                                
+                Aadd(_aDetSD3, {;
+                    oBmpAux,;
+                    FwxFilial("SD3"),;
+                    '501',;
+                    (cAlias)->COD_COMP,;
+                    Posicione("SB1",1,xFilial("SB1")+AllTrim((cAlias)->COD_COMP),"B1_DESC"),;
+                    Posicione("SB1",1,xFilial("SB1")+AllTrim((cAlias)->COD_COMP),"B1_UM"),;
+                    (cAlias)->QTD /**_nQuant*/,;                 
+                    _cNumOP,;
+                    Posicione("SB1",1,xFilial("SB1")+AllTrim((cAlias)->COD_COMP),"B1_LOCPAD"),;
+                    (cAlias)->ANSUL,;
+                    lDelLinha;
+                })  
+
             Endif
-                            
-            Aadd(_aDetSD3, {;
-                oBmpAux,;
-                FwxFilial("SD3"),;
-                '501',;
-                (cAlias)->COD_COMP,;
-                Posicione("SB1",1,xFilial("SB1")+AllTrim((cAlias)->COD_COMP),"B1_DESC"),;
-                Posicione("SB1",1,xFilial("SB1")+AllTrim((cAlias)->COD_COMP),"B1_UM"),;
-                (cAlias)->QTD*_nQuant,;                 
-                _cNumOP,;
-                Posicione("SB1",1,xFilial("SB1")+AllTrim((cAlias)->COD_COMP),"B1_LOCPAD"),;
-                (cAlias)->ANSUL,;
-                lDelLinha;
-            })  
+            (cAlias)->(DbSkip())
+        Enddo
+        
+        Processa({|| M10A0702(_aDetSD3)}, "Monta de Apontamento P I C K I N G - L I S T ")
+    /*
+    Endif
+    */
 
-        Endif
-        (cAlias)->(DbSkip())
-    Enddo
-    
-    Processa({|| M10A0702(_aDetSD3)}, "Monta de Apontamento P I C K I N G - L I S T ")
-//    Endif
-
-    (cAlias)->(dbCloseArea())
+    (cAlias)->(DBCLOSEAREA())
 Return
 
 Static Function M10A0702(_aDetSD3)
 
-Local aArea := GetArea()
-Local aAlter:= {"D4_QTDEORI"}
+    Local aArea := GetArea()
+    Local aAlter:= {"D4_QTDEORI"}
 
-//Objetos da Janela
-Private oDlgPvt
-Private oMsGetSD3
-Private aHeadSD3 := {}
-Private aColsSD3 := _aDetSD3
-Private oBtnSalv
-Private oBtnFech
-Private oBtnLege
-//Tamanho da Janela
-Private    nJanLarg    := 1600
-Private    nJanAltu    := 700
-//Fontes
-Private    cFontUti   := "Tahoma"
-Private    oFontAno   := TFont():New(cFontUti,,-38)
-Private    oFontSub   := TFont():New(cFontUti,,-20)
-Private    oFontSubN  := TFont():New(cFontUti,,-20,,.T.)
-Private    oFontBtn   := TFont():New(cFontUti,,-14)
-    
-//Criando o cabeçalho da Grid
-//              Título               Campo        Máscara                        Tamanho                   Decimal                   Valid      Usado  Tipo F3     Combo
-aAdd(aHeadSD3, {"",                  "XX_COR"   , "@BMP",                        002,                       0,                        ".F.",     "   ", "C", "",    "V",     "",      "",        "", "V"})
-aAdd(aHeadSD3, {"Filial",            "D4_FILIAL", "",                            TamSX3("D4_FILIAL")[01],   0,                        "",        ".T.", "C", "",    ""} )    
-aAdd(aHeadSD3, {"TM",                "D3_TM"    , "",                            TamSX3("D3_TM")[01],       0,                        "",        ".T.", "C", "",    ""} )
-aAdd(aHeadSD3, {"Código",            "D4_COD"   , "",                            TamSX3("D4_COD")[01],      0,                        "",        ".T.", "C", "",    ""} )
-aAdd(aHeadSD3, {"Descrição",         "B1_DESC"  , "",                            TamSX3("B1_DESC")[01],     0,                        "",        ".T.", "C", "",    ""} )
-aAdd(aHeadSD3, {"U.M.",              "B1_UM"    , "",                            TamSX3("B1_UM")[01],       0,                        "",        ".T.", "C", "",    ""} )
-aAdd(aHeadSD3, {"Quantidade",        "D4_QTDEORI","",                            TamSX3("D4_QTDEORI")[01],  0,                        "",        ".T.", "N", "",    ""} )
-aAdd(aHeadSD3, {"O.P",               "D4_OP"    , "",                            TamSX3("D4_OP")[01],       0,                        "",        ".T.", "C", "",    ""} )
-aAdd(aHeadSD3, {"Local",             "D4_LOCAL" , "",                            TamSX3("D4_LOCAL")[01],    0,                        "",        ".T.", "C", "",    ""} )
-aAdd(aHeadSD3, {"Ansul",             "G1_XANSUL", "",                            TamSX3("G1_XANSUL")[01],   0,                        "",        ".T.", "C", "",    ""} )
+    //Objetos da Janela
+    Private oDlgPvt
+    Private oMsGetSD3
+    Private aHeadSD3 := {}
+    Private aColsSD3 := _aDetSD3
+    Private oBtnSalv
+    Private oBtnFech
+    Private oBtnLege
+    //Tamanho da Janela
+    Private    nJanLarg    := 1600
+    Private    nJanAltu    := 700
+    //Fontes
+    Private    cFontUti   := "Tahoma"
+    Private    oFontAno   := TFont():New(cFontUti,,-38)
+    Private    oFontSub   := TFont():New(cFontUti,,-20)
+    Private    oFontSubN  := TFont():New(cFontUti,,-20,,.T.)
+    Private    oFontBtn   := TFont():New(cFontUti,,-14)
+     
+    //Criando o cabeçalho da Grid
+    //              Título               Campo        Máscara                        Tamanho                   Decimal                   Valid      Usado  Tipo F3     Combo
+    aAdd(aHeadSD3, {"",                  "XX_COR"   , "@BMP",                        002,                       0,                        ".F.",     "   ", "C", "",    "V",     "",      "",        "", "V"})
+    aAdd(aHeadSD3, {"Filial",            "D4_FILIAL", "",                            TamSX3("D4_FILIAL")[01],   0,                        "",        ".T.", "C", "",    ""} )    
+    aAdd(aHeadSD3, {"TM",                "D3_TM"    , "",                            TamSX3("D3_TM")[01],       0,                        "",        ".T.", "C", "",    ""} )
+    aAdd(aHeadSD3, {"Código",            "D4_COD"   , "",                            TamSX3("D4_COD")[01],      0,                        "",        ".T.", "C", "",    ""} )
+    aAdd(aHeadSD3, {"Descrição",         "B1_DESC"  , "",                            TamSX3("B1_DESC")[01],     0,                        "",        ".T.", "C", "",    ""} )
+    aAdd(aHeadSD3, {"U.M.",              "B1_UM"    , "",                            TamSX3("B1_UM")[01],       0,                        "",        ".T.", "C", "",    ""} )
+    aAdd(aHeadSD3, {"Quantidade",        "D4_QTDEORI","",                            TamSX3("D4_QTDEORI")[01],  0,                        "",        ".T.", "N", "",    ""} )
+    aAdd(aHeadSD3, {"O.P",               "D4_OP"    , "",                            TamSX3("D4_OP")[01],       0,                        "",        ".T.", "C", "",    ""} )
+    aAdd(aHeadSD3, {"Local",             "D4_LOCAL" , "",                            TamSX3("D4_LOCAL")[01],    0,                        "",        ".T.", "C", "",    ""} )
+    aAdd(aHeadSD3, {"Ansul",             "G1_XANSUL", "",                            TamSX3("G1_XANSUL")[01],   0,                        "",        ".T.", "C", "",    ""} )
+ 
 
-//Criação da tela com os dados que serão informados
-    DEFINE MSDIALOG oDlgPvt TITLE "Apontamentos Picking-List" FROM 000, 000  TO nJanAltu, nJanLarg COLORS 0, 16777215 PIXEL
-    
-    //Labels gerais
-    @ 004, 003 SAY "SIGAPCP"            SIZE 200, 030 FONT oFontAno  OF oDlgPvt COLORS RGB(149,179,215) PIXEL
-    @ 004, 100 SAY "Apontamento de"     SIZE 200, 030 FONT oFontSub  OF oDlgPvt COLORS RGB(031,073,125) PIXEL
-    @ 014, 100 SAY "Picking List  "     SIZE 200, 030 FONT oFontSubN OF oDlgPvt COLORS RGB(031,073,125) PIXEL
-                
-    //Botões
-//        @ 006, 665 BUTTON oBtnFech                          PROMPT "Salvar"        SIZE 065, 018 OF oDlgPvt ACTION (fSalvar())         FONT oFontBtn PIXEL 
-    @ 006, 665 BUTTON oBtnFech                          PROMPT "Salvar"        SIZE 065, 018 OF oDlgPvt ACTION (fSalvarT())         FONT oFontBtn PIXEL 
-    @ 006, (nJanLarg/2-001)-(0067*01) BUTTON oBtnFech   PROMPT "Fechar"        SIZE 065, 018 OF oDlgPvt ACTION (oDlgPvt:End())     FONT oFontBtn PIXEL
-            
-    //Grid dos grupos
-    oMsGetSD3 := MsNewGetDados():New(   029,;                   //nTop      - Linha Inicial
-                                        003,;                   //nLeft     - Coluna Inicial
-                                        (nJanAltu/2)-3,;        //nBottom   - Linha Final
-                                        (nJanLarg/2)-3,;        //nRight    - Coluna Final
-                                        GD_UPDATE + GD_DELETE,; //nStyle    - Estilos para edição da Grid (GD_INSERT = Inclusão de Linha; GD_UPDATE = Alteração de Linhas; GD_DELETE = Exclusão de Linhas)
-                                        "AllwaysTrue()",;       //cLinhaOk  - Validação da linha
-                                        ,;                      //cTudoOk   - Validação de todas as linhas
-                                        "",;                    //cIniCpos  - Função para inicialização de campos
-                                        aAlter,;                //aAlter    - Colunas que podem ser alteradas
-                                        1,;                     //nFreeze   - Número da coluna que será congelada
-                                        9999,;                   //nMax      - Máximo de Linhas
-                                        ,;                      //cFieldOK  - Validação da coluna
-                                        ,;                      //cSuperDel - Validação ao apertar '+'
-                                        ,;                      //cDelOk    - Validação na exclusão da linha
-                                        oDlgPvt,;               //oWnd      - Janela que é a dona da grid
-                                        aHeadSD3,;              //aHeader   - Cabeçalho da Grid
-                                        aColsSD3)               //aCols     - Dados da Grid
-    
-ACTIVATE MSDIALOG oDlgPvt CENTERED
-    
-RestArea(aArea)
-
+    //Criação da tela com os dados que serão informados
+        DEFINE MSDIALOG oDlgPvt TITLE "Apontamentos Picking-List" FROM 000, 000  TO nJanAltu, nJanLarg COLORS 0, 16777215 PIXEL
+        
+        //Labels gerais
+        @ 004, 003 SAY "SIGAPCP"            SIZE 200, 030 FONT oFontAno  OF oDlgPvt COLORS RGB(149,179,215) PIXEL
+        @ 004, 100 SAY "Apontamento de"     SIZE 200, 030 FONT oFontSub  OF oDlgPvt COLORS RGB(031,073,125) PIXEL
+        @ 014, 100 SAY "Picking List  "     SIZE 200, 030 FONT oFontSubN OF oDlgPvt COLORS RGB(031,073,125) PIXEL
+                  
+        //Botões
+        @ 006, 665 BUTTON oBtnFech                          PROMPT "Salvar"        SIZE 065, 018 OF oDlgPvt ACTION (fSalvar())         FONT oFontBtn PIXEL 
+        @ 006, (nJanLarg/2-001)-(0067*01) BUTTON oBtnFech   PROMPT "Fechar"        SIZE 065, 018 OF oDlgPvt ACTION (oDlgPvt:End())     FONT oFontBtn PIXEL
+               
+        //Grid dos grupos
+        oMsGetSD3 := MsNewGetDados():New(   029,;                   //nTop      - Linha Inicial
+                                            003,;                   //nLeft     - Coluna Inicial
+                                            (nJanAltu/2)-3,;        //nBottom   - Linha Final
+                                            (nJanLarg/2)-3,;        //nRight    - Coluna Final
+                                            GD_UPDATE + GD_DELETE,; //nStyle    - Estilos para edição da Grid (GD_INSERT = Inclusão de Linha; GD_UPDATE = Alteração de Linhas; GD_DELETE = Exclusão de Linhas)
+                                            "AllwaysTrue()",;       //cLinhaOk  - Validação da linha
+                                            ,;                      //cTudoOk   - Validação de todas as linhas
+                                            "",;                    //cIniCpos  - Função para inicialização de campos
+                                            aAlter,;                //aAlter    - Colunas que podem ser alteradas
+                                            1,;                     //nFreeze   - Número da coluna que será congelada
+                                            9999,;                   //nMax      - Máximo de Linhas
+                                            ,;                      //cFieldOK  - Validação da coluna
+                                            ,;                      //cSuperDel - Validação ao apertar '+'
+                                            ,;                      //cDelOk    - Validação na exclusão da linha
+                                            oDlgPvt,;               //oWnd      - Janela que é a dona da grid
+                                            aHeadSD3,;              //aHeader   - Cabeçalho da Grid
+                                            aColsSD3)               //aCols     - Dados da Grid
+        
+    ACTIVATE MSDIALOG oDlgPvt CENTERED
+     
+    RestArea(aArea)
 Return
 
 /*--------------------------------------------------------*
@@ -227,243 +243,89 @@ Return
  *--------------------------------------------------------*/
 Static Function fSalvar()
 
-Local aColsAux := oMsGetSD3:aCols
-Local aHeasAux := oMsGetSD3:aHeader
-Local nLinha   := 0
-Local _aCab1   := {}
-Local _aItem   := {}
-Local _atotitem:= {}
-Local nQueryRet:= 0
-Local _cQuery  := ""
-Private lMsHelpAuto := .t. // se .t. direciona as mensagens de help
-Private lMsErroAuto := .f. // Necessario a criacao
+    Local aColsAux := oMsGetSD3:aCols
+    Local nLinha   := 0
+    Local _aCab1   := {}
+    Local _aItem   := {}
+    Local _atotitem:= {}
+    //Local nQueryRet:= 0
+    //Local _cQuery  := ""
 
-_aCab1 := { {"D3_DOC"    ,NextNumero("SD3",2,"D3_DOC",.T.), NIL},;
-            {"D3_TM"     ,"501"     , NIL},;
-            {"D3_CC"     ,"        ", NIL},;
-            {"D3_EMISSAO",ddatabase, NIL}}
-
-//Percorrendo todas as linhas
-For nLinha := 1 To Len(aColsAux)
+    Private lMsHelpAuto := .t. // se .t. direciona as mensagens de help
+    Private lMsErroAuto := .f. //necessario a criacao
     
-//    If aColsAux[nLinha,10] = .F.
-    If Len(aHeasAux) + 1 = .F.
-
-        _aItem:={{"D3_COD" ,aColsAux[nLinha,4],NIL},;
-                {"D3_UM"   ,aColsAux[nLinha,6],NIL},; 
-                {"D3_QUANT",aColsAux[nLinha,7],NIL},;
-                {"D3_OP"   ,aColsAux[nLinha,8],NIL}}
-
-        aadd(_atotitem,_aitem) 
-        MSExecAuto({|x,y,z| MATA241(x,y,z)},_aCab1,_atotitem,3)
-
-        _atotitem:= {}
-            
-        If lMsErroAuto 
+    _aCab1 := { {"D3_DOC"    ,NextNumero("SD3",2,"D3_DOC",.T.), NIL},;
+                {"D3_TM"     ,"501"     , NIL},;
+                {"D3_CC"     ,"        ", NIL},;
+                {"D3_EMISSAO",ddatabase, NIL}}
     
-            Mostraerro() 
-            DisarmTransaction() 
-            break
+    //Percorrendo todas as linhas
+    For nLinha := 1 To Len(aColsAux)
+        
+        If aColsAux[nLinha,11] = .F.
+
+            _aItem:={{"D3_COD" ,aColsAux[nLinha,4],NIL},;
+                    {"D3_UM"   ,aColsAux[nLinha,6],NIL},; 
+                    {"D3_QUANT",aColsAux[nLinha,7],NIL},;
+                    {"D3_XOP"  ,aColsAux[nLinha,8],NIL}}
+
+            aadd(_atotitem,_aitem) 
+            MSExecAuto({|x,y,z| MATA241(x,y,z)},_aCab1,_atotitem,3)
+
+            _atotitem:= {}
+                
+            If lMsErroAuto 
+        
+                Mostraerro() 
+                DisarmTransaction() 
+                break
+        
+            EndIf
+        
+        Endif
+
+    Next nLinha
     
-        EndIf
+    /*
+    Begin Transaction
+        //Atualiza empenhos
+        _cQuery := "UPDATE "+RetSqlName("SD4")
+        _cQuery += "SET D4_QUANT = D4_QTDEORI -  ISNULL((SELECT SUM((CASE WHEN LEFT(D3_CF,2) = 'RE' THEN D3_QUANT ELSE D3_QUANT*-1 END))  "
+        _cQuery += "   FROM "+RetSqlName("SD3")+" SD3  "
+        _cQuery += "   WHERE D3_FILIAL = '"+FWxFilial("SD4")+"' "  "
+        _cQuery += "   AND D3_OP = D4_OP  "
+        _cQuery += "   AND D3_ESTORNO = ' ' "
+        _cQuery += "   AND D3_COD = D4_COD  "
+        _cQuery += "   AND D_E_L_E_T_ <> '*'),0) "
+
+        _cQuery += "FROM  "+RetSqlName("SD4")
+        _cQuery += "WHERE D4_FILIAL = '"+FWxFilial("SD4")+"' " "
+        _cQuery += "AND D4_DATA >= '20210701' "
+        _cQuery += "AND D4_QTDEORI -(D4_QUANT + ISNULL((SELECT SUM((CASE WHEN LEFT(D3_CF,2) = 'RE' THEN D3_QUANT ELSE D3_QUANT*-1 END))  "
+        _cQuery += "   FROM  "+RetSqlName("SD3")+" SD3  "
+        _cQuery += "   WHERE D3_FILIAL = '"+FWxFilial("SD4")+"' "  "
+        _cQuery += "   AND D3_OP = D4_OP  "
+        _cQuery += "   AND D3_ESTORNO = ' ' "
+        _cQuery += "   AND D3_OP = '"+_cNumOP+"' "
+        _cQuery += "   AND D3_COD = D4_COD 
+        _cQuery += "   AND D_E_L_E_T_ <> '*'),0)) <> 0
+        _cQuery += "AND D4_QUANT <> 0
+        _cQuery += "AND D_E_L_E_T_ <> '*'
+        nQueryRet := TCSQLEXEC(_cQuery)
+ 
+        if nQueryRet != 0
+                MsgStop("Erro na execução da query: "+TcSqlError(), "Atenção")
+                DisarmTransaction()
+        endif
+    End Transaction
+    */
+
+    //Montar rotina de sem saldos
+    FWMsgRun(, {|| U_M10A07R(_cNumOP) },'Picking - List - SEM SALDO ','Gerando relatório...')
     
-    Endif
-
-Next nLinha
-
-// Atualizando empenhos
-Begin Transaction
-    //Atualiza empenhos
-    _cQuery := "UPDATE "+RetSqlName("SD4")
-    _cQuery += "SET D4_QUANT = D4_QTDEORI -  ISNULL((SELECT SUM((CASE WHEN LEFT(D3_CF,2) = 'RE' THEN D3_QUANT ELSE D3_QUANT*-1 END))  "
-    _cQuery += "   FROM "+RetSqlName("SD3")+" SD3  "
-    _cQuery += "   WHERE D3_FILIAL = '"+FWxFilial("SD4")+"' "  "
-    _cQuery += "   AND D3_OP = D4_OP  "
-    _cQuery += "   AND D3_ESTORNO = ' ' "
-    _cQuery += "   AND D3_COD = D4_COD  "
-    _cQuery += "   AND D_E_L_E_T_ <> '*'),0) "
-
-    _cQuery += "FROM  "+RetSqlName("SD4")
-    _cQuery += "WHERE D4_FILIAL = '"+FWxFilial("SD4")+"' " "
-    _cQuery += "AND D4_DATA >= '20210701' "
-    _cQuery += "AND D4_QTDEORI -(D4_QUANT + ISNULL((SELECT SUM((CASE WHEN LEFT(D3_CF,2) = 'RE' THEN D3_QUANT ELSE D3_QUANT*-1 END))  "
-    _cQuery += "   FROM  "+RetSqlName("SD3")+" SD3  "
-    _cQuery += "   WHERE D3_FILIAL = '"+FWxFilial("SD4")+"' "  "
-    _cQuery += "   AND D3_OP = D4_OP  "
-    _cQuery += "   AND D3_ESTORNO = ' ' "
-    _cQuery += "   AND D3_OP = '"+_cNumOP+"' "
-    _cQuery += "   AND D3_COD = D4_COD 
-    _cQuery += "   AND D_E_L_E_T_ <> '*'),0)) <> 0
-    _cQuery += "AND D4_QUANT <> 0
-    _cQuery += "AND D_E_L_E_T_ <> '*'
-    nQueryRet := TCSQLEXEC(_cQuery)
-
-    if nQueryRet != 0
-            MsgStop("Erro na execução da query: "+TcSqlError(), "Atenção")
-            DisarmTransaction()
-    endif
-End Transaction
-
-//Montar rotina de sem saldos
-FWMsgRun(, {|| U_M10A07R(_cNumOP) },'Picking - List - SEM SALDO ','Gerando relatório...')
-
-oDlgPvt:End()
-
+    oDlgPvt:End()
 Return(.T.)
 
-/*--------------------------------------------------------*
- | Func.: fSalvarT                                        |
- *--------------------------------------------------------*/
-Static Function fSalvarT()
-
-Local aColsAux    := oMsGetSD3:aCols
-Local aHeasAux     := oMsGetSD3:aHeader
-Local nLinha       := 0
-Local aDadosTransf := {}
-Local cDoc         := Criavar("D3_DOC")
-Local cLocOri      := "01"   //
-Local cLocDest     := "88"   // Parametro de Local de Processo
-
-// Fecha Objeto da tela Principal
-//oDlgPvt:End()
-
-// Colocar Regua Aqui 
-//BeginTran()
-
-// Movimentacao interna de transferencia
-//cDocumento	:= If(Empty(cDocumento),NextNumero("SD3",2,"D3_DOC",.T.),cDocumento)
-//cDocumento	:= A261RetINV(cDocumento)
-//Aadd(aItensNew,{cDocumento,dDataBase})
-
-cDoc := NextNumero("SD3",2,"D3_DOC",.T.)
-aAdd(aDadosTransf, {cDoc,dDataBase})
-
-//Percorrendo todas as linhas
-For nLinha := 1 To Len(aColsAux)
-
-//    If aColsAux[nLinha,10] = .T.
-    If aColsAux[nLinha,Len(aHeasAux)+1] = .T.
-        Loop
-    EndIf
-
-    // Movimentacao interna de transferencia
-//    cDocumento	:= If(Empty(cDocumento),NextNumero("SD3",2,"D3_DOC",.T.),cDocumento)
-//    cDocumento	:= A261RetINV(cDocumento)
-    nQtdTransf := aColsAux[nLinha,7]
-
-    dbSelectArea("SB1")
-    dbSetOrder(1)
-    dbSeek(xFilial("SB1")+aColsAux[nLinha,4])
-
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³Cria o SB2 se ele nao existir                                             ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	CriaSB2(SB1->B1_COD,cLocDest) //U_CriaSB2Esp(SB1->B1_COD,SB1->B1_LOCPAD)
-
-    aAdd(aDadosTransf,{})
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_COD" 		, SB1->B1_COD								,NIL})// 01.Produto Origem
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_DESCRI" 	, Left(SB1->B1_DESC,TAMSX3("D3_DESCRI")[1])	,NIL})// 02.Descricao
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_UM"     	, SB1->B1_UM								,NIL})// 03.Unidade de Medida
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_LOCAL"  	, cLocOri                       			,NIL})// 04.Armazem Origem
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_LOCALIZ"	, ''		                              	,NIL})// 05.Endereco Origem
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_COD"    	, SB1->B1_COD                    			,NIL})// 06.Produto Destino
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_DESCRI" 	, Left(SB1->B1_DESC,TAMSX3("D3_DESCRI")[1]) ,NIL})// 07.Descricao
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_UM"     	, SB1->B1_UM                   				,NIL})// 08.Unidade de Medida
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_LOCAL"  	, cLocDest                       			,NIL})// 09.Armazem Destino
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_LOCALIZ"	, ''                             			,NIL})// 10.Endereco Destino
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_NUMSERI"	, ''                            			,NIL})// 11.Numero de Serie
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_LOTECTL"	, ''                 		         	    ,NIL})// 12.Lote Origem
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_NUMLOTE"	, ''                			            ,NIL})// 13.Sub-Lote
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_DTVALID"	, ''                			            ,NIL})// 14.Data de Validade
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_POTENCI"	, ''                             			,NIL})// 15.Potencia do Lote
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_QUANT"  	, nQtdTransf                    			,NIL})// 16.Quantidade
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_QTSEGUM"	, 0               			                ,NIL})// 17.Quantidade na 2 UM
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_ESTORNO"	, ''								        ,NIL})// 18.Estorno
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_NUMSEQ" 	, ''										,NIL})// 19.NumSeq
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_LOTECTL"	, ''                			            ,NIL})// 20.Lote Destino
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_DTVALID"	, '' 	                		            ,NIL})// 21.Data de Validade Destino
-    aAdd(aDadosTransf[Len(aDadosTransf)],{"D3_XORDSEP"	, '' 	                    		        ,NIL})// 22.Data de Validade Destino
-
-//	CursorArrow()
-//   _aItem := {{"D3_COD" ,aColsAux[nLinha,4],NIL},;
-//              {"D3_UM"   ,aColsAux[nLinha,6],NIL},; 
-//              {"D3_QUANT",aColsAux[nLinha,7],NIL},;
-//              {"D3_OP"   ,aColsAux[nLinha,8],NIL}}
-//    Aadd ( aItensNew,{SB1->B1_COD, SB1->B1_DESC, SB1->B1_UM, cLocOri , SPACE(TamSX3("D3_LOCALIZ")[1]) ,;
-//                     SB1->B1_COD, SB1->B1_DESC, SB1->B1_UM, cLocDest, SPACE(TamSX3("D3_LOCALIZ")[1]) ,;
-//            "" , "" , "",;
-//            Criavar('D3_DTVALID'), Criavar('D3_POTENCI'), nQtdTransf , criavar("D3_QTSEGUM") ,;
-//            Criavar("D3_ESTORNO"), Criavar("D3_NUMSEQ"), Criavar("D3_LOTECTL"), Criavar("D3_DTVALID"), Criavar("D3_ITEMGRD")} )
-
-/*/
-	AADD(aItensNew,{SD1->D1_COD,; //3
-	SB1->B1_DESC,;                //4
-	SB1->B1_UM,;                  //5
-	cLocOri,;         //6  01
-	Space(15),;       //7 Localiz
-	SB1->B1_COD,;     //8
-	SB1->B1_DESC,;    //9
-	SB1->B1_UM,;      //10
-	cLocDest,;        //11  04
-	Space(15),;       //12 Localiz
-	Space(20),;       //13 NumSer
-	"",;	// LOTE   //14
-	"",;	// SUBLOTE
-	Ctod("  /  /  "),;	// VALIDADE
-	0,;
-	nQtdTransf,;
-	nQtdTransf,;
-	Space(10),;
-	cDocumento,;
-	"",;
-	Ctod("  /  /  "),;
-	Space(10)})
-
-    Aadd(aAuto,aItem)		
-
-    lMsHelpAuto := .T. // Se .t. direciona as msgs de help para o arq. de log.
-	lMsErroAuto := .F. // Nessecario a criacao, pois sera atualizado quando houver alguma inconsistencia nos parametros
-    MSExecAuto({|x,y| Mata261(x,y)},aItensNew,3)
-
-	If lMsErroAuto
-		MostraErro()
-		DisarmTransaction()
-   		Break
-
-//		lTransfOk := .F.
-		// Matriz com todos os itens
-//		lGravou := .F.
-    Else
-//		lGravou := .F.
-        // D3_XOP
-
-    EndIf
-  /*/
-
- //  If lMsErroAuto
- //      MsgStop("Erro na Transferência . ","Aviso",.T.,4000)
- //      DisarmTransaction()
- //      RollBackSX8()
- //      VTAlert("Erro na Transferência . ","Aviso",.T.,4000)
- //  Else
- //      EndTran()
- //  EndIf
-
-Next
-//MSExecAuto({|x| MATA261(x)},aItensNew)
-
-MATA261(aDadosTransf,3)
-
-//Montar Rotina de sem Saldos
-FWMsgRun(, {|| U_M10A07R(_cNumOP) },'Picking - List - SEM SALDO ','Gerando relatório...')
-
-oDlgPvt:End()
-
-Return(.T.)
-
-/*--------------------------------------------------------*
- | Func.: M10A07R                                         |
- *--------------------------------------------------------*/
 User function M10A07R(_cNumOP)
 
 Local oPrinter     := Nil
@@ -477,6 +339,7 @@ Local oPrinter     := Nil
     //Local _nQtdOP      := SC2->C2_QUANT
     //Local _cCodProd    := SC2->C2_PRODUTO
     Local nPage        := 1
+    
     Private nEstru     := 0
     
     M02RFont(@oFont9,@oFont12,@oFont12B,@oFont14B,@oFont18T)
@@ -492,6 +355,7 @@ Local oPrinter     := Nil
     //+----------------------------------------------------------------------------------------
     // Cabeçalho 1 - Dados Macom
     //+----------------------------------------------------------------------------------------
+
     MR02Cab1(oPrinter,oFont14B,oFont12,@nRow)
 
     If MR02Posiciona()
@@ -514,9 +378,8 @@ Local oPrinter     := Nil
 
 Return
 
-/*--------------------------------------------------------*
- | Func.: M02RICabIt                                      |
- *--------------------------------------------------------*/
+
+//+------------------------------------------------------------------------------------------------------------------------------------------------------
 Static Function M02RICabIt(oPrinter,oFont12B,nRow)
     Local nRowStep      := 130
 
@@ -585,7 +448,7 @@ Static Function MR02Cab2(oPrinter,oFont12,oFont18T,nRow,oFont14B)
         oPrinter:Say(nRow += nRowStep     ,0100    , "PRODUTO : "    + _cCodProd, oFont14B)
         oPrinter:Say(nRow                 ,2876    , "QUANTIDADE = " + _nQuant, oFont14B)
         oPrinter:Say(nRow += nRowStep     ,0100    , _cDesc,oFont14B)
-        oPrinter:Say(nRow                 ,2876    , "FGQ-011_rev00", oFont12)  
+        oPrinter:Say(nRow                 ,2876    , "FGQ-AL-011-Rev01", oFont12)  //#6748
 
         nRow += nRowStep 
 

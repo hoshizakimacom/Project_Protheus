@@ -111,7 +111,7 @@ oVenProd:oReport:nFontBody := 10
 //³Define celulas da secao                                                 ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 
-
+TRCell():New(oVenProd,"FILIAL"		,/*Tabela*/	,"Filial"			 ,PesqPict("SC6","C6_FILIAL")	,TamSx3("C6_FILIAL")[1]		,/*lPixel*/,{|| cFilSC6 	})				// Filiais que sirão no relatório GMUD0006
 TRCell():New(oVenProd,"OPER"		,/*Tabela*/	,"Operacao"			 ,PesqPict("SC6","C6_XOPER")	,TamSx3("C6_XOPER")[1]		,/*lPixel*/,{|| cOper	})				// Tipo de Operaï¿½ï¿½o
 TRCell():New(oVenProd,"EMISSAO"		,/*Tabela*/	,"Emissao"			 ,PesqPict("SC5","C5_EMISSAO")	,TamSx3("C5_EMISSAO")[1]	,/*lPixel*/,{|| dEmiss	})				// Data de Emissï¿½o
 TRCell():New(oVenProd,"NUM"			,/*Tabela*/	,"Pedido"	 		 ,PesqPict("SC6","C6_NUM")		,TamSx3("C6_NUM")[1]		,/*lPixel*/,{|| cNum	})				// Numero do Pedido
@@ -119,10 +119,26 @@ TRCell():New(oVenProd,"TPVEN"		,/*Tabela*/ ,"Tipo Venda"		 ,PesqPict("SC5","C5_X
 TRCell():New(oVenProd,"CLIENT"		,/*Tabela*/	,"Cliente"			 ,PesqPict("SA1","A1_NOME")		,TamSx3("A1_NOME")[1]		,/*lPixel*/,{|| cNome	})				// Nome do Cliente
 TRCell():New(oVenProd,"ITEM"		,/*Tabela*/ ,"Item"				 ,PesqPict("SC6","C6_ITEM")		,TamSx3("C6_ITEM")[1]		,/*lPixel*/,{|| cItem	})				// Item do Pedido
 TRCell():New(oVenProd,"PLANTA"		,/*Tabela*/ ,"Planta"			 ,PesqPict("SC6","C6_XITEMP")	,TamSx3("C6_XITEMP")[1]		,/*lPixel*/,{|| cPlanta	},,,"CENTER")	// Item Planta
+TRCell():New(oVenProd,"LIBTEC"		,/*Tabela*/	,"Lib.Tec.Com."		 ,PesqPict("SC6","C6_XGOPDT")	,TamSx3("C6_XGOPDT")[1]		,/*lPixel*/,{|| dDtLib	})				// Data Liberacao Tec.Comerc.
+
+TRCell():New(oVenProd,"Prod. Padrao",/*Tabela*/ ,"Prod. Padrao?"	 ,PesqPict("SB1","B1_XPADRAO")	,TamSx3("B1_XPADRAO")[1]	,/*lPixel*/,{|| cXPadra})				// Produto Padr�o?
+TRCell():New(oVenProd,"PDF"			,/*Tabela*/ ,"PDF?"		 		 ,PesqPict("SB1","B1_XPDF")		,TamSx3("B1_XPDF")[1]		,/*lPixel*/,{|| cXPdf})					// PDF DEsenvolvido?
+TRCell():New(oVenProd,"DXF"			,/*Tabela*/ ,"DXF?"		 		 ,PesqPict("SB1","B1_XDFX")		,TamSx3("B1_XDFX")[1]		,/*lPixel*/,{|| cXDxf})					// DXF Desenvolvido?
+TRCell():New(oVenProd,"ESTRU"		,/*Tabela*/ ,"Estrutura?"		 ,PesqPict("SB1","B1_XESTR")	,TamSx3("B1_XESTR")[1]		,/*lPixel*/,{|| cXEstru})				// Estrutura liberada?
+TRCell():New(oVenProd,"MDOBRA"		,/*Tabela*/ ,"Mao de Obra?"		 ,PesqPict("SB1","B1_XMDOBRA")	,TamSx3("B1_XMDOBRA")[1]	,/*lPixel*/,{|| cXMDObra})				// M�o de Obra Cadastrada?
+TRCell():New(oVenProd,"Dev. Eng"	,/*Tabela*/ ,"Dev. Eng?"		 ,PesqPict("SB1","B1_XITDESE")	,TamSx3("B1_XITDESE")[1]	,/*lPixel*/,{|| cXItDese})				// Item em Desenvolvimento
+TRCell():New(oVenProd,"Dt.Dev.Eng"	,/*Tabela*/ ,"Dt.Dev.Eng"	 	 ,PesqPict("SB1","B1_XDTITDS")	,TamSx3("B1_XDTITDS")[1]	,/*lPixel*/,{|| dXDtItDs})				// Data que o item foi colocado em desenvolvimento
+TRCell():New(oVenProd,"Prod.Lib.Eng",/*Tabela*/ ,"Prod.Lib.Eng"		 ,PesqPict("SB1","B1_XESPLIB")	,TamSx3("B1_XESPLIB")[1]	,/*lPixel*/,{|| cXEspLib})				// produto Especial Liberado?
+TRCell():New(oVenProd,"Dt.Prod.Lib" ,/*Tabela*/ ,"Dt. Prod.Lib"		 ,PesqPict("SB1","B1_XDTLIB")	,TamSx3("B1_XDTLIB")[1]		,/*lPixel*/,{|| cXDtLib})				// Data Libera��o Engenharia
+TRCell():New(oVenProd,"Obs Teccom"	,/*Tabela*/ ,"Obs Teccom?"	 	 ,PesqPict("SC6","C6_XOBSENG")	,TamSx3("C6_XOBSENG")[1]	,/*lPixel*/,{|| cXObsEng})				// Observa��o TECCOM
+
 TRCell():New(oVenProd,"ETAPA"		,/*Tabela*/ ,"Etapa"			 ,PesqPict("SC6","C6_XETAPA")	,TamSx3("C6_XETAPA")[1]		,/*lPixel*/,{|| cXEtapa })				// Etapa
-TRCell():New(oVenProd,"CODIGO"		,/*Tabela*/	,"Codigo"			 ,PesqPict("SC6","C6_PRODUTO")	,TamSx3("C6_PRODUTO")[1]	,/*lPixel*/,{|| cCodigo	})				// Cï¿½digo do Produto
-TRCell():New(oVenProd,"FILIAL"		,/*Tabela*/	,"Filial"			 ,PesqPict("SC6","C6_FILIAL")	,TamSx3("C6_FILIAL")[1]		,/*lPixel*/,{|| cFilSC6 	})				// Filiais que sirão no relatório GMUD0006
-/*existe apenas 1 fabrica hj em dia*/
+TRCell():New(oVenProd,"CODIGO"		,/*Tabela*/	,"Codigo"			 ,PesqPict("SC6","C6_PRODUTO")	,TamSx3("C6_PRODUTO")[1]	,/*lPixel*/,{|| cCodigo	})				// C�digo do Produto
+
+TRCell():New(oVenProd,"COMPRIMENTO"	,/*Tabela*/	,"Comprimento"		 ,PesqPict("SB5","B5_COMPRLC")	,TamSx3("B5_COMPRLC")[1]	,/*lPixel*/,{|| cCompri	})				// Comprimento do equipamento
+TRCell():New(oVenProd,"LARGURA"		,/*Tabela*/	,"Largura"			 ,PesqPict("SB5","B5_LARGLC")	,TamSx3("B5_LARGLC")[1]		,/*lPixel*/,{|| cLargur	})				// Largura do equipamento
+TRCell():New(oVenProd,"ALTURA"		,/*Tabela*/	,"Altura"			 ,PesqPict("SB5","B5_ALTURLC")	,TamSx3("B5_ALTURLC")[1]	,/*lPixel*/,{|| cAltura	})				// Altura do equipamento
+
 //TRCell():New(oVenProd,"FABRIC"		,/*Tabela*/ ,"Fabrica"			 ,PesqPict("SB1","B1_XFABRIC")	,TamSx3("B1_XFABRIC")[1]	,/*lPixel*/,{|| cXFabric})				// Fabrica
 TRCell():New(oVenProd,"TIPO"		,/*Tabela*/ ,"Tipo"				 ,PesqPict("SB1","B1_TIPO")		,TamSx3("B1_TIPO")[1]		,/*lPixel*/,{|| cTipo	})				// Tipo do Produto
 TRCell():New(oVenProd,"LOCAL"		,/*Tabela*/ ,"Armazem"			 ,PesqPict("SB1","B1_LOCPAD")	,TamSx3("B1_LOCPAD")[1]		,/*lPixel*/,{|| cLocal	})				// Armazem
@@ -130,15 +146,15 @@ TRCell():New(oVenProd,"DESC"		,/*Tabela*/	,"Descricao"		 ,PesqPict("SB5","B5_CEM
 TRCell():New(oVenProd,"QUANT"		,/*Tabela*/	,"Quantidade"		 ,PesqPict("SC6","C6_QTDVEN")	,TamSx3("C6_QTDVEN")[1]		,/*lPixel*/,{|| nQuant	})				// Quantidade
 TRCell():New(oVenProd,"SALDO"		,/*Tabela*/	,"A Entregar"		 ,PesqPict("SC6","C6_QTDVEN")	,TamSx3("C6_QTDVEN")[1]		,/*lPixel*/,{|| nSaldo	})				// Saldo
 TRCell():New(oVenProd,"SALDOEST"	,/*Tabela*/	,"Saldo Em Estoque"	 ,PesqPict("SB2","B2_QATU")		,TamSx3("B2_QATU")[1]		,/*lPixel*/,{|| nSldEst })				// Saldo em Estoque
+TRCell():New(oVenProd,"ENTREGA"		,/*Tabela*/	,"Dt.Entrega"		 ,PesqPict("SC6","C6_ENTREG")	,TamSx3("C6_ENTREG")[1]		,/*lPixel*/,{|| dDtEntr	})				// Data de Entrega
+
 TRCell():New(oVenProd,"FAMILIA"		,/*Tabela*/	,"Familia"			 ,PesqPict("SB1","B1_XFAMILI")	,TamSx3("B1_XFAMILI")[1]	,/*lPixel*/,{|| cXFamil	})				// Familia
-TRCell():New(oVenProd,"LIBTEC"		,/*Tabela*/	,"Lib.Tec.Com."		 ,PesqPict("SC6","C6_XGOPDT")	,TamSx3("C6_XGOPDT")[1]		,/*lPixel*/,{|| dDtLib	})				// Data Liberacao Tec.Comerc.
 TRCell():New(oVenProd,"OP"			,/*Tabela*/	,"OP"				 ,PesqPict("SC6","C6_OP")		,TamSx3("C6_OP")[1]			,/*lPixel*/,{||	cOP		})				// Numero da Ordem de Produï¿½ï¿½o
 TRCell():New(oVenProd,"VLUIPI"		,/*Tabela*/	,"Vl.Tot+IPI"		 ,PesqPict("SC6","C6_XVLTBRU")	,TamSx3("C6_XVLTBRU")[1]	,/*lPixel*/,{||	nVlUnIPI})				// Vl Bruto + IPI
 TRCell():New(oVenProd,"ESTADO"		,/*Tabela*/	,"Estado"			 ,PesqPict("SA1","A1_EST")		,TamSx3("A1_EST")[1]		,/*lPixel*/,{|| cEst	})				// Estado
 TRCell():New(oVenProd,"GEREN"		,/*Tabela*/ ,"Gerente"			 ,PesqPict("SA3","A3_NOME")	    ,TamSx3("A3_NOME")[1]		,/*lPixel*/,{|| cGeren	})
 /*Falar com pessoal do Comercial*/TRCell():New(oVenProd,"VEND"		,/*Tabela*/ ,"Representante"	 ,PesqPict("SC5","C5_VEND1")	,TamSx3("C5_VEND1")[1]		,/*lPixel*/,{|| cVend1	})				// Representante
 TRCell():New(oVenProd,"EMAIL"		,/*Tabela*/ ,"E-mail"			 ,PesqPict("SA3","A3_EMAIL")	,TamSx3("A3_EMAIL")[1]		,/*lPixel*/,{|| cMailRep})				// E-Mail do Representante
-TRCell():New(oVenProd,"ENTREGA"		,/*Tabela*/	,"Dt.Entrega"		 ,PesqPict("SC6","C6_ENTREG")	,TamSx3("C6_ENTREG")[1]		,/*lPixel*/,{|| dDtEntr	})				// Data de Entrega
 TRCell():New(oVenProd,"LIBFIN"		,/*Tabela*/	,"Lib.Fin"		 	 ,PesqPict("SC5","C5_XSTSFIN")	,TamSx3("C5_XSTSFIN")[1]	,/*lPixel*/,{|| cXStsFin})				// Status Liberaï¿½ï¿½o Financeira
 TRCell():New(oVenProd,"DTLIBFIN"	,/*Tabela*/ ,"Dt.Lib.Financ."	 ,PesqPict("SC5","C5_XDTAPRV")	,TamSx3("C5_XDTAPRV")[1]	,/*lPixel*/,{|| dDtLibCom})				// Data da Liberação Financeira
 TRCell():New(oVenProd,"FRETE"		,/*Tabela*/ ,"Tp.Frete"			 ,PesqPict("SC5","C5_TPFRETE")  ,TamSx3("C5_TPFRETE")[1]	,/*lPixel*/,{|| cTpFret })				// Tipo de Frete
@@ -152,48 +168,37 @@ TRCell():New(oVenProd,"MOTIVO"      ,/*Tabela*/ ,"Motivo"            ,PesqPict("
 TRCell():New(oVenProd,"STATUSFIM"	,/*Tabela*/ ,"Status"			 ,PesqPict("SC6","C6_ITEM")		,TamSx3("C6_ITEM")[1]		,/*lPixel*/,{|| cStatus })				// Status de Embarque
 TRCell():New(oVenProd,"DTENTREGA1"	,/*Tabela*/	,"Dt.Entrega1"		 ,PesqPict("SC5","C5_XDTPCP1")	,TamSx3("C5_XDTPCP1")[1]	,/*lPixel*/,{|| cDtpcp1	})				// Data de Entrega 1
 TRCell():New(oVenProd,"OBS1"		,/*Tabela*/ ,"Observacao1"		 ,PesqPict("SC5","C5_XOBS1")	,TamSx3("C5_XOBS1")[1]		,/*lPixel*/,{|| cObs1 	})				// Observaï¿½ï¿½o 1
-TRCell():New(oVenProd,"DTENTREGA2"	,/*Tabela*/	,"Dt.Entrega2"		 ,PesqPict("SC5","C5_XDTPCP2")	,TamSx3("C5_XDTPCP2")[1]	,/*lPixel*/,{|| cDtpcp2	})				// Data de Entrega 2
-TRCell():New(oVenProd,"OBS2"		,/*Tabela*/ ,"Observacao2"		 ,PesqPict("SC5","C5_XOBS2")	,TamSx3("C5_XOBS2")[1]		,/*lPixel*/,{|| cObs2	})				// Observaï¿½ï¿½o 2
-TRCell():New(oVenProd,"DTENTREGA3"	,/*Tabela*/	,"Dt.Entrega3"		 ,PesqPict("SC5","C5_XDTPCP3")	,TamSx3("C5_XDTPCP3")[1]	,/*lPixel*/,{|| cDtpcp3	})				// Data de Entrega 3
-TRCell():New(oVenProd,"OBS3"		,/*Tabela*/ ,"Observacao3"		 ,PesqPict("SC5","C5_XOBS3")	,TamSx3("C5_XOBS3")[1]		,/*lPixel*/,{|| cObs3 	})				// Observaï¿½ï¿½o 3
-TRCell():New(oVenProd,"DTENTREGA4"	,/*Tabela*/	,"Dt.Entrega4"		 ,PesqPict("SC5","C5_XDTPCP4")	,TamSx3("C5_XDTPCP4")[1]	,/*lPixel*/,{|| cDtpcp4	})				// Data de Entrega 4
-TRCell():New(oVenProd,"OBS4"		,/*Tabela*/ ,"Observacao4"		 ,PesqPict("SC5","C5_XOBS4")	,TamSx3("C5_XOBS4")[1]		,/*lPixel*/,{|| cObs4 	})				// Observaï¿½ï¿½o 4
-TRCell():New(oVenProd,"DTENTREGA5"	,/*Tabela*/	,"Dt.Entrega5"		 ,PesqPict("SC5","C5_XDTPCP5")	,TamSx3("C5_XDTPCP5")[1]	,/*lPixel*/,{|| cDtpcp5	})				// Data de Entrega 5
-TRCell():New(oVenProd,"OBS5"		,/*Tabela*/ ,"Observacao5"		 ,PesqPict("SC5","C5_XOBS5")	,TamSx3("C5_XOBS5")[1]		,/*lPixel*/,{|| cObs5 	})				// Observaï¿½ï¿½o 5
-TRCell():New(oVenProd,"DTENTREGA6"	,/*Tabela*/	,"Dt.Entrega6"		 ,PesqPict("SC5","C5_XDTPCP6")	,TamSx3("C5_XDTPCP6")[1]	,/*lPixel*/,{|| cDtpcp6	})				// Data de Entrega 6
-TRCell():New(oVenProd,"OBS6"		,/*Tabela*/ ,"Observacao6"		 ,PesqPict("SC5","C5_XOBS6")	,TamSx3("C5_XOBS6")[1]		,/*lPixel*/,{|| cObs6 	})				// Observaï¿½ï¿½o 6
-TRCell():New(oVenProd,"DTENTREGA7"	,/*Tabela*/	,"Dt.Entrega7"		 ,PesqPict("SC5","C5_XDTPCP7")	,TamSx3("C5_XDTPCP7")[1]	,/*lPixel*/,{|| cDtpcp7	})				// Data de Entrega 7
-TRCell():New(oVenProd,"OBS7"		,/*Tabela*/ ,"Observacao7"		 ,PesqPict("SC5","C5_XOBS7")	,TamSx3("C5_XOBS7")[1]		,/*lPixel*/,{|| cObs7 	})				// Observaï¿½ï¿½o 7
-TRCell():New(oVenProd,"DTENTREGA8"	,/*Tabela*/	,"Dt.Entrega8"		 ,PesqPict("SC5","C5_XDTPCP8")	,TamSx3("C5_XDTPCP8")[1]	,/*lPixel*/,{|| cDtpcp8	})				// Data de Entrega 8
-TRCell():New(oVenProd,"OBS8"		,/*Tabela*/ ,"Observacao8"		 ,PesqPict("SC5","C5_XOBS8")	,TamSx3("C5_XOBS8")[1]		,/*lPixel*/,{|| cObs8 	})				// Observaï¿½ï¿½o 8
+//TRCell():New(oVenProd,"DTENTREGA2"	,/*Tabela*/	,"Dt.Entrega2"		 ,PesqPict("SC5","C5_XDTPCP2")	,TamSx3("C5_XDTPCP2")[1]	,/*lPixel*/,{|| cDtpcp2	})				// Data de Entrega 2
+//TRCell():New(oVenProd,"OBS2"		,/*Tabela*/ ,"Observacao2"		 ,PesqPict("SC5","C5_XOBS2")	,TamSx3("C5_XOBS2")[1]		,/*lPixel*/,{|| cObs2	})				// Observaï¿½ï¿½o 2
+//TRCell():New(oVenProd,"DTENTREGA3"	,/*Tabela*/	,"Dt.Entrega3"		 ,PesqPict("SC5","C5_XDTPCP3")	,TamSx3("C5_XDTPCP3")[1]	,/*lPixel*/,{|| cDtpcp3	})				// Data de Entrega 3
+//TRCell():New(oVenProd,"OBS3"		,/*Tabela*/ ,"Observacao3"		 ,PesqPict("SC5","C5_XOBS3")	,TamSx3("C5_XOBS3")[1]		,/*lPixel*/,{|| cObs3 	})				// Observaï¿½ï¿½o 3
+//TRCell():New(oVenProd,"DTENTREGA4"	,/*Tabela*/	,"Dt.Entrega4"		 ,PesqPict("SC5","C5_XDTPCP4")	,TamSx3("C5_XDTPCP4")[1]	,/*lPixel*/,{|| cDtpcp4	})				// Data de Entrega 4
+//TRCell():New(oVenProd,"OBS4"		,/*Tabela*/ ,"Observacao4"		 ,PesqPict("SC5","C5_XOBS4")	,TamSx3("C5_XOBS4")[1]		,/*lPixel*/,{|| cObs4 	})				// Observaï¿½ï¿½o 4
+//TRCell():New(oVenProd,"DTENTREGA5"	,/*Tabela*/	,"Dt.Entrega5"		 ,PesqPict("SC5","C5_XDTPCP5")	,TamSx3("C5_XDTPCP5")[1]	,/*lPixel*/,{|| cDtpcp5	})				// Data de Entrega 5
+//TRCell():New(oVenProd,"OBS5"		,/*Tabela*/ ,"Observacao5"		 ,PesqPict("SC5","C5_XOBS5")	,TamSx3("C5_XOBS5")[1]		,/*lPixel*/,{|| cObs5 	})				// Observaï¿½ï¿½o 5
+//TRCell():New(oVenProd,"DTENTREGA6"	,/*Tabela*/	,"Dt.Entrega6"		 ,PesqPict("SC5","C5_XDTPCP6")	,TamSx3("C5_XDTPCP6")[1]	,/*lPixel*/,{|| cDtpcp6	})				// Data de Entrega 6
+//TRCell():New(oVenProd,"OBS6"		,/*Tabela*/ ,"Observacao6"		 ,PesqPict("SC5","C5_XOBS6")	,TamSx3("C5_XOBS6")[1]		,/*lPixel*/,{|| cObs6 	})				// Observaï¿½ï¿½o 6
+//TRCell():New(oVenProd,"DTENTREGA7"	,/*Tabela*/	,"Dt.Entrega7"		 ,PesqPict("SC5","C5_XDTPCP7")	,TamSx3("C5_XDTPCP7")[1]	,/*lPixel*/,{|| cDtpcp7	})				// Data de Entrega 7
+//TRCell():New(oVenProd,"OBS7"		,/*Tabela*/ ,"Observacao7"		 ,PesqPict("SC5","C5_XOBS7")	,TamSx3("C5_XOBS7")[1]		,/*lPixel*/,{|| cObs7 	})				// Observaï¿½ï¿½o 7
+//TRCell():New(oVenProd,"DTENTREGA8"	,/*Tabela*/	,"Dt.Entrega8"		 ,PesqPict("SC5","C5_XDTPCP8")	,TamSx3("C5_XDTPCP8")[1]	,/*lPixel*/,{|| cDtpcp8	})				// Data de Entrega 8
+//TRCell():New(oVenProd,"OBS8"		,/*Tabela*/ ,"Observacao8"		 ,PesqPict("SC5","C5_XOBS8")	,TamSx3("C5_XOBS8")[1]		,/*lPixel*/,{|| cObs8 	})				// Observaï¿½ï¿½o 8
 TRCell():New(oVenProd,"LIBPROD"		,/*Tabela*/ ,"Lib.Producao"		 ,PesqPict("SC5","C5_XLIBPRO")	,TamSx3("C5_XLIBPRO")[1]	,/*lPixel*/,{|| cXLibPro})				// Liberação financeira para produção.
 TRCell():New(oVenProd,"DTLIBPROD"	,/*Tabela*/ ,"Dt.Lib.Producao"	 ,PesqPict("SC5","C5_XDLIBPR")	,TamSx3("C5_XDLIBPR")[1]	,/*lPixel*/,{|| dXDlibPr})				// Data da Liberação financeira para produção.
 TRCell():New(oVenProd,"QTD_PRV_PROD",/*Tabela*/	,"Prev.Entr.(OP)"	 ,PesqPict("SC2","C2_QUANT")		,TamSx3("C2_QUANT")[1]		,/*lPixel*/,{|| nPrvEntr })				// Saldo em Estoque
-//TRCell():New(oVenProd,"PRONTA"	  ,/*Tabela*/	,"Pronta Entrega?"	 ,PesqPict("SB1","B1_FAMILIA")	,TamSx3("B1_FAMILIA")[1]+10	,/*lPixel*/,{|| cPronta	})			// Pronta Entrega ?
-
+TRCell():New(oVenProd,"PRONTA"	  ,/*Tabela*/	,"Pronta Entrega?"	 ,PesqPict("SB1","B1_FAMILIA")	,TamSx3("B1_FAMILIA")[1]+10	,/*lPixel*/,{|| cPronta	})			// Pronta Entrega ?
 // Valor Frete 
 TRCell():New(oVenProd,"FRETEPV"	    ,/*Tabela*/	,"Frete"		     ,PesqPict("SC5","C5_FRETE")	,TamSx3("C5_FRETE")[1]	,/*lPixel*/,{||	nFrete})				// Vl Bruto + IPI
-
 // Pedido
 TRCell():New(oVenProd,"PV_QUANT"	,/*Tabela*/	,"PV.Quantidade"	 ,PesqPict("SC6","C6_QTDVEN")	,TamSx3("C6_QTDVEN")[1]		,/*lPixel*/,{|| nQuant	})				// Quantidade
 TRCell():New(oVenProd,"PV_SALDO"	,/*Tabela*/	,"PV A Entregar"	 ,PesqPict("SC6","C6_QTDVEN")	,TamSx3("C6_QTDVEN")[1]		,/*lPixel*/,{|| nSaldo	})				// Saldo
 TRCell():New(oVenProd,"PV_QT_LIB"   ,/*Tabela*/	,"PV.Qtd.Lib."		 ,PesqPict("SC6","C6_QTDVEN")	,TamSx3("C6_QTDVEN")[1]		,/*lPixel*/,{|| nPvLib	})				// Saldo
-
 // Saldos
 TRCell():New(oVenProd,"SLDEST"	    ,/*Tabela*/	,"Sld Estoque"	     ,PesqPict("SB2","B2_QATU")		,TamSx3("B2_QATU")[1]		,/*lPixel*/,{|| nSldEst })				// Saldo em Estoque
 TRCell():New(oVenProd,"QTD_EMP"	    ,/*Tabela*/	,"Qtd.Est.Empen."	 ,PesqPict("SB2","B2_QATU")		,TamSx3("B2_QATU")[1]		,/*lPixel*/,{|| nSldLib })				// Saldo em Estoque
 TRCell():New(oVenProd,"QTD_DISP"    ,/*Tabela*/	,"Qtd.Est.Disp."	 ,PesqPict("SB2","B2_QATU")		,TamSx3("B2_QATU")[1]		,/*lPixel*/,{|| nSldDisp })				// Saldo em Estoque
-
 TRCell():New(oVenProd,"RAT_FRETE"	,/*Tabela*/	,"Rat.Frete"		 ,PesqPict("SC5","C5_XFRETE")	,TamSx3("C5_XFRETE")[1]	    ,/*lPixel*/,{||	nRatFre})				// Rateio de Frete #6805
 
-TRCell():New(oVenProd,"ITDESE"		,/*Tabela*/ ,"Item Desenv?"		 ,PesqPict("SB1","B1_XITDESE")	,TamSx3("B1_XITDESE")[1]	,/*lPixel*/,{|| cXItDese})				// Item em Desenvolvimento
-TRCell():New(oVenProd,"DTITDS"		,/*Tabela*/ ,"Dt.Item Desenv"	 ,PesqPict("SB1","B1_XDTITDS")	,TamSx3("B1_XDTITDS")[1]	,/*lPixel*/,{|| dXDtItDs})				// Data que o item foi colocado em desenvolvimento
-TRCell():New(oVenProd,"PDF"			,/*Tabela*/ ,"PDF?"		 		 ,PesqPict("SB1","B1_XPDF")		,TamSx3("B1_XPDF")[1]		,/*lPixel*/,{|| cXPdf})					// PDF DEsenvolvido?
-TRCell():New(oVenProd,"DXF"			,/*Tabela*/ ,"DXF?"		 		 ,PesqPict("SB1","B1_XDFX")		,TamSx3("B1_XDFX")[1]		,/*lPixel*/,{|| cXDxf})					// DXF Desenvolvido?
-TRCell():New(oVenProd,"ESTRU"		,/*Tabela*/ ,"Estrutura?"		 ,PesqPict("SB1","B1_XESTR")	,TamSx3("B1_XESTR")[1]		,/*lPixel*/,{|| cXEstru})				// Estrutura liberada?
-TRCell():New(oVenProd,"MDOBRA"		,/*Tabela*/ ,"Mao de Obra?"		 ,PesqPict("SB1","B1_XMDOBRA")	,TamSx3("B1_XMDOBRA")[1]	,/*lPixel*/,{|| cXMDObra})				// M�o de Obra Cadastrada?
-//TRCell():New(oVenProd,"OBSENG"		,/*Tabela*/ ,"Obs Engenharia?"	 ,PesqPict("SC2","C2_XOBSENG")	,TamSx3("C2_XOBSENG")[1]	,/*lPixel*/,{|| cXObsEng})				// Observa��o Engenharia
-
+TRCell():New(oVenProd,"RESP. ENG"	,/*Tabela*/	,"Resp. Eng"		 ,PesqPict("SB1","B1_XREPENG")	,TamSx3("B1_XREPENG")[1]	    ,/*lPixel*/,{||	cXRespE})				// Rateio de Frete #6805
 
 //	nPvLib   := 0
 //  nSldLib  := 0
@@ -253,11 +258,11 @@ dbSetOrder(2)			// Produto,Numero
 			C5_EMISSAO,C5_XTPVEN,C5_VEND1,C5_XSTSFIN,C5_XDTAPRV,C5_TPFRETE,C5_TRANSP,
 			C5_XLIBREV,C5_XMOTLIB,C5_XDTPCP1,C5_XOBS1,C5_XDTPCP2,C5_XOBS2,
 			C5_XDTPCP3,C5_XOBS3,C5_XDTPCP4,C5_XOBS4,C5_XDTPCP5,C5_XOBS5,
-			C5_XDTPCP6,C5_XOBS6,C5_XDTPCP7,C5_XOBS7,C5_XDTPCP8,C5_XOBS8, C5_XFRETE, 
+			C5_XDTPCP6,C5_XOBS6,C5_XDTPCP7,C5_XOBS7,C5_XDTPCP8,C5_XOBS8, C5_XFRETE,B5_COMPRLC, B5_LARGLC,B5_ALTURLC, 
 			C5_XLIBPRO,C5_XDLIBPR,C5_CLIENTE, C5_LOJACLI, C5_FRETE,
 			A1_NOME, A1_NREDUZ, A1_EST, 
-			B1_XFABRIC,B1_TIPO,B1_LOCPAD,B1_XFAMILI, B1_FAMILIA, B1_XITDESE, B1_XDTITDS,B1_DESC,B1_XPROD, B1_XPDF, B1_XDFX, B1_XESTR, B1_XMDOBRA,
-			B5_CEME,
+			B1_XFABRIC,B1_TIPO,B1_LOCPAD,B1_XFAMILI, B1_FAMILIA, B1_XITDESE, B1_XDTITDS,B1_DESC,B1_XPROD, B1_XPDF, B1_XDFX, B1_XESTR, B1_XMDOBRA,B1_XESPLIB, B1_XREPENG,
+			B5_CEME, B1_XDTLIB,B1_XPADRAO, SC6.R_E_C_N_O_ RECSC6,
 			A3_GEREN,A3_NOME,A3_EMAIL,
 			B2_QATU,
 			(SELECT SUM(C2_QUANT - C2_QUJE) FROM %Table:SC2% SC2 WHERE C2_FILIAL = SC6.C6_FILIAL AND C2_PRODUTO = C6_PRODUTO AND C2_DATRF = ' ' AND SC2.%NotDel%) AS QTD_PRV_PROD,
@@ -331,11 +336,21 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	nSldEst	 := (cAliasQry)->B2_QATU
 	nPrvEntr := (cAliasQry)->QTD_PRV_PROD
 	cProd	 := (cAliasQry)->B1_XPROD
-	cXPdf	 := (cAliasQry)->B1_XPDF
-	cXDxf	 := (cAliasQry)->B1_XDFX
-	cXEstru  := (cAliasQry)->B1_XESTR
-	cXMDObra := (cAliasQry)->B1_XMDOBRA
-	//cXObsEng := (cAliasQry)->C2_XOBSENG
+	cXPdf	 := (cAliasQry)->B1_XPDF		//#6839
+	cXDxf	 := (cAliasQry)->B1_XDFX		//#6839
+	cXEstru  := (cAliasQry)->B1_XESTR		//#6839
+	cXMDObra := (cAliasQry)->B1_XMDOBRA		//#6839	
+	cXEspLib := (cAliasQry)->B1_XESPLIB		//#6839
+	cXDtLib := (cAliasQry)->B1_XDTLIB		//#6839
+	cXPadra := (cAliasQry)->B1_XPADRAO		//#6839
+	cCompri := (cAliasQry)->B5_COMPRLC		//#6839
+	cLargur := (cAliasQry)->B5_LARGLC		//#6839
+	cAltura := (cAliasQry)->B5_ALTURLC		//#6839
+	cXRespE := (cAliasQry)->B1_XREPENG		//#6839
+
+	SC6->(dbGoto((cAliasQry)->RECSC6))
+	cXObsEng := SC6->C6_XOBSENG 	//#6839
+	//cXObsEng := (cAliasQry)->C2_XOBSENG	//#6839
 
 	Do Case
     	Case (cAliasQry)->B1_XPROD == "1"		
@@ -375,9 +390,11 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		Case (cAliasQry)->B1_XDFX == "1"
 			cXDxf   := "Sim"
 		Case (cAliasQry)->B1_XDFX == "2"
+			cXDxf   := "N�o"
+		Case (cAliasQry)->B1_XDFX == "3"
 			cXDxf   := "N/A"
 		Case (cAliasQry)->B1_XDFX == " "
-			cXDxf   := "Avaliar"
+			cXDxf   := "Avaliar"	
 	End Case
 
 	// B1_XESTR									#6839
@@ -398,6 +415,16 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 			cXMDObra   := "N�o"
 		Case (cAliasQry)->B1_XMDOBRA == " "
 			cXMDObra   := "Avaliar"
+	End Case
+
+	// B1_XESPLIB								#6839
+	Do Case
+		Case (cAliasQry)->B1_XESPLIB == "1"
+			cXEspLib   := "Sim"
+		Case (cAliasQry)->B1_XESPLIB == "2"
+			cXEspLib   := "N�o"
+		Case (cAliasQry)->B1_XESPLIB == " "
+			cXEspLib   := "N�o"
 	End Case
 
 	cXFamil	 := POSICIONE("ZA1",1,xFilial("ZA1")+(cAliasQry)->B1_XFAMILI,"ZA1_DESC")
