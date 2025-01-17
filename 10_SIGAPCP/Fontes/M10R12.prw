@@ -28,7 +28,7 @@ Local oPrinter     := Nil
 
 Local nRow         := -0070
 Local cData        := DtoC(Date()) + ' ' + Time()
-Private _cNumOP      := SC2->C2_NUM                 //#7459
+Private _cNumOP      := SC2->C2_NUM+SC2->C2_ITEM+SC2->C2_SEQUEN                 //#7459
 Private _nQtdOP      := SC2->C2_QUANT               //#7459
 Private _cCodProd    := SC2->C2_PRODUTO             //#7459
 Private nPage        := 1
@@ -64,6 +64,8 @@ Return
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 Static Function M10RIItens(oPrinter,oFont9,oFont12,oFont12B,nRow,nPage,cData,_cNumOP,_nQtdOP,_cCodProd)
 
+//Local nX
+
 //Private aEstru    := {}         //#7459
 Private cQuery      := ''         //#7459
 Private _nRegSg1    := 0
@@ -75,6 +77,7 @@ Private nEstru      := 0
 Private cAnsul      := " "
 Private nPagina     := 0
 
+/*/
 cQuery := "WITH ESTRUT( CODIGO, COD_PAI, COD_COMP, QTD, PERDA, DT_INI, DT_FIM, ANSUL, NIVEL ) AS "
 cQuery += "( "
 
@@ -100,6 +103,36 @@ cQuery += "WHERE E1.CODIGO = '"+_cCodProd+"' "
 cQuery += "AND E1.DT_FIM >= '20471231' "
 
 TcQuery cQuery New Alias (cAlias := GetNextAlias())
+(cAlias)->(DbEval({|| _nRegSg1 ++ }))
+(cAlias)->(DbGoTop())
+/*/
+
+_cQuery := "SELECT CODIGO, COD_PAI, COD_COMP, SUM(QTD) QTD, PERDA, DT_INI, DT_FIM, ANSUL, NIVEL "
+_cQuery += " FROM ( "
+
+_cQuery += " SELECT D4_PRODUTO CODIGO, D4_PRODUTO COD_PAI, D4_COD COD_COMP "
+_cQuery += " ,( D4_QUANT - ISNULL(( SELECT SUM(CASE WHEN D3_TM > '500' THEN D3_QUANT ELSE D3_QUANT*-1 END) AS QTD FROM SD3010 SD3 WHERE D3_FILIAL = '01' AND D3_XOP = D4_OP AND D3_COD = D4_COD AND SD3.D_E_L_E_T_ = ' ' ),0) ) QTD "
+_cQuery += " , 0 PERDA, '' DT_INI, '' DT_FIM, D4_XANSUL ANSUL, 1 AS NIVEL "
+_cQuery += " FROM "+RetSqlName("SD4")+" SD4 (NOLOCK) "
+_cQuery += " WHERE SD4.D_E_L_E_T_ = ' ' "
+_cQuery += " AND D4_FILIAL = '"+FWxFilial("SD4")+"' "
+_cQuery += " AND D4_OP = '"+_cNumOP+"' "
+
+_cQuery += " ) TAB  "
+_cQuery += " GROUP BY CODIGO, COD_PAI, COD_COMP, PERDA, DT_INI, DT_FIM, ANSUL, NIVEL "
+_cQuery += " ORDER BY CODIGO, COD_PAI, COD_COMP, NIVEL "
+
+/*/
+If mv_par02 == 1  // Ansul Interno
+    _cQuery += "AND D4_XANSUL = '1' "
+ElseiF mv_par02 == 2  // Ansul Externo
+    _cQuery += "AND D4_XANSUL = '2' "
+ElseiF mv_par02 == 3  // Não Ansul
+    _cQuery += "AND D4_XANSUL NOT IN ('1','2') "
+EndIf
+/*/
+
+TcQuery _cQuery New Alias (cAlias := GetNextAlias())
 (cAlias)->(DbEval({|| _nRegSg1 ++ }))
 (cAlias)->(DbGoTop())
 
@@ -128,6 +161,7 @@ While ! (cAlias)->(Eof())
             (cAlias)->ANSUL,;                 
             .F.})  
 
+    dbSelectArea(cAlias)
     (cAlias)->(DbSkip())
 Enddo
 
