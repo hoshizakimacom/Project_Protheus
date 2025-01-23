@@ -424,7 +424,7 @@ Static Function M02EPrin(_cCodOpi,_nQtd,_cNumSer)
 		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-FB-008 Rev.00", _OFontP) /**#7666**/
 		
 		If _cINMETRO =="1"
-			_oPrinter:SayBitMap( 500, 800 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 30 * 4.0 , 30 * 4.0) // *** Valdemir - 03/03/2023 *** //
+			_oPrinter:SayBitMap( 500, 900 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 30 * 4.0 , 30 * 4.0) // *** Valdemir - 03/03/2023 *** // #7976 de 800 para 900 
 			//_oPrinter:SayBitMap( _nRow + 260, 1000 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 60 * 4.0 , 60 * 4.0)
 		Endif
 
