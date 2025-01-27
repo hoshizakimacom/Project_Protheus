@@ -229,7 +229,7 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 		_oPrinter:Say(_nRow + 450 , 70, "BCode Serial: " ,_OFontP)
 		_oPrinter:FWMSBAR('CODE128',12.4/*nRow*/,6/*nCol*/,AllTrim(_cNumSer),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/)
 //12.9
-		_oPrinter:QrCode(625,850,_cQRCode, 070) // #7976 - De 810 para 850
+		_oPrinter:QrCode(625,810,_cQRCode, 070) // #7976
 
 		_oPrinter:Say(_nRow + 505 , 270, Alltrim(_cNumSer),_OFontGG) //525
 		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-FB-008 Rev.00", _OFontP)
