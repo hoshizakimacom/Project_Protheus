@@ -90,6 +90,8 @@ If LEN(aOrdProd) > 0
 		oBrwOP:AddColumn(TCColumn():New(PADR('Qt.Entregue',25),{|| aOrdProd[oBrwOP:nAt, 11]},PesqPict("SC2","C2_QUJE"),,,'RIGHT', TAMSX3("C2_QUJE")[1]+15  ,.f.,.f.,,,,.f.,))
 		oBrwOP:AddColumn(TCColumn():New(PADR('Encerramento',20) ,{|| aOrdProd[oBrwOP:nAt, 12]},,,,'LEFT'	, TAMSX3("C2_DATRF")[1]+20    ,.f.,.f.,,,,.f.,))
 		oBrwOP:AddColumn(TCColumn():New(PADR('Sentido Pré',20) ,{|| aOrdProd[oBrwOP:nAt, 26]},,,,'LEFT'	, TAMSX3("B1_XSPRE")[1]+20    ,.f.,.f.,,,,.f.,))
+		oBrwOP:AddColumn(TCColumn():New('Prod.PAI'     ,{|| aOrdProd[oBrwOP:nAt,16]},,,,'LEFT'	, TAMSX3("C2_PRODUTO")[1]+15   ,.f.,.f.,,,,.f.,))
+		oBrwOP:AddColumn(TCColumn():New('Descr.PAI'    ,{|| aOrdProd[oBrwOP:nAt,17]},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
 		oBrwOP:AddColumn(TCColumn():New(''   		   ,{|| ''},,,,'CENTER', 1,.f.,.f.,,,,.f.,)) //Melhorar distribuição dos campos na tela
 
 		oBrwOP:SetHeaderImage(03,"COLDOWN")  //Numero da OP
@@ -167,6 +169,7 @@ User Function M04M11D()
 	Local nQtdEmpSld := 0
     //Local cAMSPDCAT  := GetNewPar(IIF(aRetPar[1]=="1","AM_SPDCATC","AM_SPDCATT"),.F.,"") //Codigos SPEND para Chapas e Tubos .Ex.: MP01;MP02
     Local cAMFAMIL2  := GetNewPar(IIF(aRetPar[1]=="1","AM_FAMIL2C","AM_FAMIL2T"),.F.,"") //Codigos Familia de Compras para Chapas e Tubos .Ex.: 000005;000011
+	Local aProdPAI   := {}
 
 	CursorWait()
 
@@ -262,6 +265,8 @@ User Function M04M11D()
 		EndIf
 		dbSelectArea(cAliasTrb)
 
+		aProdPAI := RetCodPai()
+
 		SB1->(dbGoTo((cAliasTrb)->(RECSB1)))
 
 		AADD(aOrdProd,{.F.,;                                            //1-Mark
@@ -279,8 +284,8 @@ User Function M04M11D()
                             (cAliasTrb)->RECSC2,;                       //13-RECSC2
                             (cAliasTrb)->RECSB1,;                       //14-RECPA1
                             {},;                                        //15-Array com as Operações
-                            "",;                                        //16-
-                            "",;                                        //17-
+                            aProdPai[1],;                               //16-Código Prod.PAI
+                            aProdPai[2],;                               //17-Descr.Prod.PAI
                             aRecSD4MP,;                                 //18-Registros Empenho MP de Corte
                             .F.,;                                       //19-Tem Saldo
                             cSeparada,;                                 //20-Separada
@@ -680,3 +685,44 @@ User Function M04M11L()
 	ACTIVATE MSDIALOG oDlgLeg CENTERED
 
 Return
+
+
+
+//------------------------------------------------------------------------------------------
+/*/{Protheus.doc} RetCodPai
+Retorna o Codigo e Descrição do Produto PAI
+@author    Montes 
+@version   12.1
+@since     31.01.2024
+
+@return NIL
+
+/*/
+//------------------------------------------------------------------------------------------
+Static Function RetCodPai()
+
+Local aProdPAI := {"",""}
+Local aArea    := GetArea()
+Local aAreaSC2 := SC2->(GetArea())
+Local aAreaSB1 := SC2->(GetArea())
+Local cNumOP   := SC2->C2_NUM
+Local cItemOP  := SC2->C2_ITEM
+
+dbSelectArea("SC2")
+dbSetOrder(1)
+While !EOF() .And. !(SC2->C2_SEQPAI="   ".OR.SC2->C2_SEQPAI="000")
+
+	dbSeek(xFilial("SC2")+cNumOP+cItemOP+SC2->C2_SEQPAI)
+
+EndDo
+
+If !EOF()
+   aProdPAI[1] := SC2->C2_PRODUTO
+   aProdPAI[2] := Posicione("SB1",1,xFilial("SB1")+SC2->C2_PRODUTO,"B1_DESC")
+EndIf
+
+RestArea(aArea)
+RestArea(aAreaSC2)
+RestArea(aAreaSB1)
+
+Return aProdPAI
