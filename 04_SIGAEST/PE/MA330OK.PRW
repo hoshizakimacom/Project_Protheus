@@ -26,7 +26,7 @@ If a330ParamZX[1] > LastDay(dInicio)
    lRet := .F.
 EndIf
 
-MsgStop("Inicio do Ponto de Entrada MA330OK - Atualiza豫o D3_RATEIO ! ")
+//MsgStop("Inicio do Ponto de Entrada MA330OK - Atualiza豫o D3_RATEIO ! ")
 // PRODPR0 = "3" 
 
 //旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
@@ -123,7 +123,7 @@ If Select("TRB_SD3") > 0
 	dbCloseArea()
 EndIf
 
-MsgStop("Final do Ponto de Entrada MA330OK - Atualiza豫o D3_RATEIO ! ")
+//MsgStop("Final do Ponto de Entrada MA330OK - Atualiza豫o D3_RATEIO ! ")
 
 RestArea(aArea)
 
