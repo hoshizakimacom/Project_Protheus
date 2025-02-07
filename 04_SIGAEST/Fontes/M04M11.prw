@@ -530,7 +530,7 @@ For nX := 1 To Len(aOrdProd)
 								cEspessura+";"+;
 								cMaterial+";"+;
 								Alltrim(SD4->D4_OP)+";"+;
-								Alltrim(SC2->C2_PRODUTO)+";"+;
+								Alltrim(aOrdProd[nX][16]/*SC2->C2_PRODUTO*/)+";"+;
 								cSentidoPre + chr(13)+chr(10) )
 
 				ElseIf aRetPar[1] == "2" //Tubo
