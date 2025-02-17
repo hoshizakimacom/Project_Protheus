@@ -113,7 +113,7 @@ TRCell():New(oVenProd,"TIPO"		,/*Tabela*/ ,"Tipo"	      ,PesqPict("SB1","B1_TIPO
 TRCell():New(oVenProd,"CST_STD"		,/*Tabela*/ ,"Cst.Std"	  ,PesqPict("SB1","B1_CUSTD")    ,TamSx3("B1_CUSTD")[1]   ,/*lPixel*/,{|| nCstStd })		// Descrição do Produto
 
 TRCell():New(oVenProd,"PICKING"		,/*Tabela*/ ,"Picking"	   ,PesqPict("SB1","B1_XPICLIS") ,3	  ,/*lPixel*/,{|| cPicking })		// Descrição do Produto
-TRCell():New(oVenProd,"FANTASMA"	,/*Tabela*/ ,"Fantasma"	   ,PesqPict("SB1","B1_FANTASM") ,3	  ,/*lPixel*/,{|| cFantasma})		// Descrição do Produto
+TRCell():New(oVenProd,"FANTASMA"	,/*Tabela*/ ,"Fantasma"	   ,PesqPict("SB1","B1_XKBAN")   ,3	  ,/*lPixel*/,{|| cFantasma})		// Descrição do Produto
 TRCell():New(oVenProd,"KANBAN"		,/*Tabela*/ ,"KanBan"	   ,PesqPict("SB1","B1_XKBAN")	 ,3	  ,/*lPixel*/,{|| cKanBan  })		// Descrição do Produto
 
 TRCell():New(oVenProd,"QTD_REQ"    ,/*Tabela*/ ,"Qtd.Req."	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nQtdReq  })		// Quantidade em pedido de vendas
@@ -195,13 +195,9 @@ ISNULL((SELECT MAX(B1_CUSTD) FROM SB1010 SB1 WHERE B1_FILIAL = ' '
 	AND B1_COD = COD_COMP
 	AND %NotDel%),' ') = '1' THEN 'SIM' ELSE 'NAO' END) KANBAN,
 
-QTD_REQ,
+(QTD_ESTRU * QTD_PROD) QTD_ESTRU,
 
-(ISNULL((SELECT SUM(ZG1_QUANT) FROM %Table:ZG1% ZG1 WHERE ZG1_FILIAL = %xFilial:ZG1%
-	AND ZG1_DTINCL = %Exp:MPAR05%
-	AND ZG1_COD = COD_PROD
-	AND ZG1_COMP = COD_COMP
-	AND %NotDel%),0) * QTD_PROD )  QTD_ESTRU,
+QTD_REQ,
 
 (ISNULL((SELECT SUM(D4_QTDEORI) FROM %Table:SD4% SD4 WHERE D4_FILIAL = %xFilial:SD4%
 	AND D4_OP = OP
@@ -240,8 +236,9 @@ SELECT OP,
 	AND %NotDel%) QTD_PROD,
 
 COD_COMP, 
+SUM(QTD_ESTRU) QTD_ESTRU,
 SUM(QTD_REQ) QTD_REQ,
-DATA_REQ,
+MAX(DATA_REQ) DATA_REQ,
 
 ISNULL((SELECT SUM(D3_QUANT) 
 	FROM %Table:SD3% SD32
@@ -255,16 +252,32 @@ ISNULL((SELECT SUM(D3_QUANT)
 
 FROM (
 
-SELECT D3_OP OP, D3_COD COD_COMP, D3_QUANT QTD_REQ , D3_EMISSAO DATA_REQ
+SELECT D3_OP OP, D3_COD COD_COMP, D3_QUANT QTD_REQ , D3_EMISSAO DATA_REQ, 0 QTD_ESTRU
 FROM %Table:SD3% SD3
 WHERE D3_FILIAL = %xFilial:SD3%
 AND D3_EMISSAO BETWEEN %Exp:MV_PAR01% AND  %Exp:MV_PAR02%
 AND LEFT(D3_CF,2) = 'RE'
+AND D3_OP <> ' '
 AND D3_OP BETWEEN %Exp:MV_PAR03% AND  %Exp:MV_PAR04%
 AND SD3.%NotDel%
 
+UNION ALL
+
+SELECT D3_OP OP, ZG1_COMP COD_COMP, 0 QTD_REQ , '' DATA_REQ, ZG1_QUANT QTD_ESTRU
+FROM SD3010 SD3,  ZG1010 ZG1
+WHERE D3_FILIAL = %xFilial:SD3%
+AND D3_EMISSAO BETWEEN %Exp:MV_PAR01% AND  %Exp:MV_PAR02%
+AND LEFT(D3_CF,2) = 'PR'
+AND D3_OP <> ' '
+AND D3_OP BETWEEN %Exp:MV_PAR03% AND  %Exp:MV_PAR04%
+AND SD3.%NotDel%
+AND ZG1_FILIAL = %xFilial:ZG1%
+AND ZG1_DTINCL = %Exp:MPAR05%
+AND ZG1_COD = D3_COD
+AND ZG1.%NotDel%
+
 ) TAB
-GROUP BY OP, COD_COMP, DATA_REQ
+GROUP BY OP, COD_COMP
 
 ) TAB2
 ORDER BY OP, COD_COMP
