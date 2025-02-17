@@ -45,95 +45,100 @@ Aadd(aPergs, {6, "Local arquivo CSV"      ,SPACE(100),"","","",100,.T.,"Todos os
 Aadd(aPergs, {1, "Emissão  De"            ,dDataBase ,"","","","",50,.F.}) //7
 Aadd(aPergs,{ 1, "Emissão  Ate"           ,dDataBase,"","","","",50,.T.})  //8
 
-If !ParamBox(aPergs, "Seleção para Exportação de dados para corte no Metalix", @aRetPar,/*bOk*/,/*aButtons*/,/*lCentered*/,/*nPOSX*/,/*nPOSY*/,/*oDlgWIzard*/,/*cLoad*/,/*lCanSave*/,.T./*lUserSave*/)
-    Return 
-EndIf
+While .T.
 
-LjMsgRun( "Carregando dados..." ,, {|| aOrdProd := U_M04M11D() } )
-
-If LEN(aOrdProd) > 0
-
-	oDlgPro := msDialog():New(aSizBrw[1],aSizBrw[2],aSizBrw[6],aSizBrw[5],cTitulo,,,,,,,,,.t.)
-	oTGr1qd := TGroup():New(aPosObj[1,1],aPosObj[1,2],aPosObj[1,3],aPosObj[1,4],'[ Ações da tela de Exportação de dados para Metalix ]',oDlgPro,,,.t.,)
-
-	oBtnExp := TButton():New(aPosObj[1,1]+08,aPosObj[1,2]+  3,'Exporta CSV'     ,oDlgPro,{|| LjMsgRun( "Aguarde, Exportando CSV...",, {|| U_M04M11Ger() } ) },45,15,,,.f.,.t.,.f.,,.f.,,,.f.)
-	oBtnCon := TButton():New(aPosObj[1,1]+08,aPosObj[1,2]+ 53,'Visualiza OP'    ,oDlgPro,{|| U_M04M11V() }                                                   ,45,15,,,.f.,.t.,.f.,,.f.,,,.f.)
-	oBtnLeg := TButton():New(aPosObj[1,1]+08,aPosObj[1,2]+103,'Legenda'         ,oDlgPro,{|| U_M04M11L() }                                                   ,45,15,,,.f.,.t.,.f.,,.f.,,,.f.)
-	oBtnExi := TButton():New(aPosObj[1,1]+08,aPosObj[1,2]+153,'Sair'            ,oDlgPro,{|| (lExit := .T.,oDlgPro:End()) }                                  ,45,15,,,.f.,.t.,.f.,,.f.,,,.f.)
-
-	//Quadro com as Ordens de Produção
-	oTGr2qd := TGroup():New(aPosObj[2,1],aPosObj[2,2],aPosObj[2,3],aPosObj[2,4],'[ Ordens de Produção - Corte de '+IIF(aRetPar[1]="1","Chapas","Tubos")+' ]',oDlgPro,,,.t.,)
-	oBrwOP  := MsBrGetDBase():New(aPosObj[2,1]+8,aPosObj[2,2]+1,aPosObj[2,4]-5,aPosObj[2,3]-aPosObj[2,1]-5/*25*/,,,,oDlgPro/*oWnd*/,,,,,,,,,,,,.f.,'',.t./*lPixel*/,,.f.,,,)
-	oBrwOP:SetArray(aOrdProd)
-	oBrwOP:bChange := { || CarregaOP() }
-	//oBrwOP:bDrawSelect := { || CarregaOP() }
-	oBrwOP:blDblClick := { || (lDblClick := .T.,aOrdProd[oBrwOP:nAt,1] := !aOrdProd[oBrwOP:nAt,1],oBrwOP:Refresh(),lDblClick := .F.) }
-
-	oBrwOP:bHeaderClick := {|oObj,nCol| IIf( nCol==1 , ( AEVal(aOrdProd,{|x| x[1] := !x[1] }) , oObj:Refresh() ),) }
-
-	If Len(oBrwOP:aColumns) == 0
-		oBrwOP:AddColumn(TCColumn():New('  '   		,{|| (/*CarregaOP()*/,Iif(aOrdProd[oBrwOP:nAt,1],'LBOK',"LBNO"))},,,,'CENTER', 10,.t.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New('Status'   		,{|| Iif(aOrdProd[oBrwOP:nAt,11] = 0, IIF(aOrdProd[oBrwOP:nAt,21]>0,"BR_AMARELO",Iif(aOrdProd[oBrwOP:nAt,20]="S",'BR_AZUL',Iif(aOrdProd[oBrwOP:nAt,20]="P",'BR_VIOLETA','BR_VERDE'))),;
-					(Iif(aOrdProd[oBrwOP:nAt,11] > 0 .And. EMPTY(aOrdProd[oBrwOP:nAt,12]), 'BR_AZUL',;
-					(Iif(!EMPTY(aOrdProd[oBrwOP:nAt,12]), 'BR_VERMELHO',;
-					)))))},,,,'CENTER', 25,.t.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New(PADR('Numero da OP',25),{|| aOrdProd[oBrwOP:nAt, 2]},,,,'LEFT'	, TAMSX3("C2_NUM")[1]+30       ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New('Item'   	   ,{|| aOrdProd[oBrwOP:nAt, 3]},,,,'LEFT'	, TAMSX3("C2_ITEM")[1]+10      ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New(PADR('Sequencia',15),{|| aOrdProd[oBrwOP:nAt, 4]},,,,'LEFT'	, TAMSX3("C2_SEQUEN")[1]+15    ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New('Item Grd.'    ,{|| aOrdProd[oBrwOP:nAt, 5]},,,,'LEFT'	, TAMSX3("C2_ITEMGRD")[1]+15   ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New('Produto'      ,{|| aOrdProd[oBrwOP:nAt, 6]},,,,'LEFT'	, TAMSX3("C2_PRODUTO")[1]+15   ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New('Descrição'    ,{|| aOrdProd[oBrwOP:nAt, 7]},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New('Emissão'      ,{|| aOrdProd[oBrwOP:nAt, 8]},,,,'LEFT'	, TAMSX3("C2_EMISSAO")[1]+10   ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New('Prv.Inicio'  ,{|| aOrdProd[oBrwOP:nAt, 24]},,,,'LEFT'	, TAMSX3("C2_DATPRI")[1]+10    ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New('Prv.Entrega'  ,{|| aOrdProd[oBrwOP:nAt, 9]},,,,'LEFT'	, TAMSX3("C2_DATPRF")[1]+10    ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New(PADR('Quantidade',25) ,{|| aOrdProd[oBrwOP:nAt, 10]},PesqPict("SC2","C2_QUANT"),,,'RIGHT', TAMSX3("C2_QUANT")[1]+15  ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New(PADR('Qt.Entregue',25),{|| aOrdProd[oBrwOP:nAt, 11]},PesqPict("SC2","C2_QUJE"),,,'RIGHT', TAMSX3("C2_QUJE")[1]+15  ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New(PADR('Encerramento',20) ,{|| aOrdProd[oBrwOP:nAt, 12]},,,,'LEFT'	, TAMSX3("C2_DATRF")[1]+20    ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New(PADR('Sentido Pré',20) ,{|| aOrdProd[oBrwOP:nAt, 26]},,,,'LEFT'	, TAMSX3("B1_XSPRE")[1]+20    ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New('Prod.PAI'     ,{|| aOrdProd[oBrwOP:nAt,16]},,,,'LEFT'	, TAMSX3("C2_PRODUTO")[1]+15   ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New('Descr.PAI'    ,{|| aOrdProd[oBrwOP:nAt,17]},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
-		oBrwOP:AddColumn(TCColumn():New(''   		   ,{|| ''},,,,'CENTER', 1,.f.,.f.,,,,.f.,)) //Melhorar distribuição dos campos na tela
-
-		oBrwOP:SetHeaderImage(03,"COLDOWN")  //Numero da OP
+	If !ParamBox(aPergs, "Seleção para Exportação de dados para corte no Metalix", @aRetPar,/*bOk*/,/*aButtons*/,/*lCentered*/,/*nPOSX*/,/*nPOSY*/,/*oDlgWIzard*/,/*cLoad*/,/*lCanSave*/,.T./*lUserSave*/)
+		Return 
 	EndIf
-	oBrwOP:CallRefresh()
 
-	oTGr4qd := TGroup():New(aPosObj[3,1],aPosObj[3,2],aPosObj[3,3],aPosObj[3,4],'[ Empenho de Materiais ]',oDlgPro,,,.t.,)
-	oBrwEmp := MsBrGetDBase():New(aPosObj[3,1]+8,aPosObj[3,2]+1,aPosObj[3,4]-5,aPosObj[3,3]-aPosObj[3,1]-5/*25*/,,,,oDlgPro,,,,,,,,,,,,.f.,'',.t.,,.f.,,,)
-	oBrwEmp:SetArray(aEmpenhos)
+	LjMsgRun( "Carregando dados..." ,, {|| aOrdProd := U_M04M11D() } )
 
-	If Len(oBrwEmp:aColumns) == 0
-		oBrwEmp:AddColumn(TCColumn():New('  '   		    ,{|| aEmpenhos[oBrwEmp:nAt,9]},,,,'CENTER', 10,.t.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New(PADR('Ordem de Produção',30),{|| aEmpenhos[oBrwEmp:nAt, 1]},,,,'LEFT'	, TAMSX3("D4_OP")[1]+15  ,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New('Componente'       ,{|| aEmpenhos[oBrwEmp:nAt, 2]},,,,'LEFT'	, TAMSX3("D4_COD")[1]+15  ,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New('Descrição'  	    ,{|| aEmpenhos[oBrwEmp:nAt, 3]},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New('Local'            ,{|| aEmpenhos[oBrwEmp:nAt, 4]},,,,'LEFT'	, TAMSX3("D4_LOCAL")[1]+15,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New('UM'               ,{|| aEmpenhos[oBrwEmp:nAt, 11]},,,,'LEFT'	, TAMSX3("B1_UM")[1]+15,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New('Quantidade'       ,{|| aEmpenhos[oBrwEmp:nAt, 5]},PesqPict("SD4","D4_QUANT"),,,'RIGHT'	, TAMSX3("D4_QUANT")[1]+20 ,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New(PADR('Sld.Loc.Emp.',30),{|| aEmpenhos[oBrwEmp:nAt, 6]},PesqPict("SB2","B2_QATU"),,,'RIGHT'	, TAMSX3("B2_QATU")[1]+20 ,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New(PADR('Sld.CQ',30)  ,{|| aEmpenhos[oBrwEmp:nAt, 7]},PesqPict("SB2","B2_QATU"),,,'RIGHT'	, TAMSX3("B2_QATU")[1]+20 ,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New(PADR('Sld.Processo',30)  ,{|| aEmpenhos[oBrwEmp:nAt, 12]},PesqPict("SB2","B2_QATU"),,,'RIGHT'	, TAMSX3("B2_QATU")[1]+20 ,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New(PADR('Qtd.Prv.Entrada',30),{|| aEmpenhos[oBrwEmp:nAt, 8]},PesqPict("SD4","D4_QUANT"),,,'RIGHT'	, TAMSX3("D4_QUANT")[1]+20 ,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New(PADR('Data Prev.Entrega',30),{|| aEmpenhos[oBrwEmp:nAt, 13]},,,,'LEFT'	, TAMSX3("C7_DATPRF")[1]+15,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New(PADR('Espessura',30),{|| aEmpenhos[oBrwEmp:nAt, 15]},,,,'LEFT'	, TAMSX3("B1_XESPES")[1]+15,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New(PADR('Material',30),{|| aEmpenhos[oBrwEmp:nAt, 16]},,,,'LEFT'	, TAMSX3("B1_XMAT")[1]+15,.f.,.f.,,,,.f.,))
-		oBrwEmp:AddColumn(TCColumn():New('  '   		    ,{|| ''},,,,'CENTER', 10,.t.,.f.,,,,.f.,)) //Melhorar distribuição dos campos na tela
+	If LEN(aOrdProd) > 0
+
+		oDlgPro := msDialog():New(aSizBrw[1],aSizBrw[2],aSizBrw[6],aSizBrw[5],cTitulo,,,,,,,,,.t.)
+		oTGr1qd := TGroup():New(aPosObj[1,1],aPosObj[1,2],aPosObj[1,3],aPosObj[1,4],'[ Ações da tela de Exportação de dados para Metalix ]',oDlgPro,,,.t.,)
+
+		oBtnExp := TButton():New(aPosObj[1,1]+08,aPosObj[1,2]+  3,'Exporta CSV'     ,oDlgPro,{|| LjMsgRun( "Aguarde, Exportando CSV...",, {|| U_M04M11Ger() } ) },45,15,,,.f.,.t.,.f.,,.f.,,,.f.)
+		oBtnCon := TButton():New(aPosObj[1,1]+08,aPosObj[1,2]+ 53,'Visualiza OP'    ,oDlgPro,{|| U_M04M11V() }                                                   ,45,15,,,.f.,.t.,.f.,,.f.,,,.f.)
+		oBtnLeg := TButton():New(aPosObj[1,1]+08,aPosObj[1,2]+103,'Legenda'         ,oDlgPro,{|| U_M04M11L() }                                                   ,45,15,,,.f.,.t.,.f.,,.f.,,,.f.)
+		oBtnFil := TButton():New(aPosObj[1,1]+08,aPosObj[1,2]+153,'Filtro'          ,oDlgPro,{|| oDlgPro:End() }                                                 ,45,15,,,.f.,.t.,.f.,,.f.,,,.f.)
+		oBtnExi := TButton():New(aPosObj[1,1]+08,aPosObj[1,2]+203,'Sair'            ,oDlgPro,{|| (lExit := .T.,oDlgPro:End()) }                                  ,45,15,,,.f.,.t.,.f.,,.f.,,,.f.)
+
+		//Quadro com as Ordens de Produção
+		oTGr2qd := TGroup():New(aPosObj[2,1],aPosObj[2,2],aPosObj[2,3],aPosObj[2,4],'[ Ordens de Produção - Corte de '+IIF(aRetPar[1]="1","Chapas","Tubos")+' ]',oDlgPro,,,.t.,)
+		oBrwOP  := MsBrGetDBase():New(aPosObj[2,1]+8,aPosObj[2,2]+1,aPosObj[2,4]-5,aPosObj[2,3]-aPosObj[2,1]-5/*25*/,,,,oDlgPro/*oWnd*/,,,,,,,,,,,,.f.,'',.t./*lPixel*/,,.f.,,,)
+		oBrwOP:SetArray(aOrdProd)
+		oBrwOP:bChange := { || CarregaOP() }
+		//oBrwOP:bDrawSelect := { || CarregaOP() }
+		oBrwOP:blDblClick := { || (lDblClick := .T.,aOrdProd[oBrwOP:nAt,1] := !aOrdProd[oBrwOP:nAt,1],oBrwOP:Refresh(),lDblClick := .F.) }
+
+		oBrwOP:bHeaderClick := {|oObj,nCol| IIf( nCol==1 , ( AEVal(aOrdProd,{|x| x[1] := !x[1] }) , oObj:Refresh() ),) }
+
+		If Len(oBrwOP:aColumns) == 0
+			oBrwOP:AddColumn(TCColumn():New('  '   		,{|| (/*CarregaOP()*/,Iif(aOrdProd[oBrwOP:nAt,1],'LBOK',"LBNO"))},,,,'CENTER', 10,.t.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Status'   		,{|| Iif(aOrdProd[oBrwOP:nAt,11] = 0, IIF(aOrdProd[oBrwOP:nAt,21]>0,"BR_AMARELO",Iif(aOrdProd[oBrwOP:nAt,20]="S",'BR_AZUL',Iif(aOrdProd[oBrwOP:nAt,20]="P",'BR_VIOLETA','BR_VERDE'))),;
+						(Iif(aOrdProd[oBrwOP:nAt,11] > 0 .And. EMPTY(aOrdProd[oBrwOP:nAt,12]), 'BR_AZUL',;
+						(Iif(!EMPTY(aOrdProd[oBrwOP:nAt,12]), 'BR_VERMELHO',;
+						)))))},,,,'CENTER', 25,.t.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(PADR('Numero da OP',25),{|| aOrdProd[oBrwOP:nAt, 2]},,,,'LEFT'	, TAMSX3("C2_NUM")[1]+30       ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Item'   	   ,{|| aOrdProd[oBrwOP:nAt, 3]},,,,'LEFT'	, TAMSX3("C2_ITEM")[1]+10      ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(PADR('Sequencia',15),{|| aOrdProd[oBrwOP:nAt, 4]},,,,'LEFT'	, TAMSX3("C2_SEQUEN")[1]+15    ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Item Grd.'    ,{|| aOrdProd[oBrwOP:nAt, 5]},,,,'LEFT'	, TAMSX3("C2_ITEMGRD")[1]+15   ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Produto'      ,{|| aOrdProd[oBrwOP:nAt, 6]},,,,'LEFT'	, TAMSX3("C2_PRODUTO")[1]+15   ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Descrição'    ,{|| aOrdProd[oBrwOP:nAt, 7]},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Emissão'      ,{|| aOrdProd[oBrwOP:nAt, 8]},,,,'LEFT'	, TAMSX3("C2_EMISSAO")[1]+10   ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Prv.Inicio'  ,{|| aOrdProd[oBrwOP:nAt, 24]},,,,'LEFT'	, TAMSX3("C2_DATPRI")[1]+10    ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Prv.Entrega'  ,{|| aOrdProd[oBrwOP:nAt, 9]},,,,'LEFT'	, TAMSX3("C2_DATPRF")[1]+10    ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(PADR('Quantidade',25) ,{|| aOrdProd[oBrwOP:nAt, 10]},PesqPict("SC2","C2_QUANT"),,,'RIGHT', TAMSX3("C2_QUANT")[1]+15  ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(PADR('Qt.Entregue',25),{|| aOrdProd[oBrwOP:nAt, 11]},PesqPict("SC2","C2_QUJE"),,,'RIGHT', TAMSX3("C2_QUJE")[1]+15  ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(PADR('Encerramento',20) ,{|| aOrdProd[oBrwOP:nAt, 12]},,,,'LEFT'	, TAMSX3("C2_DATRF")[1]+20    ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(PADR('Sentido Pré',20) ,{|| aOrdProd[oBrwOP:nAt, 26]},,,,'LEFT'	, TAMSX3("B1_XSPRE")[1]+20    ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Prod.PAI'     ,{|| aOrdProd[oBrwOP:nAt,16]},,,,'LEFT'	, TAMSX3("C2_PRODUTO")[1]+15   ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Descr.PAI'    ,{|| aOrdProd[oBrwOP:nAt,17]},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(''   		   ,{|| ''},,,,'CENTER', 1,.f.,.f.,,,,.f.,)) //Melhorar distribuição dos campos na tela
+
+			oBrwOP:SetHeaderImage(03,"COLDOWN")  //Numero da OP
+		EndIf
+		oBrwOP:CallRefresh()
+
+		oTGr4qd := TGroup():New(aPosObj[3,1],aPosObj[3,2],aPosObj[3,3],aPosObj[3,4],'[ Empenho de Materiais ]',oDlgPro,,,.t.,)
+		oBrwEmp := MsBrGetDBase():New(aPosObj[3,1]+8,aPosObj[3,2]+1,aPosObj[3,4]-5,aPosObj[3,3]-aPosObj[3,1]-5/*25*/,,,,oDlgPro,,,,,,,,,,,,.f.,'',.t.,,.f.,,,)
+		oBrwEmp:SetArray(aEmpenhos)
+
+		If Len(oBrwEmp:aColumns) == 0
+			oBrwEmp:AddColumn(TCColumn():New('  '   		    ,{|| aEmpenhos[oBrwEmp:nAt,9]},,,,'CENTER', 10,.t.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New(PADR('Ordem de Produção',30),{|| aEmpenhos[oBrwEmp:nAt, 1]},,,,'LEFT'	, TAMSX3("D4_OP")[1]+15  ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New('Componente'       ,{|| aEmpenhos[oBrwEmp:nAt, 2]},,,,'LEFT'	, TAMSX3("D4_COD")[1]+15  ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New('Descrição'  	    ,{|| aEmpenhos[oBrwEmp:nAt, 3]},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New('Local'            ,{|| aEmpenhos[oBrwEmp:nAt, 4]},,,,'LEFT'	, TAMSX3("D4_LOCAL")[1]+15,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New('UM'               ,{|| aEmpenhos[oBrwEmp:nAt, 11]},,,,'LEFT'	, TAMSX3("B1_UM")[1]+15,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New('Quantidade'       ,{|| aEmpenhos[oBrwEmp:nAt, 5]},PesqPict("SD4","D4_QUANT"),,,'RIGHT'	, TAMSX3("D4_QUANT")[1]+20 ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New(PADR('Sld.Loc.Emp.',30),{|| aEmpenhos[oBrwEmp:nAt, 6]},PesqPict("SB2","B2_QATU"),,,'RIGHT'	, TAMSX3("B2_QATU")[1]+20 ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New(PADR('Sld.CQ',30)  ,{|| aEmpenhos[oBrwEmp:nAt, 7]},PesqPict("SB2","B2_QATU"),,,'RIGHT'	, TAMSX3("B2_QATU")[1]+20 ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New(PADR('Sld.Processo',30)  ,{|| aEmpenhos[oBrwEmp:nAt, 12]},PesqPict("SB2","B2_QATU"),,,'RIGHT'	, TAMSX3("B2_QATU")[1]+20 ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New(PADR('Qtd.Prv.Entrada',30),{|| aEmpenhos[oBrwEmp:nAt, 8]},PesqPict("SD4","D4_QUANT"),,,'RIGHT'	, TAMSX3("D4_QUANT")[1]+20 ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New(PADR('Data Prev.Entrega',30),{|| aEmpenhos[oBrwEmp:nAt, 13]},,,,'LEFT'	, TAMSX3("C7_DATPRF")[1]+15,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New(PADR('Espessura',30),{|| aEmpenhos[oBrwEmp:nAt, 15]},,,,'LEFT'	, TAMSX3("B1_XESPES")[1]+15,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New(PADR('Material',30),{|| aEmpenhos[oBrwEmp:nAt, 16]},,,,'LEFT'	, TAMSX3("B1_XMAT")[1]+15,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New('  '   		    ,{|| ''},,,,'CENTER', 10,.t.,.f.,,,,.f.,)) //Melhorar distribuição dos campos na tela
+		EndIf
+		oBrwEmp:CallRefresh()
+
+		oBrwOP:goTop() //Força ir para a primeira linha
+
+		//CarregaOP() //Carrega a primeira OP
+
+		lExit := .F.
+		oDlgPro:Activate(,,,.t.,{|| .t. },,{|| .t.})
+
+		If lExit
+			Exit
+		EndIf
+	Else
+		MsgAlert("Não encontrado Ordens de Produção com o filtro informado! Revise o filtro")
 	EndIf
-	oBrwEmp:CallRefresh()
 
-	oBrwOP:goTop() //Força ir para a primeira linha
-
-	//CarregaOP() //Carrega a primeira OP
-
-	lExit := .F.
-	oDlgPro:Activate(,,,.t.,{|| .t. },,{|| .t.})
-
-	//If lExit
-	//	Exit
-	//EndIf
-Else
-	MsgAlert("Não encontrado Ordens de Produção com o filtro informado! Revise o filtro")
-EndIf
+EndDo
 
 Return Nil
 

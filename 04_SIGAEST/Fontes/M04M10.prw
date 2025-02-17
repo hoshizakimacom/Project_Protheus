@@ -421,7 +421,7 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
 
 	oGrpCo1 := TGROUP():New(000, 000, nLin-450, nCol-560/*600*/, "Estrutura de Produto - Visualiza Anexos", oDlg, CLR_HBLUE,, .T.)
 	//oGrpCo1:Align := CONTROL_ALIGN_ALLCLIENT
-	oTree := DbTree():New( 000, 000, nLin, nCol, oGrpCo1,{|| AtuBotao(oTree,.T.)},,.T.,,,'Produto/Componentes;_PDF;_COM;_FCT;_MNL;_RVT;_DXF')
+	oTree := DbTree():New( 000, 000, nLin, nCol, oGrpCo1,{|| AtuBotao(oTree,.T.)},,.T.,,,'Produto/Componentes;Sentido Pre;_PDF;_COM;_FCT;_MNL;_RVT;_DXF')
 	oTree:Align := CONTROL_ALIGN_ALLCLIENT
 
 	//oGrpCo2 := TGROUP():New(nLin-450, 000, nLin-250, nCol-600, "Dados do produto", oDlg, CLR_HBLUE,, .T.)
@@ -939,6 +939,13 @@ Local cDirServer := "\produtos_anexos\"
 Local cRet    	 := ""
 Local aSufixo 	 := { "_PDF", "_COM", "_FCT", "_MNL", "_RVT", "_DXF" }
 Local nX      	 := 0
+Local cXSPRE     := ""
+
+If !EMPTY(cXSPRE := POSICIONE("SB1",1,xFilial("SB1")+cProduto,"B1_XSPRE"))
+	cRet := ";"+X3Combo("B1_XSPRE",cXSPRE)
+Else
+	cRet := ";"
+EndIf
 
 For nX := 1 To Len(aSufixo)
 	If LEN(Directory(cDirServer+RTRIM(cProduto)+aSufixo[nX]+"*.*", "F")) > 0
