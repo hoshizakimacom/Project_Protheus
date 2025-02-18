@@ -4,16 +4,16 @@
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±ºPrograma  ³ M04R09    ºAutor  ³Marcos Rocha	     º Data ³  10/02/25   º±±
+±±ºPrograma  ³ M04R10    ºAutor  ³Marcos Rocha	     º Data ³  17/02/25   º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºDesc.     ³ Relatorio de Analise de OP                                 º±±
+±±ºDesc.     ³ Relatorio Consulta Transf x Requisição 99 (WIP)            º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
 ±±ºUso       ³ Macom 		                                              º±±
 ±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 */
-User Function M04R09()
+User Function M04R10()
 
 Local oReport
 
@@ -39,7 +39,7 @@ Local oReport
 Local oVenProd
 Local cAliasQry := GetNextAlias()
 
-c_Perg := "M04R09"
+c_Perg := "M04R10"
 ValidPerg()
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -53,7 +53,7 @@ ValidPerg()
 //³ExpC5 : Descricao                                                       ³
 //³                                                                        ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-oReport := TReport():New("M04R09","Relatório de Analise de OP/WIP","M04R09", {|oReport| ReportPrint(oReport,cAliasQry,oVenProd)},"Este relatorio emite com movimentos da Op x WIP !")
+oReport := TReport():New("M04R10","Relatório de Transf. x Req. WIP","M04R10", {|oReport| ReportPrint(oReport,cAliasQry,oVenProd)},"Este relatorio emite com movimentos de Transf x Requisição de Processo  !")
 oReport:SetTotalInLine(.F.)
 
 Pergunte(oReport:uParam,.F.)
@@ -92,38 +92,20 @@ Pergunte(oReport:uParam,.F.)
 //³        Default : ExpC2                                                 ³
 //³                                                                        ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-oVenProd := TRSection():New(oReport,"Rel. Analise de OP/WIP",{"SC2","SB1"},/*{Array com as ordens do relatório}*/,/*Campos do SX3*/,/*Campos do SIX*/)		// "Relacao de Pedidos por Produto"
+oVenProd := TRSection():New(oReport,"Rel. Transf x Requisição 99 (WIP) ",{"SD3","SB1"},/*{Array com as ordens do relatório}*/,/*Campos do SX3*/,/*Campos do SIX*/)		// "Relacao de Pedidos por Produto"
 oVenProd:SetTotalInLine(.F.)
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Define celulas da secao                                                 ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-TRCell():New(oVenProd,"OP"	        ,/*Tabela*/	,"Ordem Prod." ,PesqPict("SD3","D3_OP")	     ,TamSx3("D3_OP")[1]      ,/*lPixel*/,{|| cOP })		// Código do Produto
-TRCell():New(oVenProd,"EMISSAO"		,/*Tabela*/ ,"Emissao"	   ,PesqPict("SC2","C2_EMISSAO") ,TamSx3("C2_EMISSAO")[1] ,/*lPixel*/,{|| dEmissao})		// Armazem de estoque
-TRCell():New(oVenProd,"COD_PROD"	,/*Tabela*/ ,"Produto"	   ,PesqPict("SB1","B1_COD")	 ,TamSx3("B1_COD")[1]	  ,/*lPixel*/,{|| cProduto})		// Descrição do Produto
-
-TRCell():New(oVenProd,"QTD_OP"      ,/*Tabela*/ ,"Quant.OP."   ,PesqPict("SC2","C2_QUANT")	 ,TamSx3("C2_QUANT")[1]	  ,/*lPixel*/,{|| nQtdOP   })		// Quantidade em pedido de vendas
-TRCell():New(oVenProd,"QTD_PROD"    ,/*Tabela*/ ,"Quant.Prod." ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nQtdProd })		// Quantidade em pedido de vendas
-
-TRCell():New(oVenProd,"COD_COMP"	,/*Tabela*/ ,"Componente"  ,PesqPict("SB1","B1_COD")	 ,TamSx3("B1_COD")[1]	  ,/*lPixel*/,{|| cComponente})		// Descrição do Produto
-TRCell():New(oVenProd,"DESC_COMP"	,/*Tabela*/ ,"Desc.Comp"   ,PesqPict("SB1","B1_DESC")	 ,50	                  ,/*lPixel*/,{|| cDescComp })		// Descrição do Produto
-
-TRCell():New(oVenProd,"DATA_REQ"	,/*Tabela*/ ,"Dt.Req."	  ,PesqPict("SD3","D3_EMISSAO")  ,TamSx3("D3_EMISSAO")[1] ,/*lPixel*/,{|| dDtReq})		    // Armazem de estoque
-TRCell():New(oVenProd,"TIPO"		,/*Tabela*/ ,"Tipo"	      ,PesqPict("SB1","B1_TIPO")     ,TamSx3("B1_TIPO")[1]    ,/*lPixel*/,{|| cTipoComp })		// Descrição do Produto
-TRCell():New(oVenProd,"CST_STD"		,/*Tabela*/ ,"Cst.Std"	  ,PesqPict("SB1","B1_CUSTD")    ,TamSx3("B1_CUSTD")[1]   ,/*lPixel*/,{|| nCstStd })		// Descrição do Produto
-
-TRCell():New(oVenProd,"PICKING"		,/*Tabela*/ ,"Picking"	   ,PesqPict("SB1","B1_XPICLIS") ,3	  ,/*lPixel*/,{|| cPicking })		// Descrição do Produto
-TRCell():New(oVenProd,"FANTASMA"	,/*Tabela*/ ,"Fantasma"	   ,PesqPict("SB1","B1_XKBAN")   ,3	  ,/*lPixel*/,{|| cFantasma})		// Descrição do Produto
-TRCell():New(oVenProd,"KANBAN"		,/*Tabela*/ ,"KanBan"	   ,PesqPict("SB1","B1_XKBAN")	 ,3	  ,/*lPixel*/,{|| cKanBan  })		// Descrição do Produto
-
-TRCell():New(oVenProd,"QTD_REQ"    ,/*Tabela*/ ,"Qtd.Req."	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nQtdReq  })		// Quantidade em pedido de vendas
-TRCell():New(oVenProd,"QTD_ESTRU"  ,/*Tabela*/ ,"Qtd.Estr.."   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nQtdEstr })		// Quantidade em pedido de vendas
-TRCell():New(oVenProd,"QTD_EMP"    ,/*Tabela*/ ,"Qtd.Emp."	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nQtdEmp  })		// Quantidade em pedido de vendas
-TRCell():New(oVenProd,"SLD_EMP"    ,/*Tabela*/ ,"Sld.Emp."	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nSldEmp  })		// Quantidade em pedido de vendas
-TRCell():New(oVenProd,"SLD_99"     ,/*Tabela*/ ,"Sld.99"	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nSld99   })		// Quantidade em pedido de vendas
-TRCell():New(oVenProd,"QTD_TR_99"  ,/*Tabela*/ ,"Qtd_Tr_99"	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nTran99  })		// Quantidade em pedido de vendas
-TRCell():New(oVenProd,"ETAPA"       ,/*Tabela*/ ,"Etapa"	   ,PesqPict("SB1","B1_TIPO")	 ,TamSx3("B1_TIPO")[1]	  ,/*lPixel*/,{|| cEtapa})		// Descrição do Produto
-
+TRCell():New(oVenProd,"PRODUTO"	     ,/*Tabela*/ ,"Produto"	    ,PesqPict("SB1","B1_COD")	  ,TamSx3("B1_COD")[1]	  ,/*lPixel*/,{|| cProduto})		// Descrição do Produto
+TRCell():New(oVenProd,"EMISSAO"		 ,/*Tabela*/ ,"Emissao"	    ,PesqPict("SC2","C2_EMISSAO") ,TamSx3("C2_EMISSAO")[1] ,/*lPixel*/,{|| dEmissao})		// Armazem de estoque
+TRCell():New(oVenProd,"OP"	         ,/*Tabela*/ ,"Ordem Prod." ,PesqPict("SD3","D3_OP")	  ,TamSx3("D3_OP")[1]      ,/*lPixel*/,{|| cOP })		// Código do Produto
+TRCell():New(oVenProd,"QTD_TRANSF"   ,/*Tabela*/ ,"Qtd.Transf." ,PesqPict("SD3","D3_QUANT")	  ,TamSx3("D3_QUANT")[1]	  ,/*lPixel*/,{|| nQtdTransf })		// Quantidade em pedido de vendas
+TRCell():New(oVenProd,"QTD_REQ"      ,/*Tabela*/ ,"Qtd.Requis." ,PesqPict("SD3","D3_QUANT")	  ,TamSx3("D3_QUANT")[1]	  ,/*lPixel*/,{|| nQtdReq })		// Quantidade em pedido de vendas
+TRCell():New(oVenProd,"PICKING"		 ,/*Tabela*/ ,"Picking"	    ,PesqPict("SB1","B1_XPICLIS") ,3	  ,/*lPixel*/,{|| cPicking })		// Descrição do Produto
+TRCell():New(oVenProd,"FANTASMA"	 ,/*Tabela*/ ,"Fantasma"    ,PesqPict("SB1","B1_XKBAN")   ,3	  ,/*lPixel*/,{|| cFantasma})		// Descrição do Produto
+TRCell():New(oVenProd,"KANBAN"		 ,/*Tabela*/ ,"KanBan"	    ,PesqPict("SB1","B1_XKBAN")	 ,3	  ,/*lPixel*/,{|| cKanBan  })		// Descrição do Produto
 //TRCell():New(oVenProd,"CST_REQ"     ,/*Tabela*/ ,"Prim.Cont. "	     ,PesqPict("SB2","B2_QPEDVEN")	,TamSx3("B2_QPEDVEN")[1]	,/*lPixel*/,{|| nQPrim   })		// Quantidade em pedido de vendas
 
 Return(oReport)
@@ -145,7 +127,6 @@ Static Function ReportPrint(oReport,cAliasQry,oVenProd)
 Private aEstrutura := {}
 Private MPAR01 := DtoS(MV_PAR01)
 Private MPAR02 := DtoS(MV_PAR02)
-Private MPAR05 := DtoS(MV_PAR05)
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Query do relatório da secao 1                                           ³
@@ -154,136 +135,56 @@ oReport:Section(1):BeginQuery()
 
 BeginSql Alias cAliasQry
 
-SELECT OP, 
-
-ISNULL((SELECT MAX(C2_EMISSAO) FROM %Table:SC2% WHERE C2_FILIAL = %xFilial:SC2%
-	AND C2_NUM+C2_ITEM+C2_SEQUEN = LEFT(OP,11)
-	AND D_E_L_E_T_ <> '*'),' ') EMISSAO,
-
-COD_PROD, 
-
-ISNULL((SELECT MAX(C2_QUANT) FROM %Table:SC2% WHERE C2_FILIAL = %xFilial:SC2%
-	AND C2_NUM+C2_ITEM+C2_SEQUEN = LEFT(OP,11)
-	AND D_E_L_E_T_ <> '*'),' ') QTD_OP,
-
-QTD_PROD, COD_COMP, 
-
-ISNULL((SELECT MAX(B1_DESC) FROM %Table:SB1% SB1 WHERE B1_FILIAL = %xFilial:SB1%
-	AND B1_COD = COD_COMP
-	AND %NotDel%),' ') DESC_COMP,
-
- DATA_REQ,
-
-ISNULL((SELECT MAX(B1_TIPO) FROM SB1010 SB1 WHERE B1_FILIAL = ' ' 
-	AND B1_COD = COD_COMP
-	AND D_E_L_E_T_ <> '*'),' ') TIPO,
-
-ISNULL((SELECT MAX(B1_CUSTD) FROM SB1010 SB1 WHERE B1_FILIAL = ' ' 
-	AND B1_COD = COD_COMP
-	AND D_E_L_E_T_ <> '*'),' ') CST_STD,
-
+SELECT PRODUTO, EMISSAO, OP, SUM(QTD_TRANSF) QTD_TRANSF,
+SUM(QTD_REG_TRF) QTD_LANC_TRF,
+SUM(QTD_REQ) QTD_REQ, 
+SUM(QTD_REG_REQ) QTD_LANC_REQ ,
 
 (CASE WHEN ISNULL((SELECT MAX(B1_XPICLIS) FROM %Table:SB1% SB1 WHERE B1_FILIAL = %xFilial:SB1%
-	AND B1_COD = COD_COMP
+	AND B1_COD = PRODUTO
 	AND %NotDel%),' ') = '1' THEN 'SIM' ELSE 'NAO' END) PICKING,
 
 (CASE WHEN ISNULL((SELECT MAX(B1_FANTASM) FROM %Table:SB1% SB1 WHERE B1_FILIAL = %xFilial:SB1%
-	AND B1_COD = COD_COMP
+	AND B1_COD = PRODUTO
 	AND %NotDel%),' ') = 'S' THEN 'SIM' ELSE 'NAO' END) FANTASMA,
 
 (CASE WHEN ISNULL((SELECT MAX(B1_XKBAN) FROM %Table:SB1% SB1 WHERE B1_FILIAL = %xFilial:SB1%
-	AND B1_COD = COD_COMP
-	AND %NotDel%),' ') = '1' THEN 'SIM' ELSE 'NAO' END) KANBAN,
-
-(QTD_ESTRU * QTD_PROD) QTD_ESTRU,
-
-QTD_REQ,
-
-(ISNULL((SELECT SUM(D4_QTDEORI) FROM %Table:SD4% SD4 WHERE D4_FILIAL = %xFilial:SD4%
-	AND D4_OP = OP
-	AND D4_COD = COD_COMP
-	AND %NotDel%),0) )  QTD_EMP,
-
-(ISNULL((SELECT SUM(D4_QUANT) FROM %Table:SD4% SD4 WHERE D4_FILIAL = %xFilial:SD4%
-	AND D4_OP = OP
-	AND D4_COD = COD_COMP
-	AND %NotDel%),0) ) SLD_EMP,
-
-(ISNULL((SELECT SUM(B2_QATU) FROM %Table:SB2% SB2 WHERE B2_FILIAL = %xFilial:SB2%
-	AND B2_LOCAL = '99'
-	AND B2_COD = COD_COMP
-	AND %NotDel%),0) ) SLD_99,
-
-QTD_TR_99
+	AND B1_COD = PRODUTO
+	AND %NotDel%),' ') = '1' THEN 'SIM' ELSE 'NAO' END) KANBAN
 
 FROM (
 
-SELECT OP, 
-(SELECT MAX(D3_COD) 
-	FROM %Table:SD3% SD3
-	WHERE D3_FILIAL = %xFilial:SD3%
-	AND D3_EMISSAO BETWEEN %Exp:MPAR01% AND  %Exp:MPAR02%
-	AND LEFT(D3_CF,2) = 'PR'
-	AND D3_OP = OP
-	AND %NotDel%) COD_PROD,
-
-(SELECT MAX(D3_QUANT) 
-	FROM %Table:SD3% SD3
-	WHERE D3_FILIAL = %xFilial:SD3%
-	AND D3_EMISSAO BETWEEN %Exp:MPAR01% AND  %Exp:MPAR02%
-	AND LEFT(D3_CF,2) = 'PR'
-	AND D3_OP = OP
-	AND %NotDel%) QTD_PROD,
-
-COD_COMP, 
-SUM(QTD_ESTRU) QTD_ESTRU,
-SUM(QTD_REQ) QTD_REQ,
-MAX(DATA_REQ) DATA_REQ,
-
-ISNULL((SELECT SUM(D3_QUANT) 
-	FROM %Table:SD3% SD32
-	WHERE D3_FILIAL = %xFilial:SD3%
-	AND D3_EMISSAO BETWEEN %Exp:MPAR01% AND  %Exp:MPAR02%
-	AND D3_LOCAL = '99'
-	AND D3_CF IN ('DE4')
-	AND D3_COD = COD_COMP
-	AND D3_XOP = OP
-	AND %NotDel%),0) QTD_TR_99
-
-FROM (
-
-SELECT D3_OP OP, D3_COD COD_COMP, D3_QUANT QTD_REQ , D3_EMISSAO DATA_REQ, 0 QTD_ESTRU
+SELECT D3_COD PRODUTO, D3_EMISSAO EMISSAO, D3_XOP OP,
+(CASE WHEN D3_CF = 'DE4' THEN D3_QUANT ELSE D3_QUANT*-1 END) QTD_TRANSF,
+1 QTD_REG_TRF,
+0 QTD_REQ,
+0 QTD_REG_REQ 
 FROM %Table:SD3% SD3
-WHERE D3_FILIAL = %xFilial:SD3%
-AND D3_EMISSAO BETWEEN %Exp:MV_PAR01% AND  %Exp:MV_PAR02%
-AND LEFT(D3_CF,2) = 'RE'
-AND LEFT(D3_COD,3) <> 'MO-'
-AND D3_OP <> ' '
-AND D3_OP BETWEEN %Exp:MV_PAR03% AND  %Exp:MV_PAR04%
-AND SD3.%NotDel%
+WHERE D3_FILIAL =  %xFilial:SD3%
+AND D3_EMISSAO BETWEEN %Exp:MPAR01% AND  %Exp:MPAR02%
+AND (D3_CF IN('DE4','RE4') AND D3_LOCAL = '99')
+AND D3_COD BETWEEN %Exp:MV_PAR03% AND  %Exp:MV_PAR04%
+AND %NotDel%
 
 UNION ALL
 
-SELECT D3_OP OP, ZG1_COMP COD_COMP, 0 QTD_REQ , '' DATA_REQ, ZG1_QUANT QTD_ESTRU
-FROM SD3010 SD3,  ZG1010 ZG1
+SELECT D3_COD PRODUTO, D3_EMISSAO EMISSAO, D3_OP OP,
+0 QTD_TRANSF, 
+0 QTD_REG_TRF,
+D3_QUANT QTD_REQ,
+1 QTD_REG_REQ
+FROM %Table:SD3% SD3
 WHERE D3_FILIAL = %xFilial:SD3%
-AND D3_EMISSAO BETWEEN %Exp:MV_PAR01% AND  %Exp:MV_PAR02%
-AND LEFT(D3_CF,2) = 'PR'
-AND LEFT(D3_COD,3) <> 'MO-'
+AND D3_EMISSAO BETWEEN %Exp:MPAR01% AND  %Exp:MPAR02%
+
+AND (LEFT(D3_CF,2) = 'RE' AND D3_LOCAL = '99')
 AND D3_OP <> ' '
-AND D3_OP BETWEEN %Exp:MV_PAR03% AND  %Exp:MV_PAR04%
-AND SD3.%NotDel%
-AND ZG1_FILIAL = %xFilial:ZG1%
-AND ZG1_DTINCL = %Exp:MPAR05%
-AND ZG1_COD = D3_COD
-AND LEFT(ZG1_COMP,3) <> 'MO-'
-AND ZG1.%NotDel%
+AND D3_COD BETWEEN %Exp:MV_PAR03% AND  %Exp:MV_PAR04%
+AND %NotDel%
 
 ) TAB
-GROUP BY OP, COD_COMP
-
-) TAB2
-ORDER BY OP, COD_COMP
+GROUP BY PRODUTO, EMISSAO, OP
+ORDER BY PRODUTO, OP, EMISSAO
 
 EndSql
 
@@ -304,29 +205,18 @@ oReport:Section(1):Init()
 
 While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 
+	cProduto    := (cAliasQry)->PRODUTO
 	cOP         := (cAliasQry)->OP
 	dEmissao    := Stod((cAliasQry)->EMISSAO)
-	cProduto    := (cAliasQry)->COD_PROD
-	nQtdOP      := (cAliasQry)->QTD_OP
-	nQtdProd    := (cAliasQry)->QTD_PROD
-	cComponente := (cAliasQry)->COD_COMP
-	cDescComp   := (cAliasQry)->DESC_COMP
+	nQtdTransf  := (cAliasQry)->QTD_TRANSF
+	nQtdReq    	:= (cAliasQry)->QTD_REQ
 
-	dDTReq    	:= Stod((cAliasQry)->DATA_REQ)
-	cTipoComp 	:= (cAliasQry)->TIPO
-	nCstStd   	:= (cAliasQry)->CST_STD
+	nLancTr     := (cAliasQry)->QTD_LANC_TRF
+	nLancReq    := (cAliasQry)->QTD_LANC_REQ 
 
 	cPicking    := (cAliasQry)->PICKING
 	cFantasma   := (cAliasQry)->FANTASMA
 	cKanBan     := (cAliasQry)->KANBAN
-	nQtdReq     := (cAliasQry)->QTD_REQ
-
-	nQtdEstr    := (cAliasQry)->QTD_ESTRU
-	nQtdEmp     := (cAliasQry)->QTD_EMP
-	nSldEmp     := (cAliasQry)->SLD_EMP
-	nSld99      := (cAliasQry)->SLD_99
-	nTran99     := (cAliasQry)->QTD_TR_99
-	cEtapa      := " "
 	
 	oReport:IncMeter()
 	oReport:Section(1):PrintLine()
@@ -365,11 +255,10 @@ dbSetOrder(1)
 c_Perg := PADR(c_Perg,Len(SX1->X1_GRUPO))
 
 // Grupo /Ordem /Pergunta               /PERSPA  / PERENG/Variavel/Tipo   /Tamanho  /Decimal/Presel /GSC /Valid/Var01      /Def01      /DEFSPA1 /DEFENG1 /Cnt01 /Var02     /Def02           /DEFSPA2 /DEFENG2 /Cnt02 /Var03     /Def03          /DEFSPA3 /DEFENG3 /Cnt03 /Var04     /Def04          /DEFSPA4 /DEFENG4 /Cnt04 /Var05     /Def05          /DEFSPA5/DEFENG5  /Cnt05 /F3   /PYME/GRPSXG
-aAdd(aRegs,{c_Perg,"01"  ,"Emissao De ?      ",""      ,""     ,"MV_CH1","D"    ,08      ,0       ,0     ,"G" ,""    ,"MV_PAR01",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
-aAdd(aRegs,{c_Perg,"02"  ,"Emissao Até ?     ",""      ,""     ,"MV_CH2","D"    ,08      ,0       ,0     ,"G" ,""    ,"MV_PAR02",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
-aAdd(aRegs,{c_Perg,"03"  ,"Ordem Prod. De ?  ",""      ,""     ,"MV_CH3","C"    ,11      ,0       ,0     ,"G" ,""    ,"MV_PAR03",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
-aAdd(aRegs,{c_Perg,"04"  ,"Ordem Prod. Até ? ",""      ,""     ,"MV_CH4","C"    ,11      ,0       ,0     ,"G" ,""    ,"MV_PAR04",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
-aAdd(aRegs,{c_Perg,"05"  ,"Data Ref.Estrut.? ",""      ,""     ,"MV_CH5","D"    ,08      ,0       ,0     ,"G" ,""    ,"MV_PAR05",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
+aAdd(aRegs,{c_Perg,"01"  ,"Emissao De ?  ",""      ,""     ,"MV_CH1","D"    ,08      ,0       ,0     ,"G" ,""    ,"MV_PAR01",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
+aAdd(aRegs,{c_Perg,"02"  ,"Emissao Até ? ",""      ,""     ,"MV_CH2","D"    ,08      ,0       ,0     ,"G" ,""    ,"MV_PAR02",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
+aAdd(aRegs,{c_Perg,"03"  ,"Produto De ?  ",""      ,""     ,"MV_CH3","C"    ,15      ,0       ,0     ,"G" ,""    ,"MV_PAR03",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
+aAdd(aRegs,{c_Perg,"04"  ,"Produto Até ? ",""      ,""     ,"MV_CH4","C"    ,15      ,0       ,0     ,"G" ,""    ,"MV_PAR04",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
 
 For i:=1 to Len(aRegs)
 	If !dbSeek(c_Perg+aRegs[i,2])
