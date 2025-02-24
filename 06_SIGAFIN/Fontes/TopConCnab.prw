@@ -502,9 +502,9 @@ Static Function GetBarra(cBanco,cAgencia,cDigAgencia,cConta,cDigConta,cCarteira,
 
 	// Definicao do Fator de Vencimento
 	If cBanco $ "341" .AND. SE1->E1_EMISSAO == SE1->E1_VENCTO
-		cFator		:= Strzero(Val(StrZero(SE1->E1_EMISSAO - CToD("07/10/97"),4)) + 15,4)
+		cFator		:= Strzero(Val(StrZero(SE1->E1_EMISSAO - IIF(dVencto>=ctod("22/02/2025"),ctod("29/05/2022"),ctod("07/10/1997")),4)) + 15,4)
 	Else
-		cFator		:= StrZero(dVencto - CToD("07/10/97"),4)
+		cFator      := strzero(dVencto - IIF(dVencto>=ctod("22/02/2025"),ctod("29/05/2022"),ctod("07/10/1997")),4)
 	EndIf
 
 	// Definicao do NOSSO NÚMERO E CAMPO LIVRE
