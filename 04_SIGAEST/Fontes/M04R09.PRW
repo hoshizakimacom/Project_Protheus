@@ -116,12 +116,12 @@ TRCell():New(oVenProd,"PICKING"		,/*Tabela*/ ,"Picking"	   ,PesqPict("SB1","B1_X
 TRCell():New(oVenProd,"FANTASMA"	,/*Tabela*/ ,"Fantasma"	   ,PesqPict("SB1","B1_XKBAN")   ,3	  ,/*lPixel*/,{|| cFantasma})		// Descrição do Produto
 TRCell():New(oVenProd,"KANBAN"		,/*Tabela*/ ,"KanBan"	   ,PesqPict("SB1","B1_XKBAN")	 ,3	  ,/*lPixel*/,{|| cKanBan  })		// Descrição do Produto
 
-TRCell():New(oVenProd,"QTD_REQ"    ,/*Tabela*/ ,"Qtd.Req."	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nQtdReq  })		// Quantidade em pedido de vendas
 TRCell():New(oVenProd,"QTD_ESTRU"  ,/*Tabela*/ ,"Qtd.Estr.."   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nQtdEstr })		// Quantidade em pedido de vendas
+TRCell():New(oVenProd,"QTD_REQ"    ,/*Tabela*/ ,"Qtd.Req."	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nQtdReq  })		// Quantidade em pedido de vendas
 TRCell():New(oVenProd,"QTD_EMP"    ,/*Tabela*/ ,"Qtd.Emp."	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nQtdEmp  })		// Quantidade em pedido de vendas
+TRCell():New(oVenProd,"QTD_TR_99"  ,/*Tabela*/ ,"Qtd_Tr_99"	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nTran99  })		// Quantidade em pedido de vendas
 TRCell():New(oVenProd,"SLD_EMP"    ,/*Tabela*/ ,"Sld.Emp."	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nSldEmp  })		// Quantidade em pedido de vendas
 TRCell():New(oVenProd,"SLD_99"     ,/*Tabela*/ ,"Sld.99"	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nSld99   })		// Quantidade em pedido de vendas
-TRCell():New(oVenProd,"QTD_TR_99"  ,/*Tabela*/ ,"Qtd_Tr_99"	   ,PesqPict("SC2","C2_QUJE")	 ,TamSx3("C2_QUJE")[1]	  ,/*lPixel*/,{|| nTran99  })		// Quantidade em pedido de vendas
 TRCell():New(oVenProd,"ETAPA"       ,/*Tabela*/ ,"Etapa"	   ,PesqPict("SB1","B1_TIPO")	 ,TamSx3("B1_TIPO")[1]	  ,/*lPixel*/,{|| cEtapa})		// Descrição do Produto
 
 //TRCell():New(oVenProd,"CST_REQ"     ,/*Tabela*/ ,"Prim.Cont. "	     ,PesqPict("SB2","B2_QPEDVEN")	,TamSx3("B2_QPEDVEN")[1]	,/*lPixel*/,{|| nQPrim   })		// Quantidade em pedido de vendas
