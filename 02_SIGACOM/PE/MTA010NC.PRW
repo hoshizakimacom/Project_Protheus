@@ -1,4 +1,4 @@
-//Relaciona campos que não deve ser copiados na inclusão de um novo cadastro de produto.
+//Relaciona campos que não devem ser copiados na inclusão de um novo cadastro de produto.
 
 User Function MTA010NC() 
     Local aCpoNC  := {}
@@ -13,6 +13,16 @@ User Function MTA010NC()
     AAdd( aCPoNC, 'B1_XITDESE') //#4347
     AAdd( aCPoNC, 'B1_XDTITDS') //#4347
     AAdd( aCPoNC, 'B1_XUSUALT') //#4347
+
+    AAdd( aCPoNC, 'B1_XPDF')    //#8187
+    AAdd( aCPoNC, 'B1_XDFX')    //#8187
+    AAdd( aCPoNC, 'B1_XESTR')   //#8187
+    AAdd( aCPoNC, 'B1_XESPLIB') //#8187
+    AAdd( aCPoNC, 'B1_XPADRAO') //#8187
+    AAdd( aCPoNC, 'B1_XSPRE')   //#8187
+    AAdd( aCPoNC, 'B1_XESPES')  //#8187
+    AAdd( aCPoNC, 'B1_XMAT')    //#8187
+    AAdd( aCPoNC, 'B1_XMDOBRA') //#8187
 
     RestArea(_aAreaTu)
 
