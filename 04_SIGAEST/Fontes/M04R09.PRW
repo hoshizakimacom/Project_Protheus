@@ -145,7 +145,8 @@ Static Function ReportPrint(oReport,cAliasQry,oVenProd)
 Private aEstrutura := {}
 Private MPAR01 := DtoS(MV_PAR01)
 Private MPAR02 := DtoS(MV_PAR02)
-Private MPAR05 := DtoS(MV_PAR05)
+Private cDataZG1 := Left(GetMv("AM_PROCZG1"),10)
+cDataZG1 := SubStr(cDataZG1,7,4)+SubStr(cDataZG1,4,2)+Left(cDataZG1,2)
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Query do relatório da secao 1                                           ³
@@ -158,13 +159,13 @@ SELECT OP,
 
 ISNULL((SELECT MAX(C2_EMISSAO) FROM %Table:SC2% WHERE C2_FILIAL = %xFilial:SC2%
 	AND C2_NUM+C2_ITEM+C2_SEQUEN = LEFT(OP,11)
-	AND D_E_L_E_T_ <> '*'),' ') EMISSAO,
+	AND %NotDel%),' ') EMISSAO,
 
 COD_PROD, 
 
 ISNULL((SELECT MAX(C2_QUANT) FROM %Table:SC2% WHERE C2_FILIAL = %xFilial:SC2%
 	AND C2_NUM+C2_ITEM+C2_SEQUEN = LEFT(OP,11)
-	AND D_E_L_E_T_ <> '*'),' ') QTD_OP,
+	AND %NotDel%),' ') QTD_OP,
 
 QTD_PROD, COD_COMP, 
 
@@ -174,13 +175,13 @@ ISNULL((SELECT MAX(B1_DESC) FROM %Table:SB1% SB1 WHERE B1_FILIAL = %xFilial:SB1%
 
  DATA_REQ,
 
-ISNULL((SELECT MAX(B1_TIPO) FROM SB1010 SB1 WHERE B1_FILIAL = ' ' 
+ISNULL((SELECT MAX(B1_TIPO) FROM %Table:SB1% SB1 WHERE B1_FILIAL = ' ' 
 	AND B1_COD = COD_COMP
-	AND D_E_L_E_T_ <> '*'),' ') TIPO,
+	AND %NotDel%),' ') TIPO,
 
-ISNULL((SELECT MAX(B1_CUSTD) FROM SB1010 SB1 WHERE B1_FILIAL = ' ' 
+ISNULL((SELECT MAX(B1_CUSTD) FROM %Table:SB1% SB1 WHERE B1_FILIAL = ' ' 
 	AND B1_COD = COD_COMP
-	AND D_E_L_E_T_ <> '*'),' ') CST_STD,
+	AND %NotDel%),' ') CST_STD,
 
 
 (CASE WHEN ISNULL((SELECT MAX(B1_XPICLIS) FROM %Table:SB1% SB1 WHERE B1_FILIAL = %xFilial:SB1%
@@ -265,7 +266,7 @@ AND SD3.%NotDel%
 UNION ALL
 
 SELECT D3_OP OP, ZG1_COMP COD_COMP, 0 QTD_REQ , '' DATA_REQ, ZG1_QUANT QTD_ESTRU
-FROM SD3010 SD3,  ZG1010 ZG1
+FROM %Table:SD3% SD3, %Table:ZG1% ZG1
 WHERE D3_FILIAL = %xFilial:SD3%
 AND D3_EMISSAO BETWEEN %Exp:MV_PAR01% AND  %Exp:MV_PAR02%
 AND LEFT(D3_CF,2) = 'PR'
@@ -274,7 +275,7 @@ AND D3_OP <> ' '
 AND D3_OP BETWEEN %Exp:MV_PAR03% AND  %Exp:MV_PAR04%
 AND SD3.%NotDel%
 AND ZG1_FILIAL = %xFilial:ZG1%
-AND ZG1_DTINCL = %Exp:MPAR05%
+AND ZG1_DTINCL = %Exp:cDataZG1%
 AND ZG1_COD = D3_COD
 AND LEFT(ZG1_COMP,3) <> 'MO-'
 AND ZG1.%NotDel%
@@ -369,7 +370,7 @@ aAdd(aRegs,{c_Perg,"01"  ,"Emissao De ?      ",""      ,""     ,"MV_CH1","D"    
 aAdd(aRegs,{c_Perg,"02"  ,"Emissao Até ?     ",""      ,""     ,"MV_CH2","D"    ,08      ,0       ,0     ,"G" ,""    ,"MV_PAR02",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
 aAdd(aRegs,{c_Perg,"03"  ,"Ordem Prod. De ?  ",""      ,""     ,"MV_CH3","C"    ,11      ,0       ,0     ,"G" ,""    ,"MV_PAR03",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
 aAdd(aRegs,{c_Perg,"04"  ,"Ordem Prod. Até ? ",""      ,""     ,"MV_CH4","C"    ,11      ,0       ,0     ,"G" ,""    ,"MV_PAR04",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
-aAdd(aRegs,{c_Perg,"05"  ,"Data Ref.Estrut.? ",""      ,""     ,"MV_CH5","D"    ,08      ,0       ,0     ,"G" ,""    ,"MV_PAR05",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
+//aAdd(aRegs,{c_Perg,"05"  ,"qUANTO.Estrut.? ",""      ,""     ,"MV_CH5","D"    ,08      ,0       ,0     ,"G" ,""    ,"MV_PAR05",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
 
 For i:=1 to Len(aRegs)
 	If !dbSeek(c_Perg+aRegs[i,2])
