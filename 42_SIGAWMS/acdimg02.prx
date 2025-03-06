@@ -1,3 +1,5 @@
+#INCLUDE "PROTHEUS.CH"
+
 /*
 Padrao Zebra
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
@@ -37,17 +39,21 @@ Endif
 cCodigo := Alltrim(cCodigo)
 MSCBLOADGRF("SIGA.GRF")
 MSCBBEGIN(1,6)
-MSCBBOX(30,05,76,05)
-MSCBBOX(02,12.7,76,12.7)
-MSCBBOX(02,21,76,21)
-MSCBBOX(30,01,30,12.7,3)
+//MSCBBOX(30,05,76,05)
+//MSCBBOX(02,12.7,76,12.7)
+//MSCBBOX(02,21,76,21)
+//MSCBBOX(30,01,30,12.7,3)
 MSCBGRAFIC(2,3,"SIGA")
-MSCBSAY(33,02,'ENDERECO',"N","0","025,035",,,,,.t.)
-MSCBSAY(33,06,"CODIGO","N","A","012,008")
-MSCBSAY(33,08, AllTrim(SBE->BE_LOCALIZ), "N", "0", "032,035")
-MSCBSAY(05,14,"DESCRICAO","N","A","012,008")
-MSCBSAY(05,17,SBE->BE_DESCRIC,"N", "0", "020,030")
-MSCBSAYBAR(23,22,cCodigo,"N","MB07",8.36,.F.,.T.,.F.,,2,1,.F.,.F.,"1",.T.)
-MSCBInfoEti("Endereco","30X100")
+//MSCBSAY(33,02,'ENDERECO',"N","0","025,035",,,,,.t.)
+//MSCBSAY(33,06,"CODIGO","N","A","012,008")
+//MSCBSAY(33,08, AllTrim(SBE->BE_LOCALIZ), "N", "0", "032,035")
+//MSCBSAY(05,14,"DESCRICAO","N","A","012,008")
+//MSCBSAY(05,17,SBE->BE_DESCRIC,"N", "0", "020,030")
+//MSCBSAYBAR(23,22,cCodigo,"N","MB07",8.36,.F.,.T.,.F.,,2,1,.F.,.F.,"1",.T.)
+//MSCBInfoEti("Endereco","30X100")
+
+MSCBSAY(10,14, AllTrim(SBE->BE_LOCALIZ), "N", "0", "132,135")
+MSCBSAYBAR(33,42,cCodigo,"N","MB07",20.36,.F.,.T.,.F.,,2,1,.F.,.F.,"1",.T.)
+
 MSCBEND()
 Return .F.
