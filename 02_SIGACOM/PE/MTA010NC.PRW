@@ -23,6 +23,8 @@ User Function MTA010NC()
     AAdd( aCPoNC, 'B1_XESPES')  //#8187
     AAdd( aCPoNC, 'B1_XMAT')    //#8187
     AAdd( aCPoNC, 'B1_XMDOBRA') //#8187
+    AAdd( aCPoNC, 'B1_XDTLIB')  //#8228
+    AAdd( aCPoNC, 'B1_XREPENG') //#8228
 
     RestArea(_aAreaTu)
 
