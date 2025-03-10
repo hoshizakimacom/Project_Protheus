@@ -276,7 +276,7 @@ While !FT_FEOF()
 
 	// Valida duplicidade
 	nPosStr	:= aScan(aStruct,{|x| AllTrim(x[1])+AllTrim(x[2])+AllTrim(x[10]) == cCodPA+cCodMP+cSeqTRT})
-	If nPosStr > 0
+	If nPosStr > 0 .and. !RetCodUsr() $ GetMv("AM_M04A02")											//#8213
 		MsgStop(OemToAnsi("Existem componentes iguais na estrutura com a mesma sequ๊ncia : ")+cCodMP)
 		Aadd(aLog,"Existem componentes iguais na estrutura com a mesma sequ๊ncia : "+cCodMP)
 		FT_FSKIP()
@@ -538,7 +538,8 @@ For nProc := 1 To Len(aQtdEstru)
 				SG1->G1_COMP   := aEstrImp[nProc4,2]
 				SG1->G1_TRT    := aEstrImp[nProc4,6]  //cProxSequen
 				SG1->G1_QUANT  := aEstrImp[nProc4,3]
-				SG1->G1_INI    := FirstDay(dDataBase)
+//				SG1->G1_INI    := FirstDay(dDataBase)
+				SG1->G1_INI    := Ctod("01/01/2024")
 				SG1->G1_FIM    := Ctod("31/12/2049")
 				SG1->G1_FIXVAR := "V"
 				SG1->G1_PERDA  := aEstrImp[nProc4,4]
@@ -777,7 +778,7 @@ Local x       := 0
 //บ Ajustes e Execucao da Query                                              บ
 //ศออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออSilvio Cazelaอผ
 cQuery := ChangeQuery(cQuery)
-RY cQuery NEW ALIAS "_TRB"
+TCQUERY cQuery NEW ALIAS "_TRB"
 
 //ษออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออป
 //บ Montagem do Array para Retorno                                           บ
