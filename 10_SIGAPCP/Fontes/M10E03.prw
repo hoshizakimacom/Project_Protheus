@@ -177,20 +177,20 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
     End Case
   
 	Do Case 
-    	Case _cTensao == "1"
-    		 _cTensao := "220V ~ 3"     	
-    	Case _cTensao == "2"
-    	     _cTensao := "220V ~ 1"
-    	Case _cTensao == "3"
-    	     _cTensao := "127V ~ 1"
-    	Case _cTensao == "4"
-    		 _cTensao := "380V ~ 3"
-    	Case _cTensao == "5"
-    		 _cTensao := "115V ~ 1"
-    	Case _cTensao == "6"			//5078
-    		 _cTensao := "380V ~ 3N"	//5078
-		Case _cTensao == "7"			//7835
-    		 _cTensao := "220-240V ~ 1"	//7835
+    	Case _cTensao == "1"			//#8206
+    		 _cTensao := "220V 3 ~"     	
+    	Case _cTensao == "2"			//#8206
+    	     _cTensao := "220V ~"
+    	Case _cTensao == "3"			//#8206
+    	     _cTensao := "127V ~"
+    	Case _cTensao == "4"			//#8206
+    		 _cTensao := "380V 3 ~"
+    	Case _cTensao == "5"			//#8206
+    		 _cTensao := "115V ~"
+	   	Case _cTensao == "6"			//5078		//#8206
+    		 _cTensao := "380V 3N ~"	
+		Case _cTensao == "7"			//7835		//#8206
+    		 _cTensao := "220-240V ~"	
     EndCase
 
 	Do Case 
