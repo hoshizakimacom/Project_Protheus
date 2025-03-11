@@ -374,7 +374,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		Case (cAliasQry)->B1_XITDESE == " "
 			cXItDese   := "Avaliar"
 	End Case
-	
+
 	// B1_XPDF									#6839
 	Do Case
 		Case (cAliasQry)->B1_XPDF == "1"
@@ -425,6 +425,16 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 			cXEspLib   := "Não"
 		Case (cAliasQry)->B1_XESPLIB == " "
 			cXEspLib   := "Não"
+	End Case
+
+	// B1_XPADRAO								 #8191
+	Do Case
+		Case (cAliasQry)->B1_XPADRAO == "1"
+			cXItDese   := "Sim"
+		Case (cAliasQry)->B1_XPADRAO == "2"
+			cXItDese   := "Não"
+		Case (cAliasQry)->B1_XPADRAO == " "
+			cXItDese   := "Avaliar"
 	End Case
 
 	cXFamil	 := POSICIONE("ZA1",1,xFilial("ZA1")+(cAliasQry)->B1_XFAMILI,"ZA1_DESC")
