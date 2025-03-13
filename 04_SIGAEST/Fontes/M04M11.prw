@@ -44,6 +44,7 @@ Aadd(aPergs, {1, "Produto Ate"            ,REPLICATE('Z',TAMSX3("D3_COD")[1]),"@
 Aadd(aPergs, {6, "Local arquivo CSV"      ,SPACE(100),"","","",100,.T.,"Todos os arquivos (*.*) |*.*",,GETF_RETDIRECTORY+GETF_LOCALHARD+GETF_NETWORKDRIVE}) //6
 Aadd(aPergs, {1, "Emissão  De"            ,dDataBase ,"","","","",50,.F.}) //7
 Aadd(aPergs,{ 1, "Emissão  Ate"           ,dDataBase,"","","","",50,.T.})  //8
+Aadd(aPergs, {2, "Leiaute"                ,"1",{"1=Antigo","2=Novo"},80,".T.",.F.})                          //9
 
 While .T.
 
@@ -528,8 +529,13 @@ For nX := 1 To Len(aOrdProd)
 				If  aRetPar[1] == "1" // Chapa
 
 					//Alteração temporaria para teste de compartilhamento via pasta de anexos do PROTHEUS
-					cLocalDXF := "\\srvapl07\produtos_anexos" //"W:\Work\maquinas\dxf-prg" //"W:\Work\maquinas\dxf-prg\DXF-PDM"
-					cFileDXF  :=  FileDXF(SC2->C2_PRODUTO)    //Alltrim(SC2->C2_PRODUTO)+".DXF"
+					If aRetPar[9] == "1" //Leiaute anterior
+						cLocalDXF := "W:\Work\maquinas\dxf-prg" //"W:\Work\maquinas\dxf-prg\DXF-PDM"
+						cFileDXF  := Alltrim(SC2->C2_PRODUTO)+".DXF"
+					Else
+						cLocalDXF := "\\srvapl07\produtos_anexos"
+						cFileDXF  := FileDXF(SC2->C2_PRODUTO)
+					EndIf
 
 					fWrite(nH,  cLocalDXF+";"+;
 								cFileDXF+";"+;
