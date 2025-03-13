@@ -527,10 +527,12 @@ For nX := 1 To Len(aOrdProd)
 				//Dados do componente pra corte
 				If  aRetPar[1] == "1" // Chapa
 
-					cLocalDXF := "W:\Work\maquinas\dxf-prg" //"W:\Work\maquinas\dxf-prg\DXF-PDM"
+					//Alteração temporaria para teste de compartilhamento via pasta de anexos do PROTHEUS
+					cLocalDXF := "\\srvapl07\produtos_anexos" //"W:\Work\maquinas\dxf-prg" //"W:\Work\maquinas\dxf-prg\DXF-PDM"
+					cFileDXF  :=  FileDXF(SC2->C2_PRODUTO)    //Alltrim(SC2->C2_PRODUTO)+".DXF"
 
 					fWrite(nH,  cLocalDXF+";"+;
-								Alltrim(SC2->C2_PRODUTO)+".DXF"+";"+;
+								cFileDXF+";"+;
 								Alltrim(Transform(SC2->C2_QUANT/*SD4->D4_QUANT*/,"999999999.9"/*"999999999.999999"*/))+";"+;
 								cEspessura+";"+;
 								cMaterial+";"+;
@@ -731,3 +733,30 @@ RestArea(aAreaSC2)
 RestArea(aAreaSB1)
 
 Return aProdPAI
+
+//------------------------------------------------------------------------------------------
+/*/{Protheus.doc} FileDXF
+Retorna o Nome do Arquivo DXF na pasta do Servidor
+@author    Montes
+@version   12.1
+@since     06.03.2025
+
+@return NIL
+
+/*/
+//------------------------------------------------------------------------------------------
+Static Function FileDXF(cProduto)
+
+Local cDirServer := "\produtos_anexos\"
+Local cSufixo    := "_DXF"
+Local cExtensao  := ".DXF"
+Local cFile    	 := ""
+Local aFiles     := {}
+
+If LEN(aFiles := Directory(cDirServer+cProduto+cSufixo+"*"+cExtensao, "F")) > 0
+	cFile := aFiles[1,1]
+Else
+	cFile += Alltrim(cProduto)+cSufixo+"01"+cExtensao
+EndIf
+
+Return cFile
