@@ -285,21 +285,21 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNumSer)
     End Case
 
 	Do Case 
-    	Case _cTensao == "1"
-    		 _cTensao := "220v ~ 3"     	
-    	Case _cTensao == "2"
-    	     _cTensao := "220v ~ 1"
-    	Case _cTensao == "3"
-    	     _cTensao := "127v ~ 1"
-    	Case _cTensao == "4"
-    		 _cTensao := "380v ~ 3"
-    	Case _cTensao == "5"
-    		 _cTensao := "115v ~ 1"
-    	Case _cTensao == "6"			//5078
-    		 _cTensao := "380V ~ 3N"	//5078
-		Case _cTensao == "7"			//7835
-    		 _cTensao := "220-240V ~ 1"	//7835	 
-    EndCase
+		Case _cTensao == "1"			//#8206
+			_cTensao := "220V 3 ~"     	
+		Case _cTensao == "2"			//#8206
+			_cTensao := "220V ~"
+		Case _cTensao == "3"			//#8206
+			_cTensao := "127V ~"
+		Case _cTensao == "4"			//#8206
+			_cTensao := "380V 3 ~"
+		Case _cTensao == "5"			//#8206
+			_cTensao := "115V ~"
+		Case _cTensao == "6"			//5078		//#8206
+			_cTensao := "380V 3N ~"	
+		Case _cTensao == "7"			//7835		//#8206
+			_cTensao := "220-240V ~"	
+	EndCase
 
 	Do Case 
     	Case _cFreq == "1"
@@ -332,7 +332,7 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNumSer)
 		_oPrinter:Say(_nRow + 450 , 70, "BCode Serial: " ,_OFontP)
 		_oPrinter:FWMSBAR('CODE128',12.9/*nRow*/,6/*nCol*/,AllTrim(_cNumSer),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/)
 		_oPrinter:Say(_nRow + 525 , 270, Alltrim(_cNumSer),_OFontGG)
-		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-025 Rev.00", _OFontP)
+		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-FB-008 rev.01", _OFontP) // De FGQ-025 para FGQ-FB-008 rev.01
 		
 		If _cINMETRO =="1"
 			_oPrinter:SayBitMap( _nRow + 260, 1000 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 60 * 4.0 , 60 * 4.0)
