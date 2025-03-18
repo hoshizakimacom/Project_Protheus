@@ -17,37 +17,22 @@ Local _cPdf    := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPDF")
 Local _cDxf    := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XDFX")
 Local _cEstru  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESTR")
 Local _cMaoOb  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XMDOBRA")
+Local _cLibEng  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESPLIB")
+Local _cPadrao  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPADRAO")		//1=Sim 2=Não
 
-//MsgStop("TESTE","TESTE")
+IF _cTipoPrd == "ME"
+	_lRet := .F.
+    MsgAlert("Não é permitido abrir OP para Tipo ME", "Aviso")
 
-If _cItDese <> "S" //Diferente de Sim
-	MsgStop("Não é permitida a inclusão de ordem de produção, Item não está desenvolvido","ATENCAO")
-	 _lRet     := .F.
+ElseIf _cItDese == "N" 
+	_lRet := .F.
+    MsgAlert("Produto com pendências da Engenharia. Item não está desenvolvido", "Aviso")
+
+ElseIf _cLibEng == "2"
+	_lRet := .F.
+	MsgAlert("Produto não está liberado pela engenharia", "Aviso")
+
 EndIf
-
-If _cPdf <> "1" //Diferente de Sim
-	MsgStop("Não é permitida a inclusão de ordem de produção, PDF não está disponível","ATENCAO")
-	 _lRet     := .F.
-Endif
-
-If Empty(_cDxf) //Diferente de Sim
-	MsgStop("Não é permitida a inclusão de ordem de produção, DXF não está disponível","ATENCAO")
-	 _lRet     := .F.	
-Endif
-
-If _cEstru <> "1" //Diferente de Sim
-	MsgStop("Não é permitida a inclusão de ordem de produção, Não há estrutura cadastrada","ATENCAO")
-	 _lRet     := .F.
-Endif
-
-If _cMaoOb <> "1" //Diferente de Sim
-	MsgStop("Não é permitida a inclusão de ordem de produção, Não há Mão de Obra cadastrada","ATENCAO")
-	 _lRet     := .F.
-EndIf
-
-If _cTipoPrd == "ME" 
-    MsgStop("Não é permitida a inclusão de ordem de produção para produtos do tipo 'ME'","ATENCAO")
-    _lRet     := .F.
 
 ElseIf _lRet 
 
