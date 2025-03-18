@@ -34,7 +34,7 @@ ElseIf _cLibEng == "2"
 
 EndIf
 
-ElseIf _lRet 
+If _lRet 
 
     DbSelectArea("ZAB")
     dbGotop()
