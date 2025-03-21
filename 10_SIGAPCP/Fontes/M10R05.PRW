@@ -16,11 +16,11 @@ User Function M10R05()
 
 Local oReport
 
-	If FindFunction("TRepInUse") .And. TRepInUse()
+	//If FindFunction("TRepInUse") .And. TRepInUse()
 		//-- Interface de impressao
 		oReport := ReportDef()
 		oReport:PrintDialog()
-	EndIf
+	//EndIf
 
 Return
 
@@ -427,14 +427,14 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 			cXEspLib   := "Não"
 	End Case
 
-	// B1_XPADRAO								 #8191
+	// B1_XPADRAO								 #8191	
 	Do Case
-		Case (cAliasQry)->B1_XPADRAO == "1"
-			cXItDese   := "Sim"
+		Case (cAliasQry)->B1_XPADRAO == "1" 
+			cXPadra   := "Sim"					//#8249 - Ajustado variavel, de cXItDese para cXPadra
 		Case (cAliasQry)->B1_XPADRAO == "2"
-			cXItDese   := "Não"
+			cXPadra   := "Não"					//#8249 - Ajustado variavel, de cXItDese para cXPadra
 		Case (cAliasQry)->B1_XPADRAO == " "
-			cXItDese   := "Avaliar"
+			cXPadra   := "Avaliar"				//#8249 - Ajustado variavel, de cXItDese para cXPadra
 	End Case
 
 	cXFamil	 := POSICIONE("ZA1",1,xFilial("ZA1")+(cAliasQry)->B1_XFAMILI,"ZA1_DESC")
