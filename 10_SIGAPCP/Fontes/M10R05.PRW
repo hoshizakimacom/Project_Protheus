@@ -20,7 +20,7 @@ Local oReport
 		//-- Interface de impressao
 		oReport := ReportDef()
 		oReport:PrintDialog()
-	//EndIf
+	EndIf
 
 Return
 

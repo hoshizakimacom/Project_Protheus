@@ -73,7 +73,7 @@ If _nQtdJE <> 0
 	MsgStop("Não é possível a geração de Número(s) de Série, para Ordem de Produção Encerrada ou Iniciada ", "Atenção")
 	_lRet := .F.
 Else
-	If ! _cFamilia $ "000001|000002|000003|000004|000014"
+	If ! _cFamilia $ "000001|000002|000003|000004|000014|000015"
 		MsgStop("Não é posível gerar Número(s) de Série para as Famílias Cocção, Mobiliário, Refrigeração e Máquinas de Gelo Exportação ", "Atenção")
 	Else
 		Do Case
@@ -193,6 +193,7 @@ Else
                 MsUnlock()
 				M02EPrint(M->C2_PRODUTO , M->C2_QUANT, _cNumSer)
 				M02EPrin1(M->C2_PRODUTO , M->C2_QUANT, _cNumSer)
+				M02EPrin1(M->C2_PRODUTO , M->C2_QUANT, _cNumSer) //Adicionado mais uma impressão etq. Checklist
             Endif
 		Next _nX
 		
