@@ -14,7 +14,7 @@ Local I
 		//EndIf
 	EndIf
 
-	//Validacao condição de pagamento //#MONTES20250325
+	//Validacao condição de pagamento //#MONTES2025-03-25
 	For I := 1 To Len(aCols)
 		If aCols[I,Len(aHeader)+1]
 			Loop
