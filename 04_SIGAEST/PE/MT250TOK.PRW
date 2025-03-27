@@ -13,7 +13,7 @@ Local cFamili	:= Posicione("SB1",1, xFilial("SB1") + M->D3_COD, "B1_XFAMILI")
 //+---------------------------------------+
 //|| Efetua validação de quantidade única |
 //+---------------------------------------+
-If M->D3_QUANT <> 1 .And. cFamili $ "000001|000002|000004"
+If M->D3_QUANT <> 1 .And. cFamili $ "000001|000002|000003|000004"		//7487 add. Mobiliário
 	MsgStop("Quantidade apontada deve ser igual a 1","ATENÇÃO")
 	lRet := .F.
 Endif
@@ -52,7 +52,8 @@ If lRet
 
     ElseIf cFamili $ "000001|000002|000003|000004"
     	MsgStop("Número de série não encontrado !","ATENÇÃO")
-    	lRet := .F.
+//    	lRet := .F.
+
     Endif
 EndIf
 
@@ -63,10 +64,8 @@ DEFINE FONT oFont1 NAME "ARIAL" SIZE 8,14 BOLD
 //³ Valida se foram requisitados os itens na mesma proporcao do apontamento. ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 //MsgStop("MT250TOK - 1")
-
-//If GetMv("AM_XVLDPRD") == "S" .And. lRet // Parametro para Validar se foi requisitado na mesma proporcao
-If lRet // Parametro para Validar se foi requisitado na mesma proporcao
-
+/*/
+If GetMv("AM_XVLDPRD") == "S" .And. lRet // Parametro para Validar se foi requisitado na mesma proporcao
 	nPropApon := NoRound(((SC2->C2_QUJE+M->D3_QUANT) / SC2->C2_QUANT) * 100,2)
 
 	cQuery := "SELECT PRODUTO PRODUTO, SUM(QTDORI) QTDORI, SUM(QTDREQ) QTDREQ, MAX(PERCREQ) PERCREQ FROM ("
@@ -129,7 +128,10 @@ If lRet // Parametro para Validar se foi requisitado na mesma proporcao
 			cMensag += "++ Itens"+Chr(13) + Chr(10)
 			Exit
 		Else
-			cMensag += TRBTOK->PRODUTO+"   "+TransForm(TRBTOK->QTDORI,"@E 999,999.99")+"   "+TransForm(TRBTOK->QTDREQ,"@E 999,999.99")+"   "+TransForm(TRBTOK->PERCREQ ,"@E 9999.99")+ Chr(13) + Chr(10)
+			cDescProd := Left(Posicione("SB1",1,xFilial("SB1")+TRBTOK->PRODUTO,"B1_DESC"),30)
+			cTipoProd := Posicione("SB1",1,xFilial("SB1")+TRBTOK->PRODUTO,"B1_TIPO")
+
+			cMensag += TRBTOK->PRODUTO+" : "+cDescProd+" - Tipo : "+cTipoProd +"   "+TransForm(TRBTOK->QTDORI,"@E 999,999.99")+"   "+TransForm(TRBTOK->QTDREQ,"@E 999,999.99")+"   "+TransForm(TRBTOK->PERCREQ ,"@E 9999.99")+ Chr(13) + Chr(10)
 		EndIf
 		
 		dbSkip()
@@ -139,14 +141,19 @@ If lRet // Parametro para Validar se foi requisitado na mesma proporcao
 		Aviso(OemToAnsi("Atenção !"),cMensag, { "Ok" }, 3 ) 
 	EndIf
 
-	lRet := .T.  // Só Aviso por enquanto
+	//cMensag 
+
+//	lRet := .T.  // Só Aviso por enquanto
  
 	dbSelectArea("TRBTOK")
 	dbCloseArea()
 EndIf
 ///// Final do Bloqueio de Apontamento de OPs
+/*/
+
 
 ///// Valida se teve Item requisitado para OP ou tenha Chapa nos Empenhos
+/*/
 If lRet 
 
 	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -206,6 +213,7 @@ If lRet
 	EndIf
 
 EndIf
+/*/
 
 If lRet .And. cFamili $ "000001|000002|000003|000004"
 
@@ -215,7 +223,8 @@ If lRet .And. cFamili $ "000001|000002|000003|000004"
 	If ZAB->(MsSeek(xFilial("ZAB")+ M->D3_XNSERIE)) .And. lRet
 		If ZAB->ZAB_APONTA == "X"
 			MsgAlert("Numero de série já apontado !","ATENÇÃO")
-			lRet := .F.
+
+//			lRet := .F.
 		EndIf
 	EndIf
 

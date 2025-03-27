@@ -27,14 +27,12 @@ If a330ParamZX[1] > LastDay(dInicio)
 EndIf
 
 //MsgStop("Inicio do Ponto de Entrada MA330OK - Atualização D3_RATEIO ! ")
-
-//MV_PRODPR0 == '2'  - Usa a Proporcao de Rateio do Campo D3_RATEIO  
+// PRODPR0 = "3" 
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Realiza Query para calcular os rateios subentendendo que tudo é requisitado de uma vez. ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-
-cQry := " SELECT OP, D3_EMISSAO, RECSD3, QUANT_PROD, QTD_OP, QTD_PROD_MES_ANT, QTD_PROD_MES, "+CRLF
+cQry := " SELECT OP, RECSD3, QUANT_PROD, QTD_OP, QTD_PROD_MES_ANT, QTD_PROD_MES, "+CRLF
 cQry += " (CASE WHEN QUANT_PROD >= QTD_OP THEN 100 "+CRLF
 cQry += " WHEN QTD_PROD_MES >= QTD_OP THEN (QUANT_PROD / QTD_PROD_MES) * 100 "+CRLF
 cQry += " WHEN (QTD_PROD_MES_ANT + QTD_PROD_MES) >= QTD_OP THEN (QUANT_PROD / QTD_PROD_MES) * 100 "+CRLF
@@ -112,7 +110,8 @@ While TRB_SD3->(!Eof())
    //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
    SD3->(dbGoto(TRB_SD3->RECSD3))
    RecLock("SD3",.F.)
-   SD3->D3_RATEIO := nRateio
+   //SD3->D3_RATEIO := nRateio  // Marcos 29/01/25
+   SD3->D3_RATEIO := 100
    MsunLock()
    
    dbSelectArea("TRB_SD3")

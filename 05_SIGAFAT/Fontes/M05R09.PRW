@@ -166,6 +166,8 @@ TRCell():New(oVenProd,"DESCONT2"	,/*Tabela*/	,"Desconto 2" 	     ,PesqPict("SC5"
 TRCell():New(oVenProd,"DESCONT3"	,/*Tabela*/	,"Desconto 3" 	     ,PesqPict("SC5","C5_DESC3")	,TamSx3("C5_DESC3")[1]	    ,/*lPixel*/,{|| nDesc3  })				// Desconto 3
 TRCell():New(oVenProd,"DESCONT4"	,/*Tabela*/	,"Desconto 4" 	     ,PesqPict("SC5","C5_DESC4")	,TamSx3("C5_DESC4")[1]	    ,/*lPixel*/,{|| nDesc4  })				// Desconto 4
 TRCell():New(oVenProd,"%DESCONTO"	,/*Tabela*/	,"% Desconto" 	     ,PesqPict("SC6","C6_DESCONT")	,TamSx3("C6_DESCONT")[1]	,/*lPixel*/,{|| nDescitem  })			// % Desconto
+TRCell():New(oVenProd,"%FRETE"		,/*Tabela*/	,"% Frete"	 	     ,PesqPict("SC5","C5_XFRETE")	,TamSx3("C5_XFRETE")[1]	    ,/*lPixel*/,{|| cXFrete })				// % Frete
+TRCell():New(oVenProd,"%ACRSFIN"	,/*Tabela*/	,"% Acres. Finan."   ,PesqPict("SE4","E4_ACRSFIN")	,TamSx3("E4_ACRSFIN")[1]    ,/*lPixel*/,{|| nAcrsFin })				// % Frete
 
 Return(oReport)
 
@@ -216,7 +218,8 @@ dbSetOrder(2)			// Produto,Numero
 	
 		SELECT 
 			C6_FILIAL,C6_NUM,C6_ITEM, C6_NOTA,C6_DATFAT,C6_ENTREG,C6_CLI,C6_LOJA,C6_ITEM,C6_PRODUTO,C6_DESCRI,
-			C6_CF,C6_QTDVEN,C6_PRCVEN,C6_XVLTIPI,C6_XVLTSOL,C6_XOPER, B1_DESC, B1_TIPO, B1_POSIPI, B1_UM, B1_XFAMILI, C6_DESCONT
+			C6_CF,C6_QTDVEN,C6_PRCVEN,C6_XVLTIPI,C6_XVLTSOL,C6_XOPER, 
+			B1_DESC, B1_TIPO, B1_POSIPI, B1_UM, B1_XFAMILI, C6_DESCONT, SC6.R_E_C_N_O_ RECSC6
 		FROM 
 			%Table:SC6% SC6, %Table:SC5% SC5, %Table:SB1% SB1 
 		WHERE 
@@ -285,7 +288,12 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	EndIf
 	cPedido  := (cAliasQry)->C6_NUM
 
+	// Posiciona SC5 
 	lPosC5	:= SC5->(MsSeek((cAliasQry)->C6_FILIAL+(cAliasQry)->C6_NUM))
+
+	// Posiciona SC6 
+	SC6->(dbGoto((cAliasQry)->RECSC6))
+
 	lPosA1	:= SA1->(MsSeek(xFilial('SA1')+(cAliasQry)->C6_CLI+(cAliasQry)->C6_LOJA))
 
 	If lPosC5
@@ -364,6 +372,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		nDesc2		:= SC5->C5_DESC2
 		nDesc3		:= SC5->C5_DESC3
 		nDesc4		:= SC5->C5_DESC4
+		nAcrsFin	:= Posicione("SE4",1,xFilial("SE4") +SC5->C5_CONDPAG, "E4_ACRSFIN")
 
 
 	
@@ -378,6 +387,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		nVlrInst    := SC5->C5_XVLINST
 		//cTpInst		:= IIF(SC5->C5_XTPINST== "1","1 - Sem Instalacao","2 - Credenciada")
 		cXObras     := SC5->C5_XOBRAS
+		cXFrete		:= SC5->C5_XFRETE
 		
 		//U_BusTpVen(cTpVen) //Função para utilizar os tipo de vendas cadastrados no campo C5_XTPVEN
 

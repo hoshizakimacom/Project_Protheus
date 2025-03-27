@@ -64,7 +64,8 @@ Processa({||DelMODs()},"Excluindo possíveis movimentos gerados!!!")
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Gera novas Movimentacoes para o intervalo informado                                   ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-Processa({||GeraMOD()},"Gerando Movimentos de Requisição de MOD - Chapas !")
+//Processa({||GeraMOD()},"Gerando Movimentos de Requisição de MOD - Chapas !")
+// Marcos 29/01/25
 
 Processa({||GeraMOD2()},"Gerando Movimentos de Requisição de MOD !")
 
@@ -87,9 +88,12 @@ Local cQry	:= " "
 
 cQry := "SELECT R_E_C_N_O_ RECNO1 FROM "+RetSqlName("SD3")
 cQry += " WHERE D3_FILIAL = '"+xFilial("SD3")+"'"+cEOL
-//cQry += " AND LEFT(D3_COD,3) IN ('MO-','MOD','   ') "+cEOL
 //cQry += " AND LEFT(D3_COD,3) IN ('MOD','   ') "+cEOL
 cQry += " AND LEFT(D3_COD,3) IN ('MO-') "+cEOL
+
+//cQry += " AND LEFT(D3_COD,3) IN ('MO-','MOD') "+cEOL
+// Marcos 29/01/25
+
 cQry += " AND D3_TIPO = '"+c_TipoMO+"'"+cEOL
 cQry += " AND D3_TM = '"+c_TM+"' "+cEOL
 cQry += " AND D3_EMISSAO BETWEEN '"+DTOS(mv_par01)+"' AND '"+DTOS(mv_par02)+"'"+cEOL
@@ -133,6 +137,7 @@ Return
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 */
+/*/
 Static Function GeraMOD()
 
 local cEOL		:= Chr(10)+Chr(13)
@@ -142,16 +147,19 @@ Private aEstrutura := {}
 
 cQry := "SELECT D3_FILIAL, D3_COD, D3_TIPO, D3_EMISSAO, D3_NUMSEQ, D3_OP, D3_DOC "+cEOL
 cQry += " ,SUM(D3_QUANT) D3_QUANT,   SUM(D3_CUSTO1) D3_CUSTO1"+cEOL
-cQry += " FROM "+RetSqlName("SD3")+" SD3 "+cEOL
+cQry += " FROM "+RetSqlName("SD3")+" SD3, "+RetSqlName("SC2")+" SC2 "+cEOL
 cQry += " WHERE D3_FILIAL = '"+xFilial("SD3")+"'"+cEOL
 cQry += " AND D3_EMISSAO BETWEEN '"+DTOS(mv_par01)+"' AND '"+DTOS(mv_par02)+"'"+cEOL
 cQry += " AND D3_OP <> ' ' AND SUBSTRING(D3_CF,1,2)='PR' AND D3_ESTORNO<>'S' "+cEOL
+cQry += " AND SD3.D_E_L_E_T_ <> '*' "+cEOL
 
-//cQry += " AND D3_COD = 'FTC1-AN        ' "+cEOL  // Teste Fritadeira
-//cQry += " AND D3_OP = 'S4802201008   ' "+cEOL  // Teste Fritadeira
-//cQry += " AND D3_DOC = 'ZTESTFUNT' "+cEOL  // Teste Fritadeira
+cQry += " AND SC2.C2_FILIAL = SD3.D3_FILIAL "+cEOL
+cQry += " AND SC2.C2_NUM+SC2.C2_ITEM+SC2.C2_SEQUEN+'  ' = SD3.D3_OP"+cEOL
+If mv_par04 == 2  // Gera MOD de OP de Retrabalho / Reprocesso
+	cQry += " AND SC2.C2_TPPR <> 'R' "+cEOL
+EndIf
+cQry += " AND SC2.D_E_L_E_T_ <> '*' "+cEOL
 
-cQry += " AND D_E_L_E_T_ <> '*' "+cEOL
 cQry += " GROUP BY D3_FILIAL,D3_COD, D3_TIPO, D3_EMISSAO, D3_NUMSEQ, D3_OP, D3_DOC "+cEOL
 cQry += " ORDER BY D3_FILIAL,D3_COD"+cEOL
 
@@ -288,6 +296,7 @@ While TRB_SD3->(!Eof())
 EndDo
 
 Return
+/*/
 
 /*/
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
@@ -442,8 +451,8 @@ c_Perg := PADR(c_Perg,Len(SX1->X1_GRUPO))
 aAdd(aRegs,{c_Perg,"01"  ,"Data de              ?",""      ,""     ,"MV_CH1","D"    ,08      ,0       ,0     ,"G" ,""    ,"MV_PAR01",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
 aAdd(aRegs,{c_Perg,"02"  ,"Data ate             ?",""      ,""     ,"MV_CH2","D"    ,08      ,0       ,0     ,"G" ,""    ,"MV_PAR02",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
 aAdd(aRegs,{c_Perg,"03"  ,"Tipo de Movimento    ?",""      ,""     ,"MV_CH3","C"    ,03      ,0       ,0     ,"G" ,""    ,"MV_PAR03",""         ,""      ,""      ,""   ,""         ,""             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
-
-For i:=1 to Len(aRegs)
+aAdd(aRegs,{c_Perg,"04"  ,"Gera MOD OP Reproc.  ?",""      ,""     ,"MV_CH4","N"    ,01      ,0       ,0     ,"C" ,""    ,"MV_PAR04","Sim"         ,""      ,""      ,""   ,""         ,"Não"             ,""      ,""      ,""    ,""        ,""             ,""      ,""     ,""     ,""       ,""             ,""      ,""      ,""    ,""        ,""            ,""      ,""      ,""    ,""   })
+For i := 1 To Len(aRegs)
 	If !dbSeek(c_Perg+aRegs[i,2])
 		RecLock("SX1",.T.)
 		For j:=1 to FCount()
@@ -481,7 +490,7 @@ Private aEstrutura := {}
 
 cQry := "SELECT D3_FILIAL, D3_COD, D3_TIPO, D3_EMISSAO, D3_NUMSEQ, D3_OP, D3_DOC "+cEOL
 cQry += " ,SUM(D3_QUANT) D3_QUANT,   SUM(D3_CUSTO1) D3_CUSTO1"+cEOL
-cQry += " FROM "+RetSqlName("SD3")+" SD3 "+cEOL
+cQry += " FROM "+RetSqlName("SD3")+" SD3, "+RetSqlName("SC2")+" SC2 "+cEOL
 cQry += " WHERE D3_FILIAL = '"+xFilial("SD3")+"'"+cEOL
 cQry += " AND D3_EMISSAO BETWEEN '"+DTOS(mv_par01)+"' AND '"+DTOS(mv_par02)+"'"+cEOL
 cQry += " AND D3_OP <> ' ' AND SUBSTRING(D3_CF,1,2)='PR' AND D3_ESTORNO<>'S' "+cEOL
@@ -490,7 +499,15 @@ cQry += " AND D3_OP <> ' ' AND SUBSTRING(D3_CF,1,2)='PR' AND D3_ESTORNO<>'S' "+c
 //cQry += " AND D3_OP = 'S4802201008   ' "+cEOL  // Teste Fritadeira
 //cQry += " AND D3_DOC = 'ZTESTFUNT' "+cEOL  // Teste Fritadeira
 
-cQry += " AND D_E_L_E_T_ <> '*' "+cEOL
+cQry += " AND SD3.D_E_L_E_T_ <> '*' "+cEOL
+
+cQry += " AND SC2.C2_FILIAL = SD3.D3_FILIAL "+cEOL
+cQry += " AND SC2.C2_NUM+SC2.C2_ITEM+SC2.C2_SEQUEN+'  ' = SD3.D3_OP"+cEOL
+If mv_par04 == 2  // Gera MOD de OP de Retrabalho / Reprocesso
+	cQry += " AND SC2.C2_TPPR <> 'R' "+cEOL
+EndIf
+cQry += " AND SC2.D_E_L_E_T_ <> '*' "+cEOL
+
 cQry += " GROUP BY D3_FILIAL,D3_COD, D3_TIPO, D3_EMISSAO, D3_NUMSEQ, D3_OP, D3_DOC "+cEOL
 cQry += " ORDER BY D3_FILIAL,D3_COD"+cEOL
 

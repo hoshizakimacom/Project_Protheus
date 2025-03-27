@@ -17,24 +17,39 @@ Local _cPdf    := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPDF")
 Local _cDxf    := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XDFX")
 Local _cEstru  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESTR")
 Local _cMaoOb  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XMDOBRA")
-Local _cLibEng  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESPLIB")
-Local _cPadrao  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPADRAO")		//1=Sim 2=Não
 
-IF _cTipoPrd == "ME"
-	_lRet := .F.
-    MsgAlert("Não é permitido abrir OP para Tipo ME", "Aviso")
+//MsgStop("TESTE","TESTE")
 
-ElseIf _cItDese == "N" 
-	_lRet := .F.
-    MsgAlert("Produto com pendências da Engenharia. Item não está desenvolvido", "Aviso")
-
-ElseIf _cLibEng == "2"
-	_lRet := .F.
-	MsgAlert("Produto não está liberado pela engenharia", "Aviso")
-
+If _cItDese <> "S" //Diferente de Sim
+	MsgStop("Não é permitida a inclusão de ordem de produção, Item não está desenvolvido","ATENCAO")
+	 _lRet     := .F.
 EndIf
 
-If _lRet 
+If _cPdf <> "1" //Diferente de Sim
+	MsgStop("Não é permitida a inclusão de ordem de produção, PDF não está disponível","ATENCAO")
+	 _lRet     := .F.
+Endif
+
+If Empty(_cDxf) //Diferente de Sim
+	MsgStop("Não é permitida a inclusão de ordem de produção, DXF não está disponível","ATENCAO")
+	 _lRet     := .F.	
+Endif
+
+If _cEstru <> "1" //Diferente de Sim
+	MsgStop("Não é permitida a inclusão de ordem de produção, Não há estrutura cadastrada","ATENCAO")
+	 _lRet     := .F.
+Endif
+
+If _cMaoOb <> "1" //Diferente de Sim
+	MsgStop("Não é permitida a inclusão de ordem de produção, Não há Mão de Obra cadastrada","ATENCAO")
+	 _lRet     := .F.
+EndIf
+
+If _cTipoPrd == "ME" 
+    MsgStop("Não é permitida a inclusão de ordem de produção para produtos do tipo 'ME'","ATENCAO")
+    _lRet     := .F.
+
+ElseIf _lRet 
 
     DbSelectArea("ZAB")
     dbGotop()
@@ -73,7 +88,7 @@ If _nQtdJE <> 0
 	MsgStop("Não é possível a geração de Número(s) de Série, para Ordem de Produção Encerrada ou Iniciada ", "Atenção")
 	_lRet := .F.
 Else
-	If ! _cFamilia $ "000001|000002|000003|000004|000014|000015"
+	If ! _cFamilia $ "000001|000002|000003|000004|000014"
 		MsgStop("Não é posível gerar Número(s) de Série para as Famílias Cocção, Mobiliário, Refrigeração e Máquinas de Gelo Exportação ", "Atenção")
 	Else
 		Do Case
@@ -193,7 +208,6 @@ Else
                 MsUnlock()
 				M02EPrint(M->C2_PRODUTO , M->C2_QUANT, _cNumSer)
 				M02EPrin1(M->C2_PRODUTO , M->C2_QUANT, _cNumSer)
-				M02EPrin1(M->C2_PRODUTO , M->C2_QUANT, _cNumSer) //Adicionado mais uma impressão etq. Checklist
             Endif
 		Next _nX
 		
@@ -271,21 +285,21 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNumSer)
     End Case
 
 	Do Case 
-		Case _cTensao == "1"			//#8206
-			_cTensao := "220V 3 ~"     	
-		Case _cTensao == "2"			//#8206
-			_cTensao := "220V ~"
-		Case _cTensao == "3"			//#8206
-			_cTensao := "127V ~"
-		Case _cTensao == "4"			//#8206
-			_cTensao := "380V 3 ~"
-		Case _cTensao == "5"			//#8206
-			_cTensao := "115V ~"
-		Case _cTensao == "6"			//5078		//#8206
-			_cTensao := "380V 3N ~"	
-		Case _cTensao == "7"			//7835		//#8206
-			_cTensao := "220-240V ~"	
-	EndCase
+    	Case _cTensao == "1"
+    		 _cTensao := "220v ~ 3"     	
+    	Case _cTensao == "2"
+    	     _cTensao := "220v ~ 1"
+    	Case _cTensao == "3"
+    	     _cTensao := "127v ~ 1"
+    	Case _cTensao == "4"
+    		 _cTensao := "380v ~ 3"
+    	Case _cTensao == "5"
+    		 _cTensao := "115v ~ 1"
+    	Case _cTensao == "6"			//5078
+    		 _cTensao := "380V ~ 3N"	//5078
+		Case _cTensao == "7"			//7835
+    		 _cTensao := "220-240V ~ 1"	//7835	 
+    EndCase
 
 	Do Case 
     	Case _cFreq == "1"
