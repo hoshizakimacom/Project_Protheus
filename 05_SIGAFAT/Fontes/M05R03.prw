@@ -3,65 +3,47 @@
 #Include 'FWPrintSetup.ch'
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
-//| RelatÃ³rio PV
+//| Relatório PV
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 User Function M05R03(nTpImpr)
 
 Private lImprVlr := nTpImpr == 1
 
-FWMsgRun(, {|| U_M05R03A(.F.) },,'Gerando relatÃ³rio...')
+FWMsgRun(, {|| U_M05R03A() },,'Gerando relatório...')
 
 Return
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
-User Function M05R03A(lAuto)
+User Function M05R03A()
 
-    Local oPrinter       := Nil
+    Local oPrinter     := Nil
     //Local _oBrush      := TBrush():New( , RGB( 240 ,240 ,240))
-    Local oFont14B       := Nil
-    Local oFont12        := Nil
-    Local oFont12B       := Nil
-    Local oFont18T       := Nil
-    Local oFont9         := Nil
-    Local nRow           := -0080
-    Local cData          := DtoC(Date()) + ' ' + Time()
+    Local oFont14B     := Nil
+    Local oFont12      := Nil
+    Local oFont12B     := Nil
+    Local oFont18T     := Nil
+    Local oFont9       := Nil
+    Local nRow         := -0080
+    Local cData        := DtoC(Date()) + ' ' + Time()
     //Local _cAliasSA1   := GetNextAlias()
     //Local _cNumOrc     := SC5->C5_NUM
     //Local _lOk         := .T.
-    Local nPage          := 1
+    Local nPage        := 1
     //Local nRowStep     := 45
-    Local cFilePDF       := 'PV' + SC5->C5_NUM + ".pdf" // '_' + SubStr(DToS(Date()),7,2) + '_' + StrTran(Time(),":","") + ".pdf"
-    Local cPathInServer  := ""
-    Local cBarra         := if(isSrvUnix(),"/","\")
-
-    If lAuto
-        cPathInServer  := cBarra + "temp" + cBarra
-    
-        If File(cPathInServer+cFilePDF) //Apaga arquivo gerado anteriormente para criar um novo
-            FERASE(cPathInServer+cFilePDF)
-        EndIf
-    EndIf
 
     M05RFont(@oFont9,@oFont12,@oFont12B,@oFont14B,@oFont18T)
 
-    oPrinter := FWMsPrinter():New( cFilePDF /*< cFilePrintert >*/, IMP_PDF/*[ nDevice]*/, .T./*[ lAdjustToLegacy]*/,;
-                   cPathInServer/*[ cPathInServer]*/, .T./*[ lDisabeSetup ]*/, /*[ lTReport]*/, /*[ @oPrintSetup]*/,;
-                /*[ cPrinter]*/, IIF(lAuto,.T.,.F.) /*[ lServer]*/, /*[ lPDFAsPNG]*/, /*[ lRaw]*/, IIF(lAuto,.F.,.T.) /*[ lViewPDF]*/,;
-                /*[ nQtdCopy]*/ )
+    oPrinter := FWMSPrinter():New('PV' + SC5->C5_NUM + '_' + SubStr(DToS(Date()),7,2) + '_' + StrTran(Time(),":",""), IMP_PDF, .T./*_lAdjustToLegacy*/, /*cPathInServer*/, .T.)
 
     oPrinter:SetResolution(78)
     oPrinter:SetLandscape()
     oPrinter:SetMargin(0,0,0,0)
-    If lAuto
-        oPrinter:lServer := .T.
-        oPrinter:nDevice := IMP_PDF
-        oPrinter:cPathPDF := cPathInServer
-    EndIf
+
     oPrinter:StartPage()
 
 
     //+----------------------------------------------------------------------------------------
-    // CabeÃ§alho 1 - Dados Macom
+    // Cabeçalho 1 - Dados Macom
     //+----------------------------------------------------------------------------------------
   
     MR05Cab1(oPrinter,oFont14B,oFont12,@nRow)
@@ -69,22 +51,22 @@ User Function M05R03A(lAuto)
     If MR05Posiciona()
 
         //+----------------------------------------------------------------------------------------
-        // CabeÃ§alho 2 - Dados do Cliente
+        // Cabeçalho 2 - Dados do Cliente
         //+----------------------------------------------------------------------------------------
         MR05Cab2(oPrinter,oFont12,oFont18T,@nRow)
 
         //+----------------------------------------------------------------------------------------
-        // CabeÃ§alho 3 - Dados do Contato - NÃƒO IMPLEMENTADO
+        // Cabeçalho 3 - Dados do Contato - NÃO IMPLEMENTADO
         //+----------------------------------------------------------------------------------------
         MR05Cab3(oPrinter,oFont12,@nRow)
 
         //+----------------------------------------------------------------------------------------
-        // CabeÃ§alho 3 - Dados do OrÃ§amento
+        // Cabeçalho 3 - Dados do Orçamento
         //+----------------------------------------------------------------------------------------
         MR05Cab4(oPrinter,oFont12,oFont14B,oFont18T,@nRow)
 
         //+----------------------------------------------------------------------------------------
-        // Corpo do OrÃ§amento
+        // Corpo do Orçamento
         //+----------------------------------------------------------------------------------------
         MaFisEnd()
 
@@ -92,7 +74,7 @@ User Function M05R03A(lAuto)
 
 
         //+----------------------------------------------------------------------------------------
-        // RodapÃ©
+        // Rodapé
         //+----------------------------------------------------------------------------------------
         MR05Rod(oPrinter,oFont12,oFont12B,oFont14B,nRow,nPage,cData)
 
@@ -102,10 +84,10 @@ User Function M05R03A(lAuto)
         FreeObj(oPrinter)
 
         //+----------------------------------------------------------------------------------------
-        // CondiÃ§Ãµes Gerais
+        // Condições Gerais
         //+----------------------------------------------------------------------------------------
     EndIf
-Return cFilePDF
+Return
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 Static Function M05RICabIt(oPrinter,oFont12B,nRow)
@@ -116,13 +98,13 @@ Static Function M05RICabIt(oPrinter,oFont12B,nRow)
     oPrinter:Box(nRow,0100,nRow + nRowStep * 2.5,3200)
 //  oPrinter:Box(nRow,0100,nRow + nRowStep * 2,0200)                        // SQ
     oPrinter:Box(nRow,0185,nRow + nRowStep * 2.5,0403)                      // Item
-//  oPrinter:Box(nRow,0400,nRow + nRowStep * 2,0700)                        // CÃ³digo
-    oPrinter:Box(nRow,0650,nRow + nRowStep * 2.5,1250)                      // DescriÃ§Ã£o
+//  oPrinter:Box(nRow,0400,nRow + nRowStep * 2,0700)                        // Código
+    oPrinter:Box(nRow,0650,nRow + nRowStep * 2.5,1250)                      // Descrição
 //  oPrinter:Box(nRow,1200,nRow + nRowStep * 2,1400)                        // NCM
     oPrinter:Box(nRow,1400,nRow + nRowStep * 2.5,1500)                      // QTD
 
     If lImprVlr
-        //  oPrinter:Box(nRow,1500,nRow + nRowStep * 2,1700)                    // VALOR UNITÃRIO
+        //  oPrinter:Box(nRow,1500,nRow + nRowStep * 2,1700)                    // VALOR UNITÁRIO
 
         oPrinter:Box(nRow,1700,nRow + nRowStep * 2.5,1950)                      // IPI
         oPrinter:Box(nRow,1700,nRow + nRowStep * 1.25,1950)                     // IPI
@@ -141,7 +123,7 @@ Static Function M05RICabIt(oPrinter,oFont12B,nRow)
         //  oPrinter:Box(nRow,2950,nRow + nRowStep * 2,3200)                    // VALOR TOTAL
 
     Else
-        oPrinter:Box(nRow,0650,nRow + nRowStep * 2.5,2900)                      // DescriÃ§Ã£o
+        oPrinter:Box(nRow,0650,nRow + nRowStep * 2.5,2900)                      // Descrição
         //  oPrinter:Box(nRow,1200,nRow + nRowStep * 2,1400)                    // NCM
         oPrinter:Box(nRow,3050,nRow + nRowStep * 2.5,3200)                      // QTD
 
@@ -150,8 +132,8 @@ Static Function M05RICabIt(oPrinter,oFont12B,nRow)
     nRow += nRowStep
     oPrinter:Say(nRow                ,0115                ,'ITEM'          ,oFont12B)
     oPrinter:Say(nRow                ,0250                ,'PLANTA'        ,oFont12B)
-    oPrinter:Say(nRow                ,0480                ,'CÃ“DIGO'        ,oFont12B)
-    oPrinter:Say(nRow                ,0850                ,'DESCRIÃ‡ÃƒO'     ,oFont12B)
+    oPrinter:Say(nRow                ,0480                ,'CÓDIGO'        ,oFont12B)
+    oPrinter:Say(nRow                ,0850                ,'DESCRIÇÃO'     ,oFont12B)
 
     If lImprVlr
 
@@ -159,7 +141,7 @@ Static Function M05RICabIt(oPrinter,oFont12B,nRow)
         oPrinter:Say(nRow                ,1420                ,'QTD'           ,oFont12B)
 
         oPrinter:Say(nRow                ,1550                ,'VALOR'         ,oFont12B)
-        oPrinter:Say(nRow + nRowStep     ,1540                ,'UNITÃRIO'      ,oFont12B)
+        oPrinter:Say(nRow + nRowStep     ,1540                ,'UNITÁRIO'      ,oFont12B)
 
         oPrinter:Say(nRow                ,1800                ,'IPI'            ,oFont12B)
         oPrinter:Say(nRow + nRowStep     ,1720                ,'%'              ,oFont12B)
@@ -231,10 +213,10 @@ Static Function MR05ImpItem(_cAlias,oPrinter,nRow,oFont9,oFont12B,nItem)
 
 
     If lImprVlr
-        oPrinter:Box(nRow,0650,nRow + (nRowStep * 1.25 * Len(aDesc)),1250)                     // DescriÃ§Ã£o
+        oPrinter:Box(nRow,0650,nRow + (nRowStep * 1.25 * Len(aDesc)),1250)                     // Descrição
         oPrinter:Box(nRow,1400,nRow + (nRowStep * 1.25 * Len(aDesc)),1500)                     // QTD
     Else
-       oPrinter:Box(nRow,0650,nRow + (nRowStep * 1.25 * Len(aDesc)),2900)                     // DescriÃ§Ã£o
+       oPrinter:Box(nRow,0650,nRow + (nRowStep * 1.25 * Len(aDesc)),2900)                     // Descrição
        oPrinter:Box(nRow,3050,nRow + (nRowStep * 1.25 * Len(aDesc)),3200)                     // QTD
     EndIf
 
@@ -253,13 +235,13 @@ Static Function MR05ImpItem(_cAlias,oPrinter,nRow,oFont9,oFont12B,nItem)
 
     oPrinter:Say(nRow - 0008                ,0125                ,(_cAlias)->_ITEM                                                                                                            ,oFont9)    // SQ
     oPrinter:Say(nRow - 0008                ,0190                ,SubStr(AllTrim((_cAlias)->_XITEMP),1,15)                                                                                    ,oFont9)    // ITEM
-    oPrinter:Say(nRow - 0008                ,0415                ,(_cAlias)->_PRODUTO                                                                                                         ,oFont9)    // CÃ“DIGO
+    oPrinter:Say(nRow - 0008                ,0415                ,(_cAlias)->_PRODUTO                                                                                                         ,oFont9)    // CÓDIGO
    
     If lImprVlr
         oPrinter:Say(nRow - 0008                ,1267                ,Transform((_cAlias)->B1_POSIPI,"@R 9999.99.99")                                                                             ,oFont9)    // NCM
         oPrinter:Say(nRow - 0008                ,1414                ,Transform(NoRound(MaFisRet(nItem,"IT_QUANT")   ,2),"@E 999999.99")                                                          ,oFont9)    // QTD
  
-        oPrinter:Say(nRow - 0008                ,1540                ,Transform(NoRound(MaFisRet(nItem,"IT_PRCUNI"),2),cPicVal)                                                              ,oFont9)    // VALOR UNITÃRIO
+        oPrinter:Say(nRow - 0008                ,1540                ,Transform(NoRound(MaFisRet(nItem,"IT_PRCUNI"),2),cPicVal)                                                              ,oFont9)    // VALOR UNITÁRIO
         oPrinter:Say(nRow - 0008                ,1709                ,Transform(NoRound(MaFisRet( nItem ,"IT_ALIQIPI"),2),cPicAliq)                                                          ,oFont9)    // % IPI
         oPrinter:Say(nRow - 0008                ,1810                ,Transform(NoRound(MaFisRet( nItem ,"IT_VALIPI"),2),cPicVal)                                                            ,oFont9)    // VALOR IPI
         //oPrinter:Say(nRow - 0008                ,1954                ,Transform(NoRound(MaFisRet( nItem ,"IT_ALIQICM"),2),cPicAliq)                                                        ,oFont9)    // % ICMS
@@ -278,7 +260,7 @@ Static Function MR05ImpItem(_cAlias,oPrinter,nRow,oFont9,oFont12B,nItem)
     EndIf
 
     For nDesc := 1 to Len(aDesc)
-         oPrinter:Say(nRow - 0008               ,0660                ,aDesc[nDesc]     ,oFont9)     // DESCRIÃ‡ÃƒO
+         oPrinter:Say(nRow - 0008               ,0660                ,aDesc[nDesc]     ,oFont9)     // DESCRIÇÃO
 
         nRow += nRowStep
 
@@ -316,17 +298,17 @@ Static Function M05RDescr(cProd,cDescSB1,cDescSC6,nComp,nLar,nAlt,cItem)
         EndIf
     EndIf
     
-    //Tratamento para descriÃ§Ã£o FINAME
+    //Tratamento para descrição FINAME
     If SC5->C5_XFINAME == "1"
     	cFiname 	:= Posicione("SB1",1,xFilial("SB1")+cProd,"B1_XFINAME")
     	cSerMacom	:= Posicione("ZA0",1,xFilial("ZA0")+SC5->C5_NUM+cItem,"ZA0_SERIE")
     	cDesc		:= "Cod.Finame:" + cFiname + " | " + "Nr.Serie:" + cSerMacom + " | " + cDesc
     Endif
 
-    // Retira enter da descriÃ§Ã£o
+    // Retira enter da descrição
     Replace( cDesc , chr(13) ," ")
 
-    // Retira espaÃ§oes duplicados
+    // Retira espaçoes duplicados
     For i := 1 to Len( cDesc ) - 1
         cLetras := Substr( cDesc , i , 2 )
 
@@ -367,7 +349,7 @@ Static Function MR05Posiciona()
         SA1->(DbGoTop())
 
         If !SA1->(DbSeek( xFilial('SA1')  + SC5->(C5_CLIENTE + C5_LOJACLI)))
-            MsgInfo(I18N('NÃ£o foram encontrados dados do cliente #1 loja #2.' + CRLF + 'Verifique.',{SC5->C5_CLIENTE,SC5->C5_LOJACLI}),"AtenÃ§Ã£o")
+            MsgInfo(I18N('Não foram encontrados dados do cliente #1 loja #2.' + CRLF + 'Verifique.',{SC5->C5_CLIENTE,SC5->C5_LOJACLI}),"Atenção")
             lRet := .F.
         EndIf
     Else
@@ -375,7 +357,7 @@ Static Function MR05Posiciona()
         SA2->(DbGoTop())
 
         If !SA2->(DbSeek( xFilial('SA2')  + SC5->(C5_CLIENTE + C5_LOJACLI)))
-            MsgInfo(I18N('NÃ£o foram encontrados dados do Fornecedor #1 loja #2.' + CRLF + 'Verifique.',{SC5->C5_CLIENTE,SC5->C5_LOJACLI}),"AtenÃ§Ã£o")
+            MsgInfo(I18N('Não foram encontrados dados do Fornecedor #1 loja #2.' + CRLF + 'Verifique.',{SC5->C5_CLIENTE,SC5->C5_LOJACLI}),"Atenção")
             lRet := .F.
         EndIf
     EndIf
@@ -385,7 +367,7 @@ Static Function MR05Posiciona()
         SA3->(DbGoTop())
 
         If !SA3->(DbSeek( xFilial('SA3') + SC5->C5_VEND1 ))
-            MsgInfo(I18N('NÃ£o foram encontrados dados do vendedor #1' + CRLF + 'Verifique.',{SC5->C5_VEND1}),"AtenÃ§Ã£o")
+            MsgInfo(I18N('Não foram encontrados dados do vendedor #1' + CRLF + 'Verifique.',{SC5->C5_VEND1}),"Atenção")
             lRet := .F.
         EndIf
     EndIf
@@ -403,7 +385,7 @@ Return
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 Static Function MR05Cab1(oPrinter,oFont14B,oFont12,nRow)
-    Local cNome         := 'AÃ‡OS MACOM INDÃšSTRIA E COMERCIO LTDA'
+    Local cNome         := 'AÇOS MACOM INDÚSTRIA E COMERCIO LTDA'
     Local cEndC         := 'Av Julia Gaiolli, 474, Bonsucesso, Guarulhos-SP, CEP 07251-500'
     Local cCGC          := 'CNPJ: 43.553.668/0001-79 I.E.: 336.179.661.113'
     Local cTel          := 'Telefone: 55 11 2085-7000'
@@ -593,13 +575,10 @@ Static Function MR05Cab4(oPrinter,oFont12,oFont14B,oFont18T,nRow)
         oPrinter:Say(nRow             ,2900    , Posicione('SA1',1,xFilial('SA1') +SC5->C5_CLIENTE + SC5->C5_LOJACLI,'A1_XIDLOJA' )        ,oFont12)
     EndIf
 
-
-    oPrinter:Say(nRow += nRowStep     ,0100    , 'COND PAG (MEDIANTE ANÃLISE DE CRÃ‰DITO): '       ,oFont12) // #6898
-
-
+    oPrinter:Say(nRow += nRowStep     ,0100    , 'COND PAG (MEDIANTE ANÁLISE DE CRÉDITO): '       ,oFont12) //#6898
     oPrinter:Say(nRow                 ,800    , MR05GetCPg()       ,oFont12) //440
 
-    oPrinter:Say(nRow += nRowStep     ,0100    ,'REFERÃŠNCIA:'     ,oFont12)
+    oPrinter:Say(nRow += nRowStep     ,0100    ,'REFERÊNCIA:'     ,oFont12)
     oPrinter:Say(nRow                 ,0440    ,AllTrim(SC5->C5_XOBRAS)                 ,oFont12)
 
     nRow += (nRowStep * 0.50)
@@ -618,18 +597,17 @@ Static Function MR05Rod(oPrinter,oFont12,oFont12B,oFont14B,nRow,nPage,cData)
     Local cTotal        := Transfor(NoRound(MaFisRet(,"NF_TOTAL"),2),"@E 9,999,999,999.99")
     Local cSubTot       := Transfor( NoRound(( MaFisRet(,"NF_TOTAL") - ( MaFisRet(,"NF_FRETE") + MaFisRet(,"NF_DESPESA") ) ),2),"@E 9,999,999,999.99")
     Local cMoeda        := AllTrim(GetMv('MV_MOEDA' + cValToChar(SC5->C5_MOEDA),,''))
-    Local cPolitic      := 'A MACOM adota a polÃ­tica de proibiÃ§Ã£o de oferta e/ou recebimento de presentes/brindes em transaÃ§Ãµes comerciais, prezando por sua legitimidade, transparÃªncia e imparcialidade.'
+    Local cPolitic      := 'A MACOM adota a política de proibição de oferta e/ou recebimento de presentes/brindes em transações comerciais, prezando por sua legitimidade, transparência e imparcialidade.'
     
 
     nRow += (nRowStep * 5)
 
-    oPrinter:Say(nRow + 1200                ,0100        , cPolitic  ,oFont14b)
-    
     If nRow > 1600
         nRow := 2100 + nRowStep
 
         oPrinter:Say(nRow += nRowStep     ,0100    , I18N('Pedido de Venda #1 impressa em #2.',{SC5->C5_NUM,cData })  ,oFont12)
-        oPrinter:Say(nRow                 ,3000    , I18N('PÃ¡g. #1',{oPrinter:nPageCount  })  ,oFont12)
+        oPrinter:Say(nRow += nRowStep*2   ,0100    , cPolitic  ,oFont14b)                               //#8340 - Ajustado posicionamento
+        oPrinter:Say(nRow                 ,3000    , I18N('Pág. #1',{oPrinter:nPageCount  })  ,oFont12)
 
         oPrinter:EndPage()
         oPrinter:StartPage()
@@ -648,14 +626,14 @@ Static Function MR05Rod(oPrinter,oFont12,oFont12B,oFont14B,nRow,nPage,cData)
         oPrinter:Say(nRow                 ,2900     ,cSubTot                    ,oFont12)
     EndIf
 
-    oPrinter:Say(nRow += nRowStep     ,0100     ,'INSTALAÃ‡ÃƒO: '             ,oFont12)
+    oPrinter:Say(nRow += nRowStep     ,0100     ,'INSTALAÇÃO: '             ,oFont12)
     oPrinter:Say(nRow                 ,0300     ,M05RTpIsnt()               ,oFont12)
 
     If lImprVlr
        oPrinter:Say(nRow                 ,2450     ,'VALOR FRETE: '            ,oFont12)
         oPrinter:Say(nRow                 ,2900     ,cFrete                     ,oFont12)
 
-        oPrinter:Say(nRow += nRowStep     ,2450     ,'VALOR INSTALAÃ‡ÃƒO'         ,oFont12)
+        oPrinter:Say(nRow += nRowStep     ,2450     ,'VALOR INSTALAÇÃO'         ,oFont12)
         oPrinter:Say(nRow                 ,2900     ,cDespesa                   ,oFont12)
     EndIf
 
@@ -671,10 +649,10 @@ Static Function MR05Rod(oPrinter,oFont12,oFont12B,oFont14B,nRow,nPage,cData)
 
     nRow += nRowStep
     nRow += nRowStep
-    oPrinter:Say(nRow += nRowStep     ,2450    , 'AÃ‡OS MACOM INDÃšSTRIA E COMERCIO LTDA'         ,oFont12B)
+    oPrinter:Say(nRow += nRowStep     ,2450    , 'AÇOS MACOM INDÚSTRIA E COMERCIO LTDA'         ,oFont12B)
 
 	aArea := SA3->(GetArea())
-    oPrinter:Say(nRow += nRowStep     ,2450    , 'GERÃŠNCIA: ' + AllTrim(Posicione("SA3",1,xFilial("SA3")+SA3->A3_GEREN,"SA3->A3_NOME"))          ,oFont12)
+    oPrinter:Say(nRow += nRowStep     ,2450    , 'GERÊNCIA: ' + AllTrim(Posicione("SA3",1,xFilial("SA3")+SA3->A3_GEREN,"SA3->A3_NOME"))          ,oFont12)
 
     nRow += nRowStep
 
@@ -690,7 +668,8 @@ Static Function MR05Rod(oPrinter,oFont12,oFont12B,oFont14B,nRow,nPage,cData)
     nRow := 2100 + nRowStep
 
     oPrinter:Say(nRow += nRowStep     ,0100    , I18N('Pedido de Venda #1 impressa em #2.',{SC5->C5_NUM,cData })  ,oFont12)
-    oPrinter:Say(nRow                 ,3000    , I18N('PÃ¡g. #1',{oPrinter:nPageCount  })  ,oFont12)
+    oPrinter:Say(nRow += nRowStep*2   ,0100    , cPolitic  ,oFont14b)                               //#8340 - Ajustado posicionamento
+    oPrinter:Say(nRow                 ,3000    , I18N('Pág. #1',{oPrinter:nPageCount  })  ,oFont12)
 
     oPrinter:EndPage()
 Return
@@ -703,8 +682,7 @@ Static Function M05RTpFret()
     Case SC5->C5_TPFRETE == 'C'
         cRet := 'CIF'
     Case SC5->C5_TPFRETE == 'F'
-//        cRet := 'FOB (NÃƒO INCLUSO)'
-        cRet := 'FOB (POR CONTA DO CLIENTE)'
+        cRet := 'FOB (NÃO INCLUSO)'
     Case SC5->C5_TPFRETE == 'T'
         cRet := 'Por Conta de Terceiros'
     Case SC5->C5_TPFRETE == 'S'
@@ -721,10 +699,9 @@ Static Function M05RTpIsnt()
 
     Do Case
     Case SC5->C5_XTPINST == '1'
-        cRet := 'Sem InstalaÃ§Ã£o'
+        cRet := 'Sem Instalação'
     Case SC5->C5_XTPINST == '2'
-//        cRet := 'Credenciada (Vide condiÃ§Ãµes gerais de fornecimento)'
-        cRet := 'Credenciada (Vide Credenciada Macom) - R$ '+Transform(SC5->C5_XVLRINS,"@E 99,999,999.99")
+        cRet := 'Credenciada (Vide condições gerais de fornecimento)'
     Case SC5->C5_XTPINST == '3'
         cRet := 'Macom'
     Case SC5->C5_XTPINST == '4'
@@ -758,7 +735,7 @@ Static Function MR05Date()
     Case nMon == 2
         cMon    := 'FEVEREIRO'
     Case nMon == 3
-        cMon    := 'MARÃ‡O'
+        cMon    := 'MARÇO'
     Case nMon == 4
         cMon    := 'ABRIL'
     Case nMon == 5
@@ -784,12 +761,16 @@ Return cRet
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 Static Function MR05EndPag(oPrinter,oFont12,oFont12B,nRow,nRowStep,nPage,cData,nItem,_nTotal)
+    Local cPolitic      := 'A MACOM adota a política de proibição de oferta e/ou recebimento de presentes/brindes em transações comerciais, prezando por sua legitimidade, transparência e imparcialidade.'
+
     If nRow > 2000
 
         nRow := 2100 + nRowStep
 
         oPrinter:Say(nRow += nRowStep     ,0100    , I18N('Pedido de Venda #1 impressa em #2.',{SC5->C5_NUM,cData })  ,oFont12)
-        oPrinter:Say(nRow                 ,3000    , I18N('PÃ¡g. #1',{oPrinter:nPageCount  })  ,oFont12)
+        oPrinter:Say(nRow += nRowStep*2   ,0100    , cPolitic  ,oFont14b)                               //#8340 - Ajustado posicionamento
+
+        oPrinter:Say(nRow                 ,3000    , I18N('Pág. #1',{oPrinter:nPageCount  })  ,oFont12)
 
         oPrinter:EndPage()
         oPrinter:StartPage()
@@ -882,7 +863,7 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
 //    Local aParcelas     := {}
     Local aPedCli       := {}
     Local aC5Rodape     := {}
-    //Local aRelImp       := MaFisRelImp("MT100",{"SF2","SD2"})
+    Local aRelImp       := MaFisRelImp("MT100",{"SF2","SD2"})
     Local aFisGet       := Nil
     Local aFisGetSC5    := Nil
 //    Local cKey          := ""
@@ -915,7 +896,7 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
 
     FisGetInit(@aFisGet,@aFisGetSC5)
 
-    // Filtragem do relatÃ³rio
+    // Filtragem do relatório
     cQryAd := "%"
     For nY := 1 To Len(aFisGet)
         cQryAd += ","+aFisGet[nY][2]
@@ -936,8 +917,6 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
             ,SC5.C5_NUM             AS _NUM
             ,SC5.C5_CLIENTE         AS _CLIENTE
             ,SC5.C5_LOJACLI         AS _LOJA
-            ,SC5.C5_CLIENT          AS _CLIENT
-            ,SC5.C5_LOJAENT         AS _LOJAENT
             ,SC5.C5_TIPO            AS _TIPO
             ,SC5.C5_TIPOCLI         AS _TIPOCLI
             ,SC5.C5_DESC1           AS _DESC1
@@ -1025,32 +1004,16 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
     cCliEnt := (cAliasPed)->_CLIENTE
     aCabPed := {}
 
-    MaFisIni(Iif(Empty((cAliasPed)->_CLIENT),(cAliasPed)->_CLIENTE,(cAliasPed)->_CLIENT),;                      // 1-Codigo Cliente/Fornecedor
-            (cAliasPed)->_LOJAENT,;		                                                                        // 2-Loja do Cliente/Fornecedor
-            If((cAliasPed)->_TIPO$'DB',"F","C"),;                                                               // 3-C:Cliente , F:Fornecedor
-            (cAliasPed)->_TIPO,;                                                                                // 4-Tipo da NF
-            (cAliasPed)->_TIPOCLI,;                                                                             // 5-Tipo do Cliente/Fornecedor
-            Nil,;                                                                                               // 6-Relacao de Impostos que suportados no arquivo
-            Nil,;                                                                                               // 7-Tipo de complemento
-            Nil,;                                                                                               // 8-Permite Incluir Impostos no Rodape .T./.F.
-            Nil,;                                                                                               // 9-Alias do Cadastro de Produtos - ("SBI" P/ Front Loja)
-            "MATA461",;                                                                                         //10-Nome da rotina que esta utilizando a funcao
-            Nil,;
-            Nil,;
-            Nil,;
-            Nil,;
-            Nil,;
-            Nil,;
-            Nil,;
-            Nil,;
-            Nil,;
-            Nil,;
-            Nil,;
-            Nil,;
-            Nil,;
-            Nil,;
-            Nil,;
-            (cAliasPed)->_TPFRETE)
+    MaFisIni(cCliEnt,;                      // 1-Codigo Cliente/Fornecedor
+    (cAliasPed)->_LOJA,;                    // 2-Loja do Cliente/Fornecedor
+    If((cAliasPed)->_TIPO$'DB',"F","C"),;   // 3-C:Cliente , F:Fornecedor
+        (cAliasPed)->_TIPO,;                // 4-Tipo da NF
+        (cAliasPed)->_TIPOCLI,;             // 5-Tipo do Cliente/Fornecedor
+        aRelImp,;                           // 6-Relacao de Impostos que suportados no arquivo
+        ,;                                  // 7-Tipo de complemento
+        ,;                                  // 8-Permite Incluir Impostos no Rodape .T./.F.
+        "SB1",;                             // 9-Alias do Cadastro de Produtos - ("SBI" P/ Front Loja)
+        "MATA461")                          // 10-Nome da rotina que esta utilizando a funcao
 
         nFrete      := (cAliasPed)->_FRETE
         nSeguro     := (cAliasPed)->_SEGURO
@@ -1131,7 +1094,7 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
         nDesconto  := 0
         dbSelectArea('SC6')
 
-        //Â³Calcula o preco de lista                     Â³
+        //³Calcula o preco de lista                     ³
         nValMerc  := (cAliasPed)->_VALOR
         nPrcLista := (cAliasPed)->_PRUNIT
 
@@ -1188,7 +1151,7 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
                             (cAliasPed)->_QTDENT                  ,;
                             })
 
-        //Â³Forca os valores de impostos que foram informados no SC6.
+        //³Forca os valores de impostos que foram informados no SC6.
         dbSelectArea('SC6')
         For nY := 1 to Len(aFisGet)
             If !Empty(&(aFisGet[ny][2]))
@@ -1196,7 +1159,7 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
             EndIf
         Next nY
 
-        //Â³Calculo do ISS                               Â³
+        //³Calculo do ISS                               ³
         SF4->(dbSetOrder(1))
         SF4->(MsSeek(xFilial("SF4")+(cAliasPed)->_TES))
 
@@ -1213,7 +1176,7 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
             EndIf
         EndIf
 
-        //Â³Altera peso para calcular frete              Â³
+        //³Altera peso para calcular frete              ³
         SB1->(dbSetOrder(1))
         SB1->(MsSeek(xFilial("SB1")+(cAliasPed)->_PRODUTO))
 
