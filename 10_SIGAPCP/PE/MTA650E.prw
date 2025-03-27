@@ -1,9 +1,19 @@
+/*/{Protheus.doc} MTA650E
+
+PE na validação da exclusão da Ordem de Produção
+
+@author 
+@since    /  /     
+@return Nil Nulo
+/*/
 User Function MTA650E()
 
 Local _aArea	:= GetArea()
 Local _lRet		:= .T.
 
-_lRet := MsgYesNo("Ao excluir a ordem de produção os número(s) de série não serão estornado(s). Continua?","Atenção")
+If !l650Auto
+	_lRet := MsgYesNo("Ao excluir a ordem de produção os número(s) de série não serão estornado(s). Continua?","Atenção")
+EndIf
 
 If ! _lRet
 	MsgStop("Operação cancelada pelo operador","Atenção")
@@ -18,6 +28,4 @@ Else
 	RestArea(_aArea)
 EndIf
 
-
 Return _lRet
-
