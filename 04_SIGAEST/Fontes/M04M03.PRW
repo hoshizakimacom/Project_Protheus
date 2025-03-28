@@ -42,12 +42,12 @@ EndDo
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Atualiza Tabela de Custo Consumo de Chapas a Absorver                                ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-Processa({|| AtuCstChapas()},"Atualizando Custo de Consumo de Chapas na tabela de Absorção !")
+//Processa({|| AtuCstChapas()},"Atualizando Custo de Consumo de Chapas na tabela de Absorção !")
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Atualiza Custo em processo das OPS dos Periodos anteriores                           ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-//Processa({|| AtuSldProc()},"Atualizando Saldo em Processo - OPS períodos anteriores !")
+Processa({|| AtuSldProc()},"Atualizando Saldo em Processo - OPS períodos anteriores !")
 
 Return
 
@@ -67,6 +67,7 @@ Static Function AtuCstChapas()
 Local cEOL   := Chr(10)+Chr(13)
 Local cQuery := " "
 
+/*/
 cQuery := "UPDATE " + RetSqlName("ZAH")+ " "+cEOL 
 cQuery += " SET ZAH_VALOR = ISNULL((SELECT SUM(D3_CUSTO1) FROM  "+RetSqlName("SD3")+" SD3 "+cEOL
 cQuery += "   WHERE D3_FILIAL = '" + xFilial("SD3") + "' "+cEOL
@@ -85,8 +86,10 @@ cQuery += " AND D_E_L_E_T_ <> '*' "+cEOL
 //MsgStop(cQuery)
 
 TcSqlExec(cQuery) 
-
 MsgStop("Atualizando Custo de Consumo de Chapas !")
+
+/*/
+
 
 Return
 
@@ -151,6 +154,7 @@ cQuery := " DROP TABLE SC2ALT2 "
 TcSqlExec(cQuery) 
 //MsgStop("Deleta tabela temporária SC2ALT2 !")
 
+/*/
 //GERA TABELA TEMPORARIA (SC2ALT2) COM O CUSTO A APROPRIAR COM POSICAO DO ULTIMO FECHAMENTO
 cQuery := " SELECT OP, C2_EMISSAO, C2_VINI1, CSTREQ, CSTPROD, (CSTREQ-CSTPROD) CSTNAPR "
 cQuery += " INTO SC2ALT2 FROM ( "
@@ -174,6 +178,7 @@ cQuery += " WHERE C2_FILIAL = '" + xFilial("SC2") + "' "
 cQuery += " AND C2_EMISSAO <= '"+ Dtos(dDataRf)+"' "
 cQuery += " AND (C2_DATRF > '"+ Dtos(dDataRf)+"' OR C2_DATRF = ' ')  "
 cQuery += " AND SC2.D_E_L_E_T_ <> '*') TAB "
+
 TcSqlExec(cQuery) 
 MsgStop("Gera Tabela Temporaria  (SC2ALT2) com o custo a apropriar com a posicao do último Fechamento !")
 
@@ -181,6 +186,8 @@ MsgStop("Gera Tabela Temporaria  (SC2ALT2) com o custo a apropriar com a posicao
 cQuery := "DELETE FROM SC2ALT2 "
 cQuery += " WHERE CSTREQ < CSTPROD OR CSTREQ < 0 OR (CSTPROD = 0 AND CSTREQ = 0) "
 TcSqlExec(cQuery) 
+/*/
+
 
 // ZERA TODAS AS OPS ABERTAS NA DATA DE FECHAMENTO ANTERIOR
 cQuery := " UPDATE "+RetSqlName("SC2")
@@ -191,6 +198,9 @@ cQuery += " AND (C2_DATRF > '"+ Dtos(dDataRf)+"'  OR C2_DATRF = ' ')  "
 cQuery += " AND D_E_L_E_T_ <> '*' "
 TcSqlExec(cQuery) 
 
+MsgStop("Zerando Saldo em Processo dos Períodos Anteriores !")
+
+/*/
 //   GRAVA O CUSTO INICIAL DA OP A APROPRIAR ( C2_VINI1 ) A PARTIR DA TABELA TEMPORARIA
 //   COM O CALCULO DAS REQUISICOES/DEVOLUCOES DA OP ATÉ O ULTIMO FECHAMENTO
 cQuery := " UPDATE "+RetSqlName("SC2")
@@ -212,6 +222,7 @@ cQuery += " WHERE OP = C2_NUM+C2_ITEM+C2_SEQUEN) > 0 "
 cQuery += " AND C2_FILIAL = '" + xFilial("SC2") + "' "
 cQuery += " AND D_E_L_E_T_ <> '*' "
 TcSqlExec(cQuery) 
+/*/
 
 MsgStop("Atualizado Saldo em Processo - Periodos anteriores ! ")
 

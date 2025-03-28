@@ -199,7 +199,7 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles)
 
 		oProcess:SetRegua2( 2 )
 
-		oProcess:IncRegua2( "Valiando nomenclatura do arquivo.." )
+		oProcess:IncRegua2( "Validando nomenclatura do arquivo.." )
 
         cDrive   := ""
         cCaminho := ""
@@ -209,6 +209,7 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles)
 
         cProduto  := LEFT(cNome,(AT("_",cNome)-1))
         cSufixo   := LEFT(RIGHT(cNome,6),4)
+		cDescProd := ""
 
         cOcorrencia := ""
         If cSufixo == "_PDF" //"_DES"
@@ -229,25 +230,34 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles)
             cOcorrencia := "Sufixo do arquivo inválido!"
         EndIf
 
-        If lStatus .And. !SB1->(dbSeek(xFilial("SB1")+cProduto))
-            lStatus := .F.
-            cOcorrencia := "Produto não cadastrado!"
-        EndIf
+        If lStatus 
+			If !SB1->(dbSeek(xFilial("SB1")+cProduto))
+				lStatus := .F.
+				cOcorrencia := "Produto não cadastrado!"
+			Else
+				cDescProd := SB1->B1_DESC
+			EndIf
+		EndIf
 
         If lStatus .And. !File(cFileName)
             lStatus := .F.
             cOcorrencia := "Não foi possivel localizar o arquivo na origem!"
         EndIf
 
+        If lStatus .And. File(cDirServer+cNome+cExtensao)
+            lStatus := .F.
+            cOcorrencia := "Já existe o arquivo no servidor!"
+        EndIf
+
         lUpdate := .F.
         If lStatus .And. LEN(aFilesOld := Directory(cDirServer+cProduto+cSufixo+"*"+cExtensao, "F")) > 0
             For nX := 1 To Len(aFilesOld)
-                If !FErase(cDirServer+aFilesOld[nX,1])
-                    lStatus := .F.
-                    cOcorrencia := "Erro ao sobrepor arquivo no servidor!"
-                    Exit
-                Else
+                If (FErase(cDirServer+aFilesOld[nX,1]) == 0)
                     lUpdate := .T.
+                Else
+                    lStatus := .F.
+                    cOcorrencia := "Erro ao sobrepor arquivo no servidor! Houve uma falha na exclusão do arquivo, erro #" + cValToChar(FError())
+                    Exit
                 EndIf
             Next
         EndIf
@@ -257,34 +267,50 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles)
 			oProcess:IncRegua2( "Copiando arquivo.." )
 
             If CpyT2S(cFileName,cDirServer,.T.,.F.)
-                lStatus := .T.
-                If lUpdate
-                    cOcorrencia := "Arquivo atualizado com sucesso!"
-                Else
-                    cOcorrencia := "Arquivo anexo com sucesso!"
-                EndIf
-                //Apaga arquivo na origem após copia
-				lFErase := .F.
-				nTimes := 0
-				While( !lFErase .And. nTimes < 10)
-					lFErase := (FErase(cFileName) <> -1)
-					If(!lFErase)
-						nTimes++
-						Sleep(500)
-					Else
-						Exit
-					EndIf    
+
+				lFound := .F.
+				nTempo := 0
+				While !lFound 
+					lFound := File(cDirServer+cNome+cExtensao)
+					nTempo += 1
+					If nTempo > 1000
+					   Exit
+					EndIf
 				EndDo
-				If !lFErase
-                    cOcorrencia += " Só não foi possivel apagar o arquivo de origem, pode estar em uso!!"
-                EndIf
+
+				If lFound
+					lStatus := .T.
+					If lUpdate
+						cOcorrencia := "Arquivo atualizado com sucesso!"
+					Else
+						cOcorrencia := "Arquivo anexo com sucesso!"
+					EndIf
+					//Apaga arquivo na origem após copia
+					lFErase := .F.
+					nTimes := 0
+					While( !lFErase .And. nTimes < 10)
+						lFErase := (FErase(cFileName) == 0)
+						If(!lFErase)
+							nTimes++
+							Sleep(500)
+						Else
+							Exit
+						EndIf    
+					EndDo
+					If !lFErase
+						cOcorrencia += " Só não foi possivel apagar o arquivo de origem, pode estar em uso!!"
+					EndIf
+				Else
+					lStatus := .F.
+					cOcorrencia := "Erro ao fazer o upload do arquivo!"
+				EndIf
             Else
                 lStatus := .F.
                 cOcorrencia := "Erro ao fazer o upload do arquivo!"
             EndIf
         EndIf
 
-        AADD(aRet,{lStatus,aFiles[nF][1],cProduto,SB1->B1_DESC,cTipoArq,cExtensao,cSufixo,cOcorrencia})
+        AADD(aRet,{lStatus,aFiles[nF][1],cProduto,cDescProd,cTipoArq,cExtensao,cSufixo,cOcorrencia})
     Next
 
 Return aRet
@@ -395,7 +421,7 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
 
 	oGrpCo1 := TGROUP():New(000, 000, nLin-450, nCol-560/*600*/, "Estrutura de Produto - Visualiza Anexos", oDlg, CLR_HBLUE,, .T.)
 	//oGrpCo1:Align := CONTROL_ALIGN_ALLCLIENT
-	oTree := DbTree():New( 000, 000, nLin, nCol, oGrpCo1,{|| AtuBotao(oTree,.T.)},,.T.,,,'Produto/Componentes;_PDF;_COM;_FCT;_MNL;_RVT;_DXF')
+	oTree := DbTree():New( 000, 000, nLin, nCol, oGrpCo1,{|| AtuBotao(oTree,.T.)},,.T.,,,'Produto/Componentes;Sentido Pre;_PDF;_COM;_FCT;_MNL;_RVT;_DXF')
 	oTree:Align := CONTROL_ALIGN_ALLCLIENT
 
 	//oGrpCo2 := TGROUP():New(nLin-450, 000, nLin-250, nCol-600, "Dados do produto", oDlg, CLR_HBLUE,, .T.)
@@ -913,6 +939,13 @@ Local cDirServer := "\produtos_anexos\"
 Local cRet    	 := ""
 Local aSufixo 	 := { "_PDF", "_COM", "_FCT", "_MNL", "_RVT", "_DXF" }
 Local nX      	 := 0
+Local cXSPRE     := ""
+
+If !EMPTY(cXSPRE := POSICIONE("SB1",1,xFilial("SB1")+cProduto,"B1_XSPRE"))
+	cRet := ";"+X3Combo("B1_XSPRE",cXSPRE)
+Else
+	cRet := ";"
+EndIf
 
 For nX := 1 To Len(aSufixo)
 	If LEN(Directory(cDirServer+RTRIM(cProduto)+aSufixo[nX]+"*.*", "F")) > 0

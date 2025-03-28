@@ -173,100 +173,97 @@ Return
 //+------------------------------------------------------------------------------------------------
 
 Static Function MG02GetIns()
-    Local _cRet := '000000000000000000'
+    Local _cRet := ''
+    
 
-    If M->A1_XGEN == '1'
-        Do Case
-            Case Empty(M->A1_EST)
-                _cRet   := '0000000000'
+    //If M->A1_XGEN == '1'
+        
+        Do Case        
+            Case M->A1_XGEN == "1".and. M->A1_EST == "AC"
+                _cRet:= "0100482300112"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "AL"
+                _cRet:= "240000048"
 
-            Case M->A1_EST == 'AC'
-                _cRet   := '0100482300112'
+            Case M->A1_XGEN == "1".and. M->A1_EST == "AP"
+                _cRet:= "30123459"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "AM"
+                _cRet:= "999999990"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "BA"
+                _cRet:= "12345663"
 
-            Case M->A1_EST == 'AL'
-                _cRet   := '240000048'
+            Case M->A1_XGEN == "1".and. M->A1_EST == "CE"
+                _cRet:= "060000015"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "DF"
+                _cRet:= "730000100109"
 
-            Case M->A1_EST == 'AP'
-                _cRet   := '30123459'
+            Case M->A1_XGEN == "1".and. M->A1_EST == "ES"
+                _cRet:= "999999990"
 
-            Case M->A1_EST == 'AM'
-                _cRet   := '999999990'
+            Case M->A1_XGEN == "1".and. M->A1_EST == "GO"
+                _cRet:= "109876547"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "MA"
+                _cRet:= "120000385"
 
-            Case M->A1_EST == 'BA'
-                _cRet   := '12345663'
+            Case M->A1_XGEN == "1".and. M->A1_EST == "MT"
+                _cRet:= "00130000019"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "MS"
+                _cRet:= "283115947"
 
-            Case M->A1_EST == 'CE'
-                _cRet   := '060000015'
+            Case M->A1_XGEN == "1".and. M->A1_EST == "MG"
+                _cRet:= "0623079040081"
 
-            Case M->A1_EST == 'DF'
-                _cRet   := '0730000100109'
+             Case M->A1_XGEN == "1".and. M->A1_EST == "PA"
+                _cRet:= "159999995"
 
-            Case M->A1_EST == 'ES'
-                _cRet   := '999999990'
+            Case M->A1_XGEN == "1".and. M->A1_EST == "PB"
+                _cRet:= "060000015"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "PR"
+                _cRet:= "1234567850"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "PE"
+                _cRet:= "032141840"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "PI"
+                _cRet:= "194419991"
 
-            Case M->A1_EST == 'GO'
-                _cRet   := '109876547'
+            Case M->A1_XGEN == "1".and. M->A1_EST == "RJ"
+                _cRet:= "99999993"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "RN"
+                _cRet:= "200400401"
 
-            Case M->A1_EST == 'MA'
-                _cRet   := '120000385'
+            Case M->A1_XGEN == "1".and. M->A1_EST == "RS"
+                _cRet:= "2243658792"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "RO"
+                _cRet:= "101625213"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "RR"
+                _cRet:= "240066281"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "SC"
+                _cRet:= "251040852"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "SP"
+                _cRet:= "110042490114"
+            
+            Case M->A1_XGEN == "1".and. M->A1_EST == "SE"
+                _cRet:= "271234563"
 
-            Case M->A1_EST == 'MT'
-                _cRet   := '00130000019'
-
-            Case M->A1_EST == 'MS'
-                _cRet   := '283115947'
-
-            Case M->A1_EST == 'MG'
-                _cRet   := '0623079040081'
-
-            Case M->A1_EST == 'PA'
-                _cRet   := '159999995'
-
-            Case M->A1_EST == 'PB'
-                _cRet   := '060000015'
-
-            Case M->A1_EST == 'PR'
-                _cRet   := '1234567850'
-
-            Case M->A1_EST == 'PE'
-                _cRet   := '032141840'
-
-            Case M->A1_EST == 'PI'
-                _cRet   := '194419991'
-
-            Case M->A1_EST == 'RJ'
-                _cRet   := '99999993'
-
-            Case M->A1_EST == 'RN'
-                _cRet   := '200400401'
-
-            Case M->A1_EST == 'RN'
-                _cRet   := '2000400400'
-
-            Case M->A1_EST == 'RS'
-                _cRet   := '2243658792'
-
-            Case M->A1_EST == 'RO'
-                _cRet   := '101625213'
-
-            Case M->A1_EST == 'RR'
-                _cRet   := '240066281'
-
-            Case M->A1_EST == 'SC'
-                _cRet   := '251040852'
-
-            Case M->A1_EST == 'SP'
-                _cRet   := '110042490114'
-
-            Case M->A1_EST == 'SE'
-                _cRet   := '271234563'
-
-            Case M->A1_EST == 'TO'
-                _cRet   := '29010227836'
-        EndCase
-    Else
-        _cRet := ''
-    EndIf
+            Case M->A1_XGEN == "1".and. M->A1_EST == "TO"
+                _cRet:= "29010227836"
+            
+        //    Case Empty(M->A1_EST)
+        //        _cRet   := '0000000000'
+        End Case  
+    
 
     _cRet           := PadR(AllTrim(_cRet),TamSx3('A1_INSCR')[1])
     M->A1_INSCR     := _cRet

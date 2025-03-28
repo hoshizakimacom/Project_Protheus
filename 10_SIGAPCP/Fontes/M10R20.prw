@@ -90,7 +90,9 @@ Static Function ReportDef(_oReport, _cPerg)
 
 	TRCell():New(_oOP,'PICKINGLIST'		, _cAlias)		// PICKING LIST	#5706	
 	TRCell():New(_oOP,'TIPO_MOVIMENTO'	, _cAlias)		// #7628	
-	TRCell():New(_oOP,'CUSTO'			, _cAlias)		// #7628	
+	TRCell():New(_oOP,'CUSTO'			, _cAlias)		// #7628
+	TRCell():New(_oOP,'QUANTIDADE'		, _cAlias)		// #7843
+	TRCell():New(_oOP,'DTENCER'			, _cAlias)		// DT.ENCERR
 
 
 	_oOP:oReport:cFontBody 			:= 'Calibri'
@@ -115,7 +117,8 @@ Static Function ReportPrint(_oReport,_cAlias)
 		_oReport:Section(1):Cell('MEDIDAS'			):SetBlock( {||CValToChar((_cAlias)->B5_COMPRLC) + 'x' + CValToChar((_cAlias)->B5_LARGLC) + 'x' + CValToChar((_cAlias)->B5_ALTURLC)						})
 		_oReport:Section(1):Cell('MEDIDAS'			):SetBlock( {||CValToChar((_cAlias)->B5_COMPRLC) + 'x' + CValToChar((_cAlias)->B5_LARGLC) + 'x' + CValToChar((_cAlias)->B5_ALTURLC)						})
 		_oReport:Section(1):Cell('CHAVE'			):SetBlock( {|| SubStr((_cAlias)->OF,1,6) + ';' + SubStr((_cAlias)->OF,7,2) 						})
-		_oReport:Section(1):Cell('STATUS'			):SetBlock( {|| IIF((_cAlias)->QTDE - (_cAlias)->QUJE == 0,'ENCERRADA','ABERTA')   })
+		//_oReport:Section(1):Cell('STATUS'			):SetBlock( {|| IIF((_cAlias)->QTDE - (_cAlias)->QUJE == 0,'ENCERRADA','ABERTA')   })
+		_oReport:Section(1):Cell('STATUS'			):SetBlock( {|| IF(!Empty((_cAlias)->DTENCER),'ENCERRADA','ABERTA')   })
 		_oReport:Section(1):PrintLine()
 
 		_oReport:IncMeter()
@@ -135,6 +138,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 		BeginSQL Alias _cAlias
 			Column DATA_		 		as Date
 			Column PRAZO		 		as Date
+			Column DTENCER				as Date
 			Column EMISSAO_OP	 		as Date
 			Column ENG_S 				as Date
 			Column DATA_PRG 			as Date
@@ -162,6 +166,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 			Column SUP_S 				as Date	//#5175
 
 			Column EXPEDICAO 			as Date
+			Column DTENCER				as Date
 
 
 			SELECT
@@ -228,9 +233,11 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,C2_ITEM										AS ITEM
 					,C2_XOBSENG                                     AS DESC_OF
 					,C2_XENGUSS										AS USR_ENG_SAI
-					,MAX(C6_VALOR)										AS VALOR
+					,MAX(C6_VALOR)									AS VALOR
+					,C2_DATRF										AS DTENCER
 					,D3_TM											AS TIPO_MOVIMENTO		// #7628	
 					,SUM(D3_CUSTO1)									AS CUSTO				// #7628
+					,SUM(D3_QUANT)									AS QUANTIDADE			// #7843
 
 					
 					,CASE
@@ -280,9 +287,9 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				AND C2_NUM + C2_ITEM + C2_SEQUEN + C2_ITEMGRD 		BETWEEN %Exp:MV_PAR01% AND %Exp:MV_PAR02%
 				AND C2_EMISSAO 	BETWEEN %Exp:MV_PAR03% AND %Exp:MV_PAR04%
 				// Abertas
-				AND C2_TPOP = 'F'
+				//AND C2_TPOP = 'F'
 				AND C2_DATRF = ''
-				AND C2_QUJE < C2_QUANT 
+				//AND C2_QUJE < C2_QUANT 
 				
 				GROUP BY										// #7628
 				C5_XTPVEN
@@ -331,6 +338,8 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				,C2_XOBSENG
 				,C2_XENGUSS
 				,D3_TM
+				,C2_DATRF
+				//,D3_QUANT		//#7843
 				
 				ORDER BY 'OF'
 		EndSql
@@ -338,6 +347,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 		BeginSQL Alias _cAlias
 			Column DATA_		 		as Date
 			Column PRAZO		 		as Date
+			Column DTENCER				as Date
 			Column EMISSAO_OP	 		as Date
 			Column ENG_S 				as Date
 			Column DATA_PRG 			as Date
@@ -366,6 +376,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 
 
 			Column EXPEDICAO 			as Date
+			Column DTENCER				as Date
 			
 			SELECT
 					CASE 														//0002 #3881
@@ -432,9 +443,11 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,C2_ITEM										AS ITEM
 					,C2_XOBSENG                                     AS DESC_OF
 					,C2_XENGUSS										AS USR_ENG_SAI
-					,MAX(C6_VALOR)										AS VALOR
+					,MAX(C6_VALOR)									AS VALOR
+					,C2_DATRF										AS DTENCER
 					,D3_TM											AS TIPO_MOVIMENTO		// #7628	
 					,SUM(D3_CUSTO1)									AS CUSTO				// #7628
+					,SUM(D3_QUANT)									AS QUANTIDADE			// #7843
 
 					
 					,CASE
@@ -484,9 +497,9 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				AND C2_NUM + C2_ITEM + C2_SEQUEN + C2_ITEMGRD 		BETWEEN %Exp:MV_PAR01% AND %Exp:MV_PAR02%
 				AND C2_EMISSAO 	BETWEEN %Exp:MV_PAR03% AND %Exp:MV_PAR04%
 				
-				AND C2_TPOP = 'F'
+				//AND C2_TPOP = 'F'
 				AND C2_DATRF <> ''
-				AND C2_QUANT - C2_QUJE = 0
+				//AND C2_QUANT - C2_QUJE = 0
 
 				GROUP BY										// #7628
 				C5_XTPVEN
@@ -535,6 +548,8 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				,C2_XOBSENG
 				,C2_XENGUSS
 				,D3_TM
+				,C2_DATRF
+				//,D3_QUANT		//#7843
 
 				ORDER BY 'OF'
 		EndSql
@@ -569,6 +584,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 			Column SUP_E 				as Date	//#5175
 			Column SUP_S 				as Date	//#5175
 			Column EXPEDICAO 			as Date
+			Column DTENCER		 		as Date
 
 			SELECT
 					CASE //0002 #3881
@@ -635,9 +651,11 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,C2_ITEM										AS ITEM
 					,C2_XOBSENG                                     AS DESC_OF
 					,C2_XENGUSS										AS USR_ENG_SAI
-					,MAX(C6_VALOR)										AS VALOR
+					,MAX(C6_VALOR)									AS VALOR
+					,C2_DATRF										AS DTENCER
 					,D3_TM											AS TIPO_MOVIMENTO		// #7628	
 					,SUM(D3_CUSTO1)									AS CUSTO				// #7628
+					,SUM(D3_QUANT)									AS QUANTIDADE			// #7843
 					
 					,CASE
 						WHEN B1_XPICLIS = '1' THEN '1 - SIM'
@@ -732,6 +750,8 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				,C2_XOBSENG
 				,C2_XENGUSS
 				,D3_TM
+				,C2_DATRF
+				//,D3_QUANT	//#7843
 
 				ORDER BY 'OF'
 		EndSql

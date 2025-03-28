@@ -337,11 +337,21 @@ Static Function M02EPrin(_cCodOpi,_nQtd,_cNumSer)
     	     _cClClima := "ST"
 		Case _cClClima == "4" // #4410
     	     _cClClima := "5" // #4410
+		Case _cClClima == "5" // #7629
+			 _cClClima := "3" // #7629
     EndCase
 
    Do Case 						//6033
-    	Case _cPdeGelo == "1"
-    		 _cPdeGelo := "150W" 
+   		Case _cPdeGelo == "1"
+    		 _cPdeGelo := "150W"   
+    	Case _cPdeGelo == "2"	//6386
+    		 _cPdeGelo := "400W"    	
+    	Case _cPdeGelo == "3"	//6386
+    		 _cPdeGelo := "500W" 
+		Case _cPdeGelo == "4"	//6633
+			 _CPdeGelo := "300W"
+		Case _cPdeGelo == "5"	//7835
+			 _cPdeGelo := "250W"  
 	EndCase
     
     Do Case
@@ -354,18 +364,20 @@ Static Function M02EPrin(_cCodOpi,_nQtd,_cNumSer)
     End Case
 
 	Do Case 
-    	Case _cTensao == "1"
-    		 _cTensao := "220V ~ 3"     	
-    	Case _cTensao == "2"
-    	     _cTensao := "220V ~ 1"
-    	Case _cTensao == "3"
-    	     _cTensao := "127V ~ 1"
-    	Case _cTensao == "4"
-    		 _cTensao := "380V ~ 3"
-    	Case _cTensao == "5"
-    		 _cTensao := "115V ~ 1"
-	   	Case _cTensao == "6"			//5078
-    		 _cTensao := "380V ~ 3N"	//5078
+    	Case _cTensao == "1"			//#8206
+    		 _cTensao := "220V 3 ~"     	
+    	Case _cTensao == "2"			//#8206
+    	     _cTensao := "220V ~"
+    	Case _cTensao == "3"			//#8206
+    	     _cTensao := "127V ~"
+    	Case _cTensao == "4"			//#8206
+    		 _cTensao := "380V 3 ~"
+    	Case _cTensao == "5"			//#8206
+    		 _cTensao := "115V ~"
+	   	Case _cTensao == "6"			//5078		//#8206
+    		 _cTensao := "380V 3N ~"	
+		Case _cTensao == "7"			//7835		//#8206
+    		 _cTensao := "220-240V ~"	
     EndCase
 
 	Do Case 
@@ -409,10 +421,10 @@ Static Function M02EPrin(_cCodOpi,_nQtd,_cNumSer)
 		_oPrinter:Say(_nRow + 450 , 70, "BCode Serial: " ,_OFontP)
 		_oPrinter:FWMSBAR('CODE128',12.4/*nRow*/,6/*nCol*/,AllTrim(_cNumSer),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/)
 		_oPrinter:Say(_nRow + 505 , 270, Alltrim(_cNumSer),_OFontGG)
-		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-025 Rev.01", _OFontP) /**#7666**/
+		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-FB-008 Rev.00", _OFontP) /**#7666**/
 		
 		If _cINMETRO =="1"
-			_oPrinter:SayBitMap( 500, 800 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 30 * 4.0 , 30 * 4.0) // *** Valdemir - 03/03/2023 *** //
+			_oPrinter:SayBitMap( 500, 900 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 30 * 4.0 , 30 * 4.0) // *** Valdemir - 03/03/2023 *** // #7976 de 800 para 900 
 			//_oPrinter:SayBitMap( _nRow + 260, 1000 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 60 * 4.0 , 60 * 4.0)
 		Endif
 
@@ -590,7 +602,7 @@ Static Function M02EPri1(_cCodOpi,_nQtd,_cNumSer)
 	_oPrinter:Say(_nRow + 605 , 70, _cDescPro1 ,_OFontP)
 	_oPrinter:Say(_nRow + 645 , 70, _cDescPro2 ,_OFontP)
 		
-	_oPrinter:Say(_nRow + 685 , 1030, "FGQ-FB-008 Rev.01" ,_OFontP) /**#7666**/
+	_oPrinter:Say(_nRow + 685 , 1030, "FGQ-FB-008 Rev.00" ,_OFontP) /**#7666**/
 				
 	_oPrinter:SetDevice(IMP_SPOOL)
 	_oPrinter:cPrinter 	:= 'ZEBRA'

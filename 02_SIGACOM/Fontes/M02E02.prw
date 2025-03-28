@@ -150,8 +150,7 @@ Static Function M02EPrint(_cCodProd1,_cCodProd2,_nQtd,_cNota,_nQtdImp,_cNumSer)
 
 		_oPrinter:Say(_nRow + 100,_nCol03,'FGQ-056',_oFontP)
 		_oPrinter:SetDevice(IMP_SPOOL)
-		_oPrinter:cPrinter 		:= 'ZDesigner GC420t (EPL)'
-
+		_oPrinter:cPrinter 		:= 'ZEBRA' // #7646 (Alterado nome da Impressora, De ZDesigner GC420t (EPL) Para ZEBRA)
 		_oPrinter:EndPage()
 		_oPrinter:Print()
 

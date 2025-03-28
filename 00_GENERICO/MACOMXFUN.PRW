@@ -111,7 +111,10 @@ Local cCodOper   := BuscAcols('C6_OPER')
 		_lRet := .F.
     Case cCodOper == "08" .and. !RetCodUsr() $ "000000|000131|000241|000385|000095|000332|000587|000467|000728|000736"
         MsgStop('As operações 07 e 08 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
-		_lRet := .F.     
+		_lRet := .F.  
+    Case cCodOper == "36" .and. !RetCodUsr() $ "000000"
+        MsgStop('A operação 36 foi descontinuada e está fora de uso. Entre em contato com o departamento fiscal.','Atenção')
+		_lRet := .F.    
     EndCase
 Return _lRet
 

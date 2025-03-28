@@ -249,8 +249,8 @@ User Function M10RPrPro(_cAlias,_oPrinter,_oBrush,_oFont1,_oFont2,_nRow,_nColIni
     Local _nCol2        := _nColIni + 400
     Local _nNext        := 60
     Local _nX           := 0
-    Local _cB5Descr     := Posicione("SB5",1,xFilial("SB5")+(_cAlias)->B1_COD,"B5_CEME")
-    Local _aDescri      := ""//M10RDescr((_cAlias)->B1_DESC,61)
+    Local _cB5Descr     := Posicione("SB5",1,xFilial("SB5")+(_cAlias)->B1_COD,"B5_CEME") +  STR(Posicione("SB5",1,xFilial("SB5")+(_cAlias)->B1_COD,"B5_COMPRLC")) + "x" + STR(Posicione("SB5",1,xFilial("SB5")+(_cAlias)->B1_COD,"B5_LARGLC")) + "x" + STR(Posicione("SB5",1,xFilial("SB5")+(_cAlias)->B1_COD,"B5_ALTURLC")) //#7670
+    //Local _aDescri      := ""//M10RDescr((_cAlias)->B1_DESC,61)
     Local _aC6ObsEng    := M10RForm((_cAlias)->C6_RECNO,'SC6','C6_XOBSENG')
     //Local _aC6ObsCom    := U_MR10GetDes((_cAlias)->C5_RECNO,(_cAlias)->B1_DESC,75)
     Local _aC6ObsCom    := ''
@@ -266,7 +266,7 @@ User Function M10RPrPro(_cAlias,_oPrinter,_oBrush,_oFont1,_oFont2,_nRow,_nColIni
     Endif
 
 	If SB5->(MsSeek(xFilial("SB5")+AllTrim((_cAlias)->B1_COD)))
-		_aC6ObsCom    := U_MR10GetDes((_cAlias)->C5_RECNO, SB5->B5_CEME ,70)
+		_aC6ObsCom    := U_MR10GetDes((_cAlias)->C5_RECNO, Posicione("SB5",1,xFilial("SB5")+(_cAlias)->B1_COD,"B5_CEME") +  STR(Posicione("SB5",1,xFilial("SB5")+(_cAlias)->B1_COD,"B5_COMPRLC")) + "x" + STR(Posicione("SB5",1,xFilial("SB5")+(_cAlias)->B1_COD,"B5_LARGLC")) + "x" + STR(Posicione("SB5",1,xFilial("SB5")+(_cAlias)->B1_COD,"B5_ALTURLC")),70) //#7670
 	Else
 		_aC6ObsCom    := U_MR10GetDes((_cAlias)->C5_RECNO,(_cAlias)->B1_DESC,75)
 	Endif		

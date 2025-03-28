@@ -92,6 +92,7 @@ Return
 /*/
 User Function M04A022(cArq)
 
+Local aAreaSG1  := SG1->(GetArea())
 Local aStruct   := {}
 Local lContinua := .T.
 Local aStruDel  := {}
@@ -274,11 +275,32 @@ While !FT_FEOF()
 		Loop
 	EndIf
 
-	// Valida duplicidade
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Verifica se já existe estrutura cadastrada. Só alguns usuários pode re-importar. ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	If !RetCodUsr() $ GetMv("AM_M04A02")		//#8213
+
+		// Deletando a Estrutura Atual
+		dbSelectArea("SG1")
+		dbSetOrder(1)
+		If dbSeek(xFilial("SG1")+cCodPA)
+			MsgStop(OemToAnsi("Usuario sem acesso para importar/atualizar estrutura já existente : ")+cCodPA)
+			Aadd(aLog,"Usuario sem acesso para importar/atualizar estrutura já existente : "+cCodPA)
+		EndIf
+
+		FT_FSKIP()
+
+		lContinua := .F.
+		Exit
+	EndIf
+
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Valida duplicidade.                                   ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 	nPosStr	:= aScan(aStruct,{|x| AllTrim(x[1])+AllTrim(x[2])+AllTrim(x[10]) == cCodPA+cCodMP+cSeqTRT})
-	If nPosStr > 0
-		MsgStop(OemToAnsi("Existem componentes iguais na estrutura com a mesma sequência : ")+cCodMP)
-		Aadd(aLog,"Existem componentes iguais na estrutura com a mesma sequência : "+cCodMP)
+	If nPosStr > 0   //.and. !RetCodUsr() $ GetMv("AM_M04A02")											//#8213
+		MsgStop(OemToAnsi("Existem componentes iguais na estrutura com a mesma sequência Pai/Filho/TRT : ")+cCodPA+cCodMP+cSeqTRT)
+		Aadd(aLog,"Existem componentes iguais na estrutura com a mesma sequência Pai/Filho/TRT : "+cCodPA+cCodMP+cSeqTRT)
 		FT_FSKIP()
 		Loop
 	EndIf
@@ -295,6 +317,7 @@ While !FT_FEOF()
 	FT_FSKIP()
 EndDo
 
+
 //MsgStop("Quantidade registros lidos : "+Str(Len(aStruct)))
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -303,6 +326,7 @@ EndDo
 FT_FUSE()
 
 If !lContinua
+	RestArea(aAreaSG1)
 	Return
 EndIf
 
@@ -538,7 +562,8 @@ For nProc := 1 To Len(aQtdEstru)
 				SG1->G1_COMP   := aEstrImp[nProc4,2]
 				SG1->G1_TRT    := aEstrImp[nProc4,6]  //cProxSequen
 				SG1->G1_QUANT  := aEstrImp[nProc4,3]
-				SG1->G1_INI    := FirstDay(dDataBase)
+//				SG1->G1_INI    := FirstDay(dDataBase)
+				SG1->G1_INI    := Ctod("01/01/2024")
 				SG1->G1_FIM    := Ctod("31/12/2049")
 				SG1->G1_FIXVAR := "V"
 				SG1->G1_PERDA  := aEstrImp[nProc4,4]
@@ -635,7 +660,6 @@ If "CSV" $ Upper(cArq)
 EndIf
 /*/
 
-
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Grava o arquivo de log                                              ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
@@ -643,6 +667,8 @@ If Len(aLog) > 0
 	MsgStop(OemToAnsi("Atenção ! Relatório de inconsistências na importação !"))
 	U_M04A02IMP()
 EndIf
+
+RestArea(aAreaSG1)
 
 Return
 
@@ -777,7 +803,7 @@ Local x       := 0
 //º Ajustes e Execucao da Query                                              º
 //ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍSilvio CazelaÍ¼
 cQuery := ChangeQuery(cQuery)
-RY cQuery NEW ALIAS "_TRB"
+TCQUERY cQuery NEW ALIAS "_TRB"
 
 //ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
 //º Montagem do Array para Retorno                                           º

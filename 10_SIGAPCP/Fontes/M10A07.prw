@@ -49,7 +49,9 @@ Local lDelLinha := .F.
 
 Public _aCDetSD3 := {}
 
-    _cQuery := "SELECT COUNT(*) AS QTD FROM "+RetSqlName("SD3")+" WHERE D3_OP = '"+_cNumOP+"' AND D_E_L_E_T_ = ''"
+    /*
+
+    _cQuery := "SELECT COUNT(*) AS QTD FROM "+RetSqlName("SD3")+" WHERE D3_XOP = '"+_cNumOP+"' AND D_E_L_E_T_ = ''"
     TcQuery _cQuery New Alias (cAlias := GetNextAlias())
     (cAlias)->(DbEval({|| _nRegSg1 ++ }))
     (cAlias)->(DbGoTop())
@@ -59,6 +61,9 @@ Public _aCDetSD3 := {}
         FWAlertError("Favor utilizar a rotina de movimentação múltipla para OPs com apontamentos parciais", "Apontamento Parcial")
         Return
     Else
+
+    */
+        /*
         _cQuery := ""
         _cQuery := "WITH ESTRUT( CODIGO, COD_PAI, COD_COMP, QTD, PERDA, DT_INI, DT_FIM, ANSUL, NIVEL ) AS "
         _cQuery += "( "
@@ -95,6 +100,22 @@ Public _aCDetSD3 := {}
         _cQuery += "FROM ESTRUT E1 "
         _cQuery += "WHERE E1.CODIGO = '"+_cCdPro+"' "
         _cQuery += "AND E1.DT_FIM >= '20471231' "
+        */
+
+        _cQuery := "SELECT D4_PRODUTO CODIGO, D4_PRODUTO COD_PAI, D4_COD COD_COMP "
+        _cQuery += ",( D4_QUANT - ISNULL(( SELECT SUM(CASE WHEN D3_TM > '500' THEN D3_QUANT ELSE D3_QUANT*-1 END) AS QTD FROM SD3010 SD3 WHERE D3_FILIAL = '01' AND D3_XOP = D4_OP AND D3_COD = D4_COD AND SD3.D_E_L_E_T_ = ' ' ),0) ) QTD "
+        _cQuery += ", 0 PERDA, '' DT_INI, '' DT_FIM, D4_XANSUL ANSUL, 1 AS NIVEL "
+        _cQuery += "FROM "+RetSqlName("SD4")+" SD4 (NOLOCK) "
+        _cQuery += "WHERE SD4.D_E_L_E_T_ = ' ' "
+        _cQuery += "AND D4_FILIAL = '"+FWxFilial("SD4")+"' "
+        _cQuery += "AND D4_OP = '"+_cNumOP+"' "
+        If mv_par02 == 1  // Ansul Interno
+            _cQuery += "AND D4_XANSUL = '1' "
+        ElseiF mv_par02 == 2  // Ansul Externo
+            _cQuery += "AND D4_XANSUL = '2' "
+        ElseiF mv_par02 == 3  // Não Ansul
+            _cQuery += "AND D4_XANSUL NOT IN ('1','2') "
+        EndIf
 
         TcQuery _cQuery New Alias (cAlias := GetNextAlias())
         (cAlias)->(DbEval({|| _nRegSg1 ++ }))
@@ -124,7 +145,7 @@ Public _aCDetSD3 := {}
                     (cAlias)->COD_COMP,;
                     Posicione("SB1",1,xFilial("SB1")+AllTrim((cAlias)->COD_COMP),"B1_DESC"),;
                     Posicione("SB1",1,xFilial("SB1")+AllTrim((cAlias)->COD_COMP),"B1_UM"),;
-                    (cAlias)->QTD*_nQuant,;                 
+                    (cAlias)->QTD /**_nQuant*/,;                 
                     _cNumOP,;
                     Posicione("SB1",1,xFilial("SB1")+AllTrim((cAlias)->COD_COMP),"B1_LOCPAD"),;
                     (cAlias)->ANSUL,;
@@ -136,7 +157,10 @@ Public _aCDetSD3 := {}
         Enddo
         
         Processa({|| M10A0702(_aDetSD3)}, "Monta de Apontamento P I C K I N G - L I S T ")
+    /*
     Endif
+    */
+
     (cAlias)->(DBCLOSEAREA())
 Return
 
@@ -224,8 +248,8 @@ Static Function fSalvar()
     Local _aCab1   := {}
     Local _aItem   := {}
     Local _atotitem:= {}
-    Local nQueryRet:= 0
-    Local _cQuery  := ""
+    //Local nQueryRet:= 0
+    //Local _cQuery  := ""
 
     Private lMsHelpAuto := .t. // se .t. direciona as mensagens de help
     Private lMsErroAuto := .f. //necessario a criacao
@@ -238,12 +262,12 @@ Static Function fSalvar()
     //Percorrendo todas as linhas
     For nLinha := 1 To Len(aColsAux)
         
-        If aColsAux[nLinha,10] = .F.
+        If aColsAux[nLinha,11] = .F.
 
             _aItem:={{"D3_COD" ,aColsAux[nLinha,4],NIL},;
                     {"D3_UM"   ,aColsAux[nLinha,6],NIL},; 
                     {"D3_QUANT",aColsAux[nLinha,7],NIL},;
-                    {"D3_OP"   ,aColsAux[nLinha,8],NIL}}
+                    {"D3_XOP"  ,aColsAux[nLinha,8],NIL}}
 
             aadd(_atotitem,_aitem) 
             MSExecAuto({|x,y,z| MATA241(x,y,z)},_aCab1,_atotitem,3)
@@ -262,6 +286,7 @@ Static Function fSalvar()
 
     Next nLinha
     
+    /*
     Begin Transaction
         //Atualiza empenhos
         _cQuery := "UPDATE "+RetSqlName("SD4")
@@ -293,6 +318,7 @@ Static Function fSalvar()
                 DisarmTransaction()
         endif
     End Transaction
+    */
 
     //Montar rotina de sem saldos
     FWMsgRun(, {|| U_M10A07R(_cNumOP) },'Picking - List - SEM SALDO ','Gerando relatório...')
