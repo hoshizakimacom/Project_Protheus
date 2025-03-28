@@ -1,6 +1,7 @@
 #INCLUDE "FIVEWIN.CH"
 #INCLUDE "TOPCONN.CH"
 #INCLUDE "TBICONN.CH"
+#INCLUDE "Rwmake.ch"
 
 /*
 ‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹
@@ -257,6 +258,7 @@ Local lEnd := .F.
 Local nOps := 0
 Local ni
 Local aFilial  := {}
+Local oDlgLog
 
 Private aSav650 := Array(20)
 Private lConsTerc
@@ -268,6 +270,9 @@ Private lPCPA113  := .F.
 Private lGerouOP  := .T.
 Private l650Auto  := .F.
 Private lZrHeader := If(l650Auto,.T.,.F.)
+Private aHeader   := {}
+Private aCols     := {}
+Private aRotina   := {}
 
 If Aviso("Atencao !","Deseja processar o reempenho das OP's marcadas ?",{"Sim","Nao"}) <> 1
 	Return
@@ -302,7 +307,7 @@ While !EOF()
     DbSelectArea("SC2")
     DbGoTo(TRBSC2->REGISTRO)
 
-	If ValExclOP()[1]
+	If (aErro := ValExclOP())[1]
     
 		//If Aviso("Atencao !","Deseja processar o reempenho da O.P. "+SC2->C2_NUM+"-"+SC2->C2_ITEM+"-"+SC2->C2_SEQUEN+" ?",{"Sim","Nao"}) == 1
 		Processa({|| ReempOp()}, "Processando o reempenho da O.P. "+SC2->C2_NUM+"-"+SC2->C2_ITEM+"-"+SC2->C2_SEQUEN+" ...")
@@ -319,6 +324,8 @@ While !EOF()
 		MsUnLock()
 
 	EndIf
+
+	AADD(aCols,{IIF(aErro[1],"BR_VERDE","BR_VERMELHO"),SC2->C2_NUM+SC2->C2_ITEM+SC2->C2_SEQUEN+SC2->C2_ITEMGRD,aErro[2],.F.})
 
 	DbSelectArea("TRBSC2")
 	DbSkip()
@@ -350,6 +357,26 @@ If nOps > 0 //Gera Explos„o das OP's
 	//GeraEmpenho()
 EndIf
 
+If LEN(aCols) > 0
+
+    dbSelectArea("SC2")
+    dbSetOrder(1)
+
+	aHeader:={}
+	Aadd(aHeader,{ ""          ,       "Legenda" , "@BMP",01                , 00,".F.","???????????????", "C","TRB"})
+	Aadd(aHeader,{ "OP"         ,      "OP"      , "@!"  ,TAMSX3("D4_OP")[1], 00,".F.","???????????????", "N","TRB"})
+	Aadd(aHeader,{ "Ocorrencia",       "OCORR"   , "@!"  ,100               , 00,".F.","???????????????", "C","TRB"})
+
+	@ 150,1 TO 720,1220 Dialog oDlgLog Title "Resumo Processamento"
+
+	@ 010,010 TO 255,600 Multiline Object oLinhas
+
+	@ 265,570 BmpButton Type 1 Action Close(oDlgLog)
+
+	Activate Dialog oDlgLog Centered
+
+EndIf
+
 DbSelectArea("SC2")
 Return                                         
 
@@ -374,9 +401,9 @@ Local aArea    := GetArea()
 Local aAreaSD4 := SD4->(GetArea())
 
 dbSelectArea("SD4")
-dbSetOrder(1)
+dbSetOrder(2) //D4_FILIAL, D4_OP, D4_COD, D4_LOCAL
 dbSeek(xFilial("SD4")+SC2->C2_NUM+SC2->C2_ITEM+SC2->C2_SEQUEN+SC2->C2_ITEMGRD)
-While !EOF()
+While !EOF() .And. SD4->D4_FILIAL+SD4->D4_OP == xFilial("SD4")+SC2->C2_NUM+SC2->C2_ITEM+SC2->C2_SEQUEN+SC2->C2_ITEMGRD
 
 	If SD4->D4_QTDEORI <> SD4->D4_QUANT
 
