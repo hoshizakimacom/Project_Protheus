@@ -7,7 +7,7 @@
 ฑฑบPrograma  ณM04M01    บAutor  ณMarcos Rocha	     บ Data ณ  08/03/23   บฑฑ
 ฑฑฬออออออออออุออออออออออสอออออออฯออออออออออออออออออออสออออออฯอออออออออออออนฑฑ
 ฑฑบDesc.     ณ Gera Requisicao de Mao de Obra no SD3 para os produtos     บฑฑ
-ฑฑบ          ณ que os tenham cadastrados na estrutura.                    บฑฑ
+ฑฑบ          ณ que os tenham cadastrados na estrutura                    บฑฑ
 ฑฑฬออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
 ฑฑบUso       ณ Macom 		                                              บฑฑ
 ฑฑศออออออออออฯออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออผฑฑ
