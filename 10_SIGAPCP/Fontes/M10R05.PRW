@@ -20,7 +20,7 @@ Local oReport
 		//-- Interface de impressao
 		oReport := ReportDef()
 		oReport:PrintDialog()
-	EndIf
+	//EndIf
 
 Return
 
@@ -180,8 +180,8 @@ TRCell():New(oVenProd,"OBS1"		,/*Tabela*/ ,"Observacao1"		 ,PesqPict("SC5","C5_X
 //TRCell():New(oVenProd,"OBS6"		,/*Tabela*/ ,"Observacao6"		 ,PesqPict("SC5","C5_XOBS6")	,TamSx3("C5_XOBS6")[1]		,/*lPixel*/,{|| cObs6 	})				// ObservaÃ¯Â¿Â½Ã¯Â¿Â½o 6
 //TRCell():New(oVenProd,"DTENTREGA7"	,/*Tabela*/	,"Dt.Entrega7"		 ,PesqPict("SC5","C5_XDTPCP7")	,TamSx3("C5_XDTPCP7")[1]	,/*lPixel*/,{|| cDtpcp7	})				// Data de Entrega 7
 //TRCell():New(oVenProd,"OBS7"		,/*Tabela*/ ,"Observacao7"		 ,PesqPict("SC5","C5_XOBS7")	,TamSx3("C5_XOBS7")[1]		,/*lPixel*/,{|| cObs7 	})				// ObservaÃ¯Â¿Â½Ã¯Â¿Â½o 7
-//TRCell():New(oVenProd,"DTENTREGA8"	,/*Tabela*/	,"Dt.Entrega8"		 ,PesqPict("SC5","C5_XDTPCP8")	,TamSx3("C5_XDTPCP8")[1]	,/*lPixel*/,{|| cDtpcp8	})				// Data de Entrega 8
-//TRCell():New(oVenProd,"OBS8"		,/*Tabela*/ ,"Observacao8"		 ,PesqPict("SC5","C5_XOBS8")	,TamSx3("C5_XOBS8")[1]		,/*lPixel*/,{|| cObs8 	})				// ObservaÃ¯Â¿Â½Ã¯Â¿Â½o 8
+TRCell():New(oVenProd,"CONDPAG"		,/*Tabela*/	,"Cond.Pag"		 	 ,PesqPict("SC5","C5_CONDPAG")	,TamSx3("C5_CONDPAG")[1]	,/*lPixel*/,{|| cCodCond})				// Cod. Condicao Pagamento
+TRCell():New(oVenProd,"DESCPAG"		,/*Tabela*/ ,"Desc.Pag"			 ,PesqPict("SE4","E4_DESCRI")	,TamSx3("E4_DESCRI")[1]		,/*lPixel*/,{|| cRetorno})				// Desc. Condicao Pagamento
 TRCell():New(oVenProd,"LIBPROD"		,/*Tabela*/ ,"Lib.Producao"		 ,PesqPict("SC5","C5_XLIBPRO")	,TamSx3("C5_XLIBPRO")[1]	,/*lPixel*/,{|| cXLibPro})				// LiberaÃ§Ã£o financeira para produÃ§Ã£o.
 TRCell():New(oVenProd,"DTLIBPROD"	,/*Tabela*/ ,"Dt.Lib.Producao"	 ,PesqPict("SC5","C5_XDLIBPR")	,TamSx3("C5_XDLIBPR")[1]	,/*lPixel*/,{|| dXDlibPr})				// Data da LiberaÃ§Ã£o financeira para produÃ§Ã£o.
 TRCell():New(oVenProd,"QTD_PRV_PROD",/*Tabela*/	,"Prev.Entr.(OP)"	 ,PesqPict("SC2","C2_QUANT")		,TamSx3("C2_QUANT")[1]		,/*lPixel*/,{|| nPrvEntr })				// Saldo em Estoque
@@ -652,5 +652,25 @@ If nTotPed > 0
 	Endif
 
 Endif
-
 Return cRet
+
+//±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+// Descricao Cond Pagto
+//±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+User Function M10R05A(cChave)
+
+Local aArea    := GetArea()
+Local aAreaSE1 := SE1->(GetArea())
+Local cRetorno := ""
+
+dbSelectArea("SE1")
+dbSetOrder(1)
+dbSeek(xFilial("SE1")+cChave)
+
+cCodCond := Posicione("SC5",1,xFilial("SC5")+SE1->E1_PEDIDO,"C5_CONDPAG")
+cRetorno := Posicione("SE4",1,xFilial("SE4")+cCodCond,"E4_DESCRI")
+
+RestArea(aAreaSE1)
+RestArea(aArea)
+
+Return cRetorno

@@ -93,9 +93,8 @@ cQry += " AND LEFT(D3_COD,3) IN ('MO-') "+cEOL
 
 //cQry += " AND LEFT(D3_COD,3) IN ('MO-','MOD') "+cEOL
 // Marcos 29/01/25
-
 cQry += " AND D3_TIPO = '"+c_TipoMO+"'"+cEOL
-cQry += " AND D3_TM = '"+c_TM+"' "+cEOL
+cQry += " AND (D3_TM = '"+c_TM+"' OR D3_TM = '999' ) "+cEOL
 cQry += " AND D3_EMISSAO BETWEEN '"+DTOS(mv_par01)+"' AND '"+DTOS(mv_par02)+"'"+cEOL
 cQry += " AND D_E_L_E_T_ <> '*' "+cEOL
 
@@ -620,7 +619,6 @@ Local nProc
 Local aProdmod := {}
 
 For nProc := 1 To Len(aEstrutura)
-
 
 	If Left(aEstrutura[nProc,1],3) == "MO-" 
 		// Tratar a Validade da Estrutura
