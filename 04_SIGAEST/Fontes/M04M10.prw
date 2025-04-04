@@ -126,7 +126,7 @@ METHOD Anexar() CLASS ClassAnexoProduto
 			Aadd(aHeader,{ "Tipo de Arquivo",  "TIPARQ"  , "@!"  ,20 , 00,".F.","???????????????", "C","TRB"})
 			Aadd(aHeader,{ "Extensão" ,        "EXTENSAO", "@!"  ,05 , 00,".F.","???????????????", "C","TRB"})
 			Aadd(aHeader,{ "Sufixo" ,          "SUFIXO"  , "@!"  ,05 , 00,".F.","???????????????", "C","TRB"})
-			Aadd(aHeader,{ "Ocorrencia",       "OCORR"   , "@!"  ,30 , 00,".F.","???????????????", "C","TRB"})
+			Aadd(aHeader,{ "Ocorrencia",       "OCORR"   , "@!"  ,100, 00,".F.","???????????????", "C","TRB"})
 			nUsado := 4
 
 			_nItem := 0
@@ -162,18 +162,19 @@ METHOD salvarAnexo(_cFilePath) CLASS ClassAnexoProduto
 	Local aRet			:= {}
     Local aFiles        := Directory(_cFilePath+"*.*", "F")
 	Local cDirServer	:= ::cDirAnexos
+	Local lSobrepor     := (::PodeVisualizar("SOBREP"))
 
 	Private oProcess := Nil
 
     dbSelectArea("SB1")
     dbSetOrder(1)
 
-	oProcess := MsNewProcess():New( { | lEnd | aRet := UpLoad(@lEnd,_cFilePath,cDirServer,aFiles) }, "Carregando", "Aguarde, carregando arquivos...", .F. )
+	oProcess := MsNewProcess():New( { | lEnd | aRet := UpLoad(@lEnd,_cFilePath,cDirServer,aFiles,lSobrepor) }, "Carregando", "Aguarde, carregando arquivos...", .F. )
 	oProcess:Activate()
 
 Return aRet
 
-Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles)
+Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles,lSobrepor)
 
 	Local aRet			:= {}
 	Local cFileName		:= ""//Nome ORIGINAL do arquivo.
@@ -181,7 +182,8 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles)
     Local cCaminho      := ""
     Local cNome         := ""
     Local cExtensao     := ""
-    Local aFilesOld     := ""
+    Local cRevisao      := ""
+	Local aFilesOld     := ""
     Local lStatus       := .T.
     Local lUpdate       := .F.
 	Local lFErase       := .F.
@@ -209,6 +211,7 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles)
 
         cProduto  := LEFT(cNome,(AT("_",cNome)-1))
         cSufixo   := LEFT(RIGHT(cNome,6),4)
+		cRevisao  := RIGHT(cNome,2)
 		cDescProd := ""
 
         cOcorrencia := ""
@@ -231,7 +234,7 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles)
         EndIf
 
         If lStatus 
-			If !SB1->(dbSeek(xFilial("SB1")+cProduto))
+			If !SB1->(dbSeek(xFilial("SB1")+PADR(cProduto,TAMSX3("B1_COD")[1])))
 				lStatus := .F.
 				cOcorrencia := "Produto não cadastrado!"
 			Else
@@ -251,15 +254,30 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles)
 
         lUpdate := .F.
         If lStatus .And. LEN(aFilesOld := Directory(cDirServer+cProduto+cSufixo+"*"+cExtensao, "F")) > 0
-            For nX := 1 To Len(aFilesOld)
-                If (FErase(cDirServer+aFilesOld[nX,1]) == 0)
-                    lUpdate := .T.
-                Else
-                    lStatus := .F.
-                    cOcorrencia := "Erro ao sobrepor arquivo no servidor! Houve uma falha na exclusão do arquivo, erro #" + cValToChar(FError())
-                    Exit
-                EndIf
-            Next
+            
+			If !lSobrepor
+				lStatus := .F.
+				cOcorrencia := "Usuário sem acesso a sobrepor arquivos no servidor!"
+				Exit
+			Else
+			
+				For nX := 1 To Len(aFilesOld)
+					cRevServer := LEFT(RIGHT(aFilesOld[nX,1],2+LEN(cExtensao)),2)
+					If cRevisao <= cRevServer
+						lStatus := .F.
+						cOcorrencia := "Revisão inferior ao do servidor, não permitido sobrepor! Revisão do Servidor:"+cRevServer+" # Revisão do novo Arquivo:"+cRevisao
+						Exit
+					Else			
+						If (FErase(cDirServer+aFilesOld[nX,1]) == 0)
+							lUpdate := .T.
+						Else
+							lStatus := .F.
+							cOcorrencia := "Erro ao sobrepor arquivo no servidor! Houve uma falha na exclusão do arquivo, erro #" + cValToChar(FError())
+							Exit
+						EndIf
+					EndIf
+				Next
+			EndIf
         EndIf
 
         //Copiando o arquivo do cliente para o servidor
@@ -473,7 +491,7 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
 
     MontaEstru(oDlg,oTree)
 
-	oDlg:Activate(,,,.T.,,,{|| /*AtuBotao(oTree,.T.)*/ } )
+	oDlg:Activate(,,,.T.,,,{|| AtuBotao(oTree,.T.) } )
 
 Return
 
@@ -596,7 +614,7 @@ METHOD PodeVisualizar(cPrefixo) CLASS ClassAnexoProduto
  
 	Local lRet		:= .F.
 	Local aArea     := GetArea()
-	Local cField    := IIF(cPrefixo=="UPLOAD","PA0_UPLOAD","PA0_VIS"+STRTRAN(cPrefixo,"_",""))
+	Local cField    := IIF(cPrefixo=="SOBREP","PA0_SOBREP",IIF(cPrefixo=="UPLOAD","PA0_UPLOAD","PA0_VIS"+STRTRAN(cPrefixo,"_","")))
 
 	dbSelectArea("PA0")
 	dbSetOrder(1)
@@ -620,11 +638,18 @@ Static Function MontaEstru(oDlg,oTree)
 
 Local aArea  := GETAREA()
 Local lRet   := .T.
+Local nOpcx  := 2
 
 		ldbTree    := .T.
-        
+
+		//Tratamento para visualização de itens sem estrutura #MONTES20250324
+        SG1->(dbSetOrder(1))
+		If !SG1->(dbSeek(xFilial('SG1') + SB1->B1_COD, .F.))
+			nOpcx := 3
+		EndIf
+
 		oTree:Reset()
-		MontaTree(oTree, oDlg, SB1->B1_COD,, 2 /*nOpcX*/, /*cCargo*/, /*cTRTPai*/, /*lZeraStatic*/, /*lOpc*/ )
+		MontaTree(oTree, oDlg, SB1->B1_COD,, nOpcX, /*cCargo*/, /*cTRTPai*/, /*lZeraStatic*/, /*lOpc*/ )
 		oTree:TreeSeek(oTree:GetCargo())
 
 RESTAREA(aArea)

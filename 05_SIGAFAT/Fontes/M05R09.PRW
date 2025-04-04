@@ -167,7 +167,8 @@ TRCell():New(oVenProd,"DESCONT3"	,/*Tabela*/	,"Desconto 3" 	     ,PesqPict("SC5"
 TRCell():New(oVenProd,"DESCONT4"	,/*Tabela*/	,"Desconto 4" 	     ,PesqPict("SC5","C5_DESC4")	,TamSx3("C5_DESC4")[1]	    ,/*lPixel*/,{|| nDesc4  })				// Desconto 4
 TRCell():New(oVenProd,"%DESCONTO"	,/*Tabela*/	,"% Desconto" 	     ,PesqPict("SC6","C6_DESCONT")	,TamSx3("C6_DESCONT")[1]	,/*lPixel*/,{|| nDescitem  })			// % Desconto
 TRCell():New(oVenProd,"%FRETE"		,/*Tabela*/	,"% Frete"	 	     ,PesqPict("SC5","C5_XFRETE")	,TamSx3("C5_XFRETE")[1]	    ,/*lPixel*/,{|| cXFrete })				// % Frete
-TRCell():New(oVenProd,"%ACRSFIN"	,/*Tabela*/	,"% Acres. Finan."   ,PesqPict("SE4","E4_ACRSFIN")	,TamSx3("E4_ACRSFIN")[1]    ,/*lPixel*/,{|| nAcrsFin })				// % Frete
+TRCell():New(oVenProd,"%ACRSFIN"	,/*Tabela*/	,"% Acres. Finan."   ,PesqPict("SE4","E4_ACRSFIN")	,TamSx3("E4_ACRSFIN")[1]    ,/*lPixel*/,{|| nAcrsFin })				// % Acres. Financeiro
+TRCell():New(oVenProd,"%CONDPAG"	,/*Tabela*/	,"Desc. Pag."   	 ,PesqPict("SE4","E4_DESCRI")	,TamSx3("E4_DESCRI")[1]     ,/*lPixel*/,{|| cCondPag })			    // Descr. Cond. Pagamento
 
 Return(oReport)
 
@@ -197,6 +198,7 @@ Static Function ReportPrint(oReport,cAliasQry,oVenProd)
 
 Local lPosC5	:= .F.
 Local lPosA1	:= .F.
+Local lPosE4	:= .F.
 Local cPedido   := Space(6)
 Local lPrimItem := .F.
 
@@ -243,6 +245,8 @@ dbSetOrder(2)			// Produto,Numero
 			SB1.B1_COD = SC6.C6_PRODUTO  AND
 			SB1.%NotDel%
 
+			//%Table:SE4% SE4 ON SE4.E4_FILIAL = %xFilial:SE4% AND E4_CODIGO    = C5_CONDPAG AND SE4.%NotDel%
+
 		ORDER BY SC6.C6_NUM, SC6.C6_ITEM
 	EndSql 
 
@@ -267,6 +271,8 @@ dbSetOrder(1)
 dbSelectArea("SA1")
 dbSetOrder(1)
 dbSelectArea("SA3")
+dbSetOrder(1)
+dbSelectArea("SE4")
 dbSetOrder(1)
 dbSelectArea(cAliasQry)
 dbGoTop()
@@ -296,6 +302,14 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 
 	lPosA1	:= SA1->(MsSeek(xFilial('SA1')+(cAliasQry)->C6_CLI+(cAliasQry)->C6_LOJA))
 
+	// Posiciona SE4 
+	lPosE4	:= SE4->(MsSeek((cAliasQry)->C6_FILIAL+(cAliasQry)->C6_NUM))
+
+	
+	If lPosE4
+		cCondPag := SE4->E4_DESCRI
+	Endif
+	
 	If lPosC5
 	
 		If SC5->C5_EMISSAO < MV_PAR01 .Or. SC5->C5_EMISSAO > MV_PAR02
@@ -373,6 +387,8 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		nDesc3		:= SC5->C5_DESC3
 		nDesc4		:= SC5->C5_DESC4
 		nAcrsFin	:= Posicione("SE4",1,xFilial("SE4") +SC5->C5_CONDPAG, "E4_ACRSFIN")
+		
+		
 
 
 	
