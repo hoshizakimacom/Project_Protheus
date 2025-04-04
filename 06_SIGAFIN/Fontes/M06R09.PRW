@@ -5,7 +5,7 @@
 ╠╠зддддддддддбддддддддддбдддддддбдддддддддддддддддддддддбддддддбдддддддддд©╠╠
 ╠╠ЁPrograma  Ё M06R09   Ё Autor Ё Montes - MooveGestЦo  Ё Data Ё 22/11/24 Ё╠╠
 ╠╠цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢╠╠
-╠╠ЁDescri┤┘o Ё Relatorio de ProvisЦo do Contas a Receber/Pagar            Ё╠╠
+╠╠ЁDescri┤┘o Ё Relatorio de ProvisЦo do Contas a Receber / Pagar          Ё╠╠
 ╠╠Ё          Ё                                                   		  Ё╠╠
 ╠╠цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
 ╠╠ЁUso       Ё SIGAFIN                                                    Ё╠╠
