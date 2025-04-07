@@ -5,7 +5,7 @@
 ±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
 ±±³Programa  ³ M06R09   ³ Autor ³ Montes - MooveGestão  ³ Data ³ 22/11/24 ³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri‡…o ³ Relatorio de Provisão do Contas a Receber/Pagar            ³±±
+±±³Descri‡…o ³ Relatorio de Provisão do Contas a Receber / Pagar          ³±±
 ±±³          ³                                                   		  ³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
 ±±³Uso       ³ SIGAFIN                                                    ³±±
@@ -290,7 +290,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	
 	If (cAliasQry)->CARTEIRA == "R" .And. SC5->(MsSeek(xFilial('SC5')+(cAliasQry)->PEDIDO))
 		// Calcula o valor total do pedido considerando os impostos
-		M6R9TOT("R",SC5->(Recno()),@_nTotal,@_nFrete,@_nSeguro,@_nDesp,@_nFreteA,@_nAcrFin,@cCodPgto,@cNumOrc,@cContaCTB,@cDescCC,@nPercSald)
+		M6R9TOT("R",SC5->(Recno()),@_nTotal,@_nFrete,@_nSeguro,@_nDesp,@_nFreteA,@_nAcrFin,@cCodPgto,@cNumOrc,@cContaCTB,@cDescCC,@nPercSald,dDataEnt)
 		
 		nVlrPedt	:= ( _nTotal + _nFrete + _nSeguro + _nDesp + _nFreteA + _nAcrFin )
 		
@@ -301,7 +301,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 
 	ElseIf (cAliasQry)->CARTEIRA == "P" .And. SC7->(MsSeek(xFilial('SC7')+(cAliasQry)->PEDIDO))
 		// Calcula o valor total do pedido considerando os impostos
-		M6R9TOT("P",SC7->(Recno()),@_nTotal,@_nFrete,@_nSeguro,@_nDesp,@_nFreteA,@_nAcrFin,@cCodPgto,@cNumOrc,@cContaCTB,@cDescCC,@nPercSald)
+		M6R9TOT("P",SC7->(Recno()),@_nTotal,@_nFrete,@_nSeguro,@_nDesp,@_nFreteA,@_nAcrFin,@cCodPgto,@cNumOrc,@cContaCTB,@cDescCC,@nPercSald,dDataEnt)
 		
 		nVlrPedt	:= ( _nTotal + _nFrete + _nSeguro + _nDesp + _nFreteA + _nAcrFin )
 
@@ -317,7 +317,8 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	EndIf
 
 	//Deduz valor pago para o pedido via Adiantamento PVA
-	nVlrPedt := nVlrPedt - nVlrPago
+	nVlrPedt := nVlrPedt 
+	nSldPedt := nSldPedt - nVlrPago
 
 	dDataIni := IIF(dDataEnt < dDataBase,dDataBase,dDataEnt)
     aVenc    := Condicao ( nSldPedt /*nVlrPedt*/, cCodPgto, 0, dDataIni )
@@ -360,7 +361,7 @@ Return
 ±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß*/
-Static Function M6R9TOT(cCarteira,_nRecnoSC5,_nTotal,_nFrete,_nSeguro,_nDesp,_nFreteA,_nAcrFin,_cCondPag,cNumOrc,cContaCTB,cDescCC,nPercSald)
+Static Function M6R9TOT(cCarteira,_nRecnoSC5,_nTotal,_nFrete,_nSeguro,_nDesp,_nFreteA,_nAcrFin,_cCondPag,cNumOrc,cContaCTB,cDescCC,nPercSald,dDataEnt)
 	Local _aAreaSC5		:= SC5->(GetArea())
 	Local _aAreaSC7		:= SC7->(GetArea())
 	Local _aArea		:= GetArea()
@@ -385,6 +386,8 @@ Static Function M6R9TOT(cCarteira,_nRecnoSC5,_nTotal,_nFrete,_nSeguro,_nDesp,_nF
 	Local nAcresFin  	:= 0
 	Local nSaldoMerc    := 0
 	Local nTotalMerc    := 0
+	Local nTotalPedido  := 0
+	Local nProp         := 0
 
 	MA6R9FisIni(cCarteira,@aFisGet,@aFisGetCAB)
 
@@ -441,6 +444,8 @@ Static Function M6R9TOT(cCarteira,_nRecnoSC5,_nTotal,_nFrete,_nSeguro,_nDesp,_nF
 				cSeriOri   := Nil
 				nRecnoSD1  := Nil
 				nDesconto  := 0
+
+				nTotalPedido += SC7->C7_QUANT*SC7->C7_PRECO
 
 				//+------------------------------------
 				// Verifica se Possui NF Origem
@@ -602,100 +607,107 @@ Static Function M6R9TOT(cCarteira,_nRecnoSC5,_nTotal,_nFrete,_nSeguro,_nDesp,_nF
 		//+------------------------------------
 		While SC7->(!EOF()) .And. SC7->(C7_FILIAL + C7_NUM ) == cFilSC7 + cPedido
 
-				cNfOri     := Nil
-				cSeriOri   := Nil
-				nRecnoSD1  := Nil
-				nDesconto  := 0
+			cNfOri     := Nil
+			cSeriOri   := Nil
+			nRecnoSD1  := Nil
+			nDesconto  := 0
 
-				DbSelectArea('SC7')
+			nTotalPedido += SC7->C7_QUANT*SC7->C7_PRECO
 
-				//+------------------------------------
-				//Calcula o preco de lista
-				//+------------------------------------
-				nValMerc  := SC7->C7_TOTAL
-				nPrcLista := SC7->C7_PRECO
+			DbSelectArea('SC7')
+		
+			IF SC7->C7_DATPRF == dDataEnt //Tratamento por data de entrega por item #MONTES20250331
+					//+------------------------------------
+					//Calcula o preco de lista
+					//+------------------------------------
+					nValMerc  := SC7->C7_TOTAL
+					nPrcLista := SC7->C7_PRECO
 
-				If ( nPrcLista == 0 )
-					nPrcLista := NoRound(nValMerc/SC7->C7_QUANT,TamSX3("C7_PRECO")[2])
-				EndIf
-
-				nAcresFin := A410Arred(SC7->C7_PRECO*_nAcrFin/100,"D2_PRCVEN")
-				nValMerc  += A410Arred(SC7->C7_QUANT*nAcresFin,"D2_TOTAL")
-				nDesconto := a410Arred(nPrcLista*SC7->C7_QUANT,"D2_DESCON")-nValMerc
-				nDesconto := Max(0,nDesconto)
-				nPrcLista += nAcresFin
-				nValMerc  += nDesconto
-
-				nTotalMerc += SC7->C7_QUANT*SC7->C7_PRECO
-	 			nSaldoMerc += (SC7->C7_QUANT-SC7->C7_QUJE)*SC7->C7_PRECO
-
-				MaFisAdd(	SC7->C7_PRODUTO				,;	// 1-Codigo do Produto ( Obrigatorio )
-							SC7->C7_TES					,;	// 2-Codigo do TES ( Opcional )
-							SC7->C7_QUANT   			,;	// 3-Quantidade ( Obrigatorio )
-							nPrcLista					,;	// 4-Preco Unitario ( Obrigatorio )
-							nDesconto					,;	// 5-Valor do Desconto ( Opcional )
-							cNfOri						,;	// 6-Numero da NF Original ( Devolucao/Benef )
-							cSeriOri					,;	// 7-Serie da NF Original ( Devolucao/Benef )
-							nRecnoSD1					,;	// 8-RecNo da NF Original no arq SD1/SD2
-							0							,;	// 9-Valor do Frete do Item ( Opcional )
-							0							,;	// 10-Valor da Despesa do item ( Opcional )
-							0							,;	// 11-Valor do Seguro do item ( Opcional )
-							0							,;	// 12-Valor do Frete Autonomo ( Opcional )
-							nValMerc					,;	// 13-Valor da Mercadoria ( Obrigatorio )
-							0							,;	// 14-Valor da Embalagem ( Opiconal )
-							0							,;	// 15-RecNo do SB1
-							0							)	// 16-RecNo do SF4
-
-				aadd(aItemPed,	{	SC7->C7_ITEM					,;
-										SC7->C7_PRODUTO				,;
-										SC7->C7_DESCRI				,;
-										SC7->C7_TES					,;
-										''/*SC7->C7_CF*/			,;
-										SC7->C7_UM					,;
-										SC7->C7_QUANT				,;
-										SC7->C7_PRECO				,;
-										''/*SC7->C7_NOTA*/			,;
-										''/*SC7->C7_SERIE*/			,;
-										SC7->C7_FORNECE				,;
-										SC7->C7_LOJA				,;
-										SC7->C7_TOTAL				,;
-										SC7->C7_DATPRF				,;
-										SC7->C7_DESC1				,;
-										SC7->C7_LOCAL				,;
-										SC7->C7_QUANT				,;
-										SC7->C7_QUANT				,;
-										SC7->C7_QUJE				,;
-									})
-
-				//+------------------------------------
-				//Forca os valores de impostos que foram
-				//	informados no SC7.
-				//+------------------------------------
-				DbSelectArea('SC7')
-				For nY := 1 to Len(aFisGet)
-					If FIELDPOS(aFisGet[ny][2]) > 0 .And. !Empty(&(aFisGet[ny][2]))
-						MaFisAlt(aFisGet[ny][1],&(aFisGet[ny][2]),Len(aItemPed))
+					If ( nPrcLista == 0 )
+						nPrcLista := NoRound(nValMerc/SC7->C7_QUANT,TamSX3("C7_PRECO")[2])
 					EndIf
-				Next nY
 
-				//+------------------------------------
-				//Altera peso para calcular frete
-				//+------------------------------------
-				SB1->(dbSetOrder(1))
-				SB1->(MsSeek(xFilial("SB1")+SC7->C7_PRODUTO))
-				MaFisAlt("IT_PESO",SC7->C7_QUANT*SB1->B1_PESO,Len(aItemPed))
-				MaFisAlt("IT_PRCUNI",nPrcLista,Len(aItemPed))
-				MaFisAlt("IT_VALMERC",nValMerc,Len(aItemPed))
+					nAcresFin := A410Arred(SC7->C7_PRECO*_nAcrFin/100,"D2_PRCVEN")
+					nValMerc  += A410Arred(SC7->C7_QUANT*nAcresFin,"D2_TOTAL")
+					nDesconto := a410Arred(nPrcLista*SC7->C7_QUANT,"D2_DESCON")-nValMerc
+					nDesconto := Max(0,nDesconto)
+					nPrcLista += nAcresFin
+					nValMerc  += nDesconto
+
+					nTotalMerc += SC7->C7_QUANT*SC7->C7_PRECO
+					nSaldoMerc += (SC7->C7_QUANT-SC7->C7_QUJE)*SC7->C7_PRECO
+
+					MaFisAdd(	SC7->C7_PRODUTO				,;	// 1-Codigo do Produto ( Obrigatorio )
+								SC7->C7_TES					,;	// 2-Codigo do TES ( Opcional )
+								SC7->C7_QUANT   			,;	// 3-Quantidade ( Obrigatorio )
+								nPrcLista					,;	// 4-Preco Unitario ( Obrigatorio )
+								nDesconto					,;	// 5-Valor do Desconto ( Opcional )
+								cNfOri						,;	// 6-Numero da NF Original ( Devolucao/Benef )
+								cSeriOri					,;	// 7-Serie da NF Original ( Devolucao/Benef )
+								nRecnoSD1					,;	// 8-RecNo da NF Original no arq SD1/SD2
+								0							,;	// 9-Valor do Frete do Item ( Opcional )
+								0							,;	// 10-Valor da Despesa do item ( Opcional )
+								0							,;	// 11-Valor do Seguro do item ( Opcional )
+								0							,;	// 12-Valor do Frete Autonomo ( Opcional )
+								nValMerc					,;	// 13-Valor da Mercadoria ( Obrigatorio )
+								0							,;	// 14-Valor da Embalagem ( Opiconal )
+								0							,;	// 15-RecNo do SB1
+								0							)	// 16-RecNo do SF4
+
+					aadd(aItemPed,	{	SC7->C7_ITEM					,;
+											SC7->C7_PRODUTO				,;
+											SC7->C7_DESCRI				,;
+											SC7->C7_TES					,;
+											''/*SC7->C7_CF*/			,;
+											SC7->C7_UM					,;
+											SC7->C7_QUANT				,;
+											SC7->C7_PRECO				,;
+											''/*SC7->C7_NOTA*/			,;
+											''/*SC7->C7_SERIE*/			,;
+											SC7->C7_FORNECE				,;
+											SC7->C7_LOJA				,;
+											SC7->C7_TOTAL				,;
+											SC7->C7_DATPRF				,;
+											SC7->C7_DESC1				,;
+											SC7->C7_LOCAL				,;
+											SC7->C7_QUANT				,;
+											SC7->C7_QUANT				,;
+											SC7->C7_QUJE				,;
+										})
+
+					//+------------------------------------
+					//Forca os valores de impostos que foram
+					//	informados no SC7.
+					//+------------------------------------
+					DbSelectArea('SC7')
+					For nY := 1 to Len(aFisGet)
+						If FIELDPOS(aFisGet[ny][2]) > 0 .And. !Empty(&(aFisGet[ny][2]))
+							MaFisAlt(aFisGet[ny][1],&(aFisGet[ny][2]),Len(aItemPed))
+						EndIf
+					Next nY
+
+					//+------------------------------------
+					//Altera peso para calcular frete
+					//+------------------------------------
+					SB1->(dbSetOrder(1))
+					SB1->(MsSeek(xFilial("SB1")+SC7->C7_PRODUTO))
+					MaFisAlt("IT_PESO",SC7->C7_QUANT*SB1->B1_PESO,Len(aItemPed))
+					MaFisAlt("IT_PRCUNI",nPrcLista,Len(aItemPed))
+					MaFisAlt("IT_VALMERC",nValMerc,Len(aItemPed))
+
+			EndIf	
 
 			SC7->(DbSkip())
 		EndDo
 
 	EndIf
 
-	MaFisAlt("NF_FRETE"   ,nFrete)
-	MaFisAlt("NF_SEGURO"  ,nSeguro)
-	MaFisAlt("NF_AUTONOMO",nFretAut)
-	MaFisAlt("NF_DESPESA" ,nDespesa)
+	nProp := (nTotalMerc/nTotalPedido)
+
+	MaFisAlt("NF_FRETE"   ,nFrete*nProp)
+	MaFisAlt("NF_SEGURO"  ,nSeguro*nProp)
+	MaFisAlt("NF_AUTONOMO",nFretAut*nProp)
+	MaFisAlt("NF_DESPESA" ,nDespesa*nProp)
 
 	If nDescCab > 0
 		MaFisAlt("NF_DESCONTO",Min(MaFisRet(,"NF_VALMERC")-0.01,nDescCab+MaFisRet(,"NF_DESCONTO")))
@@ -834,13 +846,14 @@ BeginSql Alias cAliasQry2
 		SUM(E1_SALDO) AS SALDO		
 	FROM 
 		%Table:SE1% SE1
-	WHERE 
+	WHERE
 		SE1.E1_PEDIDO = %Exp:_nNumPed% AND
-		SE1.E1_PREFIXO = 'PVA' AND 
+		SE1.E1_PREFIXO = 'PVA' AND
+		SE1.E1_TIPO <> 'CRA' AND
 		SE1.%NotDel%
 EndSql 
 
-While  !(cAliasQry2)->(Eof())
+While !(cAliasQry2)->(Eof())
 	
 	nValPago	+= (cAliasQry2)->VALOR - (cAliasQry2)->SALDO
 	
