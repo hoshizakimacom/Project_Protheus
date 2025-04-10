@@ -46,6 +46,14 @@ If ALTERA
 	Endif
 Endif
 
+//+------------------------------------------------------------------------
+// Verifique se o tipo de venda dealer + de 90 dias entrega.(Chamado #8431)
+//+------------------------------------------------------------------------
+If AllTrim(M->C5_XTPVEN) $ "3" .and. M->C5_FECENT > dDataBase + 90
+    MsgStop('Tipo de Venda Dealer não pode ultrapassar o limite máximo de 90 dias. Entre em contato com a gerência comercial.','Atenção')
+    _lRet := .F.
+EndIf
+
 // Verifica se o cliente/loja de entrega é igual ao cliente/loja principal
 If M->C5_CLIENTE <> M->C5_CLIENT .Or. M->C5_LOJACLI <> M->C5_LOJAENT
 	MsgAlert("Cliente ou loja de entrega diferem do cliente/loja principal. Verifique !","ATENÇÃO")
