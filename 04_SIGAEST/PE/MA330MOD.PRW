@@ -3,7 +3,7 @@
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±ºPrograma  ³MA330MOD  ºAutor  ³Marcos Rocha        º Data ³  30/03/05   º±±
+±±ºPrograma  ³MA330MOD  ºAutor  ³Marcos Rocha        º Data ³  30/03/24   º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
 ±±ºDesc.     ³Retorna o saldo do centro de custo de MOD                   º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
@@ -19,6 +19,8 @@ User Function MA330MOD()
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 PRIVATE lCusUnif := GetMV("MV_CUSFIL",.F.) // Identifica qdo utiliza custo por Filial
 
+MsgStop("MA330MOD - INICIO")
+
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Quantidade do produto nesse armazem                          ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
@@ -32,6 +34,10 @@ While !Eof() .And. ZAH->ZAH_FILIAL+ZAH->ZAH_ANOMES == xFilial("ZAH")+Left(Dtos(d
 //	nQtdMOD := ZAH->ZAH_QUANT
 	nQtdMOD := 0
 	mCstMod := ZAH->ZAH_VALOR
+
+//	If Left(cCodAtu,6) == "MO-COC"
+//		MsgStop("MA330MOD - 1 - Codigo : "+cCodAtu)
+//	EndIf 
 
 	//Busca a Quantidade de requisições do Mes para preencher o SB2 e  rateio ficar correto 
 	cQry := " SELECT D3_COD CODMOD, SUM(D3_QUANT) QTD_REQ_OP "
@@ -63,12 +69,24 @@ While !Eof() .And. ZAH->ZAH_FILIAL+ZAH->ZAH_ANOMES == xFilial("ZAH")+Left(Dtos(d
 		dbCloseArea()
 	EndIf
 
-	DbSelectArea("SB2")
-	DbSetOrder(1)
-//	DbSeek(xFilial("SB2")+cCodAtu+cLocEst,.F.)
-//	While !Eof() .And. SB2->B2_FILIAL+SB2->B2_COD+SB2->B2_LOCAL == xFilial("SB2")+cCodAtu+cLocEst
-	DbSeek(xFilial("SB2")+cCodAtu,.F.)
+//	If Left(cCodAtu,6) == "MO-COC"
+//		MsgStop("MA330MOD - 2 - Codigo : "+cCodAtu)
+//	EndIf 
+
+	dbSelectArea("SB2")
+	dbSetOrder(1)
+	dbSeek(xFilial("SB2")+cCodAtu+"99",.F.)   // Colocar o parametro de local de processo
+
 	While !Eof() .And. SB2->B2_FILIAL+SB2->B2_COD == xFilial("SB2")+cCodAtu
+
+		//If Left(cCodAtu,6) == "MO-COC"
+		//	MsgStop("MA330MOD - 2 - Codigo : "+cCodAtu)
+		//	MsgStop(mCstMod)
+		//EndIf 
+		If SB2->B2_LOCAL <> "99"  // Colocar o parametro de local de processo
+			dnSkip()
+			Loop
+		EndIf
 
 		DbSelectArea("SB2")
 		RecLock("SB2",.F.)
@@ -78,6 +96,11 @@ While !Eof() .And. ZAH->ZAH_FILIAL+ZAH->ZAH_ANOMES == xFilial("ZAH")+Left(Dtos(d
 		SB2->B2_CMFIM1 := mCstMod/Abs(nQtdMOD)
 		MsUnlock()
 
+		//If Left(cCodAtu,6) == "MO-COC"
+		//	MsgStop("MA330MOD - 3 - Codigo : "+cCodAtu)
+		//	MsgStop(SB2->B2_VFIM1)
+		//EndIf 
+		
 		TTFimComMO({SB2->B2_VFIM1,SB2->B2_VFIM2,SB2->B2_VFIM3,SB2->B2_VFIM4,SB2->B2_VFIM5})
 		TTFimQtdMO()
 		
@@ -89,7 +112,7 @@ While !Eof() .And. ZAH->ZAH_FILIAL+ZAH->ZAH_ANOMES == xFilial("ZAH")+Left(Dtos(d
 	dbSkip()
 EndDo
 
-//MsgStop("MA330MOD - FIM")
+MsgStop("MA330MOD - FIM")
 
 Return
 
