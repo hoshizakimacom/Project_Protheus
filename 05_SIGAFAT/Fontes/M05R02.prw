@@ -6,7 +6,17 @@
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 //| Relatório Orçaamento
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
-User Function M05R02()
+User Function M05R02()          //Impressão com Valores
+
+Private lImprVlr := .T.
+
+    FWMsgRun(, {|| U_M05R02A() },,'Gerando relatório...')
+
+Return
+
+User Function M05R02S()         //Impressão Sem Valores #8450
+
+Private lImprVlr := .F.
 
     FWMsgRun(, {|| U_M05R02A() },,'Gerando relatório...')
 
@@ -98,21 +108,28 @@ Static Function M05RICabIt(oPrinter,oFont12B,nRow)
     oPrinter:Box(nRow,1400,nRow + nRowStep * 2.5,1500)                      // QTD
 //  oPrinter:Box(nRow,1500,nRow + nRowStep * 2,1700)                        // VALOR UNITÁRIO
 
-    oPrinter:Box(nRow,1700,nRow + nRowStep * 2.5,1950)                      // IPI
-    oPrinter:Box(nRow,1700,nRow + nRowStep * 1.25,1950)                     // IPI
-    oPrinter:Box(nRow + nRowStep * 1.25,1700,nRow + nRowStep * 2.5,1770)    // IPI
+    If lImprVlr //Impressão com valores
+        oPrinter:Box(nRow,1700,nRow + nRowStep * 2.5,1950)                      // IPI
+        oPrinter:Box(nRow,1700,nRow + nRowStep * 1.25,1950)                     // IPI
+        oPrinter:Box(nRow + nRowStep * 1.25,1700,nRow + nRowStep * 2.5,1770)    // IPI
 
-//  oPrinter:Box(nRow,1950,nRow + nRowStep * 2,2200)                        // ICMS
-    oPrinter:Box(nRow,1950,nRow + nRowStep * 1.25,2200)                     // ICMS
-    oPrinter:Box(nRow + nRowStep * 1.25,1950,nRow + nRowStep * 2.5,2020)    // ICMS
+    //  oPrinter:Box(nRow,1950,nRow + nRowStep * 2,2200)                        // ICMS
+        oPrinter:Box(nRow,1950,nRow + nRowStep * 1.25,2200)                     // ICMS
+        oPrinter:Box(nRow + nRowStep * 1.25,1950,nRow + nRowStep * 2.5,2020)    // ICMS
 
-    oPrinter:Box(nRow,2200,nRow + nRowStep * 2.5,2450)                      // PIS/COFINS
-    oPrinter:Box(nRow,2200,nRow + nRowStep * 1.25,2450)                     // PIS/COFINS
-    oPrinter:Box(nRow + nRowStep * 1.25,2200,nRow + nRowStep * 2.5,2270)    // PIS/COFINS
+        oPrinter:Box(nRow,2200,nRow + nRowStep * 2.5,2450)                      // PIS/COFINS
+        oPrinter:Box(nRow,2200,nRow + nRowStep * 1.25,2450)                     // PIS/COFINS
+        oPrinter:Box(nRow + nRowStep * 1.25,2200,nRow + nRowStep * 2.5,2270)    // PIS/COFINS
 
-//  oPrinter:Box(nRow,2450,nRow + nRowStep * 2,2700)                        // VALOR ICMS ST
-    oPrinter:Box(nRow,2700,nRow + nRowStep * 2.5,2950)                      // VALOR UNITARIO C/ IMPOSTOS
-//  oPrinter:Box(nRow,2950,nRow + nRowStep * 2,3200)                        // VALOR TOTAL
+    //  oPrinter:Box(nRow,2450,nRow + nRowStep * 2,2700)                        // VALOR ICMS ST
+        oPrinter:Box(nRow,2700,nRow + nRowStep * 2.5,2950)                      // VALOR UNITARIO C/ IMPOSTOS
+    //  oPrinter:Box(nRow,2950,nRow + nRowStep * 2,3200)                        // VALOR TOTAL
+    Else
+        oPrinter:Box(nRow,0650,nRow + nRowStep * 2.5,2900)                      // Descrição
+        //  oPrinter:Box(nRow,1200,nRow + nRowStep * 2,1400)                    // NCM
+        oPrinter:Box(nRow,3050,nRow + nRowStep * 2.5,3200)                      // QTD
+
+    EndIf
 
     nRow += nRowStep
 
@@ -122,28 +139,38 @@ Static Function M05RICabIt(oPrinter,oFont12B,nRow)
     oPrinter:Say(nRow                ,0850                ,'DESCRIÇÃO'     ,oFont12B)
     oPrinter:Say(nRow                ,1280                ,'NCM'           ,oFont12B)
     oPrinter:Say(nRow                ,1420                ,'QTD'           ,oFont12B)
-    oPrinter:Say(nRow                ,1550                ,'VALOR'         ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,1540                ,'UNITÁRIO'      ,oFont12B)
+    
+    If lImprVlr //Impressão com valores
+        oPrinter:Say(nRow                ,1550                ,'VALOR'         ,oFont12B)
+        oPrinter:Say(nRow + nRowStep     ,1540                ,'UNITÁRIO'      ,oFont12B)
 
-    oPrinter:Say(nRow                ,1800                ,'IPI'            ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,1720                ,'%'              ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,1810                ,'VALOR'          ,oFont12B)
+        oPrinter:Say(nRow                ,1800                ,'IPI'            ,oFont12B)
+        oPrinter:Say(nRow + nRowStep     ,1720                ,'%'              ,oFont12B)
+        oPrinter:Say(nRow + nRowStep     ,1810                ,'VALOR'          ,oFont12B)
 
-    oPrinter:Say(nRow                ,2040                ,'ICMS'           ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,1970                ,'%'              ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,2060                ,'VALOR'          ,oFont12B)
+        oPrinter:Say(nRow                ,2040                ,'ICMS'           ,oFont12B)
+        oPrinter:Say(nRow + nRowStep     ,1970                ,'%'              ,oFont12B)
+        oPrinter:Say(nRow + nRowStep     ,2060                ,'VALOR'          ,oFont12B)
 
-    oPrinter:Say(nRow                ,2260                ,'PIS/COFINS'     ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,2220                ,'%'              ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,2300                ,'VALOR'          ,oFont12B)
+        oPrinter:Say(nRow                ,2260                ,'PIS/COFINS'     ,oFont12B)
+        oPrinter:Say(nRow + nRowStep     ,2220                ,'%'              ,oFont12B)
+        oPrinter:Say(nRow + nRowStep     ,2300                ,'VALOR'          ,oFont12B)
 
-    oPrinter:Say(nRow                ,2490                ,'VALOR ICMS'     ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,2540                ,'ST'             ,oFont12B)
+        oPrinter:Say(nRow                ,2490                ,'VALOR ICMS'     ,oFont12B)
+        oPrinter:Say(nRow + nRowStep     ,2540                ,'ST'             ,oFont12B)
 
-    oPrinter:Say(nRow                ,2750                ,'VALOR UNIT'     ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,2750                ,'C/IMPOSTOS'     ,oFont12B)
+        oPrinter:Say(nRow                ,2750                ,'VALOR UNIT'     ,oFont12B)
+        oPrinter:Say(nRow + nRowStep     ,2750                ,'C/IMPOSTOS'     ,oFont12B)
 
-    oPrinter:Say(nRow                ,2980                ,'VALOR TOTAL'     ,oFont12B)
+        oPrinter:Say(nRow                ,2980                ,'VALOR TOTAL'     ,oFont12B)
+    
+    else
+    
+        oPrinter:Say(nRow                ,2950                ,'NCM'           ,oFont12B)   
+        oPrinter:Say(nRow                ,3100                ,'QTD'           ,oFont12B)   
+    
+    EndIf
+
 Return
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -183,34 +210,55 @@ Static Function MR05ImpItem(_cAlias,oPrinter,nRow,oFont9,oFont12B,nItem)
 
     oPrinter:Box(nRow,0100,nRow + (nRowStep * 1.25 * Len(aDesc)),3200)                     // SQ
     oPrinter:Box(nRow,0190,nRow + (nRowStep * 1.25 * Len(aDesc)),0403)                     // Item
-    oPrinter:Box(nRow,0650,nRow + (nRowStep * 1.25 * Len(aDesc)),1250)                     // Descrição
-    oPrinter:Box(nRow,1400,nRow + (nRowStep * 1.25 * Len(aDesc)),1500)                     // QTD
-    oPrinter:Box(nRow,1700,nRow + (nRowStep * 1.25 * Len(aDesc)),1950)                     // IPI %
-    oPrinter:Box(nRow,1700,nRow + (nRowStep * 1.25 * Len(aDesc)),1770)                     // IPI Valor
-    oPrinter:Box(nRow,1950,nRow + (nRowStep * 1.25 * Len(aDesc)),2200)                     // ICMS %
-    oPrinter:Box(nRow,1950,nRow + (nRowStep * 1.25 * Len(aDesc)),2020)                     // ICMS
-    oPrinter:Box(nRow,2200,nRow + (nRowStep * 1.25 * Len(aDesc)),2450)                     // PIS/COFINS %
-    oPrinter:Box(nRow,2200,nRow + (nRowStep * 1.25 * Len(aDesc)),2270)                     // PIS/COFINS
-    oPrinter:Box(nRow,2700,nRow + (nRowStep * 1.25 * Len(aDesc)),2950)                     // VALOR UNITARIO C/ IMPOSTOS
+    
+    If lImprVlr //Impressão com valores
+
+        oPrinter:Box(nRow,0650,nRow + (nRowStep * 1.25 * Len(aDesc)),1250)                     // Descrição
+        oPrinter:Box(nRow,1400,nRow + (nRowStep * 1.25 * Len(aDesc)),1500)                     // QTD
+    Else
+
+       oPrinter:Box(nRow,0650,nRow + (nRowStep * 1.25 * Len(aDesc)),2900)                     // Descrição
+       oPrinter:Box(nRow,3050,nRow + (nRowStep * 1.25 * Len(aDesc)),3200)                     // QTD
+    EndIf
+
+    If lImprVlr //Impressão com valores
+
+        oPrinter:Box(nRow,1700,nRow + (nRowStep * 1.25 * Len(aDesc)),1950)                     // IPI %
+        oPrinter:Box(nRow,1700,nRow + (nRowStep * 1.25 * Len(aDesc)),1770)                     // IPI Valor
+        oPrinter:Box(nRow,1950,nRow + (nRowStep * 1.25 * Len(aDesc)),2200)                     // ICMS %
+        oPrinter:Box(nRow,1950,nRow + (nRowStep * 1.25 * Len(aDesc)),2020)                     // ICMS
+        oPrinter:Box(nRow,2200,nRow + (nRowStep * 1.25 * Len(aDesc)),2450)                     // PIS/COFINS %
+        oPrinter:Box(nRow,2200,nRow + (nRowStep * 1.25 * Len(aDesc)),2270)                     // PIS/COFINS
+        oPrinter:Box(nRow,2700,nRow + (nRowStep * 1.25 * Len(aDesc)),2950)                     // VALOR UNITARIO C/ IMPOSTOS
+    Endif
+    
 
     nRow += nRowStep
 
     oPrinter:Say(nRow - 0008                ,0125                ,(_cAlias)->_ITEM                                                                                                            ,oFont9)    // SQ
     oPrinter:Say(nRow - 0008                ,0200                ,SubStr(AllTrim((_cAlias)->_XITEMP),1,15)                                                                                    ,oFont9)    // ITEM
     oPrinter:Say(nRow - 0008                ,0415                ,(_cAlias)->_PRODUTO                                                                                                         ,oFont9)    // CÓDIGO
-    oPrinter:Say(nRow - 0008                ,1267                ,Transform((_cAlias)->B1_POSIPI,"@R 9999.99.99")                                                                               ,oFont9)    // NCM
-    oPrinter:Say(nRow - 0008                ,1414                ,Transform(NoRound(MaFisRet(nItem,"IT_QUANT")   ,2),"@E 999999.99")                                                                                       ,oFont9)    // QTD
-    oPrinter:Say(nRow - 0008                ,1540                ,Transform(NoRound(MaFisRet(nItem,"IT_PRCUNI")     ,2),cPicVal)                                                              ,oFont9)    // VALOR UNITÁRIO
-    oPrinter:Say(nRow - 0008                ,1709                ,Transform(NoRound(MaFisRet( nItem ,"IT_ALIQIPI")  ,2),cPicAliq)                                                          ,oFont9)    // % IPI
-    oPrinter:Say(nRow - 0008                ,1810                ,Transform(NoRound(MaFisRet( nItem ,"IT_VALIPI")   ,2),cPicVal)                                                            ,oFont9)    // VALOR IPI
-    //oPrinter:Say(nRow - 0008                ,1954                ,Transform(NoRound(MaFisRet( nItem ,"IT_ALIQICM")  ,2),cPicAliq) 
-    oPrinter:Say(nRow - 0008                ,1918                ,Transform(NoRound((_cAlias)->_XALQICM  ,2), cPicVal)                                                                       ,oFont9)    // % ICMS
-    oPrinter:Say(nRow - 0008                ,2050                ,Transform(NoRound(MaFisRet( nItem ,"IT_VALICM")   ,2),cPicVal)                                                            ,oFont9)    // VALOR ICMS
-    oPrinter:Say(nRow - 0008                ,2210                ,Transform(NoRound(MaFisRet( nItem ,"IT_ALIQPS2") + MaFisRet( nItem ,"IT_ALIQCF2") ,2),cPicAliq)       ,oFont9)    // % PIS/COFINS
-    oPrinter:Say(nRow - 0008                ,2290                ,Transform(NoRound(MaFisRet( nItem ,"IT_VALPS2") + MaFisRet( nItem ,"IT_VALCF2"),2),cPicVal)          ,oFont9)    // VALOR PIS/COFINS
-    oPrinter:Say(nRow - 0008                ,2550                ,Transform(NoRound(MaFisRet( nItem ,"IT_VALSOL"),2),cPicVal)                                                            ,oFont9)    // VALOR ICMS ST
-    oPrinter:Say(nRow - 0008                ,2780                ,Transform(NoRound((MaFisRet( nItem ,"IT_TOTAL") - (MaFisRet( nItem ,"IT_FRETE") + MaFisRet( nItem ,"IT_DESPESA") ) )  / (_cAlias)->_QTDVEN ,2),cPicVal)  ,oFont9)    // VALOR UNIT C/ IMPOSTOS
-    oPrinter:Say(nRow - 0008                ,3010                ,Transform(NoRound(MaFisRet( nItem ,"IT_TOTAL") - (MaFisRet( nItem ,"IT_FRETE") + MaFisRet( nItem ,"IT_DESPESA") ),2) ,cPicVal)                           ,oFont12B)  // VALOR TOTAL
+    
+    If lImprVlr //Impressão com valores
+        oPrinter:Say(nRow - 0008                ,1267                ,Transform((_cAlias)->B1_POSIPI,"@R 9999.99.99")                                                                             ,oFont9)    // NCM
+        oPrinter:Say(nRow - 0008                ,1414                ,Transform(NoRound(MaFisRet(nItem,"IT_QUANT")   ,2),"@E 999999.99")                                                          ,oFont9)    // QTD
+        oPrinter:Say(nRow - 0008                ,1540                ,Transform(NoRound(MaFisRet(nItem,"IT_PRCUNI")     ,2),cPicVal)                                                                ,oFont9)    // VALOR UNITÁRIO
+        oPrinter:Say(nRow - 0008                ,1709                ,Transform(NoRound(MaFisRet( nItem ,"IT_ALIQIPI")  ,2),cPicAliq)                                                               ,oFont9)    // % IPI
+        oPrinter:Say(nRow - 0008                ,1810                ,Transform(NoRound(MaFisRet( nItem ,"IT_VALIPI")   ,2),cPicVal)                                                                ,oFont9)    // VALOR IPI
+        //oPrinter:Say(nRow - 0008                ,1954                ,Transform(NoRound(MaFisRet( nItem ,"IT_ALIQICM")  ,2),cPicAliq) 
+        oPrinter:Say(nRow - 0008                ,1918                ,Transform(NoRound((_cAlias)->_XALQICM  ,2), cPicVal)                                                                          ,oFont9)    // % ICMS
+        oPrinter:Say(nRow - 0008                ,2050                ,Transform(NoRound(MaFisRet( nItem ,"IT_VALICM")   ,2),cPicVal)                                                                ,oFont9)    // VALOR ICMS
+        oPrinter:Say(nRow - 0008                ,2210                ,Transform(NoRound(MaFisRet( nItem ,"IT_ALIQPS2") + MaFisRet( nItem ,"IT_ALIQCF2") ,2),cPicAliq)                               ,oFont9)    // % PIS/COFINS
+        oPrinter:Say(nRow - 0008                ,2290                ,Transform(NoRound(MaFisRet( nItem ,"IT_VALPS2") + MaFisRet( nItem ,"IT_VALCF2"),2),cPicVal)                                   ,oFont9)    // VALOR PIS/COFINS
+        oPrinter:Say(nRow - 0008                ,2550                ,Transform(NoRound(MaFisRet( nItem ,"IT_VALSOL"),2),cPicVal)                                                                   ,oFont9)    // VALOR ICMS ST
+        oPrinter:Say(nRow - 0008                ,2780                ,Transform(NoRound((MaFisRet( nItem ,"IT_TOTAL") - (MaFisRet( nItem ,"IT_FRETE") + MaFisRet( nItem ,"IT_DESPESA") ) )  / (_cAlias)->_QTDVEN ,2),cPicVal)  ,oFont9)    // VALOR UNIT C/ IMPOSTOS
+        oPrinter:Say(nRow - 0008                ,3010                ,Transform(NoRound(MaFisRet( nItem ,"IT_TOTAL") - (MaFisRet( nItem ,"IT_FRETE") + MaFisRet( nItem ,"IT_DESPESA") ),2) ,cPicVal)                           ,oFont12B)  // VALOR TOTAL
+    Else
+    
+        oPrinter:Say(nRow - 0008                ,2925                ,Transform((_cAlias)->B1_POSIPI,"@R 9999.99.99")                                                                             ,oFont9)    // NCM
+        oPrinter:Say(nRow - 0008                ,3050                ,Transform(NoRound(MaFisRet(nItem,"IT_QUANT")   ,2),"@E 999999.99")                                                          ,oFont9)    // QTD
+
+    EndIf
 
     For nDesc := 1 to Len(aDesc)
         oPrinter:Say(nRow - 0008            ,0660                ,aDesc[nDesc]                                                                                                                  ,oFont9)     // DESCRIÇÃO
@@ -232,6 +280,12 @@ Static Function M05RDescr(cProd,cDescSB1,cDescSCK,nComp,nLar,nAlt,cItem)
     Local nIni      := 1
     Local nQuebra   := 1
     Local cPic      := "@E 999999"
+
+    If !lImprVlr
+    
+        nTam      := nTam * 3.5
+    
+    ENDIF
 
     Default cDescSB1    := 'Produto sem complemento'
 
@@ -500,30 +554,35 @@ Static Function MR05Rod(oPrinter,oFont12,oFont12B,oFont14B,nRow,nPage,cData)
         nPage++
     EndIf
 
+
     oPrinter:Say(nRow += nRowStep     ,0100     ,'TIPO FRETE: '             ,oFont12)
     oPrinter:Say(nRow                 ,0300     ,M05RTpFret()               ,oFont12)
 
-    oPrinter:Line(nRow - nRowStep * 1.25, 2350,nRow - nRowStep* 1.25 , 3200)
-    oPrinter:Say(nRow                 ,2450     ,'SUB-TOTAL (' + cMoeda + ')'        ,oFont12)
-    oPrinter:Say(nRow                 ,2900     ,cSubTot                    ,oFont12)
+    If lImprVlr // Impressão com Valores
 
-    oPrinter:Say(nRow += nRowStep     ,0100     ,'INSTALAÇÃO: '             ,oFont12)
-    oPrinter:Say(nRow                 ,0300     ,M05RTpIsnt()               ,oFont12)
-    oPrinter:Say(nRow                 ,2450     ,'VALOR FRETE: '            ,oFont12)
-    oPrinter:Say(nRow                 ,2900     ,cFrete                     ,oFont12)
+        oPrinter:Line(nRow - nRowStep * 1.25, 2350,nRow - nRowStep* 1.25 , 3200)
+        oPrinter:Say(nRow                 ,2450     ,'SUB-TOTAL (' + cMoeda + ')'        ,oFont12)
+        oPrinter:Say(nRow                 ,2900     ,cSubTot                    ,oFont12)
+    
 
-    oPrinter:Say(nRow += nRowStep     ,0100     ,'VALIDADE: '               ,oFont12)
-    oPrinter:Say(nRow                 ,0300     ,DTOC(dValida)              ,oFont12)
+        oPrinter:Say(nRow += nRowStep     ,0100     ,'INSTALAÇÃO: '             ,oFont12)
+        oPrinter:Say(nRow                 ,0300     ,M05RTpIsnt()               ,oFont12)
+        oPrinter:Say(nRow                 ,2450     ,'VALOR FRETE: '            ,oFont12)
+        oPrinter:Say(nRow                 ,2900     ,cFrete                     ,oFont12)
 
-    oPrinter:Say(nRow                 ,2450     ,'VALOR INSTALAÇÃO'         ,oFont12)
-    oPrinter:Say(nRow                 ,2900     ,cDespesa                   ,oFont12)
+        oPrinter:Say(nRow += nRowStep     ,0100     ,'VALIDADE: '               ,oFont12)
+        oPrinter:Say(nRow                 ,0300     ,DTOC(dValida)              ,oFont12)
 
-    oPrinter:Say(nRow += nRowStep     ,0100     ,'PRAZO DE EMBARQUE: '       ,oFont12)
-    oPrinter:Say(nRow				  ,0500		,SCJ->CJ_XPRZEMB			 ,oFont12)
+        oPrinter:Say(nRow                 ,2450     ,'VALOR INSTALAÇÃO'         ,oFont12)
+        oPrinter:Say(nRow                 ,2900     ,cDespesa                   ,oFont12)
 
-    oPrinter:Line(nRow - nRowStep * 0.5, 2350,nRow - nRowStep * 0.5, 3200)
-    oPrinter:Say(nRow += (nRowStep )  ,2450     ,'TOTAL GERAL'              ,oFont14B)
-    oPrinter:Say(nRow                 ,2900     ,cTotal                     ,oFont14B)
+        oPrinter:Say(nRow += nRowStep     ,0100     ,'PRAZO DE EMBARQUE: '       ,oFont12)
+        oPrinter:Say(nRow				  ,0500		,SCJ->CJ_XPRZEMB			 ,oFont12)
+
+        oPrinter:Line(nRow - nRowStep * 0.5, 2350,nRow - nRowStep * 0.5, 3200)
+        oPrinter:Say(nRow += (nRowStep )  ,2450     ,'TOTAL GERAL'              ,oFont14B)
+        oPrinter:Say(nRow                 ,2900     ,cTotal                     ,oFont14B)
+    Endif
 
     nRow += nRowStep
     nRow += nRowStep
