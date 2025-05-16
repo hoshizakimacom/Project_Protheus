@@ -1,4 +1,4 @@
-#INCLUDE "MATR620.ch"
+//#INCLUDE "MATR620.ch"
 #Include "PROTHEUS.Ch"
                   
 /*ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
@@ -82,9 +82,9 @@ Local cRetorno := ""
 
 dbSelectArea("SE1")
 dbSetOrder(1)
-dbSeek(xFilial("SE1")+cChave)
+dbSeek(xFilial("SE1",SE1->E1_FILIAL)+cChave)
 
-cCodCond := Posicione("SC5",1,xFilial("SC5")+SE1->E1_PEDIDO,"C5_CONDPAG")
+cCodCond := Posicione("SC5",1,xFilial("SC5",SE1->E1_FILIAL)+SE1->E1_PEDIDO,"C5_CONDPAG")
 cRetorno := Posicione("SE4",1,xFilial("SE4")+cCodCond,"E4_DESCRI")
 
 RestArea(aAreaSE1)
