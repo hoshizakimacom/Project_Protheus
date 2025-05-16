@@ -3,7 +3,8 @@
 User Function MTA010NC() 
     Local aCpoNC  := {}
     Local _aAreaTu:= GetArea()
-
+    
+   
     AAdd( aCpoNC, 'B1_CUSTD' )
     AAdd( aCpoNC, 'B1_MSBLQL' )
     AAdd( aCpoNC, 'B1_XINMETR' )
@@ -25,7 +26,18 @@ User Function MTA010NC()
     AAdd( aCPoNC, 'B1_XMDOBRA') //#8187
     AAdd( aCPoNC, 'B1_XDTLIB')  //#8228
     AAdd( aCPoNC, 'B1_XREPENG') //#8228
-
+    
+    AAdd( aCPoNC,  'B1_XFAMILI') //Solicitado por Cibele via e-mail em 15/05/2025
+    AAdd( aCPoNC,  'B1_GRUPO') //Solicitado por Cibele via e-mail em 15/05/2025
+    AAdd( aCPoNC,  'B1_POSIPI') //Solicitado por Cibele via e-mail em 15/05/2025
+    AAdd( aCPoNC,  'B1_ORIGEM') //Solicitado por Cibele via e-mail em 15/05/2025
+    
+    /*If M->B1_MSBLQL <> '2'
+   	    M->B1_MSBLQL := "1" 
+    EndIf*/         
+	 
+        
+    
     RestArea(_aAreaTu)
 
 Return (aCpoNC)
