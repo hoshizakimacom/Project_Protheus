@@ -168,7 +168,9 @@ TRCell():New(oVenProd,"DESCONT4"	,/*Tabela*/	,"Desconto 4" 	     ,PesqPict("SC5"
 TRCell():New(oVenProd,"%DESCONTO"	,/*Tabela*/	,"% Desconto" 	     ,PesqPict("SC6","C6_DESCONT")	,TamSx3("C6_DESCONT")[1]	,/*lPixel*/,{|| nDescitem  })			// % Desconto
 TRCell():New(oVenProd,"%FRETE"		,/*Tabela*/	,"% Frete"	 	     ,PesqPict("SC5","C5_XFRETE")	,TamSx3("C5_XFRETE")[1]	    ,/*lPixel*/,{|| cXFrete })				// % Frete
 TRCell():New(oVenProd,"%ACRSFIN"	,/*Tabela*/	,"% Acres. Finan."   ,PesqPict("SE4","E4_ACRSFIN")	,TamSx3("E4_ACRSFIN")[1]    ,/*lPixel*/,{|| nAcrsFin })				// % Acres. Financeiro
-TRCell():New(oVenProd,"%CONDPAG"	,/*Tabela*/	,"Desc. Pag."   	 ,PesqPict("SE4","E4_DESCRI")	,TamSx3("E4_DESCRI")[1]     ,/*lPixel*/,{|| cCondPag })			    // Descr. Cond. Pagamento
+TRCell():New(oVenProd,"SUB FAM.SUG.",/*Tabela*/ ,"Familia Sugerida"  ,PesqPict("SB1","B1_XFAMSGD")	,TamSx3("B1_XFAMSGD")[1]	,/*lPixel*/,{|| cXFamSgd })			    // Familia Sugerida
+TRCell():New(oVenProd,"FAMILIA.SUG.",/*Tabela*/ ,"Sub.Fam. Sugerida" ,PesqPict("SB1","B1_XSUBFAM")	,TamSx3("B1_XSUBFAM")[1]	,/*lPixel*/,{|| cXSubFam })				// Sub Fam.Sugerida
+//TRCell():New(oVenProd,"%CONDPAG"	,/*Tabela*/	,"Desc. Pag."   	 ,PesqPict("SE4","E4_DESCRI")	,TamSx3("E4_DESCRI")[1]     ,/*lPixel*/,{|| cCondPag })			    // Descr. Cond. Pagamento
 
 Return(oReport)
 
@@ -201,6 +203,8 @@ Local lPosA1	:= .F.
 Local lPosE4	:= .F.
 Local cPedido   := Space(6)
 Local lPrimItem := .F.
+Local cXFamSgdCod
+Local cXSubFamCod
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Filtragem do relatório                                                  ³
@@ -306,9 +310,9 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	lPosE4	:= SE4->(MsSeek((cAliasQry)->C6_FILIAL+(cAliasQry)->C6_NUM))
 
 	
-	If lPosE4
+	/*If lPosE4
 		cCondPag := SE4->E4_DESCRI
-	Endif
+	Endif*/
 	
 	If lPosC5
 	
@@ -470,6 +474,47 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cNCM		:= (cAliasQry)->B1_POSIPI
 	cXFamil	 	:= Posicione("ZA1",1,xFilial("ZA1")+(cAliasQry)->B1_XFAMILI,"ZA1_DESC")
 	cUm		 	:= (cAliasQry)->B1_UM
+
+	cXSubFam	:= Posicione("SB1",1,xFilial("SB1")+(cAliasQry)->C6_PRODUTO,"B1_XSUBFAM")
+	cXFamSgd	:= Posicione("SB1",1,xFilial("SB1")+(cAliasQry)->C6_PRODUTO,"B1_XFAMSGD")
+
+	cXFamSgdCod := AllTrim(cXFamSgd)
+	If cXFamSgdCod 		== "1"
+		cXFamSgd		:= "1 - Cocção"
+	ElseIf cXFamSgdCod 	== "2"
+		cXFamSgd		:= "2 - Componentes"
+	ElseIf cXFamSgdCod  == "3"
+		cXFamSgd		:= "3 - Máquina de Gelo"
+	ElseIf cXFamSgdCod	== "4"
+		cXFamSgd		:= "4 - Mobiliários"
+	ElseIf cXFamSgdCod 	== "5"
+		cXFamSgd		:= "5 - Não Vendáveis"
+	ElseIf cXFamSgdCod 	== "6"
+		cXFamSgd		:= "6 - Refrigeração"
+	ElseIf cXFamSgdCod 	== "7"
+		cXFamSgd		:= "7 - Diversos"
+	Endif
+
+	cXSubFamCod := AllTrim(cXSubFam)
+	If cXSubFamCod		== "1"
+		cXSubFam		:= "1 - Fabricação"
+	ElseIf cXSubFamCod 	== "2"
+		cXSubFam		:= "2 - Revenda - Nacional"
+	ElseIf cXSubFamCod  == "3"
+		cXSubFam		:= "3 - Revenda - Importada"
+	ElseIf cXSubFamCod	== "4"
+		cXSubFam		:= "4 - Revenda - Grupo Hoshizaki"
+	ElseIf cXSubFamCod 	== "5"
+		cXSubFam		:= "5 - Serviços"
+	ElseIf cXSubFamCod 	== "6"
+		cXSubFam		:= "6 - Matéria Prima"
+	ElseIf cXSubFamCod 	== "7"
+		cXSubFam		:= "7 - Embalagem"
+	ElseIf cXSubFamCod 	== "8"
+		cXSubFam		:= "8 - Ativo"
+	ElseIf cXSubFamCod 	== "9"
+		cXSubFam		:= "9 - Material de Consumo"
+	Endif
 
 	oReport:IncMeter()
 	oReport:Section(1):PrintLine()
