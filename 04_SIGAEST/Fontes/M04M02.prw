@@ -64,6 +64,8 @@ While ! (cAlias)->(Eof())
     (cAlias)->(DbSkip())
 Enddo
 
+FClose(nH)
+
 FWAlertInfo("Arquivo gerado com Sucesso : " + cArq, "Geração de arquivos")
 
 (cAlias)->(DbCloseArea())

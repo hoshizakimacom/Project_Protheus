@@ -23,14 +23,17 @@ Private aRetPar   := {}
 Aadd(aPergs, {1, "Produto"                ,REPLICATE(' ',TAMSX3("D3_COD")[1]),"@X","","SB1","",80,.F.})     //1
 Aadd(aPergs, {6, "Local destino"          ,SPACE(100),"","","",100,.T.,"Todos os arquivos (*.*) |*.*",,GETF_RETDIRECTORY+GETF_LOCALHARD+GETF_NETWORKDRIVE}) //2
 
-If !ParamBox(aPergs, "Informe o produto e local de destino", @aRetPar,/*bOk*/,/*aButtons*/,/*lCentered*/,/*nPOSX*/,/*nPOSY*/,/*oDlgWIzard*/,/*cLoad*/,/*lCanSave*/,.T./*lUserSave*/)
-    Return 
-EndIf
+While .T.
 
-FwMakeDir(aRetPar[2])
+	If !ParamBox(aPergs, "Informe o produto e local de destino", @aRetPar,/*bOk*/,/*aButtons*/,/*lCentered*/,/*nPOSX*/,/*nPOSY*/,/*oDlgWIzard*/,/*cLoad*/,/*lCanSave*/,.T./*lUserSave*/)
+		Exit 
+	EndIf
 
-LjMsgRun( "Executando o Download..." ,, {|| U_M04M13D() } )
+	FwMakeDir(aRetPar[2])
 
+	LjMsgRun( "Executando o Download..." ,, {|| U_M04M13D() } )
+
+EndDo
 
 Return Nil
 
