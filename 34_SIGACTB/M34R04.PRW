@@ -179,7 +179,8 @@ TRCell():New(oVenProd,"Rede"		,/*Tabela*/ ,"Rede"				 ,PesqPict("SA1","A1_XREDE"
 TRCell():New(oVenProd,"Nome Rede"	,/*Tabela*/ ,"Nome Rede"		 ,PesqPict("ZA6","ZA6_DESC")	,TamSx3("ZA6_DESC")[1] 		,/*lPixel*/,{|| cReddes})		// Nome Rede #6306
 TRCell():New(oVenProd,"Seg Mercado"	,/*Tabela*/ ,"Seg Mercado"		 ,PesqPict("SA1","A1_XSEGM")	,TamSx3("A1_XSEGM")[1] 		,/*lPixel*/,{|| cXsegm})		// Segmento de Mercado #6306
 TRCell():New(oVenProd,"Nome Seg Mer",/*Tabela*/ ,"Nome Seg Mercado"	 ,PesqPict("ZA8","ZA8_DESC")	,TamSx3("ZA8_DESC")[1] 		,/*lPixel*/,{|| cSegmde})		// Nome Segmento de Mercado #6306
-
+TRCell():New(oVenProd,"SUB FAM.SUG.",/*Tabela*/ ,"Familia Sugerida"  ,PesqPict("SB1","B1_XFAMSGD")	,TamSx3("B1_XFAMSGD")[1]	,/*lPixel*/,{|| cXFamSgd })		// Familia Sugerida
+TRCell():New(oVenProd,"FAMILIA.SUG.",/*Tabela*/ ,"Sub.Fam. Sugerida" ,PesqPict("SB1","B1_XSUBFAM")	,TamSx3("B1_XSUBFAM")[1]	,/*lPixel*/,{|| cXSubFam })		// Sub Fam.Sugerida
 
 Return(oReport)
 
@@ -210,6 +211,8 @@ Static Function ReportPrint(oReport,cAliasQry,oVenProd)
 Local lPosA1	:= .F.
 Local lPosB1	:= .F.
 Local lPosC5	:= .F.
+Local cXFamSgdCod 
+Local cXSubFamCod
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Filtragem do relatório                                                  ³
@@ -435,7 +438,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 			cXTpVen		:= "12 - SAC"
 		ElseIf Alltrim(SC5->C5_XTPVEN) == ""
 			cXTpVen		:= ""			
-		Endif        
+		Endif    
 
 	Else
         nComiss     := 0
@@ -453,6 +456,47 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
         cDescTab    := ""
     Endif    	
     
+	cXSubFam	:= Posicione("SB1",1,xFilial("SB1")+(cAliasQry)->D2_COD,"B1_XSUBFAM")
+	cXFamSgd	:= Posicione("SB1",1,xFilial("SB1")+(cAliasQry)->D2_COD,"B1_XFAMSGD")
+
+	cXFamSgdCod := AllTrim(cXFamSgd)
+	If cXFamSgdCod 		== "1"
+		cXFamSgd		:= "1 - Cocção"
+	ElseIf cXFamSgdCod 	== "2"
+		cXFamSgd		:= "2 - Componentes"
+	ElseIf cXFamSgdCod  == "3"
+		cXFamSgd		:= "3 - Máquina de Gelo"
+	ElseIf cXFamSgdCod	== "4"
+		cXFamSgd		:= "4 - Mobiliários"
+	ElseIf cXFamSgdCod 	== "5"
+		cXFamSgd		:= "5 - Não Vendáveis"
+	ElseIf cXFamSgdCod 	== "6"
+		cXFamSgd		:= "6 - Refrigeração"
+	ElseIf cXFamSgdCod 	== "7"
+		cXFamSgd		:= "7 - Diversos"
+	Endif
+
+	cXSubFamCod := AllTrim(cXSubFam)
+	If cXSubFamCod		== "1"
+		cXSubFam		:= "1 - Fabricação"
+	ElseIf cXSubFamCod 	== "2"
+		cXSubFam		:= "2 - Revenda - Nacional"
+	ElseIf cXSubFamCod  == "3"
+		cXSubFam		:= "3 - Revenda - Importada"
+	ElseIf cXSubFamCod	== "4"
+		cXSubFam		:= "4 - Revenda - Grupo Hoshizaki"
+	ElseIf cXSubFamCod 	== "5"
+		cXSubFam		:= "5 - Serviços"
+	ElseIf cXSubFamCod 	== "6"
+		cXSubFam		:= "6 - Matéria Prima"
+	ElseIf cXSubFamCod 	== "7"
+		cXSubFam		:= "7 - Embalagem"
+	ElseIf cXSubFamCod 	== "8"
+		cXSubFam		:= "8 - Ativo"
+	ElseIf cXSubFamCod 	== "9"
+		cXSubFam		:= "9 - Material de Consumo"
+	Endif
+
     cOBS  := Posicione('SFT',1,xFilial("SFT")+"S"+(cAliasQry)->D2_SERIE+(cAliasQry)->D2_DOC+(cAliasQry)->D2_CLIENTE+(cAliasQry)->D2_LOJA+(cAliasQry)->D2_ITEM,'FT_OBSERV')                                                                                  
 
 	oReport:Section(1):PrintLine()

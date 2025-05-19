@@ -40,5 +40,6 @@ User Function MA415MNU()
         AAdd(aRotina,{'Crédito - Desbloquear' ,'U_M05A09_B(1)' , 0 , 2,0,NIL})
     EndIf
     
-    AAdd(aRotina,{'Exportar Itens'			      ,'U_M05R04()'  , 0 , 2,0,NIL})
+    AAdd(aRotina,{'Exportar Itens'			     ,'U_M05R04()'  , 0 , 2,0,NIL})
+    AAdd(aRotina,{'imprimir Sem Valores'		 ,'U_M05R02S()'  , 0 , 2,0,NIL})    //Impressão Sem Valores #8450
 Return
