@@ -26,10 +26,22 @@ _cDxf         := SB1->B1_XDFX
 _cEstru       := SB1->B1_XESTR
 _cMaoOb       := SB1->B1_XMDOBRA
 _cTipoPrd     := SB1->B1_TIPO
+_cLibEng      := Posicione("SB1",1,xFilial("SB1")+SC6->C6_PRODUTO,"B1_XESPLIB")
+_cPadrao      := SB1->B1_XPADRAO
 
-If _cItDese <> "S" .Or. _cPdf <> "1" .Or. Empty(_cDxf) .Or. _cEstru <> "1" .Or. _cMaoOb <> "1" .Or. _cTipoPrd == "ME"
-    lRet := .F.
-    MsgAlert("Produto com pendências da Engenharia", "Aviso")
+IF _cTipoPrd == "ME"
+	lRet := .F.
+    MsgAlert("Não é permitido abrir OP para Tipo ME. Produto: "+SC6->C6_PRODUTO, "Aviso")
+
+ElseIf _cItDese == "N" 
+	lRet := .F.
+    MsgAlert("Produto com pendências da Engenharia. Item não está desenvolvido. Produto: "+SC6->C6_PRODUTO, "Aviso")
+EndIf
+
+IF _cLibEng == "2"
+	lRet := .F.
+	MsgAlert("Produto não está liberado pela engenharia. Produto: "+SC6->C6_PRODUTO, "Aviso")
+
 EndIf
 
 RestArea(aAreaSB1)
