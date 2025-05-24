@@ -189,7 +189,7 @@ If Empty(aEstru)
 
     M02RICabIt(oPrinter,oFont12B,@nRow,cAnsul)
     nRow += 100 
-    oPrinter:Say(nRow  ,0120    ,"PRODUTO SEM ESTRUTURA"            ,oFont12B)
+    oPrinter:Say(nRow  ,0120    ,"PRODUTO SEM ESTRUTURA OU COM PICKING LIST IGUAL A NAO"            ,oFont12B)
 
 Else
     cAnsul := " "
