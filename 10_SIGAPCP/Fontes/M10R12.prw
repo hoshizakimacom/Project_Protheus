@@ -28,6 +28,8 @@ Local oPrinter     := Nil
 
 Local nRow         := -0070
 Local cData        := DtoC(Date()) + ' ' + Time()
+Local aPergs     := {}
+
 Private _cNumOP      := SC2->C2_NUM+SC2->C2_ITEM+SC2->C2_SEQUEN                 //#7459
 Private _nQtdOP      := SC2->C2_QUANT               //#7459
 Private _cCodProd    := SC2->C2_PRODUTO             //#7459
@@ -38,9 +40,15 @@ Private oFont12B   := TFont():New('Arial',,12,.T.,.T.)
 Private oFont14B   := TFont():New('Arial',,14,.T.,.T.)
 Private oFont18T   := TFont():New('Arial',,18,.T.,.T.) 
 Private nEstru     := 0
+Private aRetPar   := {}
 
 //M02RFont(@oFont9,@oFont12,@oFont12B,@oFont14B,@oFont18T)
 
+Aadd(aPergs, {2, "Tipo de Produtos"        ,"1",{"1=Comp./Picking","2=Chapas"},80,".T.",.F.})                          //1
+Aadd(aPergs, {2, "OPs Intermediar."        ,"1",{"1=Considera","2=Não Considera "},80,".T.",.F.})                          //1
+If !ParamBox(aPergs, "Parametros de Impressão ", @aRetPar,/*bOk*/,/*aButtons*/,/*lCentered*/,/*nPOSX*/,/*nPOSY*/,/*oDlgWIzard*/,/*cLoad*/,/*lCanSave*/,.T./*lUserSave*/)
+    Return 
+EndIf
 oPrinter := FWMSPrinter():New('PK' + SC2->C2_NUM + '_' + SubStr(DToS(Date()),7,2) + '_' + StrTran(Time(),":",""), IMP_PDF, .T./*_lAdjustToLegacy*/, /*cPathInServer*/, .T.)
 
 oPrinter:SetResolution(78)
@@ -65,6 +73,7 @@ Return
 Static Function M10RIItens(oPrinter,oFont9,oFont12,oFont12B,nRow,nPage,cData,_cNumOP,_nQtdOP,_cCodProd)
 
 //Local nX
+Local cAMFAMIL2  := GetNewPar("AM_FAMIL2C") //Codigos Familia de Compras para Chapas  .Ex.: 000005
 
 //Private aEstru    := {}         //#7459
 Private cQuery      := ''         //#7459
@@ -107,20 +116,32 @@ TcQuery cQuery New Alias (cAlias := GetNextAlias())
 (cAlias)->(DbGoTop())
 /*/
 
-_cQuery := "SELECT CODIGO, COD_PAI, COD_COMP, SUM(QTD) QTD, PERDA, DT_INI, DT_FIM, ANSUL, NIVEL "
+_cQuery := "SELECT CODIGO, COD_PAI, COD_COMP, SUM(QTD) QTD,  OP, PERDA, DT_INI, DT_FIM, ANSUL, NIVEL "
 _cQuery += " FROM ( "
 
-_cQuery += " SELECT D4_PRODUTO CODIGO, D4_PRODUTO COD_PAI, D4_COD COD_COMP "
-_cQuery += " ,( D4_QUANT - ISNULL(( SELECT SUM(CASE WHEN D3_TM > '500' THEN D3_QUANT ELSE D3_QUANT*-1 END) AS QTD FROM SD3010 SD3 WHERE D3_FILIAL = '01' AND D3_XOP = D4_OP AND D3_COD = D4_COD AND SD3.D_E_L_E_T_ = ' ' ),0) ) QTD "
-_cQuery += " , 0 PERDA, '' DT_INI, '' DT_FIM, D4_XANSUL ANSUL, 1 AS NIVEL "
+// Calcular Saldo - Considerar os D3 de tansferencia e o de apropriação indireta tb.
+// _cQuery += " ISNULL(( SELECT SUM(CASE WHEN D3_TM > '500' THEN D3_QUANT ELSE D3_QUANT*-1 END) AS QTD FROM SD3010 SD3 WHERE D3_FILIAL = '01' AND D3_XOP = D4_OP AND D3_COD = D4_COD AND SD3.D_E_L_E_T_ = ' ' ),0) ) QTD "
+_cQuery += " SELECT D4_PRODUTO CODIGO, D4_PRODUTO COD_PAI, D4_COD COD_COMP, "
+_cQuery += " D4_QUANT QTD, D4_OP OP, "
+_cQuery += " 0 PERDA, '' DT_INI, '' DT_FIM, D4_XANSUL ANSUL, 1 AS NIVEL "
 _cQuery += " FROM "+RetSqlName("SD4")+" SD4 (NOLOCK) "
-_cQuery += " WHERE SD4.D_E_L_E_T_ = ' ' "
-_cQuery += " AND D4_FILIAL = '"+FWxFilial("SD4")+"' "
-_cQuery += " AND D4_OP = '"+_cNumOP+"' "
+_cQuery += " WHERE D4_FILIAL = '"+FWxFilial("SD4")+"' "
+
+If aRetPar[2]="1" // Considera Ops Intermediarias
+    _cQuery += " AND (D4_OP = '"+_cNumOP+"' OR D4_OP IN (SELECT D4_OPORIG FROM "+RetSqlName("SD4")+" SD42 (NOLOCK) "
+    _cQuery += "   WHERE SD42.D4_FILIAL = '"+FWxFilial("SD4")+"' "
+    _cQuery += "   AND SD42.D4_OP = '"+_cNumOP+"' 
+    _cQuery += "   AND SD42.D_E_L_E_T_ <> '*'))
+    _cQuery += " AND SD4.D_E_L_E_T_ = ' ' "
+
+Else
+    _cQuery += " AND D4_OP = '"+_cNumOP+"' "
+
+EndIf
 
 _cQuery += " ) TAB  "
-_cQuery += " GROUP BY CODIGO, COD_PAI, COD_COMP, PERDA, DT_INI, DT_FIM, ANSUL, NIVEL "
-_cQuery += " ORDER BY CODIGO, COD_PAI, COD_COMP, NIVEL "
+_cQuery += " GROUP BY CODIGO, COD_PAI, COD_COMP, OP, PERDA, DT_INI, DT_FIM, ANSUL, NIVEL "
+_cQuery += " ORDER BY CODIGO, COD_PAI, COD_COMP, OP, NIVEL "
 
 /*/
 If mv_par02 == 1  // Ansul Interno
@@ -144,10 +165,26 @@ While ! (cAlias)->(Eof())
     dbSelectArea("SB1")
     dbSetOrder(1)
     dbSeek(xFilial("SB1")+(cAlias)->COD_COMP)
-    If SB1->B1_XPICLIS <> "1"
-        (cAlias)->(DbSkip())
-        Loop
+
+    // Filtro para facilitar a visualoizacao de todos os itens
+    If aRetPar[1] = "1" // Somente produtos Picking
+        If SB1->B1_XPICLIS <> "1"
+            (cAlias)->(DbSkip())
+            Loop
+        EndIf
+
+    Elseif aRetPar[1] = "2" // Somente Chapas
+    	If Empty(SB1->B1_XFAMIL2) .Or. !SB1->B1_XFAMIL2 $ cAMFAMIL2 
+            (cAlias)->(DbSkip())
+            Loop
+        Endif
+//    Else  //if mv_par01 == 3 // Todos - Menos Fantasma
+//        If SB1->B1_FANTASM == "S"
+//            (cAlias)->(DbSkip())
+//            Loop
+//        EndIf
     EndIf
+    cOpInter :=  If(Alltrim((cAlias)->OP)<>AllTrim(_cNumOP) , Alltrim((cAlias)->OP),"")
 
     Aadd(aEstru, {FwxFilial("SD3"),;
             '501',;
@@ -158,8 +195,9 @@ While ! (cAlias)->(Eof())
             (cAlias)->QTD,;                 
             _cNumOP,;
             SB1->B1_LOCPAD,;
-            (cAlias)->ANSUL,;                 
-            .F.})  
+            (cAlias)->ANSUL,;
+            cOpInter,;       
+            .F.}) 
 
     dbSelectArea(cAlias)
     (cAlias)->(DbSkip())
@@ -259,11 +297,18 @@ Endif
 
 oPrinter:FWMSBAR('CODE128',nRowBar,nColBar,AllTrim(aEstru[nX,3]),oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/,0.018/*0.025 nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.3*/,/*0.3,/*lCmtr2Pix*/)
 oPrinter:Say(nRow    ,0800    ,AllTrim(aEstru[nX,3])                                                                     ,oFont12B)    // Código do Produto
-oPrinter:Say(nRow    ,1100    ,AllTrim(Substr(Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_DESC"),1,84))   ,oFont12B)    // Descrição
+//oPrinter:Say(nRow    ,1100    ,AllTrim(Substr(Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_DESC"),1,84))   ,oFont12B)    // Descrição
+oPrinter:Say(nRow    ,1100    ,AllTrim(Substr(Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_DESC"),1,60))   ,oFont12B)    // Descrição
+oPrinter:Say(nRow    ,2100    ,AllTrim(aEstru[nX,11])                                                                    ,oFont12B)    // Op Inter
+
 oPrinter:Say(nRow    ,2400    ,AllTrim(Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_TIPO"))                ,oFont12B)    // TIPO #5659
 oPrinter:Say(nRow    ,2550    ,AllTrim(Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_UM"))                  ,oFont12B)    // Unidade de Medida
-oPrinter:Say(nRow    ,2750    ,AllTrim(Transform(NoRound(aEstru[nX,7] * SC2->C2_QUANT,2) ,"@E 999999.99"))               ,oFont12B)    // Quantidade do componente na estrutura proporcional a quantidade da O.P.
-oPrinter:FWMSBAR('CODE128',nRowBar,nColBarQtd,AllTrim(Transform(NoRound(aEstru[nX,7] * SC2->C2_QUANT,2) ,"@E 999999.99")),oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/,0.018/*0.025 nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.3*/,/*0.3,/*lCmtr2Pix*/)
+
+// No Empenho já está com a qtd total da OP
+//oPrinter:Say(nRow    ,2750    ,AllTrim(Transform(NoRound(aEstru[nX,7] * SC2->C2_QUANT,2) ,"@E 999999.99"))               ,oFont12B)    // Quantidade do componente na estrutura proporcional a quantidade da O.P.
+oPrinter:Say(nRow    ,2750    ,AllTrim(Transform(NoRound(aEstru[nX,7],2) ,"@E 999,999.99"))               ,oFont12B)    // Quantidade do componente na estrutura proporcional a quantidade da O.P.
+//oPrinter:FWMSBAR('CODE128',nRowBar,nColBarQtd,AllTrim(Transform(NoRound(aEstru[nX,7] * SC2->C2_QUANT,2) ,"@E 999999.99")),oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/,0.018/*0.025 nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.3*/,/*0.3,/*lCmtr2Pix*/)
+oPrinter:FWMSBAR('CODE128',nRowBar,nColBarQtd,AllTrim(Transform(NoRound(aEstru[nX,7],2) ,"@E 999,999.99")),oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/,0.018/*0.025 nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.3*/,/*0.3,/*lCmtr2Pix*/)
 
 Return
 
@@ -344,6 +389,9 @@ nRow += nRowStep
 oPrinter:Say(nRow                ,0110                ,'C.B. CÓDIGO'          ,oFont12B)
 oPrinter:Say(nRow                ,0750                ,'CÓDIGO PRODUTO'       ,oFont12B)
 oPrinter:Say(nRow                ,1500                ,'DESCRIÇÃO'            ,oFont12B)
+
+oPrinter:Say(nRow                ,2100                ,'OP.INTERM'            ,oFont12B) //5659
+
 oPrinter:Say(nRow                ,2400                ,'TIPO'                 ,oFont12B) //5659
 oPrinter:Say(nRow                ,2550                ,'U.M.'                 ,oFont12B)
 oPrinter:Say(nRow                ,2680                ,'QUANTIDADE'           ,oFont12B)
