@@ -48,11 +48,14 @@ Inclui titulo CRA com base no titulo PVA posicionado
 /*/
 Method Inclui() Class ClassTituloCRA
 
+Local aArea     := GETAREA()
+Local aAreaSE1  := SE1->(GETAREA())
+Local aAreaSE5  := SE5->(GETAREA())
+Local aAreaFK5  := FK5->(GETAREA())
 Local lRet    := .F.
 Local aFin040 := {}
 Local cNumTit  := ""
 Local cParcTit := ""
-Local dDtTit   := Ctod("  /  /  ")
 
 Private lMsErroAuto := .F. // variavel interna da rotina automatica	   	
 Private lMsHelpAuto := .F.
@@ -64,7 +67,6 @@ If SE1->E1_TIPO == "BOL" .And. SE1->E1_PREFIXO == "PVA" .And. SE5->E5_MOTBX $ "N
 
 	cNumTit  := SE1->E1_NUM
 	cParcTit := SE1->E1_PARCELA
-	dDtTit   := dDataBase
 
     aFin040 := { {"E1_PREFIXO"   ,"PVA"          ,nil},;
 					{"E1_NUM"    ,SE1->E1_NUM    ,nil},;
@@ -102,21 +104,19 @@ If SE1->E1_TIPO == "BOL" .And. SE1->E1_PREFIXO == "PVA" .And. SE5->E5_MOTBX $ "N
 	EndIf
 
 	If lRet
-		// Verifica se Gerou Movimentação Bancária do CRA e Exclue
-		cQrySE5 := "UPDATE "+RetSqlName("SE5")
-		cQrySE5 += " SET R_E_C_D_E_L_ = R_E_C_N_O_, D_E_L_E_T_ = '*' "
-		cQrySE5 += " WHERE E5_FILIAL = '"+xFilial("SE5")+"'"
-		cQrySE5 += " AND E5_PREFIXO = 'PVA' "
-//		cQrySE5 += " AND E5_NUMERO = '"+cNumTit+"'"
-//		cQrySE5 += " AND E5_PARCELA = '"+cParcTit+"'"
-		cQrySE5 += " AND E5_DATA BETWEEN '"+Dtos(dDtTit-10)+"' AND '"+Dtos(dDtTit+10)+"'"
-		cQrySE5 += " AND E5_TIPO = 'CRA' "
-		cQrySE5 += " AND E5_TIPODOC = 'VL' "
-		cQrySE5 += " AND D_E_L_E_T_ <> '*' "
-		nErro := TcSqlExec(cQrySE5)
+		/*
+		Função para excluir movimento bancário adicional de baixa de CRA (E5_RECPAG=P) quando da compensação do CRA
+		no retorno do CNAB
+		*/
+		ExcMovCRA()
 	EndIf
 
 EndIf
+
+RESTAREA(aAreaSE1)
+RESTAREA(aAreaSE5)
+RESTAREA(aAreaFK5)
+RESTAREA(aArea)
 
 Return lRet
 
@@ -183,6 +183,9 @@ Method Compensa(cPedido) Class ClassTituloCRA
 
 Local lRet      := .T.
 Local aArea     := GETAREA()
+Local aAreaSE1  := SE1->(GETAREA())
+Local aAreaSE5  := SE5->(GETAREA())
+Local aAreaFK5  := FK5->(GETAREA())
 Local cAliasQry := GetNextAlias()
 Local aTitDEB   := {}
 Local aTitCRD   := {}
@@ -295,8 +298,19 @@ If !EMPTY(cPedido)
 
 	EndIf
 
+	If lRet
+		/*
+		Função para excluir movimento bancário adicional de baixa de CRA (E5_RECPAG=P) quando da compensação do CRA
+		no retorno do CNAB
+		*/
+		ExcMovCRA()
+	EndIf
+
 EndIf
 
+RESTAREA(aAreaFK5)
+RESTAREA(aAreaSE5)
+RESTAREA(aAreaSE1)
 RESTAREA(aArea)
 
 Return lRet
@@ -312,3 +326,46 @@ Retorna msg de erro na inclusao ou exclusão de um titulo CRA
 Method RetError() Class ClassTituloCRA
 
 Return ::cMsgError
+
+/*/{Protheus.doc} ExcMovCRA
+
+Função para excluir movimento bancário adicional de baixa de CRA (E5_RECPAG=P) quando da compensação do CRA
+no retorno do CNAB
+
+@type function 
+@author Marcos Antonio Montes
+@since 05/06/2025
+/*/
+Static Function ExcMovCRA()
+
+Local cQrySE5  := ""
+Local cQryFK5  := ""
+Local dDtTit   := dDataBase //Ctod("  /  /  ")
+
+// Verifica se Gerou Movimentação Bancária do CRA e Exclui
+cQrySE5 := "UPDATE "+RetSqlName("SE5")
+cQrySE5 += " SET R_E_C_D_E_L_ = R_E_C_N_O_, D_E_L_E_T_ = '*' "
+cQrySE5 += " WHERE E5_FILIAL = '"+xFilial("SE5")+"'"
+cQrySE5 += " AND E5_PREFIXO = 'PVA' "
+//cQrySE5 += " AND E5_NUMERO = '"+cNumTit+"'"
+//cQrySE5 += " AND E5_PARCELA = '"+cParcTit+"'"
+cQrySE5 += " AND E5_DATA BETWEEN '"+Dtos(dDtTit-10)+"' AND '"+Dtos(dDtTit+10)+"'"
+cQrySE5 += " AND E5_TIPO = 'CRA' "
+cQrySE5 += " AND E5_TIPODOC = 'VL' "
+cQrySE5 += " AND D_E_L_E_T_ <> '*' "
+nErro := TcSqlExec(cQrySE5)
+
+cQryFK5 := "UPDATE "+RetSqlName("FK5")
+cQryFK5 += "SET "+RetSqlName("FK5")+".D_E_L_E_T_ = '*',"+RetSqlName("FK5")+".R_E_C_D_E_L_=FK5.R_E_C_N_O_ "
+cQryFK5 += "FROM "+RetSqlName("FK5")+" FK5 "
+cQryFK5 += "INNER JOIN "+RetSqlName("FK7")+" FK7 ON FK7_FILIAL = FK5_FILIAL AND FK7_IDDOC = FK5_IDFK7 AND FK7.D_E_L_E_T_ = ' ' "
+cQryFK5 += "WHERE FK5_FILIAL = '"+xFilial("FK5")+"' "
+cQryFK5 += "AND FK7_TIPO = 'CRA' "
+cQryFK5 += "AND FK7_PREFIX = 'PVA' "
+cQryFK5 += "AND FK5_RECPAG = 'P' "
+cQryFK5 += "AND FK5_TPDOC = 'VL' "
+cQryFK5 += "AND FK5_DATA BETWEEN '"+Dtos(dDtTit-10)+"' AND '"+Dtos(dDtTit+10)+"' "
+cQryFK5 += "AND FK5.D_E_L_E_T_ = ' ' "
+nErro := TcSqlExec(cQryFK5)
+
+Return NIL
