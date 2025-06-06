@@ -5,14 +5,14 @@
 #INCLUDE "Protheus.ch"
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
-//| Relatório Pick - List
+//| RelatÃ³rio Pick - List
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 User Function M10R12()
    
    Private aEstru        := {}         //#7459
    Private nX            := 0
 
-    FWMsgRun(, {|| U_M10R12A() },'Picking - List','Gerando relatório...')
+    FWMsgRun(, {|| U_M10R12A() },'Picking - List','Gerando relatÃ³rio...')
 /*
     For nX:=1 to Len(aEstru)
         FWMsgRun(, {|| U_M10E05() },'Picking - List','Gerando etiquetas...') //#7459
@@ -45,8 +45,8 @@ Private aRetPar   := {}
 //M02RFont(@oFont9,@oFont12,@oFont12B,@oFont14B,@oFont18T)
 
 Aadd(aPergs, {2, "Tipo de Produtos"        ,"1",{"1=Comp./Picking","2=Chapas"},80,".T.",.F.})                          //1
-Aadd(aPergs, {2, "OPs Intermediar."        ,"1",{"1=Considera","2=Não Considera "},80,".T.",.F.})                          //1
-If !ParamBox(aPergs, "Parametros de Impressão ", @aRetPar,/*bOk*/,/*aButtons*/,/*lCentered*/,/*nPOSX*/,/*nPOSY*/,/*oDlgWIzard*/,/*cLoad*/,/*lCanSave*/,.T./*lUserSave*/)
+Aadd(aPergs, {2, "OPs Intermediar."        ,"1",{"1=Considera","2=NÃ£o Considera "},80,".T.",.F.})                          //1
+If !ParamBox(aPergs, "Parametros de ImpressÃ£o ", @aRetPar,/*bOk*/,/*aButtons*/,/*lCentered*/,/*nPOSX*/,/*nPOSY*/,/*oDlgWIzard*/,/*cLoad*/,/*lCanSave*/,.T./*lUserSave*/)
     Return 
 EndIf
 oPrinter := FWMSPrinter():New('PK' + SC2->C2_NUM + '_' + SubStr(DToS(Date()),7,2) + '_' + StrTran(Time(),":",""), IMP_PDF, .T./*_lAdjustToLegacy*/, /*cPathInServer*/, .T.)
@@ -119,7 +119,7 @@ TcQuery cQuery New Alias (cAlias := GetNextAlias())
 _cQuery := "SELECT CODIGO, COD_PAI, COD_COMP, SUM(QTD) QTD,  OP, PERDA, DT_INI, DT_FIM, ANSUL, NIVEL "
 _cQuery += " FROM ( "
 
-// Calcular Saldo - Considerar os D3 de tansferencia e o de apropriação indireta tb.
+// Calcular Saldo - Considerar os D3 de tansferencia e o de apropriaÃ§Ã£o indireta tb.
 // _cQuery += " ISNULL(( SELECT SUM(CASE WHEN D3_TM > '500' THEN D3_QUANT ELSE D3_QUANT*-1 END) AS QTD FROM SD3010 SD3 WHERE D3_FILIAL = '01' AND D3_XOP = D4_OP AND D3_COD = D4_COD AND SD3.D_E_L_E_T_ = ' ' ),0) ) QTD "
 _cQuery += " SELECT D4_PRODUTO CODIGO, D4_PRODUTO COD_PAI, D4_COD COD_COMP, "
 _cQuery += " D4_QUANT QTD, D4_OP OP, "
@@ -148,7 +148,7 @@ If mv_par02 == 1  // Ansul Interno
     _cQuery += "AND D4_XANSUL = '1' "
 ElseiF mv_par02 == 2  // Ansul Externo
     _cQuery += "AND D4_XANSUL = '2' "
-ElseiF mv_par02 == 3  // Não Ansul
+ElseiF mv_par02 == 3  // NÃ£o Ansul
     _cQuery += "AND D4_XANSUL NOT IN ('1','2') "
 EndIf
 /*/
@@ -216,25 +216,23 @@ If Empty(aEstru)
     oPrinter:StartPage()
 
     //+----------------------------------------------------------------------------------------
-    // Cabeçalho 1 - Dados Macom
+    // CabeÃ§alho 1 - Dados Macom
     //+----------------------------------------------------------------------------------------
     MR02Cab1(oPrinter,oFont14B,oFont12,@nRow)
 
     //+----------------------------------------------------------------------------------------
-    // Cabeçalho 2 - Dados do Fornecedor   *****************
+    // CabeÃ§alho 2 - Dados do Fornecedor   *****************
     //+----------------------------------------------------------------------------------------
     MR02Cab2(oPrinter,oFont12,oFont18T,@nRow,oFont14B)
 
     M02RICabIt(oPrinter,oFont12B,@nRow,cAnsul)
     nRow += 100 
-    oPrinter:Say(nRow  ,0120    ,"PRODUTO SEM ESTRUTURA OU SEM ITENS PARA SEPARAÇÃO"            ,oFont12B)
-
 Else
     cAnsul := " "
 
     For nX := 1 To Len(aEstru)
 
-//        If Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_XPICLIS") == "1" // Implementação futura qualidade -> .And. Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_TIPO") == "PI"
+//        If Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_XPICLIS") == "1" // ImplementaÃ§Ã£o futura qualidade -> .And. Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_TIPO") == "PI"
 
         If nRowBar > 44  .Or. cAnsul <> aEstru[nX,10] //== 9.5  // Primeira Vez ou troca de Ansul
             nRow      := -0070
@@ -254,12 +252,12 @@ Else
             oPrinter:StartPage()
 
             //+----------------------------------------------------------------------------------------
-            // Cabeçalho 1 - Dados Macom
+            // CabeÃ§alho 1 - Dados Macom
             //+----------------------------------------------------------------------------------------
             MR02Cab1(oPrinter,oFont14B,oFont12,@nRow)
 
             //+----------------------------------------------------------------------------------------
-            // Cabeçalho 2 - Dados do Fornecedor   *****************
+            // CabeÃ§alho 2 - Dados do Fornecedor   *****************
             //+----------------------------------------------------------------------------------------
             MR02Cab2(oPrinter,oFont12,oFont18T,@nRow,oFont14B)
 
@@ -296,15 +294,15 @@ If nX > 2
 Endif	
 
 oPrinter:FWMSBAR('CODE128',nRowBar,nColBar,AllTrim(aEstru[nX,3]),oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/,0.018/*0.025 nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.3*/,/*0.3,/*lCmtr2Pix*/)
-oPrinter:Say(nRow    ,0800    ,AllTrim(aEstru[nX,3])                                                                     ,oFont12B)    // Código do Produto
-//oPrinter:Say(nRow    ,1100    ,AllTrim(Substr(Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_DESC"),1,84))   ,oFont12B)    // Descrição
-oPrinter:Say(nRow    ,1100    ,AllTrim(Substr(Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_DESC"),1,60))   ,oFont12B)    // Descrição
+oPrinter:Say(nRow    ,0800    ,AllTrim(aEstru[nX,3])                                                                     ,oFont12B)    // CÃ³digo do Produto
+//oPrinter:Say(nRow    ,1100    ,AllTrim(Substr(Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_DESC"),1,84))   ,oFont12B)    // DescriÃ§Ã£o
+oPrinter:Say(nRow    ,1100    ,AllTrim(Substr(Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_DESC"),1,60))   ,oFont12B)    // DescriÃ§Ã£o
 oPrinter:Say(nRow    ,2100    ,AllTrim(aEstru[nX,11])                                                                    ,oFont12B)    // Op Inter
 
 oPrinter:Say(nRow    ,2400    ,AllTrim(Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_TIPO"))                ,oFont12B)    // TIPO #5659
 oPrinter:Say(nRow    ,2550    ,AllTrim(Posicione("SB1",1,xFilial("SB1")+AllTrim(aEstru[nX,3]),"B1_UM"))                  ,oFont12B)    // Unidade de Medida
 
-// No Empenho já está com a qtd total da OP
+// No Empenho jÃ¡ estÃ¡ com a qtd total da OP
 //oPrinter:Say(nRow    ,2750    ,AllTrim(Transform(NoRound(aEstru[nX,7] * SC2->C2_QUANT,2) ,"@E 999999.99"))               ,oFont12B)    // Quantidade do componente na estrutura proporcional a quantidade da O.P.
 oPrinter:Say(nRow    ,2750    ,AllTrim(Transform(NoRound(aEstru[nX,7],2) ,"@E 999,999.99"))               ,oFont12B)    // Quantidade do componente na estrutura proporcional a quantidade da O.P.
 //oPrinter:FWMSBAR('CODE128',nRowBar,nColBarQtd,AllTrim(Transform(NoRound(aEstru[nX,7] * SC2->C2_QUANT,2) ,"@E 999999.99")),oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/,0.018/*0.025 nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.3*/,/*0.3,/*lCmtr2Pix*/)
@@ -322,7 +320,7 @@ Local lRet  := .T.
 dbSelectArea("SB1")
 dbSetOrder(1)
 If !SB1->(DbSeek( xFilial('SB1') + SC2->C2_PRODUTO))
-    MsgInfo(I18N('Não foram encontrados dados do produto #1 .' + CRLF + 'Verifique.',{SC2->C2_PRODUTO}),"Atenção")
+    MsgInfo(I18N('NÃ£o foram encontrados dados do produto #1 .' + CRLF + 'Verifique.',{SC2->C2_PRODUTO}),"AtenÃ§Ã£o")
     lRet := .F.
 EndIf
 
@@ -330,7 +328,7 @@ Return lRet
 
 Static Function MR02Cab1(oPrinter,oFont14B,oFont12,nRow)
 
-Local cNome         := ' AÇOS MACOM INDÚSTRIA E COMERCIO LTDA'
+Local cNome         := ' AÃ‡OS MACOM INDÃšSTRIA E COMERCIO LTDA'
 Local cEndC         := 'Av Julia Gaiolli, 474, Bonsucesso, Guarulhos-SP, CEP 07251-500'
 Local cCGC          := ' CNPJ: 43.553.668/0001-79 I.E.: 336.179.661.113'
 Local cTel          := 'Telefone: 55 11 2085-7000'
@@ -386,9 +384,9 @@ ElseIf cAnsul == "2"
 EndIf
 
 nRow += nRowStep
-oPrinter:Say(nRow                ,0110                ,'C.B. CÓDIGO'          ,oFont12B)
-oPrinter:Say(nRow                ,0750                ,'CÓDIGO PRODUTO'       ,oFont12B)
-oPrinter:Say(nRow                ,1500                ,'DESCRIÇÃO'            ,oFont12B)
+oPrinter:Say(nRow                ,0110                ,'C.B. CÃ“DIGO'          ,oFont12B)
+oPrinter:Say(nRow                ,0750                ,'CÃ“DIGO PRODUTO'       ,oFont12B)
+oPrinter:Say(nRow                ,1500                ,'DESCRIÃ‡ÃƒO'            ,oFont12B)
 
 oPrinter:Say(nRow                ,2100                ,'OP.INTERM'            ,oFont12B) //5659
 
@@ -401,5 +399,5 @@ oPrinter:Say(nRow                ,2970                ,'C.B. QTD'             ,o
 Return
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
-// Impressão Etiqueta ZEBRA
+// ImpressÃ£o Etiqueta ZEBRA
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
