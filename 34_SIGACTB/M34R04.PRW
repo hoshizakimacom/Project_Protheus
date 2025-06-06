@@ -474,6 +474,8 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		cXFamSgd		:= "6 - Refrigeração"
 	ElseIf cXFamSgdCod 	== "7"
 		cXFamSgd		:= "7 - Diversos"
+	ElseIf cXFamSgdCod 	== "8"
+		cXFamSgd		:= "8 - Lavadoras"	
 	Endif
 
 	cXSubFamCod := AllTrim(cXSubFam)

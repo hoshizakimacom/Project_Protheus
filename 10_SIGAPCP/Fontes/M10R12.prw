@@ -167,7 +167,7 @@ While ! (cAlias)->(Eof())
     dbSeek(xFilial("SB1")+(cAlias)->COD_COMP)
 
     // Filtro para facilitar a visualoizacao de todos os itens
-    If aRetPar[1] = "1" // Somente produtos Picking
+    If aRetPar[1] = "1" .or. (aRetPar[1] = "1" .and. SB1->B1_TIPO $ "BN")  // Somente produtos Picking
         If SB1->B1_XPICLIS <> "1"
             (cAlias)->(DbSkip())
             Loop
@@ -227,7 +227,7 @@ If Empty(aEstru)
 
     M02RICabIt(oPrinter,oFont12B,@nRow,cAnsul)
     nRow += 100 
-    oPrinter:Say(nRow  ,0120    ,"PRODUTO SEM ESTRUTURA"            ,oFont12B)
+    oPrinter:Say(nRow  ,0120    ,"PRODUTO SEM ESTRUTURA OU SEM ITENS PARA SEPARAÇÃO"            ,oFont12B)
 
 Else
     cAnsul := " "

@@ -224,7 +224,7 @@ dbSetOrder(2)			// Produto,Numero
 	
 		SELECT 
 			C6_FILIAL,C6_NUM,C6_ITEM, C6_NOTA,C6_DATFAT,C6_ENTREG,C6_CLI,C6_LOJA,C6_ITEM,C6_PRODUTO,C6_DESCRI,
-			C6_CF,C6_QTDVEN,C6_PRCVEN,C6_XVLTIPI,C6_XVLTSOL,C6_XOPER, 
+			C6_CF,C6_QTDVEN,C6_PRCVEN,C6_XVLTIPI,C6_XVLTSOL,C6_OPER, 
 			B1_DESC, B1_TIPO, B1_POSIPI, B1_UM, B1_XFAMILI, C6_DESCONT, SC6.R_E_C_N_O_ RECSC6
 		FROM 
 			%Table:SC6% SC6, %Table:SC5% SC5, %Table:SB1% SB1 
@@ -286,7 +286,7 @@ oReport:Section(1):Init()
 
 While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 
-	If !(cAliasQry)->C6_XOPER $cTpOperacao // '01|02|03|04|05|06|11|12|28|38|39|51|55'
+	If !(cAliasQry)->C6_OPER $cTpOperacao // '01|02|03|04|05|06|11|12|28|38|39|51|55'
 		(cAliasQry)->(dbSkip())
 		Loop
 	Endif		
