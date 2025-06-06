@@ -267,6 +267,7 @@ For nProc := 1 To Len(aStruct)
 		SB7->B7_TIPO    := Posicione("SB1",1,xFilial("SB1")+cProduto,"B1_TIPO")
 		SB7->B7_ORIGEM  := "M04M04"
 		SB7->B7_XCODUSR := SubStr(cUsuario,7,15)
+		SB7->B7_ESCOLHA := "S"
 //		    SB7->B7_DTVALID :=
 //			SB7->B7_LOCALIZ := 
 		MsUnLock()

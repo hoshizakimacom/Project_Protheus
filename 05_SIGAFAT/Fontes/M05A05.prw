@@ -43,13 +43,13 @@ cTeste := '2'
 	_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_XVLTIMP'})] 	:= SCK->CK_XVLTIMP
 	_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_XVLTBRU'})] 	:= SCK->CK_XVLTBRU
 	_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_XACRESC'})] 	:= SCK->CK_XACRESC
-	//_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_XITEMP '})] 	:= SCK->CK_XITEMP
+	_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_XITEMP'})] 		:= SCK->CK_XITEMP
 	_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_DESCONT'})] 	:= SCK->CK_XDESCON
 	_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_XACRESC'})] 	:= SCK->CK_XACRESC
 	_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_VALDESC'})] 	:= 0
-	//_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_XINSTA '})] 	:= SCK->CK_XINSTA
-	//_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_XOPER  '})] 	:= SCK->CK_XOPER
-	//_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_ENTREG '})] 	:= SCK->CK_ENTREG
+	_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_XINSTA'})] 		:= SCK->CK_XINSTA
+	_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_XOPER'})] 		:= SCK->CK_XOPER
+	_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_ENTREG'})] 		:= SCK->CK_ENTREG
 	_aCols[_nItem][AScan(_aHeader,{|x,y|x[2] == 'C6_XITEMOR'})] 	:= SCK->CK_ITEM
 
 	M->C5_XACRESC  := SCJ->CJ_XACRESC
