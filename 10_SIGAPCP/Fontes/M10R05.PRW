@@ -16,11 +16,11 @@ User Function M10R05()
 
 Local oReport
 
-	//If FindFunction("TRepInUse") .And. TRepInUse()
+	If FindFunction("TRepInUse") .And. TRepInUse()
 		//-- Interface de impressao
 		oReport := ReportDef()
 		oReport:PrintDialog()
-	//EndIf
+	EndIf
 
 Return
 
@@ -180,8 +180,8 @@ TRCell():New(oVenProd,"OBS1"		,/*Tabela*/ ,"Observacao1"		 ,PesqPict("SC5","C5_X
 //TRCell():New(oVenProd,"OBS6"		,/*Tabela*/ ,"Observacao6"		 ,PesqPict("SC5","C5_XOBS6")	,TamSx3("C5_XOBS6")[1]		,/*lPixel*/,{|| cObs6 	})				// ObservaÃ¯Â¿Â½Ã¯Â¿Â½o 6
 //TRCell():New(oVenProd,"DTENTREGA7"	,/*Tabela*/	,"Dt.Entrega7"		 ,PesqPict("SC5","C5_XDTPCP7")	,TamSx3("C5_XDTPCP7")[1]	,/*lPixel*/,{|| cDtpcp7	})				// Data de Entrega 7
 //TRCell():New(oVenProd,"OBS7"		,/*Tabela*/ ,"Observacao7"		 ,PesqPict("SC5","C5_XOBS7")	,TamSx3("C5_XOBS7")[1]		,/*lPixel*/,{|| cObs7 	})				// ObservaÃ¯Â¿Â½Ã¯Â¿Â½o 7
-TRCell():New(oVenProd,"CONDPAG"		,/*Tabela*/	,"Cond.Pag"		 	 ,PesqPict("SC5","C5_CONDPAG")	,TamSx3("C5_CONDPAG")[1]	,/*lPixel*/,{|| cCodCond})				// Cod. Condicao Pagamento
-TRCell():New(oVenProd,"DESCPAG"		,/*Tabela*/ ,"Desc.Pag"			 ,PesqPict("SE4","E4_DESCRI")	,TamSx3("E4_DESCRI")[1]		,/*lPixel*/,{|| cRetorno})				// Desc. Condicao Pagamento
+//TRCell():New(oVenProd,"DTENTREGA8"	,/*Tabela*/	,"Dt.Entrega8"		 ,PesqPict("SC5","C5_XDTPCP8")	,TamSx3("C5_XDTPCP8")[1]	,/*lPixel*/,{|| cDtpcp8	})				// Data de Entrega 8
+//TRCell():New(oVenProd,"OBS8"		,/*Tabela*/ ,"Observacao8"		 ,PesqPict("SC5","C5_XOBS8")	,TamSx3("C5_XOBS8")[1]		,/*lPixel*/,{|| cObs8 	})				// ObservaÃ¯Â¿Â½Ã¯Â¿Â½o 8
 TRCell():New(oVenProd,"LIBPROD"		,/*Tabela*/ ,"Lib.Producao"		 ,PesqPict("SC5","C5_XLIBPRO")	,TamSx3("C5_XLIBPRO")[1]	,/*lPixel*/,{|| cXLibPro})				// LiberaÃ§Ã£o financeira para produÃ§Ã£o.
 TRCell():New(oVenProd,"DTLIBPROD"	,/*Tabela*/ ,"Dt.Lib.Producao"	 ,PesqPict("SC5","C5_XDLIBPR")	,TamSx3("C5_XDLIBPR")[1]	,/*lPixel*/,{|| dXDlibPr})				// Data da LiberaÃ§Ã£o financeira para produÃ§Ã£o.
 TRCell():New(oVenProd,"QTD_PRV_PROD",/*Tabela*/	,"Prev.Entr.(OP)"	 ,PesqPict("SC2","C2_QUANT")		,TamSx3("C2_QUANT")[1]		,/*lPixel*/,{|| nPrvEntr })				// Saldo em Estoque
@@ -198,8 +198,9 @@ TRCell():New(oVenProd,"QTD_EMP"	    ,/*Tabela*/	,"Qtd.Est.Empen."	 ,PesqPict("SB
 TRCell():New(oVenProd,"QTD_DISP"    ,/*Tabela*/	,"Qtd.Est.Disp."	 ,PesqPict("SB2","B2_QATU")		,TamSx3("B2_QATU")[1]		,/*lPixel*/,{|| nSldDisp })				// Saldo em Estoque
 TRCell():New(oVenProd,"RAT_FRETE"	,/*Tabela*/	,"Rat.Frete"		 ,PesqPict("SC5","C5_XFRETE")	,TamSx3("C5_XFRETE")[1]	    ,/*lPixel*/,{||	nRatFre})				// Rateio de Frete #6805
 
-TRCell():New(oVenProd,"RESP. ENG"	,/*Tabela*/	,"Resp. Eng"		 ,PesqPict("SB1","B1_XREPENG")	,TamSx3("B1_XREPENG")[1]	    ,/*lPixel*/,{||	cXRespE})				// Rateio de Frete #6805
-
+TRCell():New(oVenProd,"RESP. ENG"	,/*Tabela*/	,"Resp. Eng"		 ,PesqPict("SB1","B1_XREPENG")	,TamSx3("B1_XREPENG")[1]	,/*lPixel*/,{||	cXRespE})				// Rateio de Frete #6805
+TRCell():New(oVenProd,"SUB FAM.SUG.",/*Tabela*/ ,"Familia Sugerida"  ,PesqPict("SB1","B1_XFAMSGD")	,TamSx3("B1_XFAMSGD")[1]	,/*lPixel*/,{|| cXFamSgd })				// Familia Sugerida
+TRCell():New(oVenProd,"FAMILIA.SUG.",/*Tabela*/ ,"Sub.Fam. Sugerida" ,PesqPict("SB1","B1_XSUBFAM")	,TamSx3("B1_XSUBFAM")[1]	,/*lPixel*/,{|| cXSubFam })				// Sub Fam.Sugerida
 //	nPvLib   := 0
 //  nSldLib  := 0
 //	nSldDisp := 0
@@ -235,6 +236,8 @@ Local lAtraso	:= .F.
 //Local nNumero   := 0
 Local nCod      := ""
 Local nCod2     := ""
+Local cXFamSgdCod 
+Local cXSubFamCod
 
 //ÃšÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â¿
 //Â³Filtragem do relatÃ³rio                                                  Â³
@@ -374,7 +377,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		Case (cAliasQry)->B1_XITDESE == " "
 			cXItDese   := "Avaliar"
 	End Case
-
+	
 	// B1_XPDF									#6839
 	Do Case
 		Case (cAliasQry)->B1_XPDF == "1"
@@ -425,16 +428,6 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 			cXEspLib   := "Não"
 		Case (cAliasQry)->B1_XESPLIB == " "
 			cXEspLib   := "Não"
-	End Case
-
-	// B1_XPADRAO								 #8191	
-	Do Case
-		Case (cAliasQry)->B1_XPADRAO == "1" 
-			cXPadra   := "Sim"					//#8249 - Ajustado variavel, de cXItDese para cXPadra
-		Case (cAliasQry)->B1_XPADRAO == "2"
-			cXPadra   := "Não"					//#8249 - Ajustado variavel, de cXItDese para cXPadra
-		Case (cAliasQry)->B1_XPADRAO == " "
-			cXPadra   := "Avaliar"				//#8249 - Ajustado variavel, de cXItDese para cXPadra
 	End Case
 
 	cXFamil	 := POSICIONE("ZA1",1,xFilial("ZA1")+(cAliasQry)->B1_XFAMILI,"ZA1_DESC")
@@ -524,6 +517,52 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
     nSldLib  := (cAliasQry)->QTD_EMP
 	nSldDisp := nSldEst - (cAliasQry)->QTD_EMP
   	nRatFre  := (cAliasQry)->C5_XFRETE
+
+/* Sub Família e Família Sugerida do Produtos
+*/
+	cXSubFam	:= Posicione("SB1",1,xFilial("SB1")+SC6->C6_PRODUTO,"B1_XSUBFAM")
+	cXFamSgd	:= Posicione("SB1",1,xFilial("SB1")+SC6->C6_PRODUTO,"B1_XFAMSGD")
+
+	cXFamSgdCod := AllTrim(cXFamSgd)
+	If cXFamSgdCod 		== "1"
+		cXFamSgd		:= "1 - Cocção"
+	ElseIf cXFamSgdCod 	== "2"
+		cXFamSgd		:= "2 - Componentes"
+	ElseIf cXFamSgdCod  == "3"
+		cXFamSgd		:= "3 - Máquina de Gelo"
+	ElseIf cXFamSgdCod	== "4"
+		cXFamSgd		:= "4 - Mobiliários"
+	ElseIf cXFamSgdCod 	== "5"
+		cXFamSgd		:= "5 - Não Vendáveis"
+	ElseIf cXFamSgdCod 	== "6"
+		cXFamSgd		:= "6 - Refrigeração"
+	ElseIf cXFamSgdCod 	== "7"
+		cXFamSgd		:= "7 - Diversos"
+	ElseIf cXFamSgdCod 	== "8"
+		cXFamSgd		:= "8 - Lavadoras"	
+	Endif
+
+	cXSubFamCod := AllTrim(cXSubFam)
+	If cXSubFamCod		== "1"
+		cXSubFam		:= "1 - Fabricação"
+	ElseIf cXSubFamCod 	== "2"
+		cXSubFam		:= "2 - Revenda - Nacional"
+	ElseIf cXSubFamCod  == "3"
+		cXSubFam		:= "3 - Revenda - Importada"
+	ElseIf cXSubFamCod	== "4"
+		cXSubFam		:= "4 - Revenda - Grupo Hoshizaki"
+	ElseIf cXSubFamCod 	== "5"
+		cXSubFam		:= "5 - Serviços"
+	ElseIf cXSubFamCod 	== "6"
+		cXSubFam		:= "6 - Matéria Prima"
+	ElseIf cXSubFamCod 	== "7"
+		cXSubFam		:= "7 - Embalagem"
+	ElseIf cXSubFamCod 	== "8"
+		cXSubFam		:= "8 - Ativo"
+	ElseIf cXSubFamCod 	== "9"
+		cXSubFam		:= "9 - Material de Consumo"
+	Endif
+
 
 //Pedido
 //TRCell():New(oVenProd,"PV_QUANT"	 ,/*Tabela*/	,"PV.Quantidade"	 ,PesqPict("SC6","C6_QTDVEN")	,TamSx3("C6_QTDVEN")[1]		,/*lPixel*/,{|| nQuant	})				// Quantidade
@@ -652,25 +691,5 @@ If nTotPed > 0
 	Endif
 
 Endif
+
 Return cRet
-
-//±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-// Descricao Cond Pagto
-//±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-User Function M10R05A(cChave)
-
-Local aArea    := GetArea()
-Local aAreaSE1 := SE1->(GetArea())
-Local cRetorno := ""
-
-dbSelectArea("SE1")
-dbSetOrder(1)
-dbSeek(xFilial("SE1")+cChave)
-
-cCodCond := Posicione("SC5",1,xFilial("SC5")+SE1->E1_PEDIDO,"C5_CONDPAG")
-cRetorno := Posicione("SE4",1,xFilial("SE4")+cCodCond,"E4_DESCRI")
-
-RestArea(aAreaSE1)
-RestArea(aArea)
-
-Return cRetorno
