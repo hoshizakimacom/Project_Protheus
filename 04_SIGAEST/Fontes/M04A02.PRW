@@ -92,15 +92,18 @@ Return
 /*/
 User Function M04A022(cArq)
 
-Local aAreaSG1  := SG1->(GetArea())
-Local aStruct   := {}
-Local lContinua := .T.
-Local aStruDel  := {}
-Local aRecDel   := {}
+Local aAreaSG1    := SG1->(GetArea())
+Local aStruct     := {}
+Local lContinua   := .T.
+Local lExistEstru := .F.
+Local aStruDel    := {}
+Local aRecDel     := {}
 Local nProc
 Local nProc4
 Local nProc3
 Local nProc5
+Local nLinha     := 0
+
 //Local cEmail    := GetMv("PR_MAILSTD")
 Private aLog	:= {}
 
@@ -127,9 +130,9 @@ EndIf
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Executa a leitura sequencial do arquivo                             ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-cCodPA   := Space(5)
-cCodMP   := Space(5)
-nQtdMP   := 0
+cCodPA    := Space(5)
+cCodMP    := Space(5)
+nQtdMP    := 0
 cCodPAAnt := Space(15)
 
 ProcRegua(FT_FLASTREC())
@@ -139,6 +142,8 @@ FT_FGOTOP()
 While !FT_FEOF()
 	
 	IncProc("Analisando arquivo...")
+
+	nLinha += 1
 	
 	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 	//³ Armazena na variavel cBuffer a linha do arquivo texto               ³
@@ -162,20 +167,20 @@ While !FT_FEOF()
 	aCampos := {}
 	For nProc := 1 To 11
 		
-//		MsgStop("teste 1.1")
-
 		nPos := At(";",cBuffer)
 
 		// Quando a primeira coluna não for uma letra
 		If nProc == 1 .And. !Alltrim(Left(cBuffer,nPos-1))$"ABCDEFGHI" 
-			MsgStop(OemToAnsi("Divergência de LayOut na primeira coluna ! Favor Verificar ! "))
+			//MsgStop(OemToAnsi("Divergência de LayOut na primeira coluna ! Favor Verificar ! "))
+			Aadd(aLog,"Divergência de LayOut na primeira coluna ! Favor Verificar ! "+" ("+RTRIM(STR(nLinha))+")")
 			lContinua := .F.
 			Exit
 		EndIf
 
 		// Quando a primeira coluna não for uma letra
 		If nPos == 0 .And. nProc <> 11
-			MsgStop(OemToAnsi("Erro na importaçâo do arquivo ! Divergência de quantidade de colunas !"))
+			//MsgStop(OemToAnsi("Erro na importaçâo do arquivo ! Divergência de quantidade de colunas !"))
+			Aadd(aLog,"Erro na importaçâo do arquivo ! Divergência de quantidade de colunas !"+" ("+RTRIM(STR(nLinha))+")")
 			lContinua := .F.
 			Exit
 		ElseIf nPos == 0
@@ -194,9 +199,9 @@ While !FT_FEOF()
 	//³ Busca e Valida produto PAI. ³
 	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 	cCodSeq   := AllTrim(aCampos[01])
-	cCodPA    := AllTrim(aCampos[02])
+	cCodPA    := PADR(aCampos[02],TAMSX3("B1_COD")[1])
 	cDescPA   := ""
-	cCodMP    := AllTrim(aCampos[03])
+	cCodMP    := PADR(aCampos[03],TAMSX3("B1_COD")[1])
 	cDescMP   := ""
 	nQtdMP    := Val(StrTran(aCampos[05],",","."))
 	nPerda    := Val(StrTran(aCampos[06],",","."))	
@@ -212,14 +217,16 @@ While !FT_FEOF()
 	dbSelectArea("SB1")
 	dbSetOrder(1)
 	If Empty(cCodPA)
-		MsgStop(OemToAnsi("Código de Produto em Branco ! Código : ")+cCodPA)
-		Aadd(aLog,"Código de Produto em Branco. Código : "+cCodMP)
+		//MsgStop(OemToAnsi("Código de Produto em Branco ! Código : ")+cCodPA)
+		Aadd(aLog,"Código de Produto em Branco. Código : "+cCodPA+" ("+RTRIM(STR(nLinha))+")")
 		FT_FSKIP()
+		lContinua := .F.
 		Loop
 	ElseIf !dbSeek(xFilial("SB1")+cCodPA)
-		MsgStop(OemToAnsi("Código de Produto não encontrado, socilitar inclusão ao Depto de Cadastro.. Código : ")+cCodPA)
-		Aadd(aLog,"Codigo da Produto não encontrado .. Código : "+cCodPA)
+		//MsgStop(OemToAnsi("Código de Produto não encontrado, socilitar inclusão ao Depto de Cadastro.. Código : ")+cCodPA)
+		Aadd(aLog,"Codigo da Produto não encontrado .. Código : "+cCodPA+" ("+RTRIM(STR(nLinha))+")")
 		FT_FSKIP()
+		lContinua := .F.
 		Loop
 	EndIf
 	nQtdEmb := SB1->B1_QB
@@ -230,14 +237,16 @@ While !FT_FEOF()
 	dbSelectArea("SB1")
 	dbSetOrder(1)
 	If Empty(cCodMP)
-		MsgStop(OemToAnsi("Código de Produto Componente em Branco ! Código : ")+cCodMP)
-		Aadd(aLog,"Código de Produto  Componente em Branco. Código : "+cCodMP)
+		//MsgStop(OemToAnsi("Código de Produto Componente em Branco ! Código : ")+cCodMP)
+		Aadd(aLog,"Código de Produto Componente em Branco. Código : "+cCodMP+" ("+RTRIM(STR(nLinha))+")")
 		FT_FSKIP()
+		lContinua := .F.
 		Loop
 	ElseIf !dbSeek(xFilial("SB1")+cCodMP)
-		MsgStop(OemToAnsi("Código de Produto Componente não encontrado, socilitar inclusão ao Depto de Cadastro.. Código : ")+cCodMP)
-		Aadd(aLog,"Codigo da Produto Componente não encontrado .. Código : "+cCodMP)
+		//MsgStop(OemToAnsi("Código de Produto Componente não encontrado, socilitar inclusão ao Depto de Cadastro.. Código : ")+cCodMP)
+		Aadd(aLog,"Codigo da Produto Componente não encontrado .. Código : "+cCodMP+" ("+RTRIM(STR(nLinha))+")")
 		FT_FSKIP()
+		lContinua := .F.
 		Loop
 	EndIf
 
@@ -245,9 +254,10 @@ While !FT_FEOF()
 	//³ Busca e Valida produto MP. ³
 	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 	If AllTrim(cCodMP) == AllTrim(cCodPA)
-		MsgStop(OemToAnsi("Código de Produto igual ao do Componente ! Código : ")+cCodMP)
-		Aadd(aLog,"Código de Produto igual ao do Componente  ! Código : "+cCodMP)
+		//MsgStop(OemToAnsi("Código de Produto igual ao do Componente ! Código : ")+cCodMP)
+		Aadd(aLog,"Código de Produto igual ao do Componente  ! Código : "+cCodMP+" ("+RTRIM(STR(nLinha))+")")
 		FT_FSKIP()
+		lContinua := .F.
 		Loop
 	EndIf
 
@@ -262,46 +272,72 @@ While !FT_FEOF()
 	EndIf	
 
 	If nQtdMP <= 0.000
-		MsgStop(OemToAnsi("Quantidade do Componente Zero.. Código : ")+cCodMP)
-		Aadd(aLog,"Quantidade do Componente Zero.. Código : "+cCodMP)
+		//MsgStop(OemToAnsi("Quantidade do Componente Zero.. Código : ")+cCodMP)
+		Aadd(aLog,"Quantidade do Componente Zero.. Código : "+cCodMP+" ("+RTRIM(STR(nLinha))+")")
 		FT_FSKIP()
+		lContinua := .F.
 		Loop
 	EndIf	
 
 	If !cAnsul $ " NIE"
-		MsgStop(OemToAnsi("Informação Ansul Invalida.. Deve conter Branco, N=Não, I-Interno ou E=Externo. Código : ")+cCodMP+" - Ansul : "+cAnsul)
-		Aadd(aLog,"Informação Ansul Invalida.. Deve conter Branco, N=Não, I-Interno ou E=Externo. Código : "+cCodMP+" - Ansul : "+cAnsul)
+		//MsgStop(OemToAnsi("Informação Ansul Invalida.. Deve conter Branco, N=Não, I-Interno ou E=Externo. Código : ")+cCodMP+" - Ansul : "+cAnsul)
+		Aadd(aLog,"Informação Ansul Invalida.. Deve conter Branco, N=Não, I-Interno ou E=Externo. Código : "+cCodMP+" - Ansul : "+cAnsul+" ("+RTRIM(STR(nLinha))+")")
 		FT_FSKIP()
+		lContinua := .F.	
 		Loop
 	EndIf
 
 	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 	//³ Verifica se já existe estrutura cadastrada. Só alguns usuários pode re-importar. ³
 	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	If !RetCodUsr() $ GetMv("AM_M04A02")		//#8213
+	dbSelectArea("SG1")
+	dbSetOrder(1)
+	If dbSeek(xFilial("SG1")+cCodPA)
+		lExistEstru := .T.
 
-		// Deletando a Estrutura Atual
-		dbSelectArea("SG1")
-		dbSetOrder(1)
-		If dbSeek(xFilial("SG1")+cCodPA)
-			MsgStop(OemToAnsi("Usuario sem acesso para importar/atualizar estrutura já existente : ")+cCodPA)
-			Aadd(aLog,"Usuario sem acesso para importar/atualizar estrutura já existente : "+cCodPA)
+		Aadd(aLog,"Produto com estrutura já existente : "+cCodPA+" ("+RTRIM(STR(nLinha))+")")
+
+		If !RetCodUsr() $ GetMv("AM_M04A02")		//#8213
+			//MsgStop(OemToAnsi("Usuario sem acesso para importar/atualizar estrutura já existente : ")+cCodPA)
+			Aadd(aLog,"Usuario sem acesso para importar/atualizar estrutura já existente : "+cCodPA+" ("+RTRIM(STR(nLinha))+")")
+
+			FT_FSKIP()
+
+			lContinua := .F.
+			Loop //Exit
 		EndIf
-
-		FT_FSKIP()
-
-		lContinua := .F.
-		Exit
 	EndIf
+
+	/*
+	//Não fazer a validação da estrutura do Componente - #MONTES20250626 - SOLIC.VINICIUS
+	dbSelectArea("SG1")
+	dbSetOrder(1)
+	If dbSeek(xFilial("SG1")+cCodMP)
+		lExistEstru := .T.
+
+		Aadd(aLog,"Produto com estrutura já existente : "+cCodMP+" ("+RTRIM(STR(nLinha))+")")
+
+		If !RetCodUsr() $ GetMv("AM_M04A02")		//#8213
+			//MsgStop(OemToAnsi("Usuario sem acesso para importar/atualizar estrutura já existente : ")+cCodMP)
+			Aadd(aLog,"Usuario sem acesso para importar/atualizar estrutura já existente : "+cCodMP+" ("+RTRIM(STR(nLinha))+")")
+
+			FT_FSKIP()
+
+			lContinua := .F.
+			Loop //Exit
+		EndIf
+	EndIf
+	*/
 
 	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 	//³ Valida duplicidade.                                   ³
 	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 	nPosStr	:= aScan(aStruct,{|x| AllTrim(x[1])+AllTrim(x[2])+AllTrim(x[10]) == cCodPA+cCodMP+cSeqTRT})
 	If nPosStr > 0   //.and. !RetCodUsr() $ GetMv("AM_M04A02")											//#8213
-		MsgStop(OemToAnsi("Existem componentes iguais na estrutura com a mesma sequência Pai/Filho/TRT : ")+cCodPA+cCodMP+cSeqTRT)
-		Aadd(aLog,"Existem componentes iguais na estrutura com a mesma sequência Pai/Filho/TRT : "+cCodPA+cCodMP+cSeqTRT)
+		//MsgStop(OemToAnsi("Existem componentes iguais na estrutura com a mesma sequência Pai/Filho/TRT : ")+cCodPA+cCodMP+cSeqTRT)
+		Aadd(aLog,"Existem componentes iguais na estrutura com a mesma sequência Pai/Filho/TRT : "+cCodPA+cCodMP+cSeqTRT+" ("+RTRIM(STR(nLinha))+")")
 		FT_FSKIP()
+		lContinua := .F.
 		Loop
 	EndIf
 
@@ -325,325 +361,331 @@ EndDo
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 FT_FUSE()
 
-If !lContinua
-	RestArea(aAreaSG1)
-	Return
+//If !lContinua
+//	RestArea(aAreaSG1)
+//	Return
+//EndIf
+
+If 	lContinua .And. lExistEstru
+	If Aviso("PRODUTOJAEXISTE",OemToAnsi("Produtos com estruturas já existentes!"),{"Abandona","Sobrepõe"}) = 1
+		lContinua := .F.
+	EndIf
 EndIf
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Verificacao da Quantidade de Estruturas ou Sub-estruturas (Resumo       ³
-//³ das Estruturas a serem importadas)                                      ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-
-//MsgStop("teste 4")
-
-aQtdEstru := {}
-For nProc := 1 To Len(aStruct)
-
-	nPos	:= aScan(aQtdEstru,{|x| AllTrim(x[1]) == AllTrim(aStruct[nProc,1])})
-	If nPos == 0
-		Aadd(aQtdEstru,{aStruct[nProc,1],;
-		1,;
-		Space(3),;
-		.F.,;
-		aStruct[nProc,2],;
-		aStruct[nProc,3],;
-		aStruct[nProc,8]})  // Codigo, Quant de Produtos, Revisao, Usou ja cadastrada ou Importou e Qtd.Comp, qtd, Perda
-
-	Else
-		aQtdEstru[nPos,2] ++
-//		If aStruct[nProc,07] $ "MP/PA/PI"
-//			aQtdEstru[nPos,6] += aStruct[nProc,3]
-//		EndIf
-	EndIf
-	
-Next
-
-ProcRegua(Len(aQtdEstru))
-
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Verificacao de Estrutura ja existente para cada SubEstruturas           ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-For nProc := 1 To Len(aQtdEstru)
-	
-	IncProc("Gravando Estrutura...")
-	
-	cProduto    := Left(aQtdEstru[nProc,1]+Space(15),15)
-	//cDescProd := aQtdEstru[nProc,5]
-	nQtdEmb     := 1  //aQtdEstru[nProc,7]
-	
-	aEstrImp := {}
-	
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Verifica se a formula fecha 100%. ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-//	If aQtdEstru[nProc,6] <> 1.000000
-//		Aadd(aLog,"Formula do Produto "+cProduto+" nao fechada !"+TransForm(aQtdEstru[nProc,6] ,"999,999.999999"))
-//		Exit
-//	EndIf
-	
+If lContinua
 	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Alimenta uma matriz somente com a SubEstrutura Corrente                 ³
+	//³ Verificacao da Quantidade de Estruturas ou Sub-estruturas (Resumo       ³
+	//³ das Estruturas a serem importadas)                                      ³
 	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	For nProc3 := 1 To Len(aStruct)
+	aQtdEstru := {}
+	For nProc := 1 To Len(aStruct)
 
-		If AllTrim(aStruct[nProc3,1]) == AllTrim(cProduto)
+		nPos	:= aScan(aQtdEstru,{|x| AllTrim(x[1]) == AllTrim(aStruct[nProc,1])})
+		If nPos == 0
+			Aadd(aQtdEstru,{aStruct[nProc,1],;
+			1,;
+			Space(3),;
+			.F.,;
+			aStruct[nProc,2],;
+			aStruct[nProc,3],;
+			aStruct[nProc,8]})  // Codigo, Quant de Produtos, Revisao, Usou ja cadastrada ou Importou e Qtd.Comp, qtd, Perda
 
-//			If aScan(aEstrImp,{|x| AllTrim(x[1])+AllTrim(x[2])+AllTrim(x[6]) == ;
-//				AllTrim(aStruct[nProc3,1])+AllTrim(aStruct[nProc3,2])+AllTrim(aStruct[nProc3,10]) }) == 0
-
-				Aadd(aEstrImp,{aStruct[nProc3,1],;
-				aStruct[nProc3,2],;
-				aStruct[nProc3,3],;
-				aStruct[nProc3,8],;
-				aStruct[nProc3,9],;
-				aStruct[nProc3,10]})
-
-//			EndIf
+		Else
+			aQtdEstru[nPos,2] ++
+	//		If aStruct[nProc,07] $ "MP/PA/PI"
+	//			aQtdEstru[nPos,6] += aStruct[nProc,3]
+	//		EndIf
 		EndIf
-	Next
-	
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Busca a Quantidade de revisoes do Produto.                              ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	/*/
-	cQuery := " SELECT REVISAO AS REVISAO FROM ("
-	cQuery += " SELECT SG1.G1_REVINI AS REVISAO "
-	cQuery += " FROM "+RetSqlName("SG1")+" SG1"
-	cQuery += " WHERE SG1.G1_FILIAL = '"+xFilial("SG1")+"' AND SG1.D_E_L_E_T_ <> '*'"
-	cQuery += " AND SG1.G1_COD = '"+cProduto+"'"
-	cQuery += " GROUP BY G1_REVINI"
-	cQuery += " UNION "
-	
-	cQuery += " SELECT SG1.G1_REVFIM AS REVISAO "
-	cQuery += " FROM "+RetSqlName("SG1")+" SG1 "
-	cQuery += " WHERE SG1.G1_FILIAL = '"+xFilial("SG1")+"' AND SG1.D_E_L_E_T_ <> '*'"
-	cQuery += " AND SG1.G1_COD = '"+cProduto+"'"
-	cQuery += " GROUP BY G1_REVFIM )  TAB "
-	cQuery += " ORDER BY REVISAO "
-	
-	aRetRev := U_QryArr(cQuery)
-	
-	lUsouEstru := .F.
-//	cProxRev   := "001"
-	cRevisao   := "   "
-	cProxSequen := "   "
-	/*/
-
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Verifica a Estrutura de cada Revisao. 		                            ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-/*/	
-	For nProc2 := 1 To Len(aRetRev)
 		
-		cRevisao := aRetRev[nProc2,1]
-		cQuery := " SELECT SG1.G1_COD, SG1.G1_COMP, SG1.G1_QUANT, SB1.B1_TIPO  "
-		cQuery += " FROM "+RetSqlName("SG1")+" SG1 ,"+ RetSqlName("SB1")+" SB1 ,"
-		cQuery += " WHERE SG1.G1_FILIAL = '"+xFilial("SG1")+"' AND SG1.D_E_L_E_T_ <> '*'"
-		cQuery += " AND SB1.B1_FILIAL = '"+xFilial("SB1")+"' AND SB1.D_E_L_E_T_ <> '*'"
-		cQuery += " AND SG1.G1_COD = '"+cProduto+"'"
-		cQuery += " AND SB1.B1_COD = SG1.G1_COMP "
-		cQuery += " AND '"+cRevisao+"' BETWEEN SG1.G1_REVINI AND SG1.G1_REVFIM "
-		cQuery += " ORDER BY G1_COMP "
-		aRetEstr := U_QryArr(cQuery)
+	Next
 
+	ProcRegua(Len(aQtdEstru))
+
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Verificacao de Estrutura ja existente para cada SubEstruturas           ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	For nProc := 1 To Len(aQtdEstru)
+		
+		IncProc("Gravando Estrutura...")
+		
+		cProduto    := Left(aQtdEstru[nProc,1]+Space(15),15)
+		//cDescProd := aQtdEstru[nProc,5]
+		nQtdEmb     := 1  //aQtdEstru[nProc,7]
+		
+		aEstrImp := {}
+		
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Verifica se a formula fecha 100%. ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	//	If aQtdEstru[nProc,6] <> 1.000000
+	//		Aadd(aLog,"Formula do Produto "+cProduto+" nao fechada !"+TransForm(aQtdEstru[nProc,6] ,"999,999.999999")+" ("+RTRIM(STR(nLinha))+")")
+	//		Exit
+	//	EndIf
+		
 		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-		//³ Processa a comparacao da Estrutura ou SubStrutura                       ³
+		//³ Alimenta uma matriz somente com a SubEstrutura Corrente                 ³
 		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-		If Len(aRetEstr) == Len(aEstrImp)
-			
-			aRetEstr := aSort(aRetEstr,,,{|x,y| x[2] > y[2]})
-			aEstrImp := aSort(aEstrImp,,,{|x,y| x[2] > y[2]})
-			For nProc4 := 1 To Len(aRetEstr)
-				
-				//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-				//³ Nao compara Embalagens e Etiquetas.                                     ³
-				//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-				//            If aRetEstr[nProc4,4] <> "MP"
-				//               Loop
-				//     EndIf
-				
-				//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-				//³ Checa o componente e a quantidade da estrutura com o da importada. ³
-				//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-				If AllTrim(aRetEstr[nProc4,2]) <> AllTrim(aEstrImp[nProc4,2]) .Or. aRetEstr[nProc4,3] <> aEstrImp[nProc4,3]
-					lUsouEstru := .F.
-					Exit
-				EndIf
-				lUsouEstru := .T.
-			Next
-		EndIf
+		For nProc3 := 1 To Len(aStruct)
 
-		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-		//³ Aborta verificacao quando encontrar uma semelhante. ³
-		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-		If lUsouEstru
-			Exit
-		EndIf
-		
-		cProxRev := If(cRevisao=="   ","001",Soma1(cRevisao))
-		cProxSequen := If(cProxSequen=="   ","001",Soma1(cProxSequen))
-	Next
-/*/
+			If AllTrim(aStruct[nProc3,1]) == AllTrim(cProduto)
 
-	//   Begin Transaction
-	
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Grava uma nova estrutura aproveitando os itens semelhantes da ultima. ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-//	If !lUsouEstru
-		
-		// cRevisao := cProxRev
-		// cProxSequen := If(cProxSequen	=="   ","001",Soma1(cProxSequen))
-		
-		For nProc4 := 1 To Len(aEstrImp)
-			
-			lCria       := .T.
-			cComp :=  Left(aEstrImp[nProc4,2]+Space(15),15)
+	//			If aScan(aEstrImp,{|x| AllTrim(x[1])+AllTrim(x[2])+AllTrim(x[6]) == ;
+	//				AllTrim(aStruct[nProc3,1])+AllTrim(aStruct[nProc3,2])+AllTrim(aStruct[nProc3,10]) }) == 0
 
-			//³ Deleta todas do mesmo nível
-			If Ascan(aStruDel,cProduto) == 0 
-				Aadd(aStruDel,cProduto)
+					Aadd(aEstrImp,{aStruct[nProc3,1],;
+					aStruct[nProc3,2],;
+					aStruct[nProc3,3],;
+					aStruct[nProc3,8],;
+					aStruct[nProc3,9],;
+					aStruct[nProc3,10]})
 
-				// Deletando a Estrutura Atual
-				dbSelectArea("SG1")
-				dbSetOrder(1)
-				dbSeek(xFilial("SG1")+cProduto)
-				While !Eof() .And. SG1->G1_FILIAL == xFilial("SG1") .And. ;
-					SG1->G1_COD == cProduto
-					
-					//If (SG1->G1_REVINI >= cRevisao .And. SG1->G1_REVFIM <= cRevisao) .And. ;
-					//	SG1->G1_QUANT == aEstrImp[nProc4,3]
-					//	RecLock("SG1",.F.)
-					//	SG1->G1_REVFIM := cProxRev
-					//	MsUnLock()
-					//	lCria := .F.
-					//EndIf
-					//cProxSequen := If(SG1->G1_TRT=="   ","001",Soma1(SG1->G1_TRT))
-
-					// Gravar os recnos numa matriz e reaproveitar o registro
-					Aadd(aRecDel,Recno())
-
-					RecLock("SG1",.F.)
-					dbDelete()
-					MsUnLock()
-
-					dbSkip()
-				EndDo
-			Endif
-
-			cProxSequen := "   "
-
-			// Define a proxima sequencia do TRT
-			/*/
-			dbSelectArea("SG1")
-			dbSetOrder(1)
-			dbSeek(xFilial("SG1")+cProduto+cComp)
-			While !Eof() .And. SG1->G1_FILIAL == xFilial("SG1") .And. ;
-				SG1->G1_COD == cProduto .And. ;
-				SG1->G1_COMP == cComp
-			
-				cProxSequen := If(SG1->G1_TRT=="   ","001",Soma1(SG1->G1_TRT))
-				dbSkip()
-			EndDo
-			/*/
-
-			If lCria
-				//If Len(aRecDel) > 0
-				//	dbGoto(aRecDel[1])
-				//	RecLock("SG1",.F.)
-				//	ADEL(aRecDel,1)
-				//	ASIZE(aCols,Len(aCols)-1)
-				//Else
-					RecLock("SG1",.T.)
-				//EndIf
-				SG1->G1_FILIAL := xFilial("SG1")
-				SG1->G1_COD    := cProduto
-				SG1->G1_COMP   := aEstrImp[nProc4,2]
-				SG1->G1_TRT    := aEstrImp[nProc4,6]  //cProxSequen
-				SG1->G1_QUANT  := aEstrImp[nProc4,3]
-//				SG1->G1_INI    := FirstDay(dDataBase)
-				SG1->G1_INI    := Ctod("01/01/2024")
-				SG1->G1_FIM    := Ctod("31/12/2049")
-				SG1->G1_FIXVAR := "V"
-				SG1->G1_PERDA  := aEstrImp[nProc4,4]
-//				SG1->G1_REVINI := cProxRev
-//				SG1->G1_REVFIM := cProxRev
-				SG1->G1_REVINI := "   "
-				SG1->G1_REVFIM := "ZZZ"
-				SG1->G1_NIV    := "01"   // Tratar
-				SG1->G1_NIVINV := "99"   // Tratar
-				SG1->G1_XANSUL := If(aEstrImp[nProc4,5]=="I","1",If(aEstrImp[nProc4,5]=="E","2","3"))
-				MsUnLock()
+	//			EndIf
 			EndIf
 		Next
-		aQtdEstru[nProc,4] := .F.  // Nao usou revisao cadastrada
 		
-//	Else
-//		aQtdEstru[nProc,4] := .T. // Usou revisao cadastrada
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Busca a Quantidade de revisoes do Produto.                              ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		/*/
+		cQuery := " SELECT REVISAO AS REVISAO FROM ("
+		cQuery += " SELECT SG1.G1_REVINI AS REVISAO "
+		cQuery += " FROM "+RetSqlName("SG1")+" SG1"
+		cQuery += " WHERE SG1.G1_FILIAL = '"+xFilial("SG1")+"' AND SG1.D_E_L_E_T_ <> '*'"
+		cQuery += " AND SG1.G1_COD = '"+cProduto+"'"
+		cQuery += " GROUP BY G1_REVINI"
+		cQuery += " UNION "
 		
-//	EndIf
-//	aQtdEstru[nProc,3] := If(lUsouEstru,cRevisao,cProxRev)
-	
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Cria Registro no cadastro de revisao de Produtos                  ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	dbSelectArea("SG5")
-	dbSetOrder(1)
-	If !dbSeek(xFilial("SG5")+cProduto+Space(3))
-		RecLock("SG5",.T.)
-		SG5->G5_FILIAL  := xFilial("SG5")
-		SG5->G5_PRODUTO := cProduto
-//		SG5->G5_REVISAO := If(lUsouEstru,cRevisao,cProxRev)
-	Else
-		RecLock("SG5",.F.)
-	EndIf
-	SG5->G5_DATAREV := dDataBase
-	MsUnLock()
+		cQuery += " SELECT SG1.G1_REVFIM AS REVISAO "
+		cQuery += " FROM "+RetSqlName("SG1")+" SG1 "
+		cQuery += " WHERE SG1.G1_FILIAL = '"+xFilial("SG1")+"' AND SG1.D_E_L_E_T_ <> '*'"
+		cQuery += " AND SG1.G1_COD = '"+cProduto+"'"
+		cQuery += " GROUP BY G1_REVFIM )  TAB "
+		cQuery += " ORDER BY REVISAO "
+		
+		aRetRev := U_QryArr(cQuery)
+		
+		lUsouEstru := .F.
+	//	cProxRev   := "001"
+		cRevisao   := "   "
+		cProxSequen := "   "
+		/*/
 
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Atualiza Pré Estrutura. ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	M04M02Pre(cProduto,aEstrImp)
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Verifica a Estrutura de cada Revisao. 		                            ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	/*/	
+		For nProc2 := 1 To Len(aRetRev)
+			
+			cRevisao := aRetRev[nProc2,1]
+			cQuery := " SELECT SG1.G1_COD, SG1.G1_COMP, SG1.G1_QUANT, SB1.B1_TIPO  "
+			cQuery += " FROM "+RetSqlName("SG1")+" SG1 ,"+ RetSqlName("SB1")+" SB1 ,"
+			cQuery += " WHERE SG1.G1_FILIAL = '"+xFilial("SG1")+"' AND SG1.D_E_L_E_T_ <> '*'"
+			cQuery += " AND SB1.B1_FILIAL = '"+xFilial("SB1")+"' AND SB1.D_E_L_E_T_ <> '*'"
+			cQuery += " AND SG1.G1_COD = '"+cProduto+"'"
+			cQuery += " AND SB1.B1_COD = SG1.G1_COMP "
+			cQuery += " AND '"+cRevisao+"' BETWEEN SG1.G1_REVINI AND SG1.G1_REVFIM "
+			cQuery += " ORDER BY G1_COMP "
+			aRetEstr := U_QryArr(cQuery)
 
-	//   End Transaction
-Next
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Processa a comparacao da Estrutura ou SubStrutura                       ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			If Len(aRetEstr) == Len(aEstrImp)
+				
+				aRetEstr := aSort(aRetEstr,,,{|x,y| x[2] > y[2]})
+				aEstrImp := aSort(aEstrImp,,,{|x,y| x[2] > y[2]})
+				For nProc4 := 1 To Len(aRetEstr)
+					
+					//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+					//³ Nao compara Embalagens e Etiquetas.                                     ³
+					//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+					//            If aRetEstr[nProc4,4] <> "MP"
+					//               Loop
+					//     EndIf
+					
+					//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+					//³ Checa o componente e a quantidade da estrutura com o da importada. ³
+					//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+					If AllTrim(aRetEstr[nProc4,2]) <> AllTrim(aEstrImp[nProc4,2]) .Or. aRetEstr[nProc4,3] <> aEstrImp[nProc4,3]
+						lUsouEstru := .F.
+						Exit
+					EndIf
+					lUsouEstru := .T.
+				Next
+			EndIf
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Exibe Resumo de Revisoes utilizadas ou Criadas. ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Alimenta aHeader. ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-aHeader:={}
-Aadd(aHeader,{ "Seq"       , "SEQ"     , "@!",03 , 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "C","TRB"})
-Aadd(aHeader,{ "Produto"   , "PRODUTO" , "@!",15 , 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "C","TRB"})
-Aadd(aHeader,{ "Descricao" , "DESCRIC" , "@!",20 , 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "C","TRB"})
-Aadd(aHeader,{ "Qtd.PI/MP" , "QTDPIMP" , "@E 999,999.999",06, 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "N","TRB"})
-Aadd(aHeader,{ "Revisao"   , "REVISAO" , "@!",03 , 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "C","TRB"})
-//Aadd(aHeader,{ "Qtd.Emb."  , "QTDEMB"  , "@E 999",00 , 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "C","TRB"})
-Aadd(aHeader,{ "Status"    , "STATUS"  , "@!",20 , 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "C","TRB"})
-nUsado := 4
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Aborta verificacao quando encontrar uma semelhante. ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			If lUsouEstru
+				Exit
+			EndIf
+			
+			cProxRev := If(cRevisao=="   ","001",Soma1(cRevisao))
+			cProxSequen := If(cProxSequen=="   ","001",Soma1(cProxSequen))
+		Next
+	/*/
 
-_nItem := 0
-Acols:={}
-For nProc5 := 1 To Len(aQtdEstru)
-	_nItem++
-	
-	dbSelectArea("SB1")
-	dbSetOrder(1)
-	dbSeek(xFilial("SB1")+aQtdEstru[nProc5,1])
-	Aadd(Acols,{StrZero(_nItem,3),aQtdEstru[nProc5,1],Left(SB1->B1_DESC,30),aQtdEstru[nProc5,2],aQtdEstru[nProc5,3],If(aQtdEstru[nProc5,4],"Re-Utilizada Revisao","Criada Nova Revisao"),.F.})
+		//   Begin Transaction
+		
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Grava uma nova estrutura aproveitando os itens semelhantes da ultima. ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	//	If !lUsouEstru
+			
+			// cRevisao := cProxRev
+			// cProxSequen := If(cProxSequen	=="   ","001",Soma1(cProxSequen))
+			
+			For nProc4 := 1 To Len(aEstrImp)
+				
+				lCria       := .T.
+				cComp :=  Left(aEstrImp[nProc4,2]+Space(15),15)
 
-Next
+				//³ Deleta todas do mesmo nível
+				If Ascan(aStruDel,cProduto) == 0 
+					Aadd(aStruDel,cProduto)
 
-@ 150,1 TO 430,630 Dialog oDlg1 Title "Resumo da Importacao"
+					// Deletando a Estrutura Atual
+					dbSelectArea("SG1")
+					dbSetOrder(1)
+					dbSeek(xFilial("SG1")+cProduto)
+					While !Eof() .And. SG1->G1_FILIAL == xFilial("SG1") .And. ;
+						SG1->G1_COD == cProduto
+						
+						//If (SG1->G1_REVINI >= cRevisao .And. SG1->G1_REVFIM <= cRevisao) .And. ;
+						//	SG1->G1_QUANT == aEstrImp[nProc4,3]
+						//	RecLock("SG1",.F.)
+						//	SG1->G1_REVFIM := cProxRev
+						//	MsUnLock()
+						//	lCria := .F.
+						//EndIf
+						//cProxSequen := If(SG1->G1_TRT=="   ","001",Soma1(SG1->G1_TRT))
 
-//	@ 030,020 TO 115,210 Multiline Modify Delete Valid LineOk() Object oLinhas
-@ 010,010 TO 105,300 Multiline Object oLinhas
-@ 115,270 BmpButton Type 1 Action Close(oDlg1)
+						// Gravar os recnos numa matriz e reaproveitar o registro
+						Aadd(aRecDel,Recno())
 
-Activate Dialog oDlg1 Centered
+						RecLock("SG1",.F.)
+						dbDelete()
+						MsUnLock()
+
+						dbSkip()
+					EndDo
+				Endif
+
+				cProxSequen := "   "
+
+				// Define a proxima sequencia do TRT
+				/*/
+				dbSelectArea("SG1")
+				dbSetOrder(1)
+				dbSeek(xFilial("SG1")+cProduto+cComp)
+				While !Eof() .And. SG1->G1_FILIAL == xFilial("SG1") .And. ;
+					SG1->G1_COD == cProduto .And. ;
+					SG1->G1_COMP == cComp
+				
+					cProxSequen := If(SG1->G1_TRT=="   ","001",Soma1(SG1->G1_TRT))
+					dbSkip()
+				EndDo
+				/*/
+
+				If lCria
+					//If Len(aRecDel) > 0
+					//	dbGoto(aRecDel[1])
+					//	RecLock("SG1",.F.)
+					//	ADEL(aRecDel,1)
+					//	ASIZE(aCols,Len(aCols)-1)
+					//Else
+						RecLock("SG1",.T.)
+					//EndIf
+					SG1->G1_FILIAL := xFilial("SG1")
+					SG1->G1_COD    := cProduto
+					SG1->G1_COMP   := aEstrImp[nProc4,2]
+					SG1->G1_TRT    := aEstrImp[nProc4,6]  //cProxSequen
+					SG1->G1_QUANT  := aEstrImp[nProc4,3]
+	//				SG1->G1_INI    := FirstDay(dDataBase)
+					SG1->G1_INI    := Ctod("01/01/2024")
+					SG1->G1_FIM    := Ctod("31/12/2049")
+					SG1->G1_FIXVAR := "V"
+					SG1->G1_PERDA  := aEstrImp[nProc4,4]
+	//				SG1->G1_REVINI := cProxRev
+	//				SG1->G1_REVFIM := cProxRev
+					SG1->G1_REVINI := "   "
+					SG1->G1_REVFIM := "ZZZ"
+					SG1->G1_NIV    := "01"   // Tratar
+					SG1->G1_NIVINV := "99"   // Tratar
+					SG1->G1_XANSUL := If(aEstrImp[nProc4,5]=="I","1",If(aEstrImp[nProc4,5]=="E","2","3"))
+					MsUnLock()
+				EndIf
+			Next
+			aQtdEstru[nProc,4] := .F.  // Nao usou revisao cadastrada
+			
+	//	Else
+	//		aQtdEstru[nProc,4] := .T. // Usou revisao cadastrada
+			
+	//	EndIf
+	//	aQtdEstru[nProc,3] := If(lUsouEstru,cRevisao,cProxRev)
+		
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Cria Registro no cadastro de revisao de Produtos                  ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		dbSelectArea("SG5")
+		dbSetOrder(1)
+		If !dbSeek(xFilial("SG5")+cProduto+Space(3))
+			RecLock("SG5",.T.)
+			SG5->G5_FILIAL  := xFilial("SG5")
+			SG5->G5_PRODUTO := cProduto
+	//		SG5->G5_REVISAO := If(lUsouEstru,cRevisao,cProxRev)
+		Else
+			RecLock("SG5",.F.)
+		EndIf
+		SG5->G5_DATAREV := dDataBase
+		MsUnLock()
+
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Atualiza Pré Estrutura. ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		M04M02Pre(cProduto,aEstrImp)
+
+		//   End Transaction
+	Next
+
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Exibe Resumo de Revisoes utilizadas ou Criadas. ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Alimenta aHeader. ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	aHeader:={}
+	Aadd(aHeader,{ "Seq"       , "SEQ"     , "@!",03 , 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "C","TRB"})
+	Aadd(aHeader,{ "Produto"   , "PRODUTO" , "@!",15 , 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "C","TRB"})
+	Aadd(aHeader,{ "Descricao" , "DESCRIC" , "@!",20 , 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "C","TRB"})
+	Aadd(aHeader,{ "Qtd.PI/MP" , "QTDPIMP" , "@E 999,999.999",06, 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "N","TRB"})
+	Aadd(aHeader,{ "Revisao"   , "REVISAO" , "@!",03 , 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "C","TRB"})
+	//Aadd(aHeader,{ "Qtd.Emb."  , "QTDEMB"  , "@E 999",00 , 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "C","TRB"})
+	Aadd(aHeader,{ "Status"    , "STATUS"  , "@!",20 , 00,".F.","ÇÇÇÇÇÇÇÇÇÇÇÇÇÇá", "C","TRB"})
+	nUsado := 4
+
+	_nItem := 0
+	Acols:={}
+	For nProc5 := 1 To Len(aQtdEstru)
+		_nItem++
+		
+		dbSelectArea("SB1")
+		dbSetOrder(1)
+		dbSeek(xFilial("SB1")+aQtdEstru[nProc5,1])
+		Aadd(Acols,{StrZero(_nItem,3),aQtdEstru[nProc5,1],Left(SB1->B1_DESC,30),aQtdEstru[nProc5,2],aQtdEstru[nProc5,3],If(aQtdEstru[nProc5,4],"Re-Utilizada Revisao","Criada Nova Revisao"),.F.})
+
+	Next
+
+	@ 150,1 TO 430,630 Dialog oDlg1 Title "Resumo da Importacao"
+
+	//	@ 030,020 TO 115,210 Multiline Modify Delete Valid LineOk() Object oLinhas
+	@ 010,010 TO 105,300 Multiline Object oLinhas
+	@ 115,270 BmpButton Type 1 Action Close(oDlg1)
+
+	Activate Dialog oDlg1 Centered
+
+EndIf
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Renomeia o arquivo para processado. ³
