@@ -98,7 +98,7 @@ If mv_par06 == 1  // Com Endereço
 EndIf
 cQry += " WHERE B1_FILIAL = '"+xFilial("SB1")+"'"+cEOL
 cQry += " AND B1_COD BETWEEN '"+mv_par01+"' AND '"+mv_par02+"' "+cEOL
-cQry += " AND B1_TIPO IN ('BN','EM','ME','MI','MP','PA','PI','PP') "+cEOL
+cQry += " AND B1_TIPO IN ('BN','EM','ME','MI','MP','PA','PI','PP','MF') "+cEOL
 cQry += " AND SB1.D_E_L_E_T_ <> '*' "+cEOL
 
 cQry += " AND B2_FILIAL = '"+xFilial("SB2")+"'"+cEOL
@@ -116,7 +116,7 @@ If mv_par06 == 1  // Com Endereço
 	cQry += " AND BF_FILIAL = '"+xFilial("SBF")+"'"+cEOL
 	cQry += " AND BF_PRODUTO = B1_COD "+cEOL
 	cQry += " AND BF_LOCAL BETWEEN '"+mv_par03+"' AND '"+mv_par04+"' "+cEOL
-	cQry += " AND LEFT(BF_LOCALIZ,8) BETWEEN '"+mv_par08+"' AND '"+mv_par09+"' "+cEOL
+	cQry += " AND LEFT(BF_LOCALIZ,11) BETWEEN '"+mv_par08+"' AND '"+mv_par09+"' "+cEOL
 	cQry += " AND SBF.D_E_L_E_T_ <> '*' "+cEOL
 //	cQry += " ORDER BY B2_LOCAL, BF_LOCALIZ "+cEOL
 //	cQry += " ORDER BY B1_COD, BF_LOCALIZ "+cEOL
@@ -175,7 +175,7 @@ While TRB_SB1->(!Eof())
 //	EndIf
 
 	If mv_par06 == 1
-		cEndere := Left(TRB_SB1->LOCALIZ,8)
+		cEndere := Left(TRB_SB1->LOCALIZ,11)
 
 		nTotLocaliz := TRB_SB1->QTD_LOCALIZ
 		If TRB_SB1->PRODUTO == cProduto
@@ -235,7 +235,7 @@ cQry := "SELECT B1_COD PRODUTO, B1_DESC DESCRI, B1_UM UM, B1_CODBAR CODBAR, B1_X
 cQry += " FROM "+RetSqlName("SB1")+" SB1 ,"+RetSqlName("SBF")+" SBF "+cEOL
 cQry += " WHERE B1_FILIAL = '"+xFilial("SB1")+"'"+cEOL
 cQry += " AND B1_COD = '"+mv_par09+"' "+cEOL
-cQry += " AND B1_TIPO IN ('BN','EM','ME','MI','MP','PA','PI','PP') "+cEOL
+cQry += " AND B1_TIPO IN ('BN','EM','ME','MI','MP','PA','PI','PP','MF') "+cEOL
 cQry += " AND SB1.D_E_L_E_T_ <> '*' "+cEOL
 If mv_par06 == 1  // Com Endereço
 	cQry += " AND BF_FILIAL = '"+xFilial("SBF")+"'"+cEOL
@@ -376,7 +376,7 @@ For nX := 1 to Len(aDados)
 		nLinCodB  := 6.2
 
 		// PRIMEIRO BLOCO
-		oPrinter:Say(nLinha+20,nCol+90,"Inventário 2024",oFont16N)
+		oPrinter:Say(nLinha+20,nCol+90,"Inventário "+RIGHT(mv_par07,4),oFont16N)
 //		oPrinter:SayBitmap(nLinha+7,nCol+303, "\system\Logo_Macom.bmp", 45,35) //  71,190
 		oPrinter:SayBitmap(nLinha+13,nCol+270, "\system\Logo_Macom.bmp", 67,32) //  71,190
 
@@ -521,8 +521,8 @@ For nX := 1 to Len(aDados)
 			nLinCodB += 14.0
 
 			If 	lImpCont  //.And. mv_par08 = 1
-				cChavebarra := Left(cFicha,2)+SubStr(cFicha,4,4)+cCont+SB1->B1_COD+cEnderec
-				oPrinter:FWMSBAR("CODE128",nLinCodB,nColCodB,cChavebarra,oPrinter,.F.,,.T.,0.040,0.6,,,,.F.,)
+				cChavebarra := Left(cFicha,2)+SubStr(cFicha,4,4)+cCont+SB1->B1_COD//+RTRIM(cEnderec)
+				oPrinter:FWMSBAR("CODE128",nLinCodB,nColCodB,cChavebarra,oPrinter,.F.,,.T.,0.017/*0.040*/,0.6,,,,.F.,)
 
 			EndIf
 			//@param nRow Posição relativa ao topo
