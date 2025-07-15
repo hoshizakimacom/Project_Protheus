@@ -754,7 +754,7 @@ Retorna o Nome do Arquivo DXF na pasta do Servidor
 Static Function FileDXF(cProduto)
 
 Local cDirServer := "\produtos_anexos\"
-Local cSufixo    := "_DXF"
+Local cSufixo    := "DXF"
 Local cExtensao  := ".DXF"
 Local cFile    	 := ""
 Local aFiles     := {}

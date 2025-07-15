@@ -52,7 +52,7 @@ CLASS ClassAnexoProduto
 
 	METHOD Anexar()
 
-	METHOD SalvarAnexar()
+	METHOD SalvarAnexo()
 
 	METHOD Visualizar(cProduto)
 
@@ -87,9 +87,8 @@ Return
 //ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 METHOD Anexar() CLASS ClassAnexoProduto
 
-	//Local cMask		:= "Arquivo PDF|*.pdf| Projeto Revit|*.RFA| Arquivo DXF|*.DXF" //"Arquivo PDF|*.pdf| Arquivo PDF|*.PDF"
 	Local cFilePath	:= ""
-    Local cDirLocal := 'C:\temp\'
+    Local cDirLocal := 'c:\temp\'
     Local nProc5
 	Local aFiles    := {}
 	Local aPergs    := {}
@@ -101,8 +100,7 @@ METHOD Anexar() CLASS ClassAnexoProduto
 
 	If ::PodeVisualizar("UPLOAD")
 
-		//cFilePath := cGetFile(/*cMask*/,"Pasta Origem",0,cDirLocal,.F., GETF_LOCALHARD  + GETF_NETWORKDRIVE + GETF_RETDIRECTORY ,.T.)		
-		Aadd(aPergs, {6, "Pasta Origem",SPACE(100),"","","",100,.F.,/*cMask*/,cDirLocal,GETF_LOCALHARD  + GETF_NETWORKDRIVE + GETF_RETDIRECTORY}) //6
+		Aadd(aPergs, {6, "Pasta Origem",SPACE(100),"","","",100,.F.,"*.*"/*cMask*/,cDirLocal,GETF_RETDIRECTORY+GETF_LOCALHARD+GETF_NETWORKDRIVE}) //6
 
 		If !ParamBox(aPergs, "UPLOAD de arquivos para o Produto", @aRetPar,/*bOk*/,/*aButtons*/,/*lCentered*/,/*nPOSX*/,/*nPOSY*/,/*oDlgWIzard*/,/*cLoad*/,/*lCanSave*/,.T./*lUserSave*/)
 			cFilePath := ""
@@ -209,23 +207,23 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles,lSobrepor)
         cExtensao:= ""
         SPLITPATH( cFileName, @cDrive, @cCaminho, @cNome, @cExtensao )
 
-        cProduto  := LEFT(cNome,(AT("_",cNome)-1))
-        cSufixo   := LEFT(RIGHT(cNome,6),4)
+        cProduto  := LEFT(cNome,(LEN(cNome)-5))  
+        cSufixo   := LEFT(RIGHT(cNome,5),3) 
 		cRevisao  := RIGHT(cNome,2)
 		cDescProd := ""
 
         cOcorrencia := ""
-        If cSufixo == "_PDF" //"_DES"
+        If cSufixo == "PDF" //"DES"
             cTipoArq  := "Desenho do produto"
-        ElseIf cSufixo == "_COM"
+        ElseIf cSufixo == "COM"
             cTipoArq  := "Desenho de Componentes"
-        ElseIf cSufixo == "_FCT"
+        ElseIf cSufixo == "FCT"
             cTipoArq  := "Ficha técnica"
-        ElseIf cSufixo == "_MNL"
+        ElseIf cSufixo == "MNL"
             cTipoArq  := "Manual"
-        ElseIf cSufixo == "_RVT"
+        ElseIf cSufixo == "RVT"
             cTipoArq  := "Revit/Bloco 2D/3D"
-        ElseIf cSufixo == "_DXF" //"_COR"
+        ElseIf cSufixo == "DXF" //"COR"
             cTipoArq  := "DXF (Desenho de corte)"
         Else
             cTipoArq  := "Não identificado"
@@ -409,19 +407,19 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
 	EndIf
 
 	aPodeVis := {}
-	AADD(aPodeVis,::PodeVisualizar("_PDF"))
-	AADD(aPodeVis,::PodeVisualizar("_COM"))
-	AADD(aPodeVis,::PodeVisualizar("_FCT"))
-	AADD(aPodeVis,::PodeVisualizar("_MNL"))
-	AADD(aPodeVis,::PodeVisualizar("_RVT"))
-	AADD(aPodeVis,::PodeVisualizar("_DXF"))
+	AADD(aPodeVis,::PodeVisualizar("PDF"))
+	AADD(aPodeVis,::PodeVisualizar("COM"))
+	AADD(aPodeVis,::PodeVisualizar("FCT"))
+	AADD(aPodeVis,::PodeVisualizar("MNL"))
+	AADD(aPodeVis,::PodeVisualizar("RVT"))
+	AADD(aPodeVis,::PodeVisualizar("DXF"))
 
-    bClick_PDF		:=	{|| ::AbrirAnexo(cFileName+"_PDF",cFilePath) }
-    bClick_COM		:=	{|| ::AbrirAnexo(cFileName+"_COM",cFilePath) }
-    bClick_FCT		:=	{|| ::AbrirAnexo(cFileName+"_FCT",cFilePath) }
-    bClick_MNL		:=	{|| ::AbrirAnexo(cFileName+"_MNL",cFilePath) }
-    bClick_RVT		:=	{|| ::AbrirAnexo(cFileName+"_RVT",cFilePath) }
-    bClick_DXF		:=	{|| ::AbrirAnexo(cFileName+"_DXF",cFilePath) }
+    bClick_PDF		:=	{|| ::AbrirAnexo(cFileName+"PDF",cFilePath) }
+    bClick_COM		:=	{|| ::AbrirAnexo(cFileName+"COM",cFilePath) }
+    bClick_FCT		:=	{|| ::AbrirAnexo(cFileName+"FCT",cFilePath) }
+    bClick_MNL		:=	{|| ::AbrirAnexo(cFileName+"MNL",cFilePath) }
+    bClick_RVT		:=	{|| ::AbrirAnexo(cFileName+"RVT",cFilePath) }
+    bClick_DXF		:=	{|| ::AbrirAnexo(cFileName+"DXF",cFilePath) }
 
     bValid_PDF		:=	{|| aPodeVis[nPosPDF] }
     bValid_COM		:=	{|| aPodeVis[nPosCOM] }
@@ -439,7 +437,7 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
 
 	oGrpCo1 := TGROUP():New(000, 000, nLin-450, nCol-560/*600*/, "Estrutura de Produto - Visualiza Anexos", oDlg, CLR_HBLUE,, .T.)
 	//oGrpCo1:Align := CONTROL_ALIGN_ALLCLIENT
-	oTree := DbTree():New( 000, 000, nLin, nCol, oGrpCo1,{|| AtuBotao(oTree,.T.)},,.T.,,,'Produto/Componentes;Sentido Pre;_PDF;_COM;_FCT;_MNL;_RVT;_DXF')
+	oTree := DbTree():New( 000, 000, nLin, nCol, oGrpCo1,{|| AtuBotao(oTree,.T.)},,.T.,,,'Produto/Componentes;Sentido Pre;PDF;COM;FCT;MNL;RVT;DXF')
 	oTree:Align := CONTROL_ALIGN_ALLCLIENT
 
 	//oGrpCo2 := TGROUP():New(nLin-450, 000, nLin-250, nCol-600, "Dados do produto", oDlg, CLR_HBLUE,, .T.)
@@ -456,37 +454,37 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
 	If aPodeVis[nPosPDF]
 		oImgPDF := TBitmap():New(nLinIni+060,nCol+013,20,20,,cImgPDFNo,.T.,oDlg/*oGrpCo2*/,bClick_PDF,bClick_PDF,.F./*lScroll*/,.T./*lStretch*/,,,,bValid_PDF,.T.)
 		oImgPDF:Disable()
-	    oTSayPDF := TSay():New(nLinIni+085,nCol+010,{||"_PDF:Desenhos dos Produtos"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
+	    oTSayPDF := TSay():New(nLinIni+085,nCol+010,{||"PDF:Desenhos dos Produtos"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
 		nCol += 080
 	EndIf
 	If aPodeVis[nPosCOM]
 		oImgCOM := TBitmap():New(nLinIni+060,nCol+013,20,20,,cImgCOMNo,.T.,oDlg/*oGrpCo2*/,bClick_COM,bClick_COM,.F./*lScroll*/,.T./*lStretch*/,,,,bValid_COM,.T.)
 		oImgCOM:Disable()
-	    oTSayCOM := TSay():New(nLinIni+085,nCol+010,{||"_COM:Desenhos de Componentes"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
+	    oTSayCOM := TSay():New(nLinIni+085,nCol+010,{||"COM:Desenhos de Componentes"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
 		nCol += 080
 	EndIf
 	If aPodeVis[nPosFCT]
 		oImgFCT := TBitmap():New(nLinIni+060,nCol+013,20,20,,cImgFCTNo,.T.,oDlg/*oGrpCo2*/,bClick_FCT,bClick_FCT,.F./*lScroll*/,.T./*lStretch*/,,,,bValid_FCT,.T.)
 		oImgFCT:Disable()
-	    oTSayFCT := TSay():New(nLinIni+085,nCol+010,{||"_FCT:Ficha Técnica"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
+	    oTSayFCT := TSay():New(nLinIni+085,nCol+010,{||"FCT:Ficha Técnica"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
 		nCol += 080
 	EndIf
 	If aPodeVis[nPosMNL]
 		oImgMNL := TBitmap():New(nLinIni+060,nCol+013,20,20,,cImgMNLNo,.T.,oDlg/*oGrpCo2*/,bClick_MNL,bClick_MNL,.F./*lScroll*/,.T./*lStretch*/,,,,bValid_MNL,.T.)
 		oImgMNL:Disable()
-	    oTSayMNL := TSay():New(nLinIni+085,nCol+010,{||"_MNL:Manual"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
+	    oTSayMNL := TSay():New(nLinIni+085,nCol+010,{||"MNL:Manual"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
 		nCol += 080
 	EndIf
 	If aPodeVis[nPosRVT]
 		oImgRVT := TBitmap():New(nLinIni+060,nCol+013,20,20,,cImgRVTNo,.T.,oDlg/*oGrpCo2*/,bClick_RVT,bClick_RVT,.F./*lScroll*/,.T./*lStretch*/,,,,bValid_RVT,.T.)
 		oImgRVT:Disable()
-	    oTSayRVT := TSay():New(nLinIni+085,nCol+010,{||"_RVT:Revit/Bloco 2D/3D"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
+	    oTSayRVT := TSay():New(nLinIni+085,nCol+010,{||"RVT:Revit/Bloco 2D/3D"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
 		nCol += 080
 	EndIf
 	If aPodeVis[nPosDXF]
 		oImgDXF := TBitmap():New(nLinIni+060,nCol+013,20,20,,cImgDXFNo,.T.,oDlg/*oGrpCo2*/,bClick_DXF,bClick_DXF,.F./*lScroll*/,.T./*lStretch*/,,,,bValid_DXF,.T.)
 		oImgDXF:Disable()
-    	oTSayDXF := TSay():New(nLinIni+085,nCol+010,{||"_DXF:Desenho de Corte"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
+    	oTSayDXF := TSay():New(nLinIni+085,nCol+010,{||"DXF:Desenho de Corte"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
 	EndIf
 
     MontaEstru(oDlg,oTree)
@@ -504,7 +502,7 @@ cProdAux  := LEFT(cPrompt,AT(";",cPrompt)-1 /*TAMSX3("B1_COD")[1]+TAMSX3("B1_DES
 cFileName := ALLTRIM(LEFT(cPrompt,AT(" ",cPrompt)-1 /*TAMSX3("B1_COD")[1]*/))
 
 If aPodeVis[nPosPDF] 
-	If "_PDF" $ cPrompt
+	If ";PDF" $ cPrompt
 		oImgPDF:cBmpFile := cImgPDF
 		oImgPDF:Enable()
 	Else
@@ -513,7 +511,7 @@ If aPodeVis[nPosPDF]
 	EndIf
 EndIf
 If aPodeVis[nPosCOM] 
-	If "_COM" $ cPrompt
+	If ";COM" $ cPrompt
 		oImgCOM:cBmpFile := cImgCOM
 		oImgCOM:Enable()
 	Else
@@ -522,7 +520,7 @@ If aPodeVis[nPosCOM]
 	EndIf
 EndIf
 If aPodeVis[nPosFCT] 
-	If "_FCT" $ cPrompt
+	If ";FCT" $ cPrompt
 		oImgFCT:cBmpFile := cImgFCT
 		oImgFCT:Enable()
 	Else
@@ -531,7 +529,7 @@ If aPodeVis[nPosFCT]
 	EndIf
 EndIf
 If aPodeVis[nPosMNL] 
-	If "_MNL" $ cPrompt
+	If ";MNL" $ cPrompt
 		oImgMNL:cBmpFile := cImgMNL
 		oImgMNL:Enable()
 	Else
@@ -540,7 +538,7 @@ If aPodeVis[nPosMNL]
 	EndIf
 EndIf
 If aPodeVis[nPosRVT] 
-	If "_RVT" $ cPrompt 
+	If ";RVT" $ cPrompt 
 		oImgRVT:cBmpFile := cImgRVT
 		oImgRVT:Enable()
 	Else
@@ -549,7 +547,7 @@ If aPodeVis[nPosRVT]
 	EndIf
 EndIf
 If aPodeVis[nPosDXF] 
-	If "_DXF" $ cPrompt
+	If ";DXF" $ cPrompt
 		oImgDXF:cBmpFile := cImgDXF
 		oImgDXF:Enable()
 	Else
@@ -614,7 +612,7 @@ METHOD PodeVisualizar(cPrefixo) CLASS ClassAnexoProduto
  
 	Local lRet		:= .F.
 	Local aArea     := GetArea()
-	Local cField    := IIF(cPrefixo=="SOBREP","PA0_SOBREP",IIF(cPrefixo=="UPLOAD","PA0_UPLOAD","PA0_VIS"+STRTRAN(cPrefixo,"_","")))
+	Local cField    := IIF(cPrefixo=="SOBREP","PA0_SOBREP",IIF(cPrefixo=="UPLOAD","PA0_UPLOAD","PA0_VIS"+cPrefixo))
 
 	dbSelectArea("PA0")
 	dbSetOrder(1)
@@ -962,7 +960,7 @@ Static Function TemAnexo(cProduto)
 
 Local cDirServer := "\produtos_anexos\"
 Local cRet    	 := ""
-Local aSufixo 	 := { "_PDF", "_COM", "_FCT", "_MNL", "_RVT", "_DXF" }
+Local aSufixo 	 := { "PDF", "COM", "FCT", "MNL", "RVT", "DXF" }
 Local nX      	 := 0
 Local cXSPRE     := ""
 

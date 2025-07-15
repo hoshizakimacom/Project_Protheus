@@ -216,7 +216,7 @@ Static Function TemAnexo(cProduto,cDirDest,nArquivos)
 Local cDirServer := "\produtos_anexos\"
 Local aFile      := {}
 
-If LEN(aFile := Directory(cDirServer+RTRIM(cProduto)+"_PDF"+"*.*", "F")) > 0
+If LEN(aFile := Directory(cDirServer+RTRIM(cProduto)+"PDF"+"*.*", "F")) > 0
 	
 	nArquivos += 1
 	
