@@ -758,9 +758,14 @@ Local cSufixo    := "DXF"
 Local cExtensao  := ".DXF"
 Local cFile    	 := ""
 Local aFiles     := {}
+Local nF         := 0
 
-If LEN(aFiles := Directory(cDirServer+cProduto+cSufixo+"*"+cExtensao, "F")) > 0
-	cFile := aFiles[1,1]
+If LEN(aFiles := Directory(cDirServer+Alltrim(cProduto)+cSufixo+"*"+cExtensao, "F")) > 0
+	For nF := 1 To LEN(aFiles)
+		If cFile < aFiles[nF,1]
+			cFile := aFiles[nF,1]
+		EndIf
+	Next
 Else
 	cFile += Alltrim(cProduto)+cSufixo+"01"+cExtensao
 EndIf
