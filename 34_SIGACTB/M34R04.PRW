@@ -134,7 +134,7 @@ TRCell():New(oVenProd,"PEDIDO"	    ,/*Tabela*/ ,"Num.Pedido"		 ,PesqPict("SD2","
 TRCell():New(oVenProd,"VENDEDOR1"   ,/*Tabela*/ ,"Vendedor1"		 ,PesqPict("SC5","C5_VEND1")	,TamSx3("C5_VEND1")[1]      ,/*lPixel*/,{|| cCodVend})		// Código do Vendedor 1
 TRCell():New(oVenProd,"NOME_VEND1"  ,/*Tabela*/ ,"Nome Vendedor 1"	 ,PesqPict("SA3","A3_NOME")	    ,TamSx3("A3_NOME")[1]       ,/*lPixel*/,{|| cNomVend})		// Nome do Vendedor 1
 TRCell():New(oVenProd,"GERENCIA"    ,/*Tabela*/ ,"Gerencia"	         ,PesqPict("SA3","A3_NOME")	    ,TamSx3("A3_NOME")[1]       ,/*lPixel*/,{|| cNomGer })		// Nome do Gerente
-TRCell():New(oVenProd,"COMISSAO1"   ,/*Tabela*/ ,"Comissao"		     ,PesqPict("SC5","C5_COMIS1")	,TamSx3("C5_COMIS1")[1]     ,/*lPixel*/,{|| nComiss })		// Comissão do Vendedor 1
+TRCell():New(oVenProd,"COMISSAO1"   ,/*Tabela*/ ,"Comissao 1"	     ,PesqPict("SC5","C5_COMIS1")	,TamSx3("C5_COMIS1")[1]     ,/*lPixel*/,{|| nComiss })		// Comissão do Vendedor 1
 TRCell():New(oVenProd,"TPVENDA"     ,/*Tabela*/ ,"Tipo Venda"		 ,PesqPict("SC5","C5_XTPVEN")	,TamSx3("C5_XTPVEN")[1]     ,/*lPixel*/,{|| cXTpVen})		// Tipo de Venda
 TRCell():New(oVenProd,"POSIPI"      ,/*Tabela*/ ,"POSIPI"		     ,PesqPict("SB1","B1_POSIPI")	,TamSx3("B1_POSIPI")[1]     ,/*lPixel*/,{|| cPosIPI })		// Posição de IPI
 TRCell():New(oVenProd,"QUANT"       ,/*Tabela*/ ,"Qauntidade"        ,PesqPict("SD2","D2_QUANT")	,TamSx3("D2_QUANT")[1]      ,/*lPixel*/,{|| nQuant  })		// Quantidade
@@ -174,6 +174,15 @@ TRCell():New(oVenProd,"OBS"         ,/*Tabela*/ ,"Observações"       ,PesqPict("
 TRCell():New(oVenProd,"VENDEDOR2"   ,/*Tabela*/ ,"Vendedor2"		 ,PesqPict("SC5","C5_VEND2")	,TamSx3("C5_VEND2")[1]      ,/*lPixel*/,{|| cCoVend2})		// Código do Vendedor 2 #5761
 TRCell():New(oVenProd,"NOME_VEND2"  ,/*Tabela*/ ,"Nome Vendedor 2"	 ,PesqPict("SA3","A3_NOME")	    ,TamSx3("A3_NOME")[1]       ,/*lPixel*/,{|| cNoVend2})		// Nome do Vendedor 2   #5761
 TRCell():New(oVenProd,"COMISSAO2"   ,/*Tabela*/ ,"Comissao2"	     ,PesqPict("SC5","C5_COMIS2")	,TamSx3("C5_COMIS2")[1]     ,/*lPixel*/,{|| nComis2 })		// Comissão do Vendedor 2 #5778
+TRCell():New(oVenProd,"VENDEDOR3"   ,/*Tabela*/ ,"Vendedor3"		 ,PesqPict("SC5","C5_VEND3")	,TamSx3("C5_VEND3")[1]      ,/*lPixel*/,{|| cCoVend3})		// Código do Vendedor 3 #8778
+TRCell():New(oVenProd,"NOME_VEND3"  ,/*Tabela*/ ,"Nome Vendedor 3"	 ,PesqPict("SA3","A3_NOME")	    ,TamSx3("A3_NOME")[1]       ,/*lPixel*/,{|| cNoVend3})		// Nome do Vendedor 3   #8778
+TRCell():New(oVenProd,"COMISSAO3"   ,/*Tabela*/ ,"Comissao3"	     ,PesqPict("SC5","C5_COMIS3")	,TamSx3("C5_COMIS3")[1]     ,/*lPixel*/,{|| nComis3 })		// Comissão do Vendedor 3 #8778
+TRCell():New(oVenProd,"VENDEDOR4"   ,/*Tabela*/ ,"Vendedor4"		 ,PesqPict("SC5","C5_VEND4")	,TamSx3("C5_VEND4")[1]      ,/*lPixel*/,{|| cCoVend4})		// Código do Vendedor 4 #8778
+TRCell():New(oVenProd,"NOME_VEND4"  ,/*Tabela*/ ,"Nome Vendedor 4"	 ,PesqPict("SA3","A3_NOME")	    ,TamSx3("A3_NOME")[1]       ,/*lPixel*/,{|| cNoVend4})		// Nome do Vendedor 4   #8778
+TRCell():New(oVenProd,"COMISSAO4"   ,/*Tabela*/ ,"Comissao4"	     ,PesqPict("SC5","C5_COMIS4")	,TamSx3("C5_COMIS4")[1]     ,/*lPixel*/,{|| nComis4 })		// Comissão do Vendedor 4 #8778
+TRCell():New(oVenProd,"VENDEDOR5"   ,/*Tabela*/ ,"Vendedor5"		 ,PesqPict("SC5","C5_VEND5")	,TamSx3("C5_VEND5")[1]      ,/*lPixel*/,{|| cCoVend5})		// Código do Vendedor 5 #8778
+TRCell():New(oVenProd,"NOME_VEND5"  ,/*Tabela*/ ,"Nome Vendedor 5"	 ,PesqPict("SA3","A3_NOME")	    ,TamSx3("A3_NOME")[1]       ,/*lPixel*/,{|| cNoVend5})		// Nome do Vendedor 5   #8778
+TRCell():New(oVenProd,"COMISSAO5"   ,/*Tabela*/ ,"Comissao5"	     ,PesqPict("SC5","C5_COMIS5")	,TamSx3("C5_COMIS5")[1]     ,/*lPixel*/,{|| nComis5 })		// Comissão do Vendedor 5 #8778
 TRCell():New(oVenProd,"PADRÃO"		,/*Tabela*/ ,"Padrão"			 ,PesqPict("SB1","B1_XPADRAO")	,TamSx3("B1_XPADRAO")[1] 	,/*lPixel*/,{|| cXpad})			// Produto Padrão? #6306
 TRCell():New(oVenProd,"Rede"		,/*Tabela*/ ,"Rede"				 ,PesqPict("SA1","A1_XREDE")	,TamSx3("A1_XREDE")[1] 		,/*lPixel*/,{|| cXrede})		// Rede #6306
 TRCell():New(oVenProd,"Nome Rede"	,/*Tabela*/ ,"Nome Rede"		 ,PesqPict("ZA6","ZA6_DESC")	,TamSx3("ZA6_DESC")[1] 		,/*lPixel*/,{|| cReddes})		// Nome Rede #6306
@@ -376,8 +385,14 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	If lPosC5
     	cCodVend    := SC5->C5_VEND1
         cCoVend2    := SC5->C5_VEND2
+		cCoVend3	:= SC5->C5_VEND3
+		cCoVend4	:= SC5->C5_VEND4
+		cCoVend5	:= SC5->C5_VEND5
     	nComiss     := SC5->C5_COMIS1
         nComis2     := SC5->C5_COMIS2
+		nComis3		:= SC5->C5_COMIS3
+		nComis4		:= SC5->C5_COMIS4
+		nComis5		:= SC5->C5_COMIS5
         cCodTab     := SC5->C5_TABELA
         nValInst    := SC5->C5_XVLINST
         nPerInst    := SC5->C5_XINSTA
@@ -391,10 +406,13 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 
 		cNomGer     := POSICIONE('SA3',1,XFILIAL('SA3') + SA3->A3_GEREN ,'A3_NOME')
         cNoVend2    := POSICIONE('SA3',1,XFILIAL('SA3') + SC5->C5_VEND2 ,'A3_NOME')
+		cNoVend3	:= POSICIONE('SA3',1,XFILIAL('SA3') + SC5->C5_VEND3 ,'A3_NOME')
+		cNoVend4	:= POSICIONE('SA3',1,XFILIAL('SA3') + SC5->C5_VEND4 ,'A3_NOME')
+		cNoVend5	:= POSICIONE('SA3',1,XFILIAL('SA3') + SC5->C5_VEND5 ,'A3_NOME')
         cDescTab    := POSICIONE('DA0',1,XFILIAL('DA0') + SC5->C5_TABELA,'DA0_DESCRI')
         nPrcTab     := POSICIONE('DA1',2,XFILIAL('DA1') + (cAliasQry)->D2_COD + SC5->C5_TABELA,'DA1_PRCVEN')
-		cReddes	:= POSICIONE("ZA6",1,XFILIAL("ZA6")+SA1->A1_XREDE,"ZA6_DESC")                                                                    
-		cSegmde	:= POSICIONE("ZA8",1,xFilial("ZA8")+SA1->A1_XSEGM,"ZA8_DESC")
+		cReddes		:= POSICIONE("ZA6",1,XFILIAL("ZA6")+SA1->A1_XREDE,"ZA6_DESC")                                                                    
+		cSegmde		:= POSICIONE("ZA8",1,xFilial("ZA8")+SA1->A1_XSEGM,"ZA8_DESC")
 
         /*
         If SC5->C5_XTPVEN == '1'
@@ -449,7 +467,13 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
     	cCodVend    := ""
         cNomVend    := ""
         cCoVend2    := ""
-        cNoVend2    := ""      
+        cNoVend2    := ""  
+		cCoVend3	:= ""
+		cNoVend3	:= ""
+		cCoVend4	:= ""
+		cNoVend4	:= ""
+		cCoVend5	:= ""
+		cNoVend5	:= ""    
         cNomGer     := ""
         cXTpVen  	:= ""
         cCodTab     := ""
