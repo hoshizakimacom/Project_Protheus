@@ -190,6 +190,8 @@ TRCell():New(oVenProd,"Seg Mercado"	,/*Tabela*/ ,"Seg Mercado"		 ,PesqPict("SA1"
 TRCell():New(oVenProd,"Nome Seg Mer",/*Tabela*/ ,"Nome Seg Mercado"	 ,PesqPict("ZA8","ZA8_DESC")	,TamSx3("ZA8_DESC")[1] 		,/*lPixel*/,{|| cSegmde})		// Nome Segmento de Mercado #6306
 TRCell():New(oVenProd,"SUB FAM.SUG.",/*Tabela*/ ,"Familia Sugerida"  ,PesqPict("SB1","B1_XFAMSGD")	,TamSx3("B1_XFAMSGD")[1]	,/*lPixel*/,{|| cXFamSgd })		// Familia Sugerida
 TRCell():New(oVenProd,"FAMILIA.SUG.",/*Tabela*/ ,"Sub.Fam. Sugerida" ,PesqPict("SB1","B1_XSUBFAM")	,TamSx3("B1_XSUBFAM")[1]	,/*lPixel*/,{|| cXSubFam })		// Sub Fam.Sugerida
+TRCell():New(oVenProd,"TES"		    ,/*Tabela*/ ,"TES"				 ,PesqPict("SD2","D2_TES")		,TamSx3("D2_TES")[1]		,/*lPixel*/,{|| cXTES })		//TES				#9197
+TRCell():New(oVenProd,"ATU. ESTOQUE",/*Tabela*/ ,"Atu.Estoque"		 ,PesqPict("SF4","F4_ESTOQUE")	,TamSx3("F4_ESTOQUE")[1]	,/*lPixel*/,{|| cAtuEst })		//Atualiza Estoque	#9197
 
 Return(oReport)
 
@@ -223,6 +225,7 @@ Local lPosC5	:= .F.
 Local cXFamSgdCod 
 Local cXSubFamCod
 
+
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Filtragem do relatório                                                  ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
@@ -243,7 +246,7 @@ dbSetOrder(3)			// Num. Docto. + Serie + Cliente + Loja + Produto + Item
 			D2_GRUPO,
 			D2_EST,D2_PEDIDO,D2_QUANT,D2_PRCVEN,D2_DESCON,D2_VALFRE,D2_SEGURO,D2_DESPESA,D2_TOTAL,
 			D2_VALBRUT,D2_BASEICM,D2_PICM,D2_VALICM,D2_BASEIPI,D2_IPI,D2_VALIPI,D2_BRICMS,D2_ICMSRET,
-			D2_BASIMP6,D2_ALQIMP6,D2_VALIMP6,D2_BASIMP5,D2_ALQIMP5,D2_VALIMP5,D2_PDORI,D2_PDDES,D2_DIFAL,D2_VFCPDIF
+			D2_BASIMP6,D2_ALQIMP6,D2_VALIMP6,D2_BASIMP5,D2_ALQIMP5,D2_VALIMP5,D2_PDORI,D2_PDDES,D2_DIFAL,D2_TES,D2_VFCPDIF
 		FROM 
 			%Table:SD2% SD2
 		WHERE 
@@ -327,6 +330,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
     nDespesa    := (cAliasQry)->D2_DESPESA
     nValTot     := (cAliasQry)->D2_TOTAL 
     nValCont    := (cAliasQry)->D2_VALBRUT
+	cXTES		:= (cAliasQry)->D2_TES
 	
 //    nVlContL    := (cAliasQry)->D2_VALBRUT - ((cAliasQry)->D2_VALICM + (cAliasQry)->D2_VALIPI + (cAliasQry)->D2_VALIMP6 + (cAliasQry)->D2_VALIMP5)
     nVlContL    := (cAliasQry)->D2_VALBRUT - ((cAliasQry)->D2_VALICM + (cAliasQry)->D2_VALIPI +  (cAliasQry)->D2_ICMSRET + (cAliasQry)->D2_VALIMP6 + (cAliasQry)->D2_VALIMP5)
@@ -430,6 +434,15 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 
 //		U_BusTpVen(SC5->C5_XTPVEN,"C5_XTPVEN") //Função para utilizar os tipo de vendas cadastrados no campo C5_XTPVEN
 
+		cAtuEst	:= Posicione("SF4",1,xFilial("SF4")+(cAliasQry)->D2_TES,"F4_ESTOQUE")
+	
+		If cAtuEst 		== "S" 	//#9197
+			cAtuEst	:= "Sim"
+		ElseIf cAtuEst 	== "N" //#9197
+			cAtuEst	:= "Não"
+		EndIf
+		
+		
 		If Alltrim(SC5->C5_XTPVEN) == "1" 
 			cXTpVen := "1 - Projeto"
 		ElseIf Alltrim(SC5->C5_XTPVEN) == "2"
@@ -523,7 +536,8 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		cXSubFam		:= "9 - Material de Consumo"
 	Endif
 
-    cOBS  := Posicione('SFT',1,xFilial("SFT")+"S"+(cAliasQry)->D2_SERIE+(cAliasQry)->D2_DOC+(cAliasQry)->D2_CLIENTE+(cAliasQry)->D2_LOJA+(cAliasQry)->D2_ITEM,'FT_OBSERV')                                                                                  
+
+	cOBS  := Posicione('SFT',1,xFilial("SFT")+"S"+(cAliasQry)->D2_SERIE+(cAliasQry)->D2_DOC+(cAliasQry)->D2_CLIENTE+(cAliasQry)->D2_LOJA+(cAliasQry)->D2_ITEM,'FT_OBSERV')                                                                                  
 
 	oReport:Section(1):PrintLine()
 
