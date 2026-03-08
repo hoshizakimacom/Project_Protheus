@@ -21,6 +21,14 @@ User Function A010TOK()
             EndIf
         EndIf
 
+        // Valida NCM se o tipo do produto for diferente de PI
+        If lRet
+            If (M->B1_TIPO <> 'PI' .And. Empty(M->B1_POSIPI)) //#9728 - Chamado Vinicius Capeli
+                lRet := .F.
+                MsgInfo('É obrigatório informar o campo NCM diferentes do tipo PI.','Atenção')
+            EndIf
+        EndIf
+
         // Valida URL
         If lRet .And. !Empty(M->B1_XURL)
             If ! "www.hoshizakimacom.com.br" $ M->B1_XURL //#7554 - Chamado Tierre
