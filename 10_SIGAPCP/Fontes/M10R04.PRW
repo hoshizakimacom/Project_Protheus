@@ -116,14 +116,20 @@ TRCell():New(oVenProd,"DESC"		,/*Tabela*/ ,"Descriçao"		 ,PesqPict("SB1","B1_DES
 TRCell():New(oVenProd,"SALDO"		,/*Tabela*/ ,"Saldo"			 ,PesqPict("SC6","C6_VALOR")	,TamSx3("C6_VALOR")[1]		,/*lPixel*/,{|| nSaldo	})		// Saldo
 TRCell():New(oVenProd,"COMP"		,/*Tabela*/ ,"Comp."			 ,PesqPict("SB5","B5_COMPRLC")  ,TamSx3("B5_COMPRLC")[1]+5	,/*lPixel*/,{|| nComp	})		// Comprimento Armazem
 TRCell():New(oVenProd,"LARG"		,/*Tabela*/ ,"Larg."			 ,PesqPict("SB5","B5_LARGLC")	,TamSx3("B5_LARGLC")[1] 	,/*lPixel*/,{|| nLarg	})		// Largura Armazem
-TRCell():New(oVenProd,"ALT"			,/*Tabela*/ ,"Alt."				 ,PesqPict("SB5","B5_LARGLC")	,TamSx3("B5_LARGLC")[1]		,/*lPixel*/,{|| nAlt	})		// Altura Armazem
+TRCell():New(oVenProd,"ALT"			,/*Tabela*/ ,"Alt."				 ,PesqPict("SB5","B5_ALTURLC")	,TamSx3("B5_ALTURLC")[1]	,/*lPixel*/,{|| nAlt	})		// Altura Armazem
 TRCell():New(oVenProd,"PESO"		,/*Tabela*/ ,"Peso"				 ,PesqPict("SB5","B5_PESO")		,TamSx3("B5_PESO")[1]		,/*lPixel*/,{|| nPeso	})		// Peso do Produto
 TRCell():New(oVenProd,"M3"			,/*Tabela*/ ,"M3"				 ,PesqPict("SC6","C6_PRCVEN")	,TamSx3("C6_PRCVEN")[1] 	,/*lPixel*/,{|| nM3		})		// M3 Cubagem
+TRCell():New(oVenProd,"COMPA"		,/*Tabela*/ ,"Comp.Emb"	 		 ,PesqPict("SB5","B5_COMPRLC")	,TamSx3("B5_COMPRLC")[1] 	,/*lPixel*/,{|| nCompA	})		// Comprimento A
+TRCell():New(oVenProd,"LARGA"		,/*Tabela*/ ,"Larg.Emb"	 		 ,PesqPict("SB5","B5_LARGLC")	,TamSx3("B5_LARGLC")[1] 	,/*lPixel*/,{|| nLargA	})		// Largura A
+TRCell():New(oVenProd,"ALTURA"		,/*Tabela*/ ,"Altura.Emb"		 ,PesqPict("SB5","B5_ALTURLC")	,TamSx3("B5_ALTURLC")[1] 	,/*lPixel*/,{|| nAlturA})		// Altura A
+TRCell():New(oVenProd,"METRO3"		,/*Tabela*/ ,"M3.Emb"	   	     ,PesqPict("SC6","C6_PRCVEN")	,TamSx3("C6_PRCVEN")[1] 	,/*lPixel*/,{|| nM3A	})		// M3A Cubagem
 //TRCell():New(oVenProd,"TOTM3"		,/*Tabela*/ ,"Total M3"			 ,PesqPict("SC6","C6_PRCVEN")	,TamSx3("C6_PRCVEN")[1] 	,/*lPixel*/,{|| nTotM3	})		// Total M3 Cubagem
-//TRCell():New(oVenProd,"TOTPESO"		,/*Tabela*/ ,"Total Peso"		 ,PesqPict("SB5","B5_PESO")		,TamSx3("B5_PESO")[1]		,/*lPixel*/,{|| nTotPeso})		// Total Peso do Produto
+//TRCell():New(oVenProd,"TOTPESO"		,/*Tabela*/ ,"Total Peso"		 ,PesqPict("SB5","B5_PESO")		,TamSx3("B5_PESO")[1]	,/*lPixel*/,{|| nTotPeso})		// Total Peso do Produto
 
-TRFunction():New(oVenProd:Cell("PESO")		,/* cID */,"SUM",/*oBreak*/,/*cTitle*/,/*cPicture*/,/*uFormula*/,.F./*lEndSection*/,.T./*lEndReport*/,/*lEndPage*/)
+TRFunction():New(oVenProd:Cell("PESO")	,/* cID */,"SUM",/*oBreak*/,/*cTitle*/,/*cPicture*/,/*uFormula*/,.F./*lEndSection*/,.T./*lEndReport*/,/*lEndPage*/)
 TRFunction():New(oVenProd:Cell("M3")	,/* cID */,"SUM",/*oBreak*/,/*cTitle*/,/*cPicture*/,/*uFormula*/,.F./*lEndSection*/,.T./*lEndReport*/,/*lEndPage*/)
+TRFunction():New(oVenProd:Cell("M3.Emb")	,/* cID */,"SUM",/*oBreak*/,/*cTitle*/,/*cPicture*/,/*uFormula*/,.F./*lEndSection*/,.T./*lEndReport*/,/*lEndPage*/)
+
 
 Return(oReport)
 
@@ -161,6 +167,7 @@ dbSelectArea("SC6")		// Itens do Pedido de Vendas
 dbSetOrder(2)			// Produto,Numero
 
 oReport:Section(1):Cell("M3" ):SetBlock({|| nM3 })
+oReport:Section(1):Cell("M3.Emb" ):SetBlock({|| nM3A })
 oReport:Section(1):Cell("PESO" ):SetBlock({|| nPeso })
 
 #IFDEF TOP
@@ -232,8 +239,12 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		nComp		:= SB5->B5_COMPRLC
 		nLarg		:= SB5->B5_LARGLC 
 		nAlt		:= SB5->B5_ALTURLC
+		nCompA 		= (nComp + 50)
+		nLargA 		= (nLarg + 90)
+		nAlturA		= (nAlt + 160)
 		nPeso		:= SB5->B5_PESO
 		nM3			:= (nComp * nLarg * nAlt * nSaldo) / 1000000000
+		nM3A		:= (nCompA * nLargA * nAlturA * nSaldo) / 1000000000
 		nTotM3		:=	nM3
 		nTotPeso	:=	nPeso
 	Else // pegar os dados da tabela de produtos
@@ -241,7 +252,11 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		nLarg		:= 0
 		nAlt		:= 0
 		nPeso		:= 0
+		nCompA		:= 0
+		nLargA		:= 0
+		nAlturA		:= 0
 		nM3			:= 0
+		nM3A		:= 0
 		nTotM3		:= 0
 		nTotPeso	:= 0
 	Endif
@@ -252,8 +267,12 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	nComp	:= 0
 	nLarg	:= 0
 	nAlt	:= 0
+	nCompA	:= 0
+	nLargA	:= 0
+	nAlturA	:= 0
 	nPeso	:= 0
 	nM3		:= 0
+	nM3A	:= 0
 
 	(cAliasQry)->(dbSkip())
 End
