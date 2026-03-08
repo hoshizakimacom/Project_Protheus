@@ -42,6 +42,12 @@ User Function M05G02(_cField)
         Case _cField == 'A1_COD_MUN'
             _xRet   := M->A1_COD_MUN
 
+            MG02SetNat()
+
+        Case _cField == 'A1_NATUREZ'
+            _xRet   := M->A1_NATUREZ
+
+
             MG02SetMun()
 
         Case _cField == 'A1_XGRPEC'
@@ -127,6 +133,15 @@ Static Function MG02SetCep()
 Return
 
 //+------------------------------------------------------------------------------------------------
+
+//+------------------------------------------------------------------------------------------------
+Static Function MG02SetNat()
+    M->A1_NATUREZ    := AllTrim(M->A1_NATUREZ)
+Return
+
+//+------------------------------------------------------------------------------------------------
+
+
 Static Function MG02SetEs()
     Local cReg      := ''
     Local cRegDes   := ''
