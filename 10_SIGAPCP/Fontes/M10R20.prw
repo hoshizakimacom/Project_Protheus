@@ -93,6 +93,7 @@ Static Function ReportDef(_oReport, _cPerg)
 	TRCell():New(_oOP,'CUSTO'			, _cAlias)		// #7628
 	TRCell():New(_oOP,'QUANTIDADE'		, _cAlias)		// #7843
 	TRCell():New(_oOP,'DTENCER'			, _cAlias)		// DT.ENCERR
+	TRCell():New(_oOP,'TIPO_RE_DE'		, _cAlias)		// #7628
 
 
 	_oOP:oReport:cFontBody 			:= 'Calibri'
@@ -238,6 +239,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,D3_TM											AS TIPO_MOVIMENTO		// #7628	
 					,SUM(D3_CUSTO1)									AS CUSTO				// #7628
 					,SUM(D3_QUANT)									AS QUANTIDADE			// #7843
+					,D3_CF											AS TIPO_RE_DE			//#10158
 
 					
 					,CASE
@@ -339,6 +341,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				,C2_XENGUSS
 				,D3_TM
 				,C2_DATRF
+				,D3_CF
 				//,D3_QUANT		//#7843
 				
 				ORDER BY 'OF'
@@ -448,6 +451,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,D3_TM											AS TIPO_MOVIMENTO		// #7628	
 					,SUM(D3_CUSTO1)									AS CUSTO				// #7628
 					,SUM(D3_QUANT)									AS QUANTIDADE			// #7843
+					,D3_CF											AS TIPO_RE_DE
 
 					
 					,CASE
@@ -549,6 +553,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				,C2_XENGUSS
 				,D3_TM
 				,C2_DATRF
+				,D3_CF
 				//,D3_QUANT		//#7843
 
 				ORDER BY 'OF'
@@ -656,6 +661,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,D3_TM											AS TIPO_MOVIMENTO		// #7628	
 					,SUM(D3_CUSTO1)									AS CUSTO				// #7628
 					,SUM(D3_QUANT)									AS QUANTIDADE			// #7843
+					,D3_CF											AS TIPO_RE_DE
 					
 					,CASE
 						WHEN B1_XPICLIS = '1' THEN '1 - SIM'
@@ -751,6 +757,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				,C2_XENGUSS
 				,D3_TM
 				,C2_DATRF
+				,D3_CF
 				//,D3_QUANT	//#7843
 
 				ORDER BY 'OF'
