@@ -150,7 +150,10 @@ TRCell():New(oVenProd,"ENTREGA"		,/*Tabela*/	,"Dt.Entrega"		 ,PesqPict("SC6","C6
 
 TRCell():New(oVenProd,"FAMILIA"		,/*Tabela*/	,"Familia"			 ,PesqPict("SB1","B1_XFAMILI")	,TamSx3("B1_XFAMILI")[1]	,/*lPixel*/,{|| cXFamil	})				// Familia
 TRCell():New(oVenProd,"OP"			,/*Tabela*/	,"OP"				 ,PesqPict("SC6","C6_OP")		,TamSx3("C6_OP")[1]			,/*lPixel*/,{||	cOP		})				// Numero da Ordem de Produï¿½ï¿½o
-TRCell():New(oVenProd,"VLUIPI"		,/*Tabela*/	,"Vl.Tot+IPI"		 ,PesqPict("SC6","C6_XVLTBRU")	,TamSx3("C6_XVLTBRU")[1]	,/*lPixel*/,{||	nVlUnIPI})				// Vl Bruto + IPI
+//TRCell():New(oVenProd,"VLUIPI"		,/*Tabela*/	,"Vl.Tot+IPI"		 ,PesqPict("SC6","C6_XVLTBRU")	,TamSx3("C6_XVLTBRU")[1]	,/*lPixel*/,{||	nVlUnIPI})
+
+TRCell():New(oVenProd,"VLNET"		,/*Tabela*/	,"Vl.Tot NET"		 ,PesqPict("SC6","C6_XVLTBRU")	,TamSx3("C6_XVLTBRU")[1]	,/*lPixel*/,{||	nVlNET})		
+
 TRCell():New(oVenProd,"ESTADO"		,/*Tabela*/	,"Estado"			 ,PesqPict("SA1","A1_EST")		,TamSx3("A1_EST")[1]		,/*lPixel*/,{|| cEst	})				// Estado
 TRCell():New(oVenProd,"GEREN"		,/*Tabela*/ ,"Gerente"			 ,PesqPict("SA3","A3_NOME")	    ,TamSx3("A3_NOME")[1]		,/*lPixel*/,{|| cGeren	})
 /*Falar com pessoal do Comercial*/TRCell():New(oVenProd,"VEND"		,/*Tabela*/ ,"Representante"	 ,PesqPict("SC5","C5_VEND1")	,TamSx3("C5_VEND1")[1]		,/*lPixel*/,{|| cVend1	})				// Representante
@@ -200,7 +203,8 @@ TRCell():New(oVenProd,"RAT_FRETE"	,/*Tabela*/	,"Rat.Frete"		 ,PesqPict("SC5","C5
 
 TRCell():New(oVenProd,"RESP. ENG"	,/*Tabela*/	,"Resp. Eng"		 ,PesqPict("SB1","B1_XREPENG")	,TamSx3("B1_XREPENG")[1]	,/*lPixel*/,{||	cXRespE})				// Rateio de Frete #6805
 TRCell():New(oVenProd,"SUB FAM.SUG.",/*Tabela*/ ,"Familia Sugerida"  ,PesqPict("SB1","B1_XFAMSGD")	,TamSx3("B1_XFAMSGD")[1]	,/*lPixel*/,{|| cXFamSgd })				// Familia Sugerida
-TRCell():New(oVenProd,"FAMILIA.SUG.",/*Tabela*/ ,"Sub.Fam. Sugerida" ,PesqPict("SB1","B1_XSUBFAM")	,TamSx3("B1_XSUBFAM")[1]	,/*lPixel*/,{|| cXSubFam })				// Sub Fam.Sugerida
+TRCell():New(oVenProd,"FAMILIA.SUG.",/*Tabela*/ ,"Sub.Fam. Sugerida" ,PesqPict("SB1","B1_XSUBFAM")	,TamSx3("B1_XSUBFAM")[1]	,/*lPixel*/,{|| cXSubFam })
+TRCell():New(oVenProd,"VLUIPI"		,/*Tabela*/	,"Vl.Tot+IPI"		 ,PesqPict("SC6","C6_XVLTBRU")	,TamSx3("C6_XVLTBRU")[1]	,/*lPixel*/,{||	nVlUnIPI})				// Sub Fam.Sugerida
 //	nPvLib   := 0
 //  nSldLib  := 0
 //	nSldDisp := 0
@@ -258,6 +262,7 @@ dbSetOrder(2)			// Produto,Numero
 		SELECT DISTINCT
 			C6_FILIAL,C6_NUM,C6_ITEM,C6_PRODUTO,C6_QTDVEN,C6_QTDENT,C6_LOCAL,C6_BLQ, C6_TES,
 			C6_XITEMP,C6_XOPER,C6_XETAPA,C6_XGOPDT,C6_OP,C6_ENTREG,C6_XVLUBRU,C6_XVLTBRU,
+			C6_XVLTIPI,C6_XVLTICM,C6_XVLTCF2,C6_XVLTPS2,C6_XVLTSOL,
 			C5_EMISSAO,C5_XTPVEN,C5_VEND1,C5_XSTSFIN,C5_XDTAPRV,C5_TPFRETE,C5_TRANSP,
 			C5_XLIBREV,C5_XMOTLIB,C5_XDTPCP1,C5_XOBS1,C5_XDTPCP2,C5_XOBS2,
 			C5_XDTPCP3,C5_XOBS3,C5_XDTPCP4,C5_XOBS4,C5_XDTPCP5,C5_XOBS5,
@@ -457,12 +462,23 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	/*
 	Verificar se o pedido gera ou não receita chamado 2154
 	*/
+
+	
 	cGerafin	:= Posicione("SF4",1,xFilial("SF4")+(cAliasQry)->C6_TES,"F4_DUPLIC")
 	
 	If AllTrim(cGerafin) = 'S'
 		nVlUnIPI	:= ((cAliasQry)->C6_XVLTBRU / nQuant ) * nSaldo
 	Else
 		nVlUnIPI	:= 0
+	Endif
+	
+	
+	cGerafin2	:= Posicione("SF4",1,xFilial("SF4")+(cAliasQry)->C6_TES,"F4_DUPLIC")
+
+	If AllTrim(cGerafin2) = 'S'
+		nVlNET	:= ((cAliasQry)->((C6_XVLTBRU - (C6_XVLTIPI+C6_XVLTICM+C6_XVLTCF2+C6_XVLTPS2+C6_XVLTSOL))/C6_QTDVEN)*(C6_QTDVEN-C6_QTDENT))
+	Else
+		nVlNET	:= 0
 	Endif
 
 	lAtraso		:= (cAliasQry)->C6_ENTREG < DDATABASE
