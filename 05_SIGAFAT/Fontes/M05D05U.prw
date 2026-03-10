@@ -1,159 +1,170 @@
-#Include 'Protheus.ch'
+#INCLUDE "protheus.ch"
 
-//+------------------------------------------------------------------------------------------------
-//  Rotina de ajuste que informa região e descrição da região de acordo com o estado informado
-//  no cadastro do cliente.
-//+------------------------------------------------------------------------------------------------
-User Function M05D05U()
-    Local   _aSays          := {}
-    Local   _aButton        := {}
-    Local   _cTitulo        := FunName()
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M05D05U()
+LOCAL _ASAYS := {}
+LOCAL _ABUTTON := {}
+LOCAL _CTITULO := FUNNAME()
 
-    Local lSimulacao        := MsgYesNo('Deseja executar em modo SIMULAÇÃO?','Atenção')
-    Local _cArqLog          := ''
+LOCAL LSIMULACAO := MSGYESNO("DESEJA EXECUTAR EM MODO SIMULAÇÃO?","ATENÇÃO")
+LOCAL _CARQLOG := ""
 
-    If lSimulacao
-        AADD(_aSays,OemToAnsi('*** SIMULAÇÃO *** '))
-    EndIf
+IF LSIMULACAO
+    AADD(_ASAYS,OEMTOANSI("*** SIMULAÇÃO *** "))
+ENDIF
 
-    AADD(_aSays,OemToAnsi("Rotina de ajuste de Região de Clientes"))
+AADD(_ASAYS,OEMTOANSI("ROTINA DE AJUSTE DE REGIÃO DE CLIENTES"))
 
-    aAdd( _aButton, { 1, .T., {|| MD05Proc(lSimulacao,@_cArqLog),FechaBatch()}} )
-    aAdd( _aButton, { 2, .T., {|| FechaBatch()                  }}  )
+AADD(_ABUTTON,{1, .T. ,{||MD05PROC(LSIMULACAO,@_CARQLOG),FECHABATCH()}})
+AADD(_ABUTTON,{2, .T. ,{||FECHABATCH()}})
 
-    FormBatch( _cTitulo, _aSays, _aButton )
+FORMBATCH(_CTITULO,_ASAYS,_ABUTTON)
 
-    _cArqLog        := ''
-Return
+_CARQLOG := ""
+RETURN 
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05Proc(lSimulacao,_cArqLog)
-    Local _oDlg         := Nil
-    Local _cTitle       := 'Ajuste de Regiçao de Clientes'
-    Local _oArqLog      := Nil
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05PROC(LSIMULACAO,_CARQLOG)
+LOCAL _ODLG := NIL
+LOCAL _CTITLE := "AJUSTE DE REGIÇAO DE CLIENTES"
+LOCAL _OARQLOG := NIL
 
-    Define MsDialog _oDlg Title _cTitle Style DS_MODALFRAME From 000,000 To 300,900 Pixel
+_ODLG := MSDIALOG():NEW(0,0,300,900,_CTITLE,,, .F. ,128,,,,, .T. ,,, .F. )
 
-    @040,020 Say  'Arquivo Log:' Of _oDlg Pixel
-    @037,080 Get _oArqLog Var _cArqLog Size 300,010 Of _oDlg Pixel WHEN .F.
+TSAY():NEW(40,20,{||"ARQUIVO LOG:"},_ODLG,,, .F. , .F. , .F. , .T. ,,,,, .F. , .F. , .F. , .F. , .F. , .F. )
+_OARQLOG := TGET():NEW(37,80,{ | U |IIF(PCOUNT()==0,_CARQLOG,_CARQLOG := U)},_ODLG,300,10,,,,,, .F. ,, .T. ,, .F. ,{|| .F. }, .F. , .F. ,, .F. , .F. ,,"_CARQLOG",,,)
 
-    @037,400 BUTTON "Selec. Arquivo"    SIZE 040, 015 PIXEL OF _oDlg ACTION ( MD05ArqLog(@_cArqLog) )
+TBUTTON():NEW(37,400,"SELEC. ARQUIVO",_ODLG,{||MD05ARQLOG(@_CARQLOG)},40,15,,, .F. , .T. , .F. ,, .F. ,,, .F. )
 
-    @120,170 BUTTON "Confirmar"     SIZE 040, 012 PIXEL OF _oDlg ACTION ( MD05Ok(lSimulacao,@_cArqLog) )
-    @120,220 BUTTON "Cancelar"      SIZE 040, 012 PIXEL OF _oDlg ACTION (_oDlg:End())
+TBUTTON():NEW(120,170,"CONFIRMAR",_ODLG,{||MD05OK(LSIMULACAO,@_CARQLOG)},40,12,,, .F. , .T. , .F. ,, .F. ,,, .F. )
+TBUTTON():NEW(120,220,"CANCELAR",_ODLG,{||_ODLG:END()},40,12,,, .F. , .T. , .F. ,, .F. ,,, .F. )
 
-    Activate MsDialog _oDlg Centered
+_ODLG:ACTIVATE(_ODLG:BLCLICKED,_ODLG:BMOVED,_ODLG:BPAINTED, .T. ,,,,_ODLG:BRCLICKED,)
 
-    _cArqLog        := ''
-Return
+_CARQLOG := ""
+RETURN 
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05ArqLog(_cArqLog)
-    Local _cArq     :=  cGetFile('*.TXT'    ,'Informe diretorio para arquivo de log'    ,0,'',.F.           ,nOR( GETF_LOCALHARD, GETF_LOCALFLOPPY, GETF_RETDIRECTORY ),.F., .T. )
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05ARQLOG(_CARQLOG)
+LOCAL _CARQ := CGETFILE("*.TXT","INFORME DIRETORIO PARA ARQUIVO DE LOG",0,"", .F. ,NOR(48,8,128), .F. , .T. )
 
-    _cArqLog := _cArq + DToS(Date()) + '_' + (StrTran(Time(),':','')) + '.TXT'
-Return
+_CARQLOG := _CARQ+DTOS(DATE())+"_"+STRTRAN(TIME(),":","")+".TXT"
+RETURN 
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05Ok(lSimulacao,_cArqLog)
-    Local _nTotal   := 0
-    Local _nReg     := 0
-    Local _cLog     := 'Inicio ' + DToC(Date()) + ' ' + Time() + CRLF + CRLF
-    Local _cMsg     := ''
-    Local _nErr     := 0
-    Local _nInc     := 0
-    Local _nAtu     := 0
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05OK(LSIMULACAO,_CARQLOG)
+LOCAL _NTOTAL := 0
+LOCAL _NREG := 0
+LOCAL _CLOG := "INICIO "+DTOC(DATE())+" "+TIME() + CRLF + CRLF
+LOCAL _CMSG := ""
+LOCAL _NERR := 0
+LOCAL _NINC := 0
+LOCAL _NATU := 0
 
-    SA1->(DbSetOrder(1))
-    SA1->(DbGoTop())
+SA1->(DBSETORDER(1))
+SA1->(DBGOTOP())
 
-    SA1->( DbEval( {|| _nTotal++ } ) )
-    SA1->(DbGoTop())
+SA1->(DBEVAL({||_NTOTAL++}))
+SA1->(DBGOTOP())
 
-    // Percorre itens do array
-    While SA1->(!EOF())
-        FWMsgRun(, {||MD05Exec(@_cLog,@_nErr,@_nInc,@_nAtu,lSimulacao) },,I18N('Atualizando Cliente #1 de #2 ...',{++_nReg,_nTotal}))
+WHILE !SA1->(EOF())
+ 
+    FWMSGRUN(,{||MD05EXEC(@_CLOG,@_NERR,@_NINC,@_NATU,LSIMULACAO)},,I18N("ATUALIZANDO CLIENTE #1 DE #2 ...",{++_NREG,_NTOTAL}))
 
-        SA1->(DbSkip())
-    EndDo
+    SA1->(DBSKIP())
+    ENDDO
 
-    _cMsg := MD05Log(_cArqLog,_cMsg,@_cLog,_nErr,_nInc,_nAtu)
+_CMSG := MD05LOG(_CARQLOG,_CMSG,@_CLOG,_NERR,_NINC,_NATU)
 
-    Aviso('Atenção',I18N( _cMsg,{_nTotal,_cArqLog}),{'OK'},3)
+AVISO("ATENÇÃO",I18N(_CMSG,{_NTOTAL,_CARQLOG}),{"OK"},3)
 
-    _cArqLog        := ''
-Return
+_CARQLOG := ""
+RETURN 
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05Log(_cArqLog,_cMsg,_cLog,_nErr,_nInc,_nAtu)
-    Local _nHandle      := 0
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05LOG(_CARQLOG,_CMSG,_CLOG,_NERR,_NINC,_NATU)
+LOCAL _NHANDLE := 0
 
-    _nHandle    := FCREATE(_cArqLog)
+_NHANDLE := FCREATE(_CARQLOG)
 
-    _cLog := CRLF + CRLF + I18N('Regiões incluídas: #1',{_nInc})  +  CRLF + I18N('Regiões atualizadas: #1',{_nAtu})  +  CRLF  + I18N('Regiões não atualizadas: #1',{_nErr}) + CRLF + CRLF + _cLog
-    _cLog += CRLF + CRLF + 'Fim ' + DToC(Date()) + ' ' + Time() + CRLF + CRLF
+_CLOG := CHR(13)+CHR(10) + CRLF+I18N("REGIÕES INCLUÍDAS: #1",{_NINC}) + CRLF+I18N("REGIÕES ATUALIZADAS: #1",{_NATU}) + CRLF+I18N("REGIÕES NÃO ATUALIZADAS: #1",{_NERR}) + CRLF + CRLF+_CLOG
+_CLOG += CHR(13)+CHR(10) + CRLF+"FIM "+DTOC(DATE())+" "+TIME() + CRLF + CRLF
 
-    If _nHandle = -1
-        _cMsg   += " Erro ao criar arquivo - ferror " + Str(Ferror())
-    Else
-        _cMsg += ' Verifique arquivo de log gerado: ' + CRLF + CRLF + '#2 ' + CRLF
-        FWrite(_nHandle, _cLog)
-        FClose(_nHandle)
-    EndIf
-Return _cMsg
+IF _NHANDLE=- (1)
+    _CMSG += " ERRO AO CRIAR ARQUIVO - FERROR "+STR(FERROR())
+ELSE 
+    _CMSG += " VERIFIQUE ARQUIVO DE LOG GERADO: " + CRLF + CRLF+"#2 " + CRLF
+    FWRITE(_NHANDLE,_CLOG)
+    FCLOSE(_NHANDLE)
+ENDIF
+RETURN _CMSG
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05Exec(_cLog,_nErr,_nInc,_nAtu,lSimulacao)
-    Local _cMsgLog      := ''
-    Local cReg          := ''
-    Local cRegDes       := ''
-    Local cRegOld       := ''
-    Local cRegDesOld    := ''
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05EXEC(_CLOG,_NERR,_NINC,_NATU,LSIMULACAO)
+LOCAL _CMSGLOG := ""
+LOCAL CREG := ""
+LOCAL CREGDES := ""
+LOCAL CREGOLD := ""
+LOCAL CREGDESOLD := ""
 
-    If !Empty(SA1->A1_EST)
-        U_M05A30(SA1->A1_EST,@cReg,@cRegDes)
+IF !(EMPTY(SA1->A1_EST))
+    U_M05A30(SA1->A1_EST,@CREG,@CREGDES)
+    
+    CREGOLD := SA1->A1_REGIAO
+    CREGDESOLD := SA1->A1_DSCREG
+    
+    IF ( ALLTRIM( UPPER(CREGDESOLD))<> ALLTRIM( UPPER(CREGDES))) .OR. ( ALLTRIM(CREGOLD)<> ALLTRIM(CREG))
+        
+        IF EMPTY(SA1->A1_REGIAO)
+            _CMSGLOG := "INCLUIDO"
+            ++_NINC
+        ELSE 
+            _CMSGLOG := "ATUALIZADO"
+            ++_NATU
+        ENDIF
+        
+        IF !(LSIMULACAO)
+            RECLOCK("SA1", .F. )
+            SA1->A1_REGIAO := CREG
+            SA1->A1_DSCREG := CREGDES
+            SA1->(MSUNLOCK())
+        ENDIF
+    ELSE 
+        
+        _CMSGLOG := "REGIAO JA CADASTRADA"
+        ++_NERR
+    ENDIF
+ELSE 
+    ++_NERR
+    _CMSGLOG := "ESTADO NÃO PREENCHIDO"
+ENDIF
 
-        cRegOld     := SA1->A1_REGIAO
-        cRegDesOld  := SA1->A1_DSCREG
+MD05GETLOG(SA1->A1_COD,SA1->A1_LOJA,SA1->A1_EST,CREG,CREGDES,CREGOLD,CREGDESOLD,_CMSGLOG,@_CLOG)
+RETURN 
 
-        If AllTrim(Upper(cRegDesOld)) <> AllTrim(Upper(cRegDes)) .Or. AllTrim(cRegOld) <> AllTrim(cReg)
-
-            If Empty(SA1->A1_REGIAO)
-                _cMsgLog    := 'Incluido'
-                ++_nInc
-            Else
-                _cMsgLog    := 'Atualizado'
-                ++_nAtu
-            EndIf
-            If !lSimulacao
-                RecLock('SA1',.F.)
-                    SA1->A1_REGIAO  := cReg
-                    SA1->A1_DSCREG  := cRegDes
-                SA1->(MsUnLock())
-            EndIf
-
-
-        Else
-            _cMsgLog    := 'Regiao ja cadastrada'
-            ++_nErr
-        EndIf
-    Else
-        ++_nErr
-        _cMsgLog    := 'Estado não preenchido'
-    EndIf
-
-    MD05GetLog(SA1->A1_COD,SA1->A1_LOJA,SA1->A1_EST,cReg,cRegDes,cRegOld,cRegDesOld,_cMsgLog,@_cLog)
-Return
-
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05GetLog(cCod,cLoja,cEst,cReg,cRegDes,cRegOld,cRegDesOld,_cMsgLog,_cLog)
-    _cLog += CRLF
-    _cLog += ' | Código: '          + cCod
-    _cLog += ' | Loja: '            + cLoja
-    _cLog += ' | Estado: '          + cEst
-    _cLog += ' | Regiao Ant.: '     + cRegOld
-    _cLog += ' | Desc Ant.: '       + cRegDesOld
-    _cLog += ' | Regiao Nova: '     + cReg
-    _cLog += ' | Desc Nova: '       + PadR(cRegDes,TamSX3('A1_DSCREG')[1])
-    _cLog += ' | STATUS: '          + AllTrim(_cMsgLog) + ' |'
-Return
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05GETLOG(CCOD,CLOJA,CEST,CREG,CREGDES,CREGOLD,CREGDESOLD,_CMSGLOG,_CLOG)
+_CLOG += CHR(13)+CHR(10)
+_CLOG += " | CÓDIGO: "+CCOD
+_CLOG += " | LOJA: "+CLOJA
+_CLOG += " | ESTADO: "+CEST
+_CLOG += " | REGIAO ANT.: "+CREGOLD
+_CLOG += " | DESC ANT.: "+CREGDESOLD
+_CLOG += " | REGIAO NOVA: "+CREG
+_CLOG += " | DESC NOVA: "+PADR(CREGDES,TAMSX3("A1_DSCREG")[1])
+_CLOG += " | STATUS: "+ ALLTRIM(_CMSGLOG)+" |"
+RETURN 
