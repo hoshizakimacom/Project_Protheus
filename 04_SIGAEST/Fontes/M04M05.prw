@@ -52,7 +52,7 @@ EndIf
 //³ Monta macro dos titulos a serem exibidos                                ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 For _n := 1 To Len(aCampos)
-	Aadd(aParam,{aCampos[_n,1],aCampos[_n,2],GetMv(aCampos[_n,1])})
+	Aadd(aParam,{aCampos[_n,1],aCampos[_n,2],fGetParam(aCampos[_n,1])})
 Next
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -71,7 +71,8 @@ oListBox:blDblClick := {|| cConTemp := aParam[oListBox:nAt,3], MsgGet( "Alteraçã
 Activate Dialog oDlgMV Centered
 
 Return
-
+Static Function fGetParam(cParam)
+Return GetMv(cParam)
 /*
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
