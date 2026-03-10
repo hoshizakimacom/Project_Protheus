@@ -3,47 +3,65 @@
 #Include 'FWPrintSetup.ch'
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
-//| Relatório PV
+//| RelatÃ³rio PV
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 User Function M05R03(nTpImpr)
 
 Private lImprVlr := nTpImpr == 1
 
-FWMsgRun(, {|| U_M05R03A() },,'Gerando relatório...')
+FWMsgRun(, {|| U_M05R03A(.F.) },,'Gerando relatório...')
 
 Return
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
-User Function M05R03A()
+User Function M05R03A(lAuto)
 
-    Local oPrinter     := Nil
+    Local oPrinter       := Nil
     //Local _oBrush      := TBrush():New( , RGB( 240 ,240 ,240))
-    Local oFont14B     := Nil
-    Local oFont12      := Nil
-    Local oFont12B     := Nil
-    Local oFont18T     := Nil
-    Local oFont9       := Nil
-    Local nRow         := -0080
-    Local cData        := DtoC(Date()) + ' ' + Time()
+    Local oFont14B       := Nil
+    Local oFont12        := Nil
+    Local oFont12B       := Nil
+    Local oFont18T       := Nil
+    Local oFont9         := Nil
+    Local nRow           := -0080
+    Local cData          := DtoC(Date()) + ' ' + Time()
     //Local _cAliasSA1   := GetNextAlias()
     //Local _cNumOrc     := SC5->C5_NUM
     //Local _lOk         := .T.
-    Local nPage        := 1
+    Local nPage          := 1
     //Local nRowStep     := 45
+    Local cFilePDF       := 'PV' + SC5->C5_NUM + ".pdf" // '_' + SubStr(DToS(Date()),7,2) + '_' + StrTran(Time(),":","") + ".pdf"
+    Local cPathInServer  := ""
+    Local cBarra         := if(isSrvUnix(),"/","\")
+
+    If lAuto
+        cPathInServer  := cBarra + "temp" + cBarra
+    
+        If File(cPathInServer+cFilePDF) //Apaga arquivo gerado anteriormente para criar um novo
+            FERASE(cPathInServer+cFilePDF)
+        EndIf
+    EndIf
 
     M05RFont(@oFont9,@oFont12,@oFont12B,@oFont14B,@oFont18T)
 
-    oPrinter := FWMSPrinter():New('PV' + SC5->C5_NUM + '_' + SubStr(DToS(Date()),7,2) + '_' + StrTran(Time(),":",""), IMP_PDF, .T./*_lAdjustToLegacy*/, /*cPathInServer*/, .T.)
+    oPrinter := FWMsPrinter():New( cFilePDF /*< cFilePrintert >*/, IMP_PDF/*[ nDevice]*/, .T./*[ lAdjustToLegacy]*/,;
+                   cPathInServer/*[ cPathInServer]*/, .T./*[ lDisabeSetup ]*/, /*[ lTReport]*/, /*[ @oPrintSetup]*/,;
+                /*[ cPrinter]*/, IIF(lAuto,.T.,.F.) /*[ lServer]*/, /*[ lPDFAsPNG]*/, /*[ lRaw]*/, IIF(lAuto,.F.,.T.) /*[ lViewPDF]*/,;
+                /*[ nQtdCopy]*/ )
 
     oPrinter:SetResolution(78)
     oPrinter:SetLandscape()
     oPrinter:SetMargin(0,0,0,0)
-
+    If lAuto
+        oPrinter:lServer := .T.
+        oPrinter:nDevice := IMP_PDF
+        oPrinter:cPathPDF := cPathInServer
+    EndIf
     oPrinter:StartPage()
 
 
     //+----------------------------------------------------------------------------------------
-    // Cabeçalho 1 - Dados Macom
+    // Cabeçalho 1 - Dados Hoshizaki Macom
     //+----------------------------------------------------------------------------------------
   
     MR05Cab1(oPrinter,oFont14B,oFont12,@nRow)
@@ -87,7 +105,7 @@ User Function M05R03A()
         // Condições Gerais
         //+----------------------------------------------------------------------------------------
     EndIf
-Return
+Return cFilePDF
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 Static Function M05RICabIt(oPrinter,oFont12B,nRow)
@@ -99,7 +117,7 @@ Static Function M05RICabIt(oPrinter,oFont12B,nRow)
 //  oPrinter:Box(nRow,0100,nRow + nRowStep * 2,0200)                        // SQ
     oPrinter:Box(nRow,0185,nRow + nRowStep * 2.5,0403)                      // Item
 //  oPrinter:Box(nRow,0400,nRow + nRowStep * 2,0700)                        // Código
-    oPrinter:Box(nRow,0650,nRow + nRowStep * 2.5,1250)                      // Descrição
+    oPrinter:Box(nRow,0650,nRow + nRowStep * 2.5,1250)                      // DescriÃção
 //  oPrinter:Box(nRow,1200,nRow + nRowStep * 2,1400)                        // NCM
     oPrinter:Box(nRow,1400,nRow + nRowStep * 2.5,1500)                      // QTD
 
@@ -308,7 +326,7 @@ Static Function M05RDescr(cProd,cDescSB1,cDescSC6,nComp,nLar,nAlt,cItem)
     // Retira enter da descrição
     Replace( cDesc , chr(13) ," ")
 
-    // Retira espaçoes duplicados
+    // Retira espaços duplicados
     For i := 1 to Len( cDesc ) - 1
         cLetras := Substr( cDesc , i , 2 )
 
@@ -385,11 +403,11 @@ Return
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 Static Function MR05Cab1(oPrinter,oFont14B,oFont12,nRow)
-    Local cNome         := 'AÇOS MACOM INDÚSTRIA E COMERCIO LTDA'
+    Local cNome         := 'HOSHIZAKI MACOM LTDA'
     Local cEndC         := 'Av Julia Gaiolli, 474, Bonsucesso, Guarulhos-SP, CEP 07251-500'
     Local cCGC          := 'CNPJ: 43.553.668/0001-79 I.E.: 336.179.661.113'
     Local cTel          := 'Telefone: 55 11 2085-7000'
-    Local cMail         := 'www.acosmacom.com.br'
+    Local cMail         := 'www.hoshizakimacom.com.br'
     Local nRowStep      := 45
     Local nSizecNome
     Local nSizecEndC
@@ -575,7 +593,10 @@ Static Function MR05Cab4(oPrinter,oFont12,oFont14B,oFont18T,nRow)
         oPrinter:Say(nRow             ,2900    , Posicione('SA1',1,xFilial('SA1') +SC5->C5_CLIENTE + SC5->C5_LOJACLI,'A1_XIDLOJA' )        ,oFont12)
     EndIf
 
-    oPrinter:Say(nRow += nRowStep     ,0100    , 'COND PAG (MEDIANTE ANÁLISE DE CRÉDITO): '       ,oFont12) //#6898
+
+    oPrinter:Say(nRow += nRowStep     ,0100    , 'COND PAG (MEDIANTE ANÁLISE DE CRÉDITO): '       ,oFont12) // #6898
+
+
     oPrinter:Say(nRow                 ,800    , MR05GetCPg()       ,oFont12) //440
 
     oPrinter:Say(nRow += nRowStep     ,0100    ,'REFERÊNCIA:'     ,oFont12)
@@ -597,17 +618,18 @@ Static Function MR05Rod(oPrinter,oFont12,oFont12B,oFont14B,nRow,nPage,cData)
     Local cTotal        := Transfor(NoRound(MaFisRet(,"NF_TOTAL"),2),"@E 9,999,999,999.99")
     Local cSubTot       := Transfor( NoRound(( MaFisRet(,"NF_TOTAL") - ( MaFisRet(,"NF_FRETE") + MaFisRet(,"NF_DESPESA") ) ),2),"@E 9,999,999,999.99")
     Local cMoeda        := AllTrim(GetMv('MV_MOEDA' + cValToChar(SC5->C5_MOEDA),,''))
-    Local cPolitic      := 'A MACOM adota a política de proibição de oferta e/ou recebimento de presentes/brindes em transações comerciais, prezando por sua legitimidade, transparência e imparcialidade.'
+    Local cPolitic      := 'A HOSHIZAKI MACOM adota a política de proibição de oferta e/ou recebimento de presentes/brindes em transações comerciais, prezando por sua legitimidade, transparência e imparcialidade.'
     
 
     nRow += (nRowStep * 5)
 
+    oPrinter:Say(nRow + 1200                ,0100        , cPolitic  ,oFont14b)
+    
     If nRow > 1600
         nRow := 2100 + nRowStep
 
         oPrinter:Say(nRow += nRowStep     ,0100    , I18N('Pedido de Venda #1 impressa em #2.',{SC5->C5_NUM,cData })  ,oFont12)
-        oPrinter:Say(nRow += nRowStep*2   ,0100    , cPolitic  ,oFont14b)                               //#8340 - Ajustado posicionamento
-        oPrinter:Say(nRow                 ,3000    , I18N('Pág. #1',{oPrinter:nPageCount  })  ,oFont12)
+        oPrinter:Say(nRow                 ,3000    , I18N('PÃ¡g. #1',{oPrinter:nPageCount  })  ,oFont12)
 
         oPrinter:EndPage()
         oPrinter:StartPage()
@@ -649,7 +671,7 @@ Static Function MR05Rod(oPrinter,oFont12,oFont12B,oFont14B,nRow,nPage,cData)
 
     nRow += nRowStep
     nRow += nRowStep
-    oPrinter:Say(nRow += nRowStep     ,2450    , 'AÇOS MACOM INDÚSTRIA E COMERCIO LTDA'         ,oFont12B)
+    oPrinter:Say(nRow += nRowStep     ,2450    , 'HOSHIZAKI MACOM LTDA'         ,oFont12B)
 
 	aArea := SA3->(GetArea())
     oPrinter:Say(nRow += nRowStep     ,2450    , 'GERÊNCIA: ' + AllTrim(Posicione("SA3",1,xFilial("SA3")+SA3->A3_GEREN,"SA3->A3_NOME"))          ,oFont12)
@@ -668,7 +690,6 @@ Static Function MR05Rod(oPrinter,oFont12,oFont12B,oFont14B,nRow,nPage,cData)
     nRow := 2100 + nRowStep
 
     oPrinter:Say(nRow += nRowStep     ,0100    , I18N('Pedido de Venda #1 impressa em #2.',{SC5->C5_NUM,cData })  ,oFont12)
-    oPrinter:Say(nRow += nRowStep*2   ,0100    , cPolitic  ,oFont14b)                               //#8340 - Ajustado posicionamento
     oPrinter:Say(nRow                 ,3000    , I18N('Pág. #1',{oPrinter:nPageCount  })  ,oFont12)
 
     oPrinter:EndPage()
@@ -682,7 +703,8 @@ Static Function M05RTpFret()
     Case SC5->C5_TPFRETE == 'C'
         cRet := 'CIF'
     Case SC5->C5_TPFRETE == 'F'
-        cRet := 'FOB (NÃO INCLUSO)'
+//        cRet := 'FOB (NÃO INCLUSO)'
+        cRet := 'FOB (POR CONTA DO CLIENTE)'
     Case SC5->C5_TPFRETE == 'T'
         cRet := 'Por Conta de Terceiros'
     Case SC5->C5_TPFRETE == 'S'
@@ -701,7 +723,8 @@ Static Function M05RTpIsnt()
     Case SC5->C5_XTPINST == '1'
         cRet := 'Sem Instalação'
     Case SC5->C5_XTPINST == '2'
-        cRet := 'Credenciada (Vide condições gerais de fornecimento)'
+//        cRet := 'Credenciada (Vide condições gerais de fornecimento)'
+        cRet := 'Credenciada (Vide Credenciada Macom)' //- R$ '+Transform(SC5->C5_XVLRINS,"@E 99,999,999.99") //#9487
     Case SC5->C5_XTPINST == '3'
         cRet := 'Macom'
     Case SC5->C5_XTPINST == '4'
@@ -761,15 +784,11 @@ Return cRet
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
 Static Function MR05EndPag(oPrinter,oFont12,oFont12B,nRow,nRowStep,nPage,cData,nItem,_nTotal)
-    Local cPolitic      := 'A MACOM adota a política de proibição de oferta e/ou recebimento de presentes/brindes em transações comerciais, prezando por sua legitimidade, transparência e imparcialidade.'
-
     If nRow > 2000
 
         nRow := 2100 + nRowStep
 
         oPrinter:Say(nRow += nRowStep     ,0100    , I18N('Pedido de Venda #1 impressa em #2.',{SC5->C5_NUM,cData })  ,oFont12)
-        oPrinter:Say(nRow += nRowStep*2   ,0100    , cPolitic  ,oFont14b)                               //#8340 - Ajustado posicionamento
-
         oPrinter:Say(nRow                 ,3000    , I18N('Pág. #1',{oPrinter:nPageCount  })  ,oFont12)
 
         oPrinter:EndPage()
@@ -863,7 +882,7 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
 //    Local aParcelas     := {}
     Local aPedCli       := {}
     Local aC5Rodape     := {}
-    Local aRelImp       := MaFisRelImp("MT100",{"SF2","SD2"})
+    //Local aRelImp       := MaFisRelImp("MT100",{"SF2","SD2"})
     Local aFisGet       := Nil
     Local aFisGetSC5    := Nil
 //    Local cKey          := ""
@@ -917,6 +936,8 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
             ,SC5.C5_NUM             AS _NUM
             ,SC5.C5_CLIENTE         AS _CLIENTE
             ,SC5.C5_LOJACLI         AS _LOJA
+            ,SC5.C5_CLIENT          AS _CLIENT
+            ,SC5.C5_LOJAENT         AS _LOJAENT
             ,SC5.C5_TIPO            AS _TIPO
             ,SC5.C5_TIPOCLI         AS _TIPOCLI
             ,SC5.C5_DESC1           AS _DESC1
@@ -1004,16 +1025,32 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
     cCliEnt := (cAliasPed)->_CLIENTE
     aCabPed := {}
 
-    MaFisIni(cCliEnt,;                      // 1-Codigo Cliente/Fornecedor
-    (cAliasPed)->_LOJA,;                    // 2-Loja do Cliente/Fornecedor
-    If((cAliasPed)->_TIPO$'DB',"F","C"),;   // 3-C:Cliente , F:Fornecedor
-        (cAliasPed)->_TIPO,;                // 4-Tipo da NF
-        (cAliasPed)->_TIPOCLI,;             // 5-Tipo do Cliente/Fornecedor
-        aRelImp,;                           // 6-Relacao de Impostos que suportados no arquivo
-        ,;                                  // 7-Tipo de complemento
-        ,;                                  // 8-Permite Incluir Impostos no Rodape .T./.F.
-        "SB1",;                             // 9-Alias do Cadastro de Produtos - ("SBI" P/ Front Loja)
-        "MATA461")                          // 10-Nome da rotina que esta utilizando a funcao
+    MaFisIni(Iif(Empty((cAliasPed)->_CLIENT),(cAliasPed)->_CLIENTE,(cAliasPed)->_CLIENT),;                      // 1-Codigo Cliente/Fornecedor
+            (cAliasPed)->_LOJAENT,;		                                                                        // 2-Loja do Cliente/Fornecedor
+            If((cAliasPed)->_TIPO$'DB',"F","C"),;                                                               // 3-C:Cliente , F:Fornecedor
+            (cAliasPed)->_TIPO,;                                                                                // 4-Tipo da NF
+            (cAliasPed)->_TIPOCLI,;                                                                             // 5-Tipo do Cliente/Fornecedor
+            Nil,;                                                                                               // 6-Relacao de Impostos que suportados no arquivo
+            Nil,;                                                                                               // 7-Tipo de complemento
+            Nil,;                                                                                               // 8-Permite Incluir Impostos no Rodape .T./.F.
+            Nil,;                                                                                               // 9-Alias do Cadastro de Produtos - ("SBI" P/ Front Loja)
+            "MATA461",;                                                                                         //10-Nome da rotina que esta utilizando a funcao
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            Nil,;
+            (cAliasPed)->_TPFRETE)
 
         nFrete      := (cAliasPed)->_FRETE
         nSeguro     := (cAliasPed)->_SEGURO
@@ -1094,7 +1131,7 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
         nDesconto  := 0
         dbSelectArea('SC6')
 
-        //³Calcula o preco de lista                     ³
+        //Calcula o preco de lista
         nValMerc  := (cAliasPed)->_VALOR
         nPrcLista := (cAliasPed)->_PRUNIT
 
@@ -1151,7 +1188,7 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
                             (cAliasPed)->_QTDENT                  ,;
                             })
 
-        //³Forca os valores de impostos que foram informados no SC6.
+        //Forca os valores de impostos que foram informados no SC6.
         dbSelectArea('SC6')
         For nY := 1 to Len(aFisGet)
             If !Empty(&(aFisGet[ny][2]))
@@ -1159,7 +1196,7 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
             EndIf
         Next nY
 
-        //³Calculo do ISS                               ³
+        //Calculo do ISS
         SF4->(dbSetOrder(1))
         SF4->(MsSeek(xFilial("SF4")+(cAliasPed)->_TES))
 
@@ -1176,7 +1213,7 @@ Static Function MR05Planil(cNum,cAliasPed,_nTotal)
             EndIf
         EndIf
 
-        //³Altera peso para calcular frete              ³
+        //Altera peso para calcular frete
         SB1->(dbSetOrder(1))
         SB1->(MsSeek(xFilial("SB1")+(cAliasPed)->_PRODUTO))
 
