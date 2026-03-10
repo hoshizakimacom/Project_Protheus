@@ -36,7 +36,15 @@ User Function M05A06()
 
     If lMsErroAuto
         MsgStop('Erro ao criar item contabil para o cliente.' + CRLF + CRLF + 'Favor tirar print do erro e abrir chamado para TI.')
-        MostraErro()
+        	If (!IsBlind()) // COM INTERFACE GRÁFICA
+	MostraErro() // TELA
+Else // EM ESTADO DE JOB
+	cError := MostraErro("/dirdoc", "error.log") // ARMAZENA A MENSAGEM DE ERRO
+
+	ConOut(PadC("Automatic routine ended with error", 80))
+	ConOut("Error: "+ cError)
+EndIf
+
      Else
 
         // Atualiza cadastro do cliente
