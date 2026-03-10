@@ -1,264 +1,265 @@
-#Include 'Protheus.ch'
+#INCLUDE "protheus.ch"
 
-//+---------------------------------------------------------------------------------------------------------------------------------------------
-// Valida total de desconto do item do orçamento/pedido de venda
-//+---------------------------------------------------------------------------------------------------------------------------------------------
-User Function M05A28(cFunc,lItem,nvalor)
-    Local lRet      := .T.
-    Local aArea     := GetArea()
-    Local nItens    := 0
-    Local nDescCab  := 1
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M05A28(CFUNC,LITEM,NVALOR)
+LOCAL LRET :=  .T. 
+LOCAL AAREA := GETAREA()
+LOCAL NITENS := 0
+LOCAL NDESCCAB := 1
+
+LOCAL CMSG := ""
+LOCAL CGRPAPR := GETMV("AM_05A28_A",,"")
+LOCAL LAPROV := U_M00A01(CGRPAPR)
+LOCAL CCODUSR := RETCODUSR()
+PRIVATE CNOMUSR := USRFULLNAME(CCODUSR)
+PRIVATE NDESCITE := 1
+
+NVALOR := IIF(NVALOR==NIL,0,NVALOR)
+
+NDESCCAB := MA05GETDEC(CFUNC)
+
+LRET := MA05GETTOT(CFUNC,NDESCCAB,@CMSG,LITEM,@NITENS,NVALOR)
+
+IF !(LRET := EMPTY(CMSG))
+
+    IF LAPROV
+        LRET := MSGYESNO(I18N("DESCONTO CONCEDIDO É MAIOR QUE O PERMITIDO PARA OS #1 ITENS ABAIXO." + CRLF+"#2" + CRLF + CRLF+"DESEJA APROVAR TODOS OS DESCONTOS?",{NITENS,CMSG}),)
+        
+        IF LRET
+            M->C5_XAPROV := USRFULLNAME(RETCODUSR())
+        ELSE 
+            M->C5_DESC1 := 0
+            M->C5_DESC2 := 0
+        ENDIF
+    ELSE 
+        AVISO("ATENÇÃO",I18N("DESCONTO CONCEDIDO É MAIOR QUE O PERMITIDO PARA OS #1 ITENS ABAIXO:" + CRLF+"#2",{NITENS,CMSG}),{"OK"},3)
+    ENDIF
+ENDIF
+
+RESTAREA(AAREA)
+RETURN LRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MA05GETDEC(CFUNC)
+LOCAL ADESC := {}
+LOCAL _NX := 0
+LOCAL NPERDESC := 1
+
+DO CASE 
+ CASE CFUNC=="PV"
+AADD(ADESC,1-(M->C5_DESC1) / (100))
+AADD(ADESC,1-(M->C5_DESC2) / (100))
+AADD(ADESC,1-(M->C5_DESC3) / (100))
+AADD(ADESC,1-(M->C5_DESC4) / (100))
+
+CASE CFUNC=="OV"
+
+AADD(ADESC,1-(M->CJ_DESC1) / (100))
+AADD(ADESC,1-(M->CJ_DESC2) / (100))
+AADD(ADESC,1-(M->CJ_DESC3) / (100))
+AADD(ADESC,1-(M->CJ_DESC4) / (100))
+ENDCASE
+
+FOR _NX := 1 TO  LEN(ADESC)
+    NPERDESC := (NPERDESC) * (ADESC[_NX])
+NEXT
+
+RETURN NPERDESC
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MA05GETTOT(CFUNC,NPERDESC,CMSG,LITEM,NITENS,NVALOR)
+
+LOCAL AAREA := GETAREA()
+LOCAL NBKP
+LOCAL NITEM := 0
+LOCAL ADESC := {}
+LOCAL LRET :=  .T. 
+
+DO CASE 
+ CASE CFUNC=="PV"
+IF LITEM
+    AAUX := MA05DESCPV(NPERDESC,NVALOR)
+    AADD(ADESC,AAUX)
+ELSE 
+
+    NBKP := N
+    N := 1
     
-    Local cMsg      := ''
-    Local cGrpApr   := GetMv('AM_05A28_A',,'')
-    Local lAprov    := U_M00A01(cGrpApr)
-    Local cCodUsr	:= RetCodUsr()
-    Private cNomUsr	:= UsrFullName(cCodUsr)
-    Private nDescIte  := 1
+    IF  LEN(ACOLS)>0 .AND. !(EMPTY(GDFIELDGET("C6_PRODUTO",N)))
+        FOR N := 1 TO  LEN(ACOLS)
+            AAUX := {}
+            AAUX := MA05DESCPV(NPERDESC)
+            AADD(ADESC,AAUX)
+        NEXT
+        N := NBKP
+        OGETDAD:OBROWSE:REFRESH()
+    ENDIF
+ENDIF
+
+CASE CFUNC=="OV"
+IF LITEM
+    AAUX := MA05DESCOV(NPERDESC,NVALOR)
+    AADD(ADESC,AAUX)
+ELSE 
+
+    (TMP1)->(DBGOTOP())
+
+    IF !(TMP1)->(EOF()) .AND. !(EMPTY((TMP1)->(FIELDGET(FIELDPOS("CK_PRODUTO")))))
+        WHILE !(TMP1)->(EOF())
+        
+            AAUX := {}
+            AAUX := MA05DESCOV(NPERDESC,NVALOR)
+            AADD(ADESC,AAUX)
+
+            (TMP1)->(DBSKIP())
+            ENDDO
+
+        (TMP1)->(DBGOTOP())
+
+        OGETDAD:OBROWSE:REFRESH()
+    ENDIF
+ENDIF
+ENDCASE
+
+FOR NITEM := 1 TO  LEN(ADESC)
     
-    DEFAULT nValor := 0
+    IF ADESC[NITEM][4]>0 .AND. ADESC[NITEM][4]<ADESC[NITEM][3]
+        CMSG += CHR(13)+CHR(10)+I18N("SEQ.: #1 |PROD.: #2 |DESC. APLICADO: #3 % |MÁXIMO: #4 %",{ADESC[NITEM][5],ADESC[NITEM][1],ADESC[NITEM][3],ADESC[NITEM][4]})
+        LRET :=  .F. 
+        NITENS++
+    ENDIF
+NEXT
 
-    // Busca Desconto no cabeçalho
-    nDescCab    := MA05GetDeC(cFunc)
+RESTAREA(AAREA)
+RETURN LRET
 
-    lRet := MA05GetTot(cFunc,nDescCab,@cMsg,lItem,@nItens,nvalor)
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MA05DESCPV(NPERDESC,NVALOR)
 
-    If !(lRet := Empty(cMsg))
+LOCAL CPROD := ""
+LOCAL CFAMILIA := ""
+LOCAL CITEM := ""
+LOCAL NDESCFAM := 0
+LOCAL NDESCTOT := 1
 
-        If lAprov
-            lRet := MsgYesNo(I18N('Desconto concedido é maior que o permitido para os #1 itens abaixo.' + CRLF + '#2' + CRLF + CRLF + 'Deseja aprovar todos os descontos?',{nItens,cMsg}))
-			If lRet
-				M->C5_XAPROV := UsrFullName(RetCodUsr())
-			Else
-				M->C5_DESC1 := 0
-				M->C5_DESC2 := 0
-			Endif
-        Else
-            Aviso('Atenção',I18N('Desconto concedido é maior que o permitido para os #1 itens abaixo:' + CRLF + '#2', {nItens,cMsg}),{'OK'},3)
-        EndIf
-    EndIf
+LOCAL NDESCI := 0
+LOCAL ARET := {}
+LOCAL CCODUSER := RETCODUSR()
+PRIVATE NITEM := 1
 
-    RestArea(aArea)
-Return lRet
+NVALOR := IIF(NVALOR==NIL,0,NVALOR)
 
-//+---------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MA05GetDeC(cFunc)
-    Local aDesc     := {}
-    Local _nX       := 0
-    Local nPerDesc  := 1
+IF TYPE("M->C6_DESCONT")=="N"
+    NDESCI := 1-(M->C6_DESCONT) / (100)
+ELSE 
+    NDESCI := 1-(GDFIELDGET("C6_DESCONT",N)) / (100)
+ENDIF
 
-    Do Case
-    Case cFunc == 'PV'
-        AAdd(aDesc, 1 - (M->C5_DESC1 / 100))
-        AAdd(aDesc, 1 - (M->C5_DESC2 / 100))
-        AAdd(aDesc, 1 - (M->C5_DESC3 / 100))
-        AAdd(aDesc, 1 - (M->C5_DESC4 / 100))
+IF TYPE("M->C6_DESCONT")=="U"
+    NDESCI := ((NVALOR) / (GDFIELDGET("C6_XVLTBRU",N))) * (100)
+    NDESCI := 100-NDESCI
 
-    Case cFunc == 'OV'
+    IF (READVAR()=="M->C5_DESC1") .OR. (READVAR()=="M->C5_DESC2")
+        NDESCTOT := 100-(NPERDESC) * (NDESCI)
+    ELSE 
+        NDESCTOT := (NPERDESC) * (NDESCI)
+    ENDIF
+ELSE 
+    NDESCTOT := (NPERDESC) * (NDESCI)
+    NDESCTOT := 100-(NDESCTOT) * (100)
+ENDIF
 
-        AAdd(aDesc, 1 - (M->CJ_DESC1 / 100))
-        AAdd(aDesc, 1 - (M->CJ_DESC2 / 100))
-        AAdd(aDesc, 1 - (M->CJ_DESC3 / 100))
-        AAdd(aDesc, 1 - (M->CJ_DESC4 / 100))
-    EndCase
+IF READVAR()=="M->C5_DESC1" .AND. M->C5_DESC1==0
+    NDESCTOT := 0
+ENDIF
 
-    For _nX := 1 to Len(aDesc)
-        nPerDesc := nPerDesc * aDesc[_nX]
-    Next _nX
+CPROD := GDFIELDGET("C6_PRODUTO",N)
+CFAMILIA := POSICIONE("SB1",1,XFILIAL("SB1")+CPROD,"B1_XFAMILI")
+NDESCFAM := POSICIONE("ZA1",1,XFILIAL("ZA1")+CFAMILIA,"ZA1_DESCON")
+CITEM := GDFIELDGET("C6_ITEM",N)
 
-Return nPerDesc
+IF (CCODUSER) $ ("000036|000078|000113|000190")
+    NDESCFAM := 30
+ENDIF
 
-//+---------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MA05GetTot(cFunc,nPerDesc,cMsg,lItem,nItens,nValor)
+IF CCODUSER=="000034"
+    NDESCFAM := 40
+ENDIF
 
-    Local aArea         := GetArea()
-    Local nBkp
-    Local nItem  := 0
-    Local aDesc         := {}
-    Local lRet          := .T.
- //   Default N
- 
-    Do Case
-    Case cFunc == 'PV'
-        If lItem
-            aAux    := MA05DescPV(nPerDesc,nValor)
-            AAdd(aDesc,aAux)
+AADD(ARET,CPROD)
+AADD(ARET,CFAMILIA)
+AADD(ARET,NDESCTOT)
+AADD(ARET,NDESCFAM)
+AADD(ARET,CITEM)
+RETURN ACLONE(ARET)
 
-        Else
-            nBkp    := N
-            N       := 1
-           If Len(aCols) > 0 .And. !Empty( GdFieldGet('C6_PRODUTO',n) )
-                For n := 1 To Len(aCols)
-                    aAux    := {}
-                    aAux    := MA05DescPV(nPerDesc)
-                    AAdd(aDesc,aAux)
-                Next
-                 N := nBkp
-                oGetDad:oBrowse:Refresh()
-            EndIf
-        EndIf
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MA05DESCOV(NPERDESC,NVALOR)
+LOCAL CPROD := ""
+LOCAL CFAMILIA := ""
+LOCAL CITEM := ""
+LOCAL NDESCFAM := 0
+LOCAL NDESCTOT := 1
+LOCAL NDESCI := 0
+LOCAL ARET := {}
+LOCAL CUSUARIO := RETCODUSR()
+PRIVATE NITEM := 1
+NVALOR := IIF(NVALOR==NIL,0,NVALOR)
 
-    Case cFunc == 'OV'
-        If lItem
-            aAux    := MA05DescOV(nPerDesc,nValor)
-            AAdd(aDesc,aAux)
-        Else
-
-            TMP1->(DbGotop())
-
-            If TMP1->(!EOF()) .And. !Empty( TMP1->(FieldGet(FieldPos('CK_PRODUTO'))) )
-                While TMP1->(!EOF())
-                    aAux    := {}
-                    aAux    := MA05DescOV(nPerDesc,nValor)
-                    AAdd(aDesc,aAux)
-
-                    TMP1->(DbSkip())
-                EndDo
-                TMP1->(DbGotop())
-
-                oGetDad:oBrowse:Refresh()
-            EndIf
-        EndIf
-    EndCase
-
-    For nItem := 1 To Len(aDesc)
-        If aDesc[nItem][4] > 0 .And. aDesc[nItem][4] < aDesc[nItem][3]
-            cMsg += CRLF + I18N('Seq.: #1 |Prod.: #2 |Desc. Aplicado: #3 % |Máximo: #4 %',{aDesc[nItem][5],aDesc[nItem][1],aDesc[nItem][3],aDesc[nItem][4]})
-            lRet := .F.
-            nItens++
-        EndIf
-    Next
-
-    RestArea(aArea)
-Return lRet
-
-//+---------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MA05DescPV(nPerDesc,nValor)
-
-    Local cProd         := ''
-    Local cFamilia      := ''
-    Local cItem         := ''
-    Local nDescFam      := 0
-    Local nDescTot      := 1
-   
-    Local nDescI        := 0
-    Local aRet          := {}
-    Local cCodUser		:= RetCodUsr()
-    Private nItem         := 1
-
-	DEFAULT nValor := 0
- 	
-    If Type('M->C6_DESCONT') == 'N'
-        nDescI      := 1 - (M->C6_DESCONT / 100)
-    Else
-        nDescI      := 1 - ( GdFieldGet('C6_DESCONT',n) / 100)
-    EndIf
-
-	If Type('M->C6_DESCONT') == 'U'
-		nDescI      := (nValor / GDFieldGet('C6_XVLTBRU',n)) * 100
-		nDescI		:= 100 - nDescI
-		
-		If ReadVar() == "M->C5_DESC1" .Or. ReadVar() == "M->C5_DESC2"
-			nDescTot    := 100 - (nPerDesc * nDescI)
-		Else
-			nDescTot    := nPerDesc * nDescI
-		Endif
-	Else
-	    nDescTot    := nPerDesc * nDescI
-	    nDescTot    := 100 - (nDescTot * 100)		
-	Endif
-
-	If ReadVar() == "M->C5_DESC1" .And. M->C5_DESC1 == 0 
-		nDescTot    := 0 
-	Endif
-
-    cProd       := GdFieldGet('C6_PRODUTO',n)
-    cFamilia    := Posicione('SB1',1,xFilial('SB1') + cProd,'B1_XFAMILI' )
-    nDescFam    := Posicione('ZA1',1,xFilial('ZA1') + cFamilia,'ZA1_DESCON')
-    cItem       := GdFieldGet('C6_ITEM',n)
-
-	// Independente do desconto máximo no cadastro de familia de produtos
-	// Os usuários : Celso|Cleyton|Sardinha|Silvia 
-	// podem aplicar desconto máximo de 20%. 
-	// Dessa forma altero o percentual de desconto abaixo
-
-	If cCodUser $ '000036|000078|000113|000190'
-		nDescFam	:= 30
-	Endif
-		
-	If cCodUser == '000034'
-		nDescFam	:= 40
-	Endif
-	
-    AAdd(aRet,cProd)
-    AAdd(aRet,cFamilia)
-    AAdd(aRet,nDescTot)
-    AAdd(aRet,nDescFam)
-    AAdd(aRet,cItem)
-Return AClone(aRet)
-
-//+---------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MA05DescOV(nPerDesc,nValor)
-    Local cProd         := ''
-    Local cFamilia      := ''
-    Local cItem         := ''
-    Local nDescFam      := 0
-    Local nDescTot      := 1
-    Local nDescI        := 0
-    Local aRet          := {}
-    Local cUsuario		:= RetCodUsr()
-    Private nItem         := 1
-    DEFAULT nValor := 0
- 
-	If ReadVar() $ 'M->CJ_DESC1'
-		nPerDesc := 1 - nPerDesc
-		nDescTot := M->CJ_DESC1 
-	Else
-		nPerDesc := 1 - nPerDesc
-		nDescTot := M->CJ_DESC1 + M->CJ_DESC2  		
-	    If Type('M->CK_DESCONT') == 'N'
-    	    nDescI      := ( M->CK_DESCONT / 100)
-    	Else
-        	nDescI      := 1 - ( TMP1->(FieldGet(FieldPos('CK_DESCONT')))/ 100)
-    	EndIf
-
-		If Type('M->CK_DESCONT') == 'U'
-			nDescI      := (nValor / TMP1->(FieldGet(FieldPos('CK_XVLTBRU')))) * 100
-			nDescI		:= 100 - nDescI
-			nDescTot    := nPerDesc * nDescI
-		Else
-	    	nDescTot    := nPerDesc + nDescI
-	    	nDescTot    := (nDescTot * 100)		
-		Endif
-
-		If ReadVar() == "M->CJ_DESC1" .And. M->CJ_DESC1 == 0 
-			nDescTot    := 100 - (nDescTot * 100)
-		Endif
-
-	    // nDescTot    := nPerDesc * nDescI
-	Endif
-	
-    cProd       := TMP1->(FieldGet(FieldPos('CK_PRODUTO')))
-    cFamilia    := Posicione('SB1',1,xFilial('SB1') + cProd,'B1_XFAMILI' )
-    nDescFam    := Posicione('ZA1',1,xFilial('ZA1') + cFamilia,'ZA1_DESCON')
-    cItem       := TMP1->(FieldGet(FieldPos('CK_ITEM')))
+IF (READVAR()) $ ("M->CJ_DESC1")
+    NPERDESC := 1-NPERDESC
+    NDESCTOT := M->CJ_DESC1
+ELSE 
+    NPERDESC := 1-NPERDESC
+    NDESCTOT := M->CJ_DESC1+M->CJ_DESC2
     
-	// Independente do desconto máximo no cadastro de familia de produtos
-	// Os usuários : Celso|Sardinha|Silvia 
-	// podem aplicar desconto máximo de 30%. 
-	// Dessa forma altero o percentual de desconto abaixo
-    If cUsuario $ '000036|000078|000113'
-    	nDescFam	:= 30
-    Endif
+    IF TYPE("M->CK_DESCONT")=="N"
+        NDESCI := (M->CK_DESCONT) / (100)
+    ELSE 
+        NDESCI := 1-((TMP1)->(FIELDGET(FIELDPOS("CK_DESCONT")))) / (100)
+    ENDIF
     
-    If cUsuario == '000034'
-    	nDescFam	:= 40
-    Endif    
+    IF TYPE("M->CK_DESCONT")=="U"
+        NDESCI := ((NVALOR) / ((TMP1)->(FIELDGET(FIELDPOS("CK_XVLTBRU"))))) * (100)
+        NDESCI := 100-NDESCI
+        NDESCTOT := (NPERDESC) * (NDESCI)
+    ELSE 
+        NDESCTOT := NPERDESC+NDESCI
+        NDESCTOT := (NDESCTOT) * (100)
+    ENDIF
+    
+    IF READVAR()=="M->CJ_DESC1" .AND. M->CJ_DESC1==0
+        NDESCTOT := 100-(NDESCTOT) * (100)
+    ENDIF
+ENDIF
 
-    AAdd(aRet,cProd)
-    AAdd(aRet,cFamilia)
-    AAdd(aRet,nDescTot)
-    AAdd(aRet,nDescFam)
-    AAdd(aRet,cItem)
+CPROD := (TMP1)->(FIELDGET(FIELDPOS("CK_PRODUTO")))
+CFAMILIA := POSICIONE("SB1",1,XFILIAL("SB1")+CPROD,"B1_XFAMILI")
+NDESCFAM := POSICIONE("ZA1",1,XFILIAL("ZA1")+CFAMILIA,"ZA1_DESCON")
+CITEM := (TMP1)->(FIELDGET(FIELDPOS("CK_ITEM")))
 
-Return AClone(aRet)
+IF (CUSUARIO) $ ("000036|000078|000113")
+    NDESCFAM := 30
+ENDIF
+
+IF CUSUARIO=="000034"
+    NDESCFAM := 40
+ENDIF
+
+AADD(ARET,CPROD)
+AADD(ARET,CFAMILIA)
+AADD(ARET,NDESCTOT)
+AADD(ARET,NDESCFAM)
+AADD(ARET,CITEM)
+
+RETURN ACLONE(ARET)
