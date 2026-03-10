@@ -43,7 +43,7 @@ Return
 //+----------------------------------------------------------------------------------------------------------------
 Static Function M04EMain(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 
-	BeginTran()
+	BEGIN TRANSACTION //BeginTran()
 
 		If M04EValid(_cCodProd,_nQtd,_cNota,_nQtdImp)
 
@@ -54,7 +54,7 @@ Static Function M04EMain(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 
 		EndIf
 
-	EndTran()
+	END TRANSACTION //EndTran()
 	MsUnlockAll()
 
 Return
