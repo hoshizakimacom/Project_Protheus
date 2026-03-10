@@ -3,16 +3,16 @@
 #INCLUDE "TOPCONN.CH"
 #Include "TBICONN.CH"
 /*/
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Fun‡…o    ³ M06M01   ³ Autor ³ Marcos Rocha '  	    ³ Data ³ 16/10/23 ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri‡…o ³ Envia email de Pedido de Compra                            ³±±
-±±³          ³ Especifico Macom                                           ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½
+ï¿½ï¿½ï¿½Funï¿½ï¿½o    ï¿½ M06M01   ï¿½ Autor ï¿½ Marcos Rocha '  	    ï¿½ Data ï¿½ 16/10/23 ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä´ï¿½ï¿½
+ï¿½ï¿½ï¿½Descriï¿½ï¿½o ï¿½ Envia email de Pedido de Compra                            ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½          ï¿½ Especifico Macom                                           ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù±ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 /*/
 User Function M02M01()
 
@@ -46,10 +46,10 @@ If File("samples/wf/M02M01_Mail001.html")
 	EndIf
 
 	If Empty(cEmailFor)
-		MsgStop("Email do Fornecedor não preenchido !")
+		MsgStop("Email do Fornecedor nï¿½o preenchido !")
 	EndIf
 
-    If MsgYesNo('Envia Email para Fornecedor ?',"Atenção")
+    If MsgYesNo('Envia Email para Fornecedor ?',"Atenï¿½ï¿½o")
   		cMailEnv := cEmailFor
 		lEnvFor  := .T.
     EndIf
@@ -64,7 +64,7 @@ If File("samples/wf/M02M01_Mail001.html")
 	//If File(cAnexo)
 	//	MsgStop("Arquivo Localizado ")
 	//Else
-	//	MsgStop("Arquivo Não Localizado ")
+	//	MsgStop("Arquivo Nï¿½o Localizado ")
 	//Endif 
 
     If U_MTSendMail({cMailEnv},OemToAnsi("Pedido de Compra"),cBody,cAnexo)
@@ -121,12 +121,14 @@ Copia da Funcao de envio de email - Incluido parametro de anexo.
 //-------------------------------------------------------------------
 User Function MTSendMail(aMailPara,cMailAssun,cMailTexto,cAnexo)
 
-// - Variaveis para conexão ao servidor de e-mail.
+// - Variaveis para conexï¿½o ao servidor de e-mail.
 Local cMailServer	:= AllTrim(SuperGetMv("MV_RELSERV"))
 Local cMailConta 	:= AllTrim(SuperGetMv("MV_RELACNT"))
 Local cMailSenha 	:= AllTrim(SuperGetMv("MV_RELPSW"))
 Local lAuth		:= SuperGetMv("MV_RELAUTH",,.F.)
-
+Local nSMTPPort 	:= GetNewPar("MV_PORSMTP",25)	// PORTA SMTP
+	Local lAutentica	:= GetNewPar("MV_RELAUTH",.F.)	// VERIFICAR A NECESSIDADE DE AUTENTICACAO
+	Local nSMTPTime 	:= GetNewPar("MV_RELTIME",60)	// TIMEOUT PARA A CONEXAO       
 //PARA ATENTICAR NO SERVIDOR DE EMAIL
 Local cUsrAutent  	:= SuperGetMv("MV_RELAUSR")
 Local cPswAutent  	:= SuperGetMv("MV_RELAPSW")
@@ -145,7 +147,7 @@ If Len(aMailPara) == 0
 EndIf
 
 If lRet .And. !Empty(cMailServer) .And. !Empty(cMailConta) .And. !Empty(cMailSenha)
-	//- Realiza validações para envio de e-mail
+	//- Realiza validaï¿½ï¿½es para envio de e-mail
 	For nI := 1 To Len(aMailPara)
     	If !Empty(aMailPara[nI])
     		cEnvia += aMailPara[nI]+"; "
@@ -153,41 +155,110 @@ If lRet .And. !Empty(cMailServer) .And. !Empty(cMailConta) .And. !Empty(cMailSen
     Next
     cEnvia := SubStr(cEnvia,1,Len(cEnvia)-2)
 
-    //- Conexão com o servidor SMTP
-	CONNECT SMTP SERVER cMailServer ACCOUNT cMailConta PASSWORD cMailSenha RESULT lRet
+    //- Conexï¿½o com o servidor SMTP
+//	CONNECT SMTP SERVER cMailServer ACCOUNT cMailConta PASSWORD cMailSenha RESULT lRet
+//
+//	If lRet .And. lAuth
+//	//- Autenticacao da conta de e-mail
+//		lRet := MailAuth(cUsrAutent,cPswAutent)
+//		If !lRet
+//			If lMsgError
+//				GET MAIL ERROR cError
+//				MsgInfo(cError,OemToAnsi("Erro de Autenticaï¿½ï¿½o do usuario no servidor de E-Mail")) // "Erro de Autenticaï¿½ï¿½o do usuario no servidor de E-Mail"
+//			Endif
+//			lRet := .F.
+//		Endif
+//	Else
+//		If !lRet
+//			If lMsgError
+//				GET MAIL ERROR cError
+//				MsgInfo(cError,OemToAnsi("Erro de Conexï¿½o com servidor de E-Mail"))	//"Erro de Conexï¿½o com servidor de E-Mail"
+//			Endif
+//			lRet := .F.
+//		Endif
+//	EndIf
+//
+//	If lRet
+//	//- Processa envio de e-mail
+//		SEND MAIL FROM cMailConta TO cEnvia SUBJECT cMailAssun BODY cMailTexto ATTACHMENT cAnexo RESULT lRet
+//		//SEND MAIL FROM cMailConta TO cEnvia SUBJECT cMailAssun BODY cMailTexto RESULT lRet
+//		If !lRet
+//			If lMsgError
+//				GET MAIL ERROR cError
+//				MsgInfo(cError,OemToAnsi("Erro ao enviar E-Mail"))	//"Erro ao enviar E-Mail"
+//			Endif
+//		EndIf
+//	EndIf
+//	DISCONNECT SMTP SERVER
 
-	If lRet .And. lAuth
-	//- Autenticacao da conta de e-mail
-		lRet := MailAuth(cUsrAutent,cPswAutent)
-		If !lRet
-			If lMsgError
-				GET MAIL ERROR cError
-				MsgInfo(cError,OemToAnsi("Erro de Autenticação do usuario no servidor de E-Mail")) // "Erro de Autenticação do usuario no servidor de E-Mail"
-			Endif
-			lRet := .F.
-		Endif
-	Else
-		If !lRet
-			If lMsgError
-				GET MAIL ERROR cError
-				MsgInfo(cError,OemToAnsi("Erro de Conexão com servidor de E-Mail"))	//"Erro de Conexão com servidor de E-Mail"
-			Endif
-			lRet := .F.
-		Endif
+
+
+//Objeto de Email
+	oServer := tMailManager():New()
+
+
+
+
+	nErr := oServer:init("",cMailServer,ACCOUNT,PASSWORD,,cMailSenha)
+	If nErr <> 0	
+		alert("Falha ao conectar:" + oServer:getErrorString(nErr)) // Falha ao conectar: 	
+		Return(.F.)
+	Endif
+
+
+	If oServer:SetSMTPTimeout(nSMTPTime) != 0
+		alert("Falha ao definir timeout") // Falha ao definir timeout
+		Return(.F.)
 	EndIf
 
-	If lRet
-	//- Processa envio de e-mail
-		SEND MAIL FROM cMailConta TO cEnvia SUBJECT cMailAssun BODY cMailTexto ATTACHMENT cAnexo RESULT lRet
-		//SEND MAIL FROM cMailConta TO cEnvia SUBJECT cMailAssun BODY cMailTexto RESULT lRet
-		If !lRet
-			If lMsgError
-				GET MAIL ERROR cError
-				MsgInfo(cError,OemToAnsi("Erro ao enviar E-Mail"))	//"Erro ao enviar E-Mail"
-			Endif
+
+	nErr := oServer:smtpConnect()
+	If nErr <> 0	
+		alert("Falha ao conectar:" + oServer:getErrorString(nErr)) // Falha ao conectar:		
+		oServer:SMTPDisconnect()
+		Return(.F.)
+	EndIf
+
+
+
+	// Realiza autenticacao no servidor
+	If lAutentica
+		nErr := oServer:smtpAuth(cMailTexto,cPswAutent)
+		If nErr <> 0		
+			alert("Falha ao autenticar: " + oServer:getErrorString(nErr)) // Falha ao autenticar: 
+			oServer:SMTPDisconnect() 
 		EndIf
+	EndIf	
+
+
+	// Cria uma nova mensagem (TMailMessage)
+	oMessage := tMailMessage():new()
+	oMessage:clear()        
+
+
+	// Dados da mensagem		
+	oMessage:cFrom		:= cMailConta  
+	oMessage:cTo     	:=  cEnvia 
+	oMessage:cSubject	:= cMailAssun
+	oMessage:cBody   	:= cMailTexto
+
+
+
+	nErr := oMessage:send(oServer)
+	If nErr <> 0		
+		alert("Falha ao Enviar MSg: " + oServer:getErrorString(nErr)) // Falha ao autenticar: 
+		oServer:SMTPDisconnect() 
 	EndIf
-	DISCONNECT SMTP SERVER
+
+	// Desconecta do Servidor
+	oServer:smtpDisconnect() 
+
+
+
+
+
+
+
 Else
 	MsgInfo(OemToAnsi("Envio OK"))
 EndIf
