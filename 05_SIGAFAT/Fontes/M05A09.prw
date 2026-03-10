@@ -19,14 +19,13 @@ User Function M05A09(_cFilial,_cCliente,_cLoja)
     EndIf
 
     If _lBlqCred
-        //Alteração para não considerar titulo CRA e ajustar para tamanho de 3 caracteres. Ticket#7257_MONTES_20250703
         BeginSql Alias _cAlias
             Column E1_VENCREA as Date
             SELECT  E1_FILIAL,E1_PREFIXO, E1_NUM,E1_PARCELA,E1_TIPO,E1_VALOR,E1_SALDO,E1_VENCREA
                 FROM SE1010 SE1
                 WHERE   E1_SALDO > 0
                     AND E1_CLIENTE = %Exp:_cCliente% AND E1_LOJA = %Exp:_cLoja%  AND E1_FILIAL = %Exp:_cFilial% AND E1_VENCREA < %Exp:Date()% AND SE1.%NotDel%
-                    AND E1_TIPO NOT IN ('RA ','NCC','CRA')
+                    AND E1_TIPO NOT IN ('RA','NCC')
         EndSql
 
         If (_cAlias)->(!EOF())
