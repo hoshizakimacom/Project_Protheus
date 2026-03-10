@@ -44,7 +44,7 @@ Static Function M02EMain(_cCodProd1,_cCodProd2,_nQtd)
 
 	Private _nX	:= 0
 
-	BeginTran()
+	Begin Transaction 
 
 		If M02EValid(_cCodProd1,_cCodProd2,_nQtd)
 
@@ -54,7 +54,7 @@ Static Function M02EMain(_cCodProd1,_cCodProd2,_nQtd)
 			_nQtd		:= 1
 		EndIf
 
-	EndTran()
+	End Transaction
 	MsUnlockAll()
 
 Return
