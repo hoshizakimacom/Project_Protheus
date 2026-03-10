@@ -1,22 +1,19 @@
-#Include 'Protheus.ch'
+#INCLUDE "protheus.ch"
 
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M05A40()
 
-//------------------------------------------------------------------------------
-//  Rotina de calculo de % de margem de custo médio
-//------------------------------------------------------------------------------
-User Function M05A40()
+LOCAL CRET := ""
+LOCAL NVLBRUTO := CK_XVLUBRU
+LOCAL NIMPOSTO := CK_XVLTIPI+CK_XVLTPS2+CK_XVLTCF2+CK_XVLTICM+CK_XVLTSOL
+LOCAL NCUSTOMD := POSICIONE("SB2",1,XFILIAL("SB2")+SCK->CK_PRODUTO,"B2_CMFIM1")
 
-local cRet     := ""
-local nVlBruto := CK_XVLUBRU
-local nImposto := CK_XVLTIPI+CK_XVLTPS2+CK_XVLTCF2+CK_XVLTICM+CK_XVLTSOL
-local nCustoMd := POSICIONE("SB2",1,XFILIAL("SB2")+SCK->CK_PRODUTO,"B2_CMFIM1")
+IF !(EMPTY(SCK->CK_TPPROD))
+    CRET := ((NVLBRUTO-NIMPOSTO-NCUSTOMD) / (NVLBRUTO-NIMPOSTO)) * (100)
+ELSE 
+    CRET := 0
+ENDIF
 
-   //MsgStop("TESTE")
-
-   If !Empty(SCK->CK_TPPROD)
-      cRet := ((nVlBruto-(nImposto)-(nCustoMd))/(nVlBruto+(nImposto))*100)
-   else
-      cRet := 0
-   endif
-
-return cRet
+RETURN CRET
