@@ -17,10 +17,14 @@ Return
 Static Function MenuDef()
     Local aRotina := {}
 
-    ADD OPTION aRotina TITLE 'Visualizar' ACTION 'VIEWDEF.M05A17' OPERATION 2 ACCESS 0
+    /*ADD OPTION aRotina TITLE 'Visualizar' ACTION 'VIEWDEF.M05A17' OPERATION 2 ACCESS 0
     ADD OPTION aRotina TITLE 'Incluir'    ACTION 'VIEWDEF.M05A17' OPERATION 3 ACCESS 0
     ADD OPTION aRotina TITLE 'Alterar'    ACTION 'VIEWDEF.M05A17' OPERATION 4 ACCESS 0
-    ADD OPTION aRotina TITLE 'Excluir'    ACTION 'VIEWDEF.M05A17' OPERATION 5 ACCESS 0
+    ADD OPTION aRotina TITLE 'Excluir'    ACTION 'VIEWDEF.M05A17' OPERATION 5 ACCESS 0*/
+    aAdd(aRotina, {'Visualizar', 'VIEWDEF.M05A17',0,2})
+    aAdd(aRotina, {'Incluir',   'VIEWDEF.M05A17',0,3})
+    aAdd(aRotina, {'Alterar',   'VIEWDEF.M05A17',0,4})
+    aAdd(aRotina, {'Excluir',   'VIEWDEF.M05A17',0,5})
 Return aRotina
 
 
