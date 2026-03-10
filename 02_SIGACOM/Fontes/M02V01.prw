@@ -1,21 +1,19 @@
-#INCLUDE "rwmake.ch"
+#INCLUDE "protheus.ch"
 
-/*/
-// Validacao para a data de entrega do pedido de compras nao
-//  ser inferior a data de emissao ou database
-/*/
-User Function M02V01()
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M02V01()
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Variaveis da Rotina                                                 ³                                                                ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ  
-Local lRet		:= .T. 
+LOCAL LRET :=  .T. 
 
-If ReadVar() == "M->C7_DATPRF"
-	If Dtos(&(ReadVar())) < Dtos(DA120EMIS) .Or. Dtos(&(ReadVar())) < Dtos(dDatabase)
-		lRet := .F.
-		Help(" ",1,"Inconsistência",,"A data de entrega não pode ser inferior a data de emissão ou database.",4)
-	EndIf
-EndIf
+IF READVAR()=="M->C7_DATPRF"
+    
+    IF (DTOS(&(READVAR()))<DTOS(DA120EMIS)) .OR. (DTOS(&(READVAR()))<DTOS(DDATABASE))
+        LRET :=  .F. 
+        HELP(" ",1,"INCONSISTENCIA",,"A DATA DE ENTREGA NÃO PODE SER INFERIOR A DATA DE EMISSAO OU DATABASE.",4)
+    ENDIF
+ENDIF
 
-Return(lRet)	
+RETURN LRET
+
