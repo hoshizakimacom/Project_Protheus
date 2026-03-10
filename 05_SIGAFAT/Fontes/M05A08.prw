@@ -2,7 +2,7 @@
 #include 'colors.ch'
 
 //+---------------------------------------------------------------------------------------------------------
-//|	Rotina responsável pela criação dos titulos de recebimento antecipado com prefixo PVA
+//|	Rotina responsï¿½vel pela criaï¿½ï¿½o dos titulos de recebimento antecipado com prefixo PVA
 //|	Chamada do PE MA410MNU
 //+---------------------------------------------------------------------------------------------------------
 User Function M05A08()
@@ -26,7 +26,7 @@ User Function M05A08()
 	Local _oPedido		:= Nil
 
 	//+------------------------------------
-	// Valida informações do pedido/itens
+	// Valida informaï¿½ï¿½es do pedido/itens
 	//+------------------------------------
 	_lOk := MA08Valid(@_cNaturez)
 
@@ -93,7 +93,7 @@ Return
 //+---------------------------------------------------------------------------------------------------------
 
 //+--------------------------------------------------------------------------------------------
-//|	Rotina responsável pela inclusão do titulo a receber
+//|	Rotina responsï¿½vel pela inclusï¿½o do titulo a receber
 //+--------------------------------------------------------------------------------------------
 Static Function MA08PutSE1(_cE1Num,_nValor,_dData,_cParc,_cRAPre,_cNaturez,_cErro,_cMsg)
 	Local _aVet		:= {}
@@ -143,7 +143,7 @@ Static Function MA08PutSE1(_cE1Num,_nValor,_dData,_cParc,_cRAPre,_cNaturez,_cErr
 
 	_aVet	:= FwVetByDic(_aVet,'SE1')
 
-	MsExecAuto( { |x,y| FINA040(x,y)} , _aVet, 3)  // 3 - Inclusao, 4 - Alteração, 5 - Exclusão
+	MsExecAuto( { |x,y| FINA040(x,y)} , _aVet, 3)  // 3 - Inclusao, 4 - Alteraï¿½ï¿½o, 5 - Exclusï¿½o
 
 	If lMsErroAuto
 		_cErro := MA010GetEr()
@@ -156,7 +156,7 @@ Static Function MA08PutSE1(_cE1Num,_nValor,_dData,_cParc,_cRAPre,_cNaturez,_cErr
 Return !lMsErroAuto
 
 //+--------------------------------------------------------------------------------------------
-//|	Rotina responsável pela definição dos valores e datas das parcelas a serem geradas
+//|	Rotina responsï¿½vel pela definiï¿½ï¿½o dos valores e datas das parcelas a serem geradas
 //+--------------------------------------------------------------------------------------------
 Static Function MA08Ok(_nRecnoSC5,_nRecAnt,_cCondPag,_cRAPre,_cNaturez)
 
@@ -172,7 +172,7 @@ Static Function MA08Ok(_nRecnoSC5,_nRecAnt,_cCondPag,_cRAPre,_cNaturez)
 
 	_aDuplic := Condicao(_nRecAnt,_cCondPag)
 
-	BeginTran()
+	Begin Transaction
 		SE1->(DbGoTop())
 		SE1->(DbSetOrder(1))
 
@@ -183,7 +183,7 @@ Static Function MA08Ok(_nRecnoSC5,_nRecAnt,_cCondPag,_cRAPre,_cNaturez)
 
 		For _nX := 1 To Len(_aDuplic)
 
-			// Posiciona SC5 - na gravação da segunda parcela ele está desposicionado  
+			// Posiciona SC5 - na gravaï¿½ï¿½o da segunda parcela ele estï¿½ desposicionado  
 			SC5->(dbGoto(_nRecnoSC5))
 
 			_nValor 	:= _aDuplic[_nX][2]
@@ -200,16 +200,17 @@ Static Function MA08Ok(_nRecnoSC5,_nRecAnt,_cCondPag,_cRAPre,_cNaturez)
 		DisarmTransaction()
 		MsUnlockAll()
 
-		MsgInfo(I18N('Erro ao incluir recebimento antecipado: ' + CRLF + CRLF + ' #1',{_cErro}),'Atenção')
+		MsgInfo(I18N('Erro ao incluir recebimento antecipado: ' + CRLF + CRLF + ' #1',{_cErro}),'Atenï¿½ï¿½o')
 	Else
-		EndTran()
+		
 		MsUnlockAll()
-		Aviso('Atenção','Recebimento(s) gerados(s): ' + CRLF + CRLF + _cMsg,{'OK'},3)
+		Aviso('Atenï¿½ï¿½o','Recebimento(s) gerados(s): ' + CRLF + CRLF + _cMsg,{'OK'},3)
 	EndIf
+	End Transaction
 Return
 
 //+--------------------------------------------------------------------------------------------
-//|	Rotina responsável pela validação do total informado pelo usuário
+//|	Rotina responsï¿½vel pela validaï¿½ï¿½o do total informado pelo usuï¿½rio
 //+--------------------------------------------------------------------------------------------
 Static Function MA08ValidT(_nRecAnt,_nPedSaldo)
 	Local _lRet	:= .T.
@@ -219,12 +220,12 @@ Static Function MA08ValidT(_nRecAnt,_nPedSaldo)
 	EndIf
 
 	If _lRet .And. !(_lRet := _nRecAnt <= _nPedSaldo)
-		MsgStop('Recebimento antecipado não pode ser maior que o valor do saldo total.')
+		MsgStop('Recebimento antecipado nï¿½o pode ser maior que o valor do saldo total.')
 	EndIf
 Return _lRet
 
 //+--------------------------------------------------------------------------------------------
-//|	Rotina responsável pela validação da condição de pagamento informada pelo usuário
+//|	Rotina responsï¿½vel pela validaï¿½ï¿½o da condiï¿½ï¿½o de pagamento informada pelo usuï¿½rio
 //+--------------------------------------------------------------------------------------------
 Static Function MA08ValidC(_cCondPag,_nTotal)
 	Local _lRet 		:= .T.
@@ -234,14 +235,14 @@ Static Function MA08ValidC(_cCondPag,_nTotal)
 	SE4->(DbGoTop())
 
 	If !Empty(_cCondPag) .And.  !(_lRet := SE4->(DbSeek(xFilial("SE4") + _cCondPag)) )
-		Alert('Condição de pagamento não encontrada.')
+		Alert('Condiï¿½ï¿½o de pagamento nï¿½o encontrada.')
 	EndIf
 
 	RestArea(aArea)
 Return _lRet
 
 //+--------------------------------------------------------------------------------------------
-//|	Rotina responsável pela validação dos dados do pedido utilizados para gerar o reb. antecipado
+//|	Rotina responsï¿½vel pela validaï¿½ï¿½o dos dados do pedido utilizados para gerar o reb. antecipado
 //+--------------------------------------------------------------------------------------------
 Static Function MA08Valid(_cNaturez)
 	Local _lRet			:= .T.
@@ -252,11 +253,11 @@ Static Function MA08Valid(_cNaturez)
 	_lRet	:= SC5->(!EOF())
 
 	If !_lRet
-		MsgInfo('É obrigatório estar posicionado em um registro para gerar recebimento antecipado.','Atenção')
+		MsgInfo('ï¿½ obrigatï¿½rio estar posicionado em um registro para gerar recebimento antecipado.','Atenï¿½ï¿½o')
 	EndIf
 
 	If _lRet .And. !(_lRet := !Empty(SC5->C5_CLIENTE))
-		MsgInfo('Informe o cliente antes de incluir o recebimento antecipado.','Atenção')
+		MsgInfo('Informe o cliente antes de incluir o recebimento antecipado.','Atenï¿½ï¿½o')
 	EndIf
 
 	//+------------------------------------
@@ -269,14 +270,14 @@ Static Function MA08Valid(_cNaturez)
 		SED->(DbSetOrder(1))
 
 		If !(_lRet := (SED->(DbSeek( xFilial('SED') + _cNaturez))))
-			MsgInfo('Verifique Natureza informada no cadastro do cliente antes de incluir o recebimento antecipado.','Atenção')
+			MsgInfo('Verifique Natureza informada no cadastro do cliente antes de incluir o recebimento antecipado.','Atenï¿½ï¿½o')
 		EndIf
 	EndIf
 
 	//+------------------------------------
 	// 	Valida CFOP para nao gerar
 	//	recebimento para os CFOP informados
-	//	no parâmetro
+	//	no parï¿½metro
 	//+------------------------------------
 	If _lRet
 		SC6->(DbGoTop())
@@ -286,8 +287,8 @@ Static Function MA08Valid(_cNaturez)
 			While SC6->(!EOF()) .And. SC6->(C6_FILIAL + C6_NUM ) ==  SC5->(C5_FILIAL + C5_NUM)
 
 				If !(_lRet := !(SC6->C6_CF $ _cCFBlq))
-					MsgInfo(I18N('CFOP do item #1 não permite incluir recebimento antecipado.' ;
-								+ CRLF + 'Parâmetro #2.',{AllTrim(SC6->C6_ITEM),'MV_X06A002'}),'Atenção')
+					MsgInfo(I18N('CFOP do item #1 nï¿½o permite incluir recebimento antecipado.' ;
+								+ CRLF + 'Parï¿½metro #2.',{AllTrim(SC6->C6_ITEM),'MV_X06A002'}),'Atenï¿½ï¿½o')
 					Exit
 				EndIf
 
@@ -302,13 +303,13 @@ Static Function MA08Valid(_cNaturez)
 	// Verificacao de itens/quantidade
 	//+------------------------------------
 	If _lRet .And. !(_lRet := (_nValor> 0))
-		MsgInfo('Não é possível gerar recebimento antecipado para pedido sem Valor Bruto.' ;
-					+ CRLF + 'Verifique quantidade dos itens.','Atenção')
+		MsgInfo('Nï¿½o ï¿½ possï¿½vel gerar recebimento antecipado para pedido sem Valor Bruto.' ;
+					+ CRLF + 'Verifique quantidade dos itens.','Atenï¿½ï¿½o')
 	EndIf
 Return _lRet
 
 //+--------------------------------------------------------------------------------------------
-//|	Rotina responsável pela captura da mensagem de erro na execução automática
+//|	Rotina responsï¿½vel pela captura da mensagem de erro na execuï¿½ï¿½o automï¿½tica
 //+--------------------------------------------------------------------------------------------
 Static Function MA010GetEr()
 	Local _lTitulo		:= .T.
@@ -335,7 +336,7 @@ Static Function MA010GetEr()
 Return _cRet
 
 //+--------------------------------------------------------------------------------------------
-//|	Rotina responsável pelo retorno do total de títulos de recebimento antecipados do pedido
+//|	Rotina responsï¿½vel pelo retorno do total de tï¿½tulos de recebimento antecipados do pedido
 //+--------------------------------------------------------------------------------------------
 Static Function MA08GetSE1(_cPedido,_cRAPre,_cCodCli,_cLojCli)
 	Local _nRet	:= 0
@@ -362,7 +363,7 @@ Static Function MA08GetSE1(_cPedido,_cRAPre,_cCodCli,_cLojCli)
 Return _nRet
 
 //+----------------------------------------------------------------------------------------
-//|	Rotina responsável pelo cálculo do total do pedido
+//|	Rotina responsï¿½vel pelo cï¿½lculo do total do pedido
 //+----------------------------------------------------------------------------------------
 Static Function MA08GetTot(_nRecnoSC5,_nTotal,_nFrete,_nSeguro,_nDesp,_nFreteA,_nAcrFin,_cCondPag)
 	Local _aAreaSC5		:= SC5->(GetArea())
@@ -573,7 +574,7 @@ Static Function MA08GetTot(_nRecnoSC5,_nTotal,_nFrete,_nSeguro,_nDesp,_nFreteA,_
 Return
 
 //+----------------------------------------------------------------------------------------
-//|	Rotina responsável pela inicialização das referencias utilizadas no calculo do total
+//|	Rotina responsï¿½vel pela inicializaï¿½ï¿½o das referencias utilizadas no calculo do total
 //+----------------------------------------------------------------------------------------
 Static Function MA08FisIni(aFisGet,aFisGetSC5)
 	Local _aAreaSX3		:= SX3->(GetArea())
@@ -581,36 +582,38 @@ Static Function MA08FisIni(aFisGet,aFisGetSC5)
 	Local cReferencia 	:= ''
 	Local nPosIni     	:= 0
 	Local nLen        	:= 0
+	Local nCont
 
 	If aFisGet == Nil
 		aFisGet	:= {}
 
-		DbSelectArea('SX3')
+		//DbSelectArea('SX3')
 
-		SX3->(DbGoTop())
-		SX3->(dbSetOrder(1))
-		SX3->(DbSeek('SC6'))
+		//SX3->(DbGoTop())
+		//SX3->(dbSetOrder(1))
+		//SX3->(DbSeek('SC6'))
+		aCmp := FWSX3Util():GetAllFields( "SC6" , .T. )
 
-		While SX3->(!EOF()).And. SX3->X3_ARQUIVO == 'SC6'
-			cValid := UPPER(SX3->X3_VALID) + UPPER(SX3->X3_VLDUSER)
+		For nCont := 1 to Len(aCmp)//While SX3->(!EOF()).And. SX3->X3_ARQUIVO == 'SC6'
+			cValid := UPPER(getsx3cache(aCmp[nCont],"X3_VALID")) + UPPER(getsx3cache(aCmp[nCont],"X3_VLDUSER"))
 
 			If 'MAFISGET("'$cValid
 				nPosIni 		:= AT('MAFISGET("',cValid)+10
 				nLen			:= AT('")',Substr(cValid,nPosIni,Len(cValid)-nPosIni))-1
 				cReferencia 	:= Substr(cValid,nPosIni,nLen)
 
-				AAdd(aFisGet,{cReferencia,X3_CAMPO,MaFisOrdem(cReferencia)})
+				AAdd(aFisGet,{cReferencia,getsx3cache(aCmp[nCont],"X3_CAMPO"),MaFisOrdem(cReferencia)})
 			EndIf
 
 			If 'MAFISREF("'$cValid
 				nPosIni		:= AT('MAFISREF("',cValid) + 10
 				cReferencia	:= Substr(cValid,nPosIni,AT('","MT410",',cValid)-nPosIni)
 
-				AAdd(aFisGet,{cReferencia,X3_CAMPO,MaFisOrdem(cReferencia)})
+				AAdd(aFisGet,{cReferencia,getsx3cache(aCmp[nCont],"X3_CAMPO"),MaFisOrdem(cReferencia)})
 			EndIf
 
 			SX3->(DbSkip())
-		EndDo
+		Next //EndDo
 
 		ASort(aFisGet,,,{|x,y| x[3]<y[3]})
 	EndIf
@@ -618,31 +621,36 @@ Static Function MA08FisIni(aFisGet,aFisGetSC5)
 	If aFisGetSC5 == Nil
 		aFisGetSC5	:= {}
 
-		DbSelectArea('SX3')
-		SX3->(DbGoTop())
-		SX3->(dbSetOrder(1))
-		SX3->(DbSeek('SC5'))
+//		DbSelectArea('SX3')
+//		SX3->(DbGoTop())
+//		SX3->(dbSetOrder(1))
+//		SX3->(DbSeek('SC5'))
+		
+		
+		aCmp := FWSX3Util():GetAllFields( "SC5" , .T. )
+		//While !Eof() .And. SX3->X3_ARQUIVO=="CNF"
+	For nCont := 1 to Len(aCmp)
+		
 
-		While SX3->(!EOF()).And. SX3->X3_ARQUIVO == 'SC5'
-			cValid := UPPER(SX3->X3_VALID) + UPPER(SX3->X3_VLDUSER)
+		//While SX3->(!EOF()).And. SX3->X3_ARQUIVO == 'SC5'
+			cValid := UPPER(getsx3cache(aCmp[nCont],"X3_VALID")) + UPPER(getsx3cache(aCmp[nCont],"X3_VLDUSER"))
 
 			If 'MAFISGET("'$cValid
 				nPosIni 		:= AT('MAFISGET("',cValid)+10
 				nLen			:= AT('")',Substr(cValid,nPosIni,Len(cValid)-nPosIni))-1
 				cReferencia 	:= Substr(cValid,nPosIni,nLen)
 
-				aAdd(aFisGetSC5,{cReferencia,X3_CAMPO,MaFisOrdem(cReferencia)})
+				aAdd(aFisGetSC5,{cReferencia,getsx3cache(aCmp[nCont],"X3_CAMPO"),MaFisOrdem(cReferencia)})
 			EndIf
 
 			If 'MAFISREF("'$cValid
 				nPosIni			:= AT('MAFISREF("',cValid) + 10
 				cReferencia		:= Substr(cValid,nPosIni,AT('","MT410",',cValid)-nPosIni)
 
-				aAdd(aFisGetSC5,{cReferencia,X3_CAMPO,MaFisOrdem(cReferencia)})
+				aAdd(aFisGetSC5,{cReferencia,getsx3cache(aCmp[nCont],"X3_CAMPO"),MaFisOrdem(cReferencia)})
 			EndIf
 
-			SX3->(DbSkip())
-		EndDo
+			next
 
 		ASort(aFisGetSC5,,,{|x,y| x[3]<y[3]})
 	EndIf
