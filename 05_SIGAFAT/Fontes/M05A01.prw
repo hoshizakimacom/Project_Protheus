@@ -1,542 +1,544 @@
-#Include 'Protheus.ch'
+#INCLUDE "protheus.ch"
 
-//------------------------------------------------------------------------------
-//	Rotina de calcualo de pre√ßo
-//------------------------------------------------------------------------------
-User Function M05A01(_cFunc,lAtuOper)
-    Local _nPrecoVend	:= 0
-    Local _cTipo		:= ''
-    Local _cTipoCli		:= ''
-
-    Local _nXPrcTab		:= 0
-    Local _cProduto		:= ''
-    Local _cTES			:= ''
-
-    Local _nAliqImp		:= 0
-    Local _nPis			:= 0
-    Local _nCofins		:= 0
-    Local _nICMS		:= 0
-    Local _nICMOri		:= 0
-    Local _nICMDes		:= 0
-    Local _nIPI			:= 0
-
-    Local _nAliqICM		:= 0
-    Local _nAliqFCP		:= 0
-    Local _nXVlrImp		:= 0
-
-    Local _cClient		:= ''
-    Local _cLoja		:= ''
-    Local _nQtd			:= 0
-    Local _nBasICM      := 0
-
-    Local _nSol         := 0
-
-    Default lAtuOper    := .T.
-
-
-    SetPrcTab(_cFunc)		// Atualiza pre√ßo de tabela
-
-
-    If lAtuOper
-        SetOper(_cFunc)			// Atualiza tipo de opera√ß√£o
-    EndIf
-
-    If lAtuOper
-        SetTES(_cFunc)			// Atualiza TES
-    EndIf
-
-    MaFisEnd()
-
-    GetValueIt(_cFunc,@_cProduto,@_cTES,@_nXPrcTab,@_nQtd,@_nBasICM)
-    GetValueCa(_cFunc,@_cTipo,@_cTipoCli,@_cClient,@_cLoja)	// retorna tipo do cliente
-
-    //+---------------------------------------------------------------
-    // CALCULA VALOR DE VENDA
-    //+---------------------------------------------------------------
-    MaFisIni(_cClient,_cLoja,_cTipo,"N",_cTipoCli,Nil,Nil,Nil,Nil,"MATA410")
-
-    MaFisAdd(_cProduto,_cTES,1,_nXPrcTab -  0,0,"","",Nil,0,0,0,0,_nXPrcTab,0)
-
-    _nAliqICM	:= MaFisRet(1,'IT_ALIQICM')
-    _nPis		:= GetPis('ALIQ')					// Aliquota PIS
-    _nCofins	:= GetCofins('ALIQ')				// Aliquota Cofins
-    _nICMS		:= GetICM('ALIQ',_cTES,_nAliqICM)	// Aliquota ICMS
-    _nICMOri	:= GetICMOri('ALIQ',_nAliqICM) 		// ICMS Complementar
-    _nICMDes	:= GetICMDes('ALIQ',_nAliqICM) 		// ICMS Complementar
-    _nAliqFCP	:= GetFCP('ALIQ')				// ICMS Fundo de Apoio e Combate a Pobreza
-    _nIPI		:= GetIPI('ALIQ',_nICMS,_nICMOri,_nICMDes,_nAliqFCP,_cTES,_cProduto,_cTipoCli)
-    _nSol       := GetSol('ALIQ')                // Aliquota ICM Sol
-
-    MaFisEnd()
-
-    _nAliqImp				:= _nPis + _nCofins + _nICMS + _nICMOri + _nICMDes + _nIPI + _nAliqFCP
-    _nPrecoVend				:= A410Arred(_nXPrcTab / ( ((_nAliqImp / 100) -1)  * (-1)),'C6_PRCVEN')
-
-    SetPrcVen(_cFunc,_nPrecoVend)
-    SetAliImp(_cFunc,_nPis,_nCofins,_nICMS,_nICMOri,_nICMDes,_nAliqFCP,_nIPI,_nAliqImp,_nSol)
-
-    //+---------------------------------------------------------------
-    // CALCULA VALOR IMPOSTOS
-    //+---------------------------------------------------------------
-    MaFisIni(_cClient,_cLoja,_cTipo,"N",_cTipoCli,Nil,Nil,Nil,Nil,"MATA410")
-
-    MaFisAdd(_cProduto,_cTES,1,_nPrecoVend -  0,0,"","",Nil,0,0,0,0,_nPrecoVend * 1,0)
-
-    _nPis		:= GetPis('VLR')
-    _nCofins 	:= GetCofins('VLR')
-    _nICMS		:= GetICM('VLR')
-    _nICMOri	:= GetICMOri('VLR',_nAliqICM)
-    _nICMDes	:= GetICMDes('VLR',_nAliqICM)
-    _nAliqFCP	:= GetFCP('VLR')
-    _nIPI		:= GetIPI('VLR',_nICMS,_nICMOri,_nICMDes,_nAliqFCP,'','',_cTipoCli)
-    _nXVlrImp 	:= MaFisRet(,'NF_TOTAL')
-    _nSol       := GetSol('VLR')
-
-
-    SetPrcImp(_cFunc,_nPis,_nCofins,_nICMS,_nICMOri,_nICMDes,_nAliqFCP,_nIPI,_nXVlrImp,_nBasICM,_nSol)
-    SetVlUnit(_cFunc,_nPrecoVend,_nQtd)
-
-    MaFisEnd()
-
-    // Calcula valores totais com desconto/acrescimo
-    U_M05A03(_cFunc)
-
-Return _nPrecoVend
-
-//+----------------------------------------------------------------------------------------------------
-Static Function SetVlUnit(_cFunc,_nPrecoVend,_nQtd)
-    Local _nTotalSol	:= 0
-    Local _nTotalPS2	:= 0
-    Local _nTotalCF2	:= 0
-    Local _nTotalDIF	:= 0
-    Local _nTotalIPI	:= 0
-    Local _nTotalICM	:= 0
-    Local _nTotICOri	:= 0
-    Local _nTotICDes	:= 0
-    Local _nTotalImp	:= 0
-
-    Do Case
-    Case _cFunc == 'PV'
-        _nTotalSol	:= A410Arred( GdFieldGet('C6_XVLUSOL'	,n) * _nQtd ,'C6_XVLTSOL')
-        _nTotalPS2	:= A410Arred( GdFieldGet('C6_XVLUPS2'	,n) * _nQtd ,'C6_XVLTPS2')
-        _nTotalCF2	:= A410Arred( GdFieldGet('C6_XVLUCF2'	,n) * _nQtd ,'C6_XVLTCF2')
-        _nTotalDIF	:= A410Arred( GdFieldGet('C6_XVLUFCP'	,n) * _nQtd ,'C6_XVLTFCP')
-        _nTotalIPI	:= A410Arred( GdFieldGet('C6_XVLUIPI'	,n) * _nQtd ,'C6_XVLTIPI')
-        _nTotalICM	:= A410Arred( GdFieldGet('C6_XVLUICM'	,n) * _nQtd ,'C6_XVLTICM')
-        _nTotICOri	:= A410Arred( GdFieldGet('C6_XVLUICO'	,n) * _nQtd ,'C6_XVLTICO')
-        _nTotICDes	:= A410Arred( GdFieldGet('C6_XVLUICD'	,n) * _nQtd ,'C6_XVLTICD')
-        _nTotalImp	:= A410Arred( GdFieldGet('C6_XVLUIMP'	,n) * _nQtd ,'C6_XVLTIMP')
-
-    Case _cFunc == 'OV'
-
-        _nTotalSol	:= A410Arred( TMP1->(FieldGet(FieldPos('CK_XVLUSOL'))) * _nQtd ,'CK_XVLTSOL')
-        _nTotalPS2	:= A410Arred( TMP1->(FieldGet(FieldPos('CK_XVLUPS2'))) * _nQtd ,'CK_XVLTPS2')
-        _nTotalCF2	:= A410Arred( TMP1->(FieldGet(FieldPos('CK_XVLUCF2'))) * _nQtd ,'CK_XVLTCF2')
-        _nTotalDIF	:= A410Arred( TMP1->(FieldGet(FieldPos('CK_XVLUFCP'))) * _nQtd ,'CK_XVLTFCP')
-        _nTotalIPI	:= A410Arred( TMP1->(FieldGet(FieldPos('CK_XVLUIPI'))) * _nQtd ,'CK_XVLTIPI')
-        _nTotalICM	:= A410Arred( TMP1->(FieldGet(FieldPos('CK_XVLUICM'))) * _nQtd ,'CK_XVLTICM')
-        _nTotICOri	:= A410Arred( TMP1->(FieldGet(FieldPos('CK_XVLUICO'))) * _nQtd ,'CK_XVLTICO')
-        _nTotICDes	:= A410Arred( TMP1->(FieldGet(FieldPos('CK_XVLUICD'))) * _nQtd ,'CK_XVLTICD')
-        _nTotalImp	:= A410Arred( TMP1->(FieldGet(FieldPos('CK_XVLUIMP'))) * _nQtd ,'CK_XVLTIMP')
-
-    EndCase
-Return
-
-//+----------------------------------------------------------------------------------------------------
-Static Function SetPrcImp(_cFunc,_nPis,_nCofins,_nICMS,_nICMOri,_nICMDes,_nAliqFCP,_nIPI,_nXVlrImp,_nBasICM,_nSol)
-
-    Do Case
-    Case _cFunc == 'PV'
-
-        GdFieldPut('C6_XVLUSOL'	,_nSol					,n)
-        GdFieldPut('C6_XVLUIPI'	,_nIPI					,n)
-        GdFieldPut('C6_XVLUICM'	,_nICMS					,n)
-        GdFieldPut('C6_XVLUICO'	,_nICMOri				,n)
-        GdFieldPut('C6_XVLUICD'	,_nICMDes				,n)
-        GdFieldPut('C6_XVLUPS2'	,_nPis					,n)
-        GdFieldPut('C6_XVLUCF2'	,_nCofins				,n)
-        GdFieldPut('C6_XVLUFCP'	,_nAliqFCP				,n)
-        GdFieldPut('C6_XVLUBRU'	,_nXVlrImp				,n)
-        GdFieldPut('C6_XVLUIMP'	,(_nPis + _nCofins + _nICMS + _nICMOri + _nICMDes + _nAliqFCP + _nIPI)			,n)
-
-        GdFieldPut('C6_XBASICM' ,_nBasICM              ,n)
-
-    Case _cFunc == 'OV'
-        TMP1->(FieldPut(FieldPos('CK_XVLUSOL')	,_nSol))
-        TMP1->(FieldPut(FieldPos('CK_XVLUIPI')	,_nIPI))
-        TMP1->(FieldPut(FieldPos('CK_XVLUICM')	,_nICMS))
-        TMP1->(FieldPut(FieldPos('CK_XVLUICO')	,_nICMOri))
-        TMP1->(FieldPut(FieldPos('CK_XVLUICD')	,_nICMDes))
-        TMP1->(FieldPut(FieldPos('CK_XVLUPS2')	,_nPis))
-        TMP1->(FieldPut(FieldPos('CK_XVLUCF2')	,_nCofins))
-        TMP1->(FieldPut(FieldPos('CK_XVLUFCP')	,_nAliqFCP))
-        TMP1->(FieldPut(FieldPos('CK_XVLUBRU')	,_nXVlrImp))
-        TMP1->(FieldPut(FieldPos('CK_XVLUIMP')	,(_nPis + _nCofins + _nICMS + _nICMOri + _nICMDes + _nAliqFCP + _nIPI)))
-    EndCase
-Return
-
-//+----------------------------------------------------------------------------------------------------
-Static Function SetAliImp(_cFunc,_nPis,_nCofins,_nICMS,_nICMOri,_nICMDes,_nAliqFCP,_nIPI,_nAliqImp,_nSol)
-
-    Do Case
-    Case _cFunc == 'PV'
-        GdFieldPut('C6_XALQIPI'	,_nIPI				,n)
-        GdFieldPut('C6_XALQICM'	,_nICMS				,n)
-        GdFieldPut('C6_XALQICO'	,_nICMOri  			,n)
-        GdFieldPut('C6_XALQICD'	,_nICMDes			,n)
-        GdFieldPut('C6_XALQPS2'	,_nPis				,n)
-        GdFieldPut('C6_XALQCF2'	,_nCofins			,n)
-        GdFieldPut('C6_XALQFCP'	,_nAliqFCP			,n)
-        GdFieldPut('C6_XALQIMP'	,_nAliqImp			,n)
-        GdFieldPut('C6_XALQSOL'	,_nSol			    ,n)
-
-    Case _cFunc == 'OV'
-        TMP1->(FieldPut(FieldPos('CK_XALQIPI')	,_nIPI))
-        TMP1->(FieldPut(FieldPos('CK_XALQICM')	,_nICMS))
-        TMP1->(FieldPut(FieldPos('CK_XALQICO')	,_nICMOri))
-        TMP1->(FieldPut(FieldPos('CK_XALQICD')	,_nICMDes))
-        TMP1->(FieldPut(FieldPos('CK_XALQPS2')	,_nPis))
-        TMP1->(FieldPut(FieldPos('CK_XALQCF2')	,_nCofins))
-        TMP1->(FieldPut(FieldPos('CK_XALQFCP')	,_nAliqFCP))
-        TMP1->(FieldPut(FieldPos('CK_XALQIMP')	,_nAliqImp))
-        TMP1->(FieldPut(FieldPos('CK_XALQSOL')	,_nSol))
-    EndCase
-Return
-
-//+----------------------------------------------------------------------------------------------------
-Static Function SetPrcVen(_cFunc,_nRet,lAtuValor)
-
-    Default lAtuValor := .F.
-
-    Do Case
-    Case _cFunc == 'PV'
-
-        GdFieldPut('C6_PRCVEN'	,_nRet				,n)
-        GdFieldPut('C6_PRUNIT'	,_nRet				,n)
-        GdFieldPut('C6_XVLULIQ'	,_nRet				,n)
-
-        If lAtuValor
-            GdFieldPut('C6_VALOR'	,_nRet	* GdFieldGet('C6_QTDVEN'   ,n)			,n)
-        EndIf
-
-    Case _cFunc == 'OV'
-        TMP1->(FieldPut(FieldPos('CK_PRCVEN')	,_nRet))
-        TMP1->(FieldPut(FieldPos('CK_PRUNIT')	,_nRet))
-        TMP1->(FieldPut(FieldPos('CK_XVLULIQ')	,_nRet))
-
-        If lAtuValor
-            TMP1->(FieldPut(FieldPos('CK_VALOR')	,_nRet * TMP1->(FieldGet(FieldPos('CK_QTDVEN'))) ))
-        EndIf
-    EndCase
-Return
-
-//+----------------------------------------------------------------------------------------------------
-Static Function GetValueIt(_cFunc,_cProduto,_cTES,_nXPrcTab,_nQtd,_nBasICM)
-
-    Do Case
-    Case _cFunc == 'PV'
-        _cProduto		:= GdFieldGet('C6_PRODUTO'	,n)
-        _cTES			:= GdFieldGet('C6_TES'		,n)
-        _nXPrcTab		:= GdFieldGet('C6_XVLUTAB'	,n)
-        _nQtd			:= GdFieldGet('C6_QTDVEN'	,n)
-
-        _nBasICM     := Posicione('SF4',1,xFilial('SF4') + _cTES ,'F4_BASEICM')
-
-    Case _cFunc == 'OV'
-        _cProduto		:= TMP1->(FieldGet(FieldPos('CK_PRODUTO')))
-        _cTES			:= TMP1->(FieldGet(FieldPos('CK_TES')))
-        _nXPrcTab		:= TMP1->(FieldGet(FieldPos('CK_XVLUTAB')))
-        _nQtd			:= TMP1->(FieldGet(FieldPos('CK_QTDVEN')))
-
-         _nBasICM     := Posicione('SF4',1,xFilial('SF4') + _cTES ,'F4_BASEICM')
-    EndCase
-Return
-
-//+----------------------------------------------------------------------------------------------------
-Static Function GetValueCa(_cFunc,_cTipo,_cTipoCli,_cClient,_cLoja)
-
-    Do Case
-    Case _cFunc == 'PV'
-        _cClient	:= M->C5_CLIENTE
-        _cLoja		:= M->C5_LOJACLI
-
-        If M->C5_TIPO <> "B"
-            _cTipo	 	:= "C" 				//Cliente
-            _cTipoCli 	:= Posicione("SA1",1,xFilial("SA1") + _cClient + _cLoja,"A1_TIPO")
-        Else
-            _cTipo	 	:= "F" 				//Fornecedor
-            _cTipoCli 	:= Posicione("SA2",1,xFilial("SA2") + _cClient + _cLoja,"A2_TIPO")
-        EndIf
-
-    Case _cFunc == 'OV'
-        _cClient		:= M->CJ_CLIENT
-        _cLoja			:= M->CJ_LOJA
-        _cTipo	 		:= "C" 				//Cliente
-        _cTipoCli 		:= Posicione("SA1",1,xFilial("SA1") + _cClient + _cLoja,"A1_TIPO")
-    EndCase
-Return
-
-//+----------------------------------------------------------------------------------------------------
-Static Function GetPis(_cRef)
-    Local _nRet	:= 0
-
-    If _cRef == 'ALIQ'
-        _nRet	:= MaFisRet(1,'IT_ALIQPS2')
-    Else
-        _nRet	:= MaFisRet(1,'IT_VALPS2')
-    EndIf
-Return _nRet
-
-//+----------------------------------------------------------------------------------------------------
-Static Function GetCofins(_cRef)
-    Local _nRet	:= 0
-
-    If _cRef == 'ALIQ'
-        _nRet	:= MaFisRet(1,'IT_ALIQCF2')
-    Else
-        _nRet	:= MaFisRet(1,'IT_VALCF2')
-    EndIf
-Return _nRet
-
-//+----------------------------------------------------------------------------------------------------
-Static Function GetSol(_cRef)
-    Local _nRet	:= 0
-
-    If _cRef == 'ALIQ'
-        _nRet	:= MaFisRet(1,'IT_ALIQSOL')
-    Else
-        _nRet	:= MaFisRet(1,'IT_VALSOL')
-    EndIf
-Return _nRet
-
-//+----------------------------------------------------------------------------------------------------
-Static Function GetICM(_cRef,_cTES,_nAliqICM)
-    Local _nRet			:= 0
-    Local _nPerICM		:= 0
-
-
-    If _cRef == 'ALIQ'
-        _nPerICM		:= Posicione('SF4',1,xFilial('SF4') + _cTES ,'F4_BASEICM') / 100
-
-        If _nPerICM > 0
-            _nRet := _nAliqICM * _nPerICM
-        Else
-            _nRet	:= _nAliqICM
-        EndIf
-    Else
-        _nRet	:= MaFisRet(1,'IT_VALICM')
-    EndIf
-Return _nRet
-
-//+----------------------------------------------------------------------------------------------------
-Static Function GetICMDes(_cRef,_nAliqICM)
-    Local _nRet	:= 0
-
-    If _cRef == 'ALIQ'
-        _nRet 		:= (MaFisRet(1,'IT_DIFAL') * 100) / MaFisRet(1,'IT_BASEICM')
-    Else
-        _nRet		:= MaFisRet(1,'IT_DIFAL')
-    EndIf
-Return _nRet
-
-//+----------------------------------------------------------------------------------------------------
-Static Function GetICMOri(_cRef,_nAliqICM)
-    Local _nRet	:= 0
-
-    If _cRef == 'ALIQ'
-        _nRet 		:= MaFisRet(1,'IT_VALCMP') * 100 / MaFisRet(1,'IT_BASEICM')
-    Else
-        _nRet		:= MaFisRet(1,'IT_VALCMP')
-    EndIf
-Return _nRet
-
-//+----------------------------------------------------------------------------------------------------
-
-Static Function GetFCP(_cRef)
-    Local _nRet := 0
-
-    If _cRef == 'ALIQ'
-        _nRet		:= MaFisRet(1,'IT_VFCPDIF') * 100  / MaFisRet(1,'IT_BASEICM')
-    Else
-        _nRet		:= MaFisRet(1,'IT_VFCPDIF')
-    EndIf
-Return _nRet
-
-//+----------------------------------------------------------------------------------------------------
-Static Function GetIPI(_cRef,_nICMS,_nICMOri,_nICMDes,_nAliqFCP,_cTES,_cProduto,_cTipoCli)
-    Local _cIncide	:= ''
-    Local _cOrigem	:= ''
-    Local _nRet		:= 0
-
-    If _cRef == 'ALIQ'
-        _cIncide	:= Posicione('SF4',1,xFilial('SF4') + _cTES ,'F4_INCIDE')
-        _cOrigem	:= Posicione('SB1',1,xFilial('SB1') + _cProduto ,'B1_ORIGEM')
-
-        If MaFisRet(1,'IT_VALIPI') > 0
-            If _cTipoCli == 'F' .And. _cIncide == 'F' .and. _cOrigem == "0"
-                _nRet := (_nICMS + _nICMOri + _nICMDes + _nAliqFCP) * (MaFisRet(1,'IT_ALIQIPI')/100)  // IPI e REDU√á√ÉO DE IPI NACIONAL
-            ElseIf _cTipoCli == 'F' .And. _cIncide == 'F' .and. _cOrigem <> "0"
-                _nRet := (_nICMS + _nICMOri + _nICMDes + _nAliqFCP) * (MaFisRet(1,'IT_ALIQIPI')/100)  // IPI e REDU√á√ÉO DE IPI IMPORTADO VDA
-            EndIf
-        EndIf
-    Else
-        _nRet := MaFisRet(1,'IT_VALIPI')
-    EndIf
-Return _nRet
-
-//+----------------------------------------------------------------------------------------------------
-
-
-
-//+------------------------------------------------------------------------------------------------
-// Atualiza campo C6_XPRCTAB/CK_XPRCTAB com pre√ßo de tabela
-//+------------------------------------------------------------------------------------------------
-Static Function SetPrcTab(_cFunc)
-
-    Local _nPrcTab	:= 0
-    Local _cProduto	:= ''
-    Local _dDataVig	:= CTOD("  /  /  ")
-    Local _cCodUsr  := SuperGetMV( "AM_USRTABP", .F. , "000131|000151" )
-
-    Do Case
-    Case _cFunc == 'PV'  
-    
-    	_dDataVig	:= Posicione('DA1',1,xFilial('DA1') + M->C5_TABELA + GdFieldGet('C6_PRODUTO',n),'DA1_DATVIG')
-    
-    	If _dDataVig >= dDataBase .Or. RetCodUsr() $ _cCodUsr 
-    		_nPrcTab	:= Posicione('DA1',1,xFilial('DA1') + M->C5_TABELA + GdFieldGet('C6_PRODUTO',n),'DA1_PRCVEN')
-        Else
-        	MsgAlert("Produto fora da vig√™ncia ! Entre em contato com o departamento comercial. Valor unit√°rio n√£o atualizado !","Aten√ß√£o!")
-    	Endif
-
-        GdFieldPut('C6_XVLUTAB'	,_nPrcTab	,n)
-
-    Case _cFunc == 'OV'
-        _cProduto	:= TMP1->(FieldGet(FieldPos('CK_PRODUTO')))
-        _nPrcTab	:= Posicione('DA1',1,xFilial('DA1') + M->CJ_TABELA + _cProduto ,'DA1_PRCVEN')
-
-        TMP1->(FieldPut(FieldPos('CK_XVLUTAB')	,_nPrcTab))
-    EndCase
-Return
-
-//+------------------------------------------------------------------------------------------------
-//	Respons√°vel pelo peenchimento do tipo de opera√ß√£o
-//+------------------------------------------------------------------------------------------------
-Static Function SetOper(_cFunc)
-    Local _cProduto		:= ''
-    Local _cTipo		:= ''
-    Local _cOper		:= ''
-    Local _cTipoCli		:= ''
-
-    Do Case
-    Case _cFunc == 'PV'
-        _cProduto		:= GdFieldGet('C6_PRODUTO',n)
-        _cTipo			:= Posicione('SB1',1,xFilial('SB1') + _cProduto,'B1_TIPO')
-        _cOper			:= U_M05A02(M->C5_TIPOCLI,_cTipo)
-
-        GdFieldPut('C6_OPER',_cOper,n)
-        GdFieldPut('C6_XOPER',_cOper,n)
-
-    Case _cFunc == 'OV'
-        _cProduto		:= TMP1->(FieldGet(FieldPos('CK_PRODUTO')))
-        _cTipo			:= Posicione('SB1',1,xFilial('SB1') + _cProduto,'B1_TIPO')
-        _cTipoCli 		:= Posicione("SA1",1,xFilial("SA1") + M->CJ_CLIENT + M->CJ_LOJA,"A1_TIPO") //Fisico,Juridico,Xportacao
-        _cOper			:= U_M05A02(_cTipoCli,_cTipo)
-
-        TMP1->(FieldPut(FieldPos('CK_OPER'),_cOper))
-        TMP1->(FieldPut(FieldPos('CK_XOPER'),_cOper))
-    EndCase
-
-Return
-
-//+------------------------------------------------------------------------------------------------
-//	Atualiza TES com TES Inteligente
-//+------------------------------------------------------------------------------------------------
-Static Function SetTES(_cFunc)
-    Local _cProduto			:= ''
-    Local _cOper			:= ''
-    Local _cTes				:= ''
-
-    Do Case
-    Case _cFunc == 'PV'
-        _cProduto			:= GdFieldGet('C6_PRODUTO',n)
-        _cOper				:= GdFieldGet('C6_OPER',n)
-        _cTes 				:= MaTesInt(2,_cOper,M->C5_CLIENT,M->C5_LOJAENT,If(M->C5_TIPO$'DB',"F","C"),_cProduto,"C6_TES")
-
-        GdFieldPut('C6_TES',_cTes,n)
-
-    Case _cFunc == 'OV'
-        _cProduto			:= TMP1->(FieldGet(FieldPos('CK_PRODUTO')))
-        _cOper				:= TMP1->(FieldGet(FieldPos('CK_OPER')))
-        _cTes 				:= MaTesInt(2,_cOper,M->CJ_CLIENT,M->CJ_LOJA,'C',_cProduto,"CK_TES")
-
-        TMP1->(FieldPut(FieldPos('CK_TES'),_cTes))
-    EndCase
-Return
-
-
-
-//------------------------------------------------------------------------------
-//  Rotina de calcualo de pre√ßo operacoes 03 04 e 36
-//------------------------------------------------------------------------------
-User Function M05A01_A(_cFunc)
-    Local _nPrecoVend   := 0
-
-    CalcPrcA(_cFunc,@_nPrecoVend)     // Busca valor do pedido original
-    SetTES(_cFunc)                      // Atualiza TES
-    SetPrcVen(_cFunc,_nPrecoVend,.T.)   // Atualiza valores do pedido
-Return
-
-//+--------------------------------------------------------------------------------------------------------------------
-Static Function CalcPrcA(_cFunc,_nPrecoVend)
-    Do Case
-    Case _cFunc == 'PV'
-        _nPrecoVend         := GdFieldGet('C6_XVLTBRU',n) / GdFieldGet('C6_QTDVEN',n)
-
-
-    Case _cFunc == 'OV'
-        _nPrecoVend           := TMP1->(FieldGet(FieldPos('CK_XVLTBRU'))) / TMP1->(FieldGet(FieldPos('CK_QTDVEN')))
-
-    EndCase
-Return
-
-//------------------------------------------------------------------------------
-//  Rotina de calcualo de pre√ßo operacoes 27 E 44
-//------------------------------------------------------------------------------
-User Function M05A01_B(_cFunc)
-    Local _nPrecoVend   := 0
-
-    CalcPrcB(_cFunc,@_nPrecoVend)     // Busca valor do pedido original
-    SetTES(_cFunc)                      // Atualiza TES
-    SetPrcVen(_cFunc,_nPrecoVend,.T.)   // Atualiza valores do pedido
-Return
-
-//+--------------------------------------------------------------------------------------------------------------------
-/*Static Function CalcPrcB(_cFunc,_nPrecoVend)
-    Do Case
-    Case _cFunc == 'PV'
-        _nPrecoVend         := GdFieldGet('C6_XVLTBRU',n) - GdFieldGet('C6_XVLTIPI',n) / GdFieldGet('C6_QTDVEN',n)
-
-
-    Case _cFunc == 'OV'
-        _nPrecoVend           := TMP1->(FieldGet(FieldPos('CK_XVLTBRU'))) - TMP1->(FieldGet(FieldPos('CK_XVLTIPI'))) / TMP1->(FieldGet(FieldPos('CK_QTDVEN')))
-
-    EndCase
-Return
-*/
-
-Static Function CalcPrcB(_cFunc,_nPrecoVend)
-    Do Case
-    Case _cFunc == 'PV'
-    	If !GdFieldGet('C6_OPER',n) $ '27|44'
-    		_nPrecoVend         := GdFieldGet('C6_PRCVEN',n) + GdFieldGet('C6_XVLUSOL',n)
-    	Else
-    		_nPrecoVend         := GdFieldGet('C6_PRCVEN',n)
-    	Endif
-
-
-    Case _cFunc == 'OV'
-        _nPrecoVend           := TMP1->(FieldGet(FieldPos('CK_PRCVEN'))) + TMP1->(FieldGet(FieldPos('CK_XVLUSOL')))
-
-    EndCase
-Return
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M05A01(_CFUNC,LATUOPER)
+LOCAL _NPRECOVEND := 0
+LOCAL _CTIPO := ""
+LOCAL _CTIPOCLI := ""
+
+LOCAL _NXPRCTAB := 0
+LOCAL _CPRODUTO := ""
+LOCAL _CTES := ""
+
+LOCAL _NALIQIMP := 0
+LOCAL _NPIS := 0
+LOCAL _NCOFINS := 0
+LOCAL _NICMS := 0
+LOCAL _NICMORI := 0
+LOCAL _NICMDES := 0
+LOCAL _NIPI := 0
+
+LOCAL _NALIQICM := 0
+LOCAL _NALIQFCP := 0
+LOCAL _NXVLRIMP := 0
+
+LOCAL _CCLIENT := ""
+LOCAL _CLOJA := ""
+LOCAL _NQTD := 0
+LOCAL _NBASICM := 0
+
+LOCAL _NSOL := 0
+
+LATUOPER := IIF(VALTYPE(LATUOPER)=="U", .T. ,LATUOPER)
+
+SETPRCTAB(_CFUNC)
+
+IF LATUOPER
+    SETOPER(_CFUNC)
+ENDIF
+
+IF LATUOPER
+    SETTES(_CFUNC)
+ENDIF
+
+MAFISEND()
+
+GETVALUEIT(_CFUNC,@_CPRODUTO,@_CTES,@_NXPRCTAB,@_NQTD,@_NBASICM)
+GETVALUECA(_CFUNC,@_CTIPO,@_CTIPOCLI,@_CCLIENT,@_CLOJA)
+
+MAFISINI(_CCLIENT,_CLOJA,_CTIPO,"N",_CTIPOCLI,NIL,NIL,NIL,NIL,"MATA410")
+
+MAFISADD(_CPRODUTO,_CTES,1,_NXPRCTAB-0,0,"","",NIL,0,0,0,0,_NXPRCTAB,0)
+
+_NALIQICM := MAFISRET(1,"IT_ALIQICM")
+_NPIS := GETPIS("ALIQ")
+_NCOFINS := GETCOFINS("ALIQ")
+_NICMS := GETICM("ALIQ",_CTES,_NALIQICM)
+_NICMORI := GETICMORI("ALIQ",_NALIQICM)
+_NICMDES := GETICMDES("ALIQ",_NALIQICM)
+_NALIQFCP := GETFCP("ALIQ")
+_NIPI := GETIPI("ALIQ",_NICMS,_NICMORI,_NICMDES,_NALIQFCP,_CTES,_CPRODUTO,_CTIPOCLI)
+_NSOL := GETSOL("ALIQ")
+
+MAFISEND()
+
+_NALIQIMP := _NPIS+_NCOFINS+_NICMS+_NICMORI+_NICMDES+_NIPI+_NALIQFCP
+_NPRECOVEND := A410ARRED((_NXPRCTAB) / (((_NALIQIMP) / (100)-1) * (- (1))),"C6_PRCVEN")
+
+SETPRCVEN(_CFUNC,_NPRECOVEND)
+SETALIIMP(_CFUNC,_NPIS,_NCOFINS,_NICMS,_NICMORI,_NICMDES,_NALIQFCP,_NIPI,_NALIQIMP,_NSOL)
+
+MAFISINI(_CCLIENT,_CLOJA,_CTIPO,"N",_CTIPOCLI,NIL,NIL,NIL,NIL,"MATA410")
+
+MAFISADD(_CPRODUTO,_CTES,1,_NPRECOVEND-0,0,"","",NIL,0,0,0,0,(_NPRECOVEND) * (1),0)
+
+_NPIS := GETPIS("VLR")
+_NCOFINS := GETCOFINS("VLR")
+_NICMS := GETICM("VLR")
+_NICMORI := GETICMORI("VLR",_NALIQICM)
+_NICMDES := GETICMDES("VLR",_NALIQICM)
+_NALIQFCP := GETFCP("VLR")
+_NIPI := GETIPI("VLR",_NICMS,_NICMORI,_NICMDES,_NALIQFCP,"","",_CTIPOCLI)
+_NXVLRIMP := MAFISRET(,"NF_TOTAL")
+_NSOL := GETSOL("VLR")
+
+SETPRCIMP(_CFUNC,_NPIS,_NCOFINS,_NICMS,_NICMORI,_NICMDES,_NALIQFCP,_NIPI,_NXVLRIMP,_NBASICM,_NSOL)
+SETVLUNIT(_CFUNC,_NPRECOVEND,_NQTD)
+
+MAFISEND()
+
+U_M05A03(_CFUNC)
+
+RETURN _NPRECOVEND
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION SETVLUNIT(_CFUNC,_NPRECOVEND,_NQTD)
+LOCAL _NTOTALSOL := 0
+LOCAL _NTOTALPS2 := 0
+LOCAL _NTOTALCF2 := 0
+LOCAL _NTOTALDIF := 0
+LOCAL _NTOTALIPI := 0
+LOCAL _NTOTALICM := 0
+LOCAL _NTOTICORI := 0
+LOCAL _NTOTICDES := 0
+LOCAL _NTOTALIMP := 0
+
+DO CASE 
+ CASE _CFUNC=="PV"
+_NTOTALSOL := A410ARRED((GDFIELDGET("C6_XVLUSOL",N)) * (_NQTD),"C6_XVLTSOL")
+_NTOTALPS2 := A410ARRED((GDFIELDGET("C6_XVLUPS2",N)) * (_NQTD),"C6_XVLTPS2")
+_NTOTALCF2 := A410ARRED((GDFIELDGET("C6_XVLUCF2",N)) * (_NQTD),"C6_XVLTCF2")
+_NTOTALDIF := A410ARRED((GDFIELDGET("C6_XVLUFCP",N)) * (_NQTD),"C6_XVLTFCP")
+_NTOTALIPI := A410ARRED((GDFIELDGET("C6_XVLUIPI",N)) * (_NQTD),"C6_XVLTIPI")
+_NTOTALICM := A410ARRED((GDFIELDGET("C6_XVLUICM",N)) * (_NQTD),"C6_XVLTICM")
+_NTOTICORI := A410ARRED((GDFIELDGET("C6_XVLUICO",N)) * (_NQTD),"C6_XVLTICO")
+_NTOTICDES := A410ARRED((GDFIELDGET("C6_XVLUICD",N)) * (_NQTD),"C6_XVLTICD")
+_NTOTALIMP := A410ARRED((GDFIELDGET("C6_XVLUIMP",N)) * (_NQTD),"C6_XVLTIMP")
+
+CASE _CFUNC=="OV"
+
+_NTOTALSOL := A410ARRED(((TMP1)->(FIELDGET(FIELDPOS("CK_XVLUSOL")))) * (_NQTD),"CK_XVLTSOL")
+_NTOTALPS2 := A410ARRED(((TMP1)->(FIELDGET(FIELDPOS("CK_XVLUPS2")))) * (_NQTD),"CK_XVLTPS2")
+_NTOTALCF2 := A410ARRED(((TMP1)->(FIELDGET(FIELDPOS("CK_XVLUCF2")))) * (_NQTD),"CK_XVLTCF2")
+_NTOTALDIF := A410ARRED(((TMP1)->(FIELDGET(FIELDPOS("CK_XVLUFCP")))) * (_NQTD),"CK_XVLTFCP")
+_NTOTALIPI := A410ARRED(((TMP1)->(FIELDGET(FIELDPOS("CK_XVLUIPI")))) * (_NQTD),"CK_XVLTIPI")
+_NTOTALICM := A410ARRED(((TMP1)->(FIELDGET(FIELDPOS("CK_XVLUICM")))) * (_NQTD),"CK_XVLTICM")
+_NTOTICORI := A410ARRED(((TMP1)->(FIELDGET(FIELDPOS("CK_XVLUICO")))) * (_NQTD),"CK_XVLTICO")
+_NTOTICDES := A410ARRED(((TMP1)->(FIELDGET(FIELDPOS("CK_XVLUICD")))) * (_NQTD),"CK_XVLTICD")
+_NTOTALIMP := A410ARRED(((TMP1)->(FIELDGET(FIELDPOS("CK_XVLUIMP")))) * (_NQTD),"CK_XVLTIMP")
+ENDCASE
+
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION SETPRCIMP(_CFUNC,_NPIS,_NCOFINS,_NICMS,_NICMORI,_NICMDES,_NALIQFCP,_NIPI,_NXVLRIMP,_NBASICM,_NSOL)
+
+DO CASE 
+ CASE _CFUNC=="PV"
+
+GDFIELDPUT("C6_XVLUSOL",_NSOL,N)
+GDFIELDPUT("C6_XVLUIPI",_NIPI,N)
+GDFIELDPUT("C6_XVLUICM",_NICMS,N)
+GDFIELDPUT("C6_XVLUICO",_NICMORI,N)
+GDFIELDPUT("C6_XVLUICD",_NICMDES,N)
+GDFIELDPUT("C6_XVLUPS2",_NPIS,N)
+GDFIELDPUT("C6_XVLUCF2",_NCOFINS,N)
+GDFIELDPUT("C6_XVLUFCP",_NALIQFCP,N)
+GDFIELDPUT("C6_XVLUBRU",_NXVLRIMP,N)
+GDFIELDPUT("C6_XVLUIMP",_NPIS+_NCOFINS+_NICMS+_NICMORI+_NICMDES+_NALIQFCP+_NIPI,N)
+
+GDFIELDPUT("C6_XBASICM",_NBASICM,N)
+
+CASE _CFUNC=="OV"
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XVLUSOL"),_NSOL))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XVLUIPI"),_NIPI))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XVLUICM"),_NICMS))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XVLUICO"),_NICMORI))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XVLUICD"),_NICMDES))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XVLUPS2"),_NPIS))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XVLUCF2"),_NCOFINS))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XVLUFCP"),_NALIQFCP))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XVLUBRU"),_NXVLRIMP))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XVLUIMP"),_NPIS+_NCOFINS+_NICMS+_NICMORI+_NICMDES+_NALIQFCP+_NIPI))
+ENDCASE
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION SETALIIMP(_CFUNC,_NPIS,_NCOFINS,_NICMS,_NICMORI,_NICMDES,_NALIQFCP,_NIPI,_NALIQIMP,_NSOL)
+
+DO CASE 
+ CASE _CFUNC=="PV"
+GDFIELDPUT("C6_XALQIPI",_NIPI,N)
+GDFIELDPUT("C6_XALQICM",_NICMS,N)
+GDFIELDPUT("C6_XALQICO",_NICMORI,N)
+GDFIELDPUT("C6_XALQICD",_NICMDES,N)
+GDFIELDPUT("C6_XALQPS2",_NPIS,N)
+GDFIELDPUT("C6_XALQCF2",_NCOFINS,N)
+GDFIELDPUT("C6_XALQFCP",_NALIQFCP,N)
+GDFIELDPUT("C6_XALQIMP",_NALIQIMP,N)
+GDFIELDPUT("C6_XALQSOL",_NSOL,N)
+
+CASE _CFUNC=="OV"
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XALQIPI"),_NIPI))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XALQICM"),_NICMS))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XALQICO"),_NICMORI))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XALQICD"),_NICMDES))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XALQPS2"),_NPIS))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XALQCF2"),_NCOFINS))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XALQFCP"),_NALIQFCP))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XALQIMP"),_NALIQIMP))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XALQSOL"),_NSOL))
+ENDCASE
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION SETPRCVEN(_CFUNC,_NRET,LATUVALOR)
+
+LATUVALOR := IIF(VALTYPE(LATUVALOR)=="U", .F. ,LATUVALOR)
+
+DO CASE 
+ CASE _CFUNC=="PV"
+
+GDFIELDPUT("C6_PRCVEN",_NRET,N)
+GDFIELDPUT("C6_PRUNIT",_NRET,N)
+GDFIELDPUT("C6_XVLULIQ",_NRET,N)
+
+IF LATUVALOR
+    GDFIELDPUT("C6_VALOR",(_NRET) * (GDFIELDGET("C6_QTDVEN",N)),N)
+ENDIF
+
+CASE _CFUNC=="OV"
+(TMP1)->(FIELDPUT(FIELDPOS("CK_PRCVEN"),_NRET))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_PRUNIT"),_NRET))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XVLULIQ"),_NRET))
+
+IF LATUVALOR
+    (TMP1)->(FIELDPUT(FIELDPOS("CK_VALOR"),(_NRET) * ((TMP1)->(FIELDGET(FIELDPOS("CK_QTDVEN"))))))
+ENDIF
+ENDCASE
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION GETVALUEIT(_CFUNC,_CPRODUTO,_CTES,_NXPRCTAB,_NQTD,_NBASICM)
+
+DO CASE 
+ CASE _CFUNC=="PV"
+_CPRODUTO := GDFIELDGET("C6_PRODUTO",N)
+_CTES := GDFIELDGET("C6_TES",N)
+_NXPRCTAB := GDFIELDGET("C6_XVLUTAB",N)
+_NQTD := GDFIELDGET("C6_QTDVEN",N)
+
+_NBASICM := POSICIONE("SF4",1,XFILIAL("SF4")+_CTES,"F4_BASEICM")
+
+CASE _CFUNC=="OV"
+_CPRODUTO := (TMP1)->(FIELDGET(FIELDPOS("CK_PRODUTO")))
+_CTES := (TMP1)->(FIELDGET(FIELDPOS("CK_TES")))
+_NXPRCTAB := (TMP1)->(FIELDGET(FIELDPOS("CK_XVLUTAB")))
+_NQTD := (TMP1)->(FIELDGET(FIELDPOS("CK_QTDVEN")))
+
+_NBASICM := POSICIONE("SF4",1,XFILIAL("SF4")+_CTES,"F4_BASEICM")
+ENDCASE
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION GETVALUECA(_CFUNC,_CTIPO,_CTIPOCLI,_CCLIENT,_CLOJA)
+
+DO CASE 
+ CASE _CFUNC=="PV"
+_CCLIENT := M->C5_CLIENTE
+_CLOJA := M->C5_LOJACLI
+
+IF M->C5_TIPO<>"B"
+    _CTIPO := "C"
+    _CTIPOCLI := POSICIONE("SA1",1,XFILIAL("SA1")+_CCLIENT+_CLOJA,"A1_TIPO")
+ELSE 
+    _CTIPO := "F"
+    _CTIPOCLI := POSICIONE("SA2",1,XFILIAL("SA2")+_CCLIENT+_CLOJA,"A2_TIPO")
+ENDIF
+
+CASE _CFUNC=="OV"
+_CCLIENT := M->CJ_CLIENT
+_CLOJA := M->CJ_LOJA
+_CTIPO := "C"
+_CTIPOCLI := POSICIONE("SA1",1,XFILIAL("SA1")+_CCLIENT+_CLOJA,"A1_TIPO")
+ENDCASE
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION GETPIS(_CREF)
+LOCAL _NRET := 0
+
+IF _CREF=="ALIQ"
+    _NRET := MAFISRET(1,"IT_ALIQPS2")
+ELSE 
+    _NRET := MAFISRET(1,"IT_VALPS2")
+ENDIF
+RETURN _NRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION GETCOFINS(_CREF)
+LOCAL _NRET := 0
+
+IF _CREF=="ALIQ"
+    _NRET := MAFISRET(1,"IT_ALIQCF2")
+ELSE 
+    _NRET := MAFISRET(1,"IT_VALCF2")
+ENDIF
+RETURN _NRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION GETSOL(_CREF)
+LOCAL _NRET := 0
+
+IF _CREF=="ALIQ"
+    _NRET := MAFISRET(1,"IT_ALIQSOL")
+ELSE 
+    _NRET := MAFISRET(1,"IT_VALSOL")
+ENDIF
+RETURN _NRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION GETICM(_CREF,_CTES,_NALIQICM)
+LOCAL _NRET := 0
+LOCAL _NPERICM := 0
+
+IF _CREF=="ALIQ"
+    _NPERICM := (POSICIONE("SF4",1,XFILIAL("SF4")+_CTES,"F4_BASEICM")) / (100)
+
+    IF _NPERICM>0
+        _NRET := (_NALIQICM) * (_NPERICM)
+    ELSE 
+        _NRET := _NALIQICM
+    ENDIF
+ELSE 
+    _NRET := MAFISRET(1,"IT_VALICM")
+ENDIF
+RETURN _NRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION GETICMDES(_CREF,_NALIQICM)
+LOCAL _NRET := 0
+
+IF _CREF=="ALIQ"
+    _NRET := ((MAFISRET(1,"IT_DIFAL")) * (100)) / (MAFISRET(1,"IT_BASEICM"))
+ELSE 
+    _NRET := MAFISRET(1,"IT_DIFAL")
+ENDIF
+RETURN _NRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION GETICMORI(_CREF,_NALIQICM)
+LOCAL _NRET := 0
+
+IF _CREF=="ALIQ"
+    _NRET := ((MAFISRET(1,"IT_VALCMP")) * (100)) / (MAFISRET(1,"IT_BASEICM"))
+ELSE 
+    _NRET := MAFISRET(1,"IT_VALCMP")
+ENDIF
+RETURN _NRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION GETFCP(_CREF)
+LOCAL _NRET := 0
+
+IF _CREF=="ALIQ"
+    _NRET := ((MAFISRET(1,"IT_VFCPDIF")) * (100)) / (MAFISRET(1,"IT_BASEICM"))
+ELSE 
+    _NRET := MAFISRET(1,"IT_VFCPDIF")
+ENDIF
+RETURN _NRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION GETIPI(_CREF,_NICMS,_NICMORI,_NICMDES,_NALIQFCP,_CTES,_CPRODUTO,_CTIPOCLI)
+LOCAL _CINCIDE := ""
+LOCAL _CORIGEM := ""
+LOCAL _NRET := 0
+
+IF _CREF=="ALIQ"
+    _CINCIDE := POSICIONE("SF4",1,XFILIAL("SF4")+_CTES,"F4_INCIDE")
+    _CORIGEM := POSICIONE("SB1",1,XFILIAL("SB1")+_CPRODUTO,"B1_ORIGEM")
+
+    IF MAFISRET(1,"IT_VALIPI")>0
+        
+        IF _CTIPOCLI=="F" .AND. _CINCIDE=="F" .AND. _CORIGEM=="0"
+            _NRET := (_NICMS+_NICMORI+_NICMDES+_NALIQFCP) * ((MAFISRET(1,"IT_ALIQIPI")) / (100))
+        ELSEIF _CTIPOCLI=="F" .AND. _CINCIDE=="F" .AND. _CORIGEM<>"0"
+            _NRET := (_NICMS+_NICMORI+_NICMDES+_NALIQFCP) * ((MAFISRET(1,"IT_ALIQIPI")) / (100))
+        ENDIF
+    ENDIF
+ELSE 
+    _NRET := MAFISRET(1,"IT_VALIPI")
+ENDIF
+RETURN _NRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION SETPRCTAB(_CFUNC)
+
+LOCAL _NPRCTAB := 0
+LOCAL _CPRODUTO := ""
+LOCAL _DDATAVIG := CTOD("  /  /  ")
+LOCAL _CCODUSR := SUPERGETMV("AM_USRTABP", .F. ,"000131|000151")
+
+DO CASE 
+ CASE _CFUNC=="PV"
+
+_DDATAVIG := POSICIONE("DA1",1,XFILIAL("DA1")+M->C5_TABELA+GDFIELDGET("C6_PRODUTO",N),"DA1_DATVIG")
+
+IF (_DDATAVIG>=DDATABASE) .OR. ((RETCODUSR()) $ (_CCODUSR))
+    _NPRCTAB := POSICIONE("DA1",1,XFILIAL("DA1")+M->C5_TABELA+GDFIELDGET("C6_PRODUTO",N),"DA1_PRCVEN")
+ELSE 
+    IIF(FINDFUNCTION("MSGALERT"),MSGALERT("PRODUTO FORA DA VIG NCIA ! ENTRE EM CONTATO COM O DEPARTAMENTO COMERCIAL. VALOR UNIT¡RIO N√O ATUALIZADO !","ATEN«√O!"),MSGALERT("PRODUTO FORA DA VIG NCIA ! ENTRE EM CONTATO COM O DEPARTAMENTO COMERCIAL. VALOR UNIT¡RIO N√O ATUALIZADO !","ATEN«√O!"))
+ENDIF
+
+GDFIELDPUT("C6_XVLUTAB",_NPRCTAB,N)
+
+CASE _CFUNC=="OV"
+_CPRODUTO := (TMP1)->(FIELDGET(FIELDPOS("CK_PRODUTO")))
+_NPRCTAB := POSICIONE("DA1",1,XFILIAL("DA1")+M->CJ_TABELA+_CPRODUTO,"DA1_PRCVEN")
+
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XVLUTAB"),_NPRCTAB))
+ENDCASE
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION SETOPER(_CFUNC)
+LOCAL _CPRODUTO := ""
+LOCAL _CTIPO := ""
+LOCAL _COPER := ""
+LOCAL _CTIPOCLI := ""
+
+DO CASE 
+ CASE _CFUNC=="PV"
+_CPRODUTO := GDFIELDGET("C6_PRODUTO",N)
+_CTIPO := POSICIONE("SB1",1,XFILIAL("SB1")+_CPRODUTO,"B1_TIPO")
+_COPER := U_M05A02(M->C5_TIPOCLI,_CTIPO)
+
+GDFIELDPUT("C6_OPER",_COPER,N)
+GDFIELDPUT("C6_XOPER",_COPER,N)
+
+CASE _CFUNC=="OV"
+_CPRODUTO := (TMP1)->(FIELDGET(FIELDPOS("CK_PRODUTO")))
+_CTIPO := POSICIONE("SB1",1,XFILIAL("SB1")+_CPRODUTO,"B1_TIPO")
+_CTIPOCLI := POSICIONE("SA1",1,XFILIAL("SA1")+M->CJ_CLIENT+M->CJ_LOJA,"A1_TIPO")
+_COPER := U_M05A02(_CTIPOCLI,_CTIPO)
+
+(TMP1)->(FIELDPUT(FIELDPOS("CK_OPER"),_COPER))
+(TMP1)->(FIELDPUT(FIELDPOS("CK_XOPER"),_COPER))
+ENDCASE
+
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION SETTES(_CFUNC)
+LOCAL _CPRODUTO := ""
+LOCAL _COPER := ""
+LOCAL _CTES := ""
+
+DO CASE 
+ CASE _CFUNC=="PV"
+_CPRODUTO := GDFIELDGET("C6_PRODUTO",N)
+_COPER := GDFIELDGET("C6_OPER",N)
+_CTES := MATESINT(2,_COPER,M->C5_CLIENT,M->C5_LOJAENT,IIF((M->C5_TIPO) $ ("DB"),"F","C"),_CPRODUTO,"C6_TES")
+
+GDFIELDPUT("C6_TES",_CTES,N)
+
+CASE _CFUNC=="OV"
+_CPRODUTO := (TMP1)->(FIELDGET(FIELDPOS("CK_PRODUTO")))
+_COPER := (TMP1)->(FIELDGET(FIELDPOS("CK_OPER")))
+_CTES := MATESINT(2,_COPER,M->CJ_CLIENT,M->CJ_LOJA,"C",_CPRODUTO,"CK_TES")
+
+(TMP1)->(FIELDPUT(FIELDPOS("CK_TES"),_CTES))
+ENDCASE
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M05A01_A(_CFUNC)
+LOCAL _NPRECOVEND := 0
+
+CALCPRCA(_CFUNC,@_NPRECOVEND)
+SETTES(_CFUNC)
+SETPRCVEN(_CFUNC,_NPRECOVEND, .T. )
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION CALCPRCA(_CFUNC,_NPRECOVEND)
+
+DO CASE 
+ CASE _CFUNC=="PV"
+_NPRECOVEND := (GDFIELDGET("C6_XVLTBRU",N)) / (GDFIELDGET("C6_QTDVEN",N))
+
+CASE _CFUNC=="OV"
+_NPRECOVEND := ((TMP1)->(FIELDGET(FIELDPOS("CK_XVLTBRU")))) / ((TMP1)->(FIELDGET(FIELDPOS("CK_QTDVEN"))))
+ENDCASE
+
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M05A01_B(_CFUNC)
+LOCAL _NPRECOVEND := 0
+
+CALCPRCB(_CFUNC,@_NPRECOVEND)
+SETTES(_CFUNC)
+SETPRCVEN(_CFUNC,_NPRECOVEND, .T. )
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION CALCPRCB(_CFUNC,_NPRECOVEND)
+
+DO CASE 
+ CASE _CFUNC=="PV"
+IF !((GDFIELDGET("C6_OPER",N)) $ ("27|44"))
+    _NPRECOVEND := GDFIELDGET("C6_PRCVEN",N)+GDFIELDGET("C6_XVLUSOL",N)
+ELSE 
+    _NPRECOVEND := GDFIELDGET("C6_PRCVEN",N)
+ENDIF
+
+CASE _CFUNC=="OV"
+_NPRECOVEND := (TMP1)->(FIELDGET(FIELDPOS("CK_PRCVEN")))+(TMP1)->(FIELDGET(FIELDPOS("CK_XVLUSOL")))
+ENDCASE
+
+RETURN 
