@@ -1,773 +1,758 @@
-#INCLUDE 'Totvs.ch'
-#Include 'RptDef.ch'
-#Include 'FWPrintSetup.ch
+#INCLUDE "protheus.ch"
 
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-//| Contrato de Parceiria
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-User Function M02R07(lEnvEmail)
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M02R07(LENVEMAIL)
 
-Local aArea := GetArea()
+LOCAL AAREA := GETAREA()
 
-FWMsgRun(, {|| U_M02R07A(lEnvEmail) },'Autorização de Entrega','Gerando Relatório...')
+FWMSGRUN(,{||U_M02R07A(LENVEMAIL)},"AUTORIZAÇÃO DE ENTREGA","GERANDO RELATÓRIO...")
 
-RestArea(aArea)
+RESTAREA(AAREA)
 
-Return
+RETURN 
 
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-User Function M02R07A(lEnvEmail)
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M02R07A(LENVEMAIL)
 
-    Local oPrinter     := Nil
-    Local oFont14B     := Nil
-    Local oFont12      := Nil
-    Local oFont12B     := Nil
-    Local oFont18T     := Nil
-    Local oFont9       := Nil
-    Local nRow         := -0080
-    Local cData        := DtoC(Date()) + ' ' + Time()
-  
-    Local nTotPed      := 0
-    Local nValFret     := 0
-    Local nValDesp     := 0
-    Local nValDesc     := 0
-    Local nValST       := 0
-    Local cLocal	:= GetSrvProfString ("STARTPATH","")
+LOCAL OPRINTER := NIL
+LOCAL OFONT14B := NIL
+LOCAL OFONT12 := NIL
+LOCAL OFONT12B := NIL
+LOCAL OFONT18T := NIL
+LOCAL OFONT9 := NIL
+LOCAL NROW := - (80)
+LOCAL CDATA := DTOC(DATE())+" "+TIME()
 
-    Private _cAliasSA1   := GetNextAlias()
-    Private _oBrush      := TBrush():New( , RGB( 240 ,240 ,240))
-    Private _cNumOrc     := SC7->C7_NUM
-    Private _lOk         := .T.
-    Private nPage        := 1
-    Private nRowStep     := 45
+LOCAL NTOTPED := 0
+LOCAL NVALFRET := 0
+LOCAL NVALDESP := 0
+LOCAL NVALDESC := 0
+LOCAL NVALST := 0
+LOCAL CLOCAL := GETSRVPROFSTRING("STARTPATH","")
 
-    M02RFont(@oFont9,@oFont12,@oFont12B,@oFont14B,@oFont18T)
+PRIVATE _CALIASSA1 := GETNEXTALIAS()
+PRIVATE _OBRUSH := TBRUSH():NEW(,240+(240) * (256)+(240) * (65536))
+PRIVATE _CNUMORC := SC7->C7_NUM
+PRIVATE _LOK :=  .T. 
+PRIVATE NPAGE := 1
+PRIVATE NROWSTEP := 45
 
-    If !lEnvEmail
-        cFileImp := 'AE' + SC7->C7_NUM + '_' + SubStr(DToS(Date()),7,2) + '_' + StrTran(Time(),":","")
-        oPrinter := FWMSPrinter():New(cFileImp, IMP_PDF, .T./*_lAdjustToLegacy*/, /*cPathInServer*/, .T.)
-    Else
-        cFileImp := 'AE' + SC7->C7_NUM + '_' + DToS(Date())
-    	cLocal   := "\SPOOL\"
+M02RFONT(@OFONT9,@OFONT12,@OFONT12B,@OFONT14B,@OFONT18T)
 
-        // Exclui arquivo gerado anteriormente
-        Ferase(cLocal+cFileImp+".pdf")
+IF !(LENVEMAIL)
+    CFILEIMP := "AE"+SC7->C7_NUM+"_"+ SUBSTR(DTOS(DATE()),7,2)+"_"+STRTRAN(TIME(),":","")
+    OPRINTER := FWMSPRINTER():NEW(CFILEIMP,6, .T. ,, .T. )
+ELSE 
+    CFILEIMP := "AE"+SC7->C7_NUM+"_"+DTOS(DATE())
+    CLOCAL := "\SPOOL\"
 
-        oPrinter := FWMSPrinter():New(cFileImp, IMP_PDF, .T./*_lAdjustToLegacy*/, cLocal,.T.,,,,,,,.F.)
-       // oDanfe := FWMSPrinter():New(cFilePrint, IMP_PDF, lAdjustToLegacy,cDirPDF /*cPathInServer*/,.T.,,,,.F.,,,.F.)
-       // oPrinter:=FWMSPrinter():New(cNumPed,6,.F.,,lDisableSetup,,,,,,,lViewPDF)
-   
-    	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-    	//³Define o local de impressão padrao caso o Setup esteja desabilitado ³
-    	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-        oPrinter:cPathPDF := cLocal
-		oPrinter:nDevice  := IMP_PDF
+    FERASE(CLOCAL+CFILEIMP+".PDF")
 
-    EndIf
+    OPRINTER := FWMSPRINTER():NEW(CFILEIMP,6, .T. ,CLOCAL, .T. ,,,,,,, .F. )
 
-    oPrinter:SetResolution(78)
-    oPrinter:SetLandscape()
-    oPrinter:SetMargin(0,0,0,0)
+    OPRINTER:CPATHPDF := CLOCAL
+    OPRINTER:NDEVICE := 6
+ENDIF
 
-    oPrinter:StartPage()
+OPRINTER:SETRESOLUTION(78)
+OPRINTER:SETLANDSCAPE()
+OPRINTER:SETMARGIN(0,0,0,0)
 
-    //+----------------------------------------------------------------------------------------
-    // Cabeçalho 1 - Dados Macom
-    //+----------------------------------------------------------------------------------------
-    MR02Cab1(oPrinter,oFont14B,oFont12,@nRow)
+OPRINTER:STARTPAGE()
 
-    If MR02Posiciona()
+MR02CAB1(OPRINTER,OFONT14B,OFONT12,@NROW)
 
-        //+----------------------------------------------------------------------------------------
-        // Cabeçalho 2 - Dados do Fornecedor   *****************
-        //+----------------------------------------------------------------------------------------
-        MR02Cab2(oPrinter,oFont12,oFont18T,@nRow,oFont14B)
+IF MR02POSICIONA()
 
-        //+----------------------------------------------------------------------------------------
-        // Cabeçalho 3 - Dados do Contato - NÃO IMPLEMENTADO
-        //+----------------------------------------------------------------------------------------
-        //MR05Cab3(oPrinter,oFont12,@nRow)
+    MR02CAB2(OPRINTER,OFONT12,OFONT18T,@NROW,OFONT14B)
 
-        //+----------------------------------------------------------------------------------------
-        // Cabeçalho 3 - Dados do Orçamento
-        //+----------------------------------------------------------------------------------------
-        MR02Cab4(oPrinter,oFont12,oFont14B,oFont18T,@nRow)
+    MR02CAB4(OPRINTER,OFONT12,OFONT14B,OFONT18T,@NROW)
 
-        //+----------------------------------------------------------------------------------------
-        // Corpo do Orçamento
-        //+----------------------------------------------------------------------------------------
-        //MaFisEnd()
-        M02RIItens(oPrinter,oFont9,oFont12,oFont12B,@nRow,@nPage,cData,@nTotPed,@nValFret,@nValDesp,@nValDesc,@nValST)
+    M02RIITENS(OPRINTER,OFONT9,OFONT12,OFONT12B,@NROW,@NPAGE,CDATA,@NTOTPED,@NVALFRET,@NVALDESP,@NVALDESC,@NVALST)
 
-        //+----------------------------------------------------------------------------------------
-        // Rodapé
-        //+----------------------------------------------------------------------------------------
-        MR02Rod(oPrinter,oFont12,oFont12B,oFont14B,nRow,nPage,cData,@nTotPed,@nValFret,@nValDesp,@nValDesc,@nValST)
+    MR02ROD(OPRINTER,OFONT12,OFONT12B,OFONT14B,NROW,NPAGE,CDATA,@NTOTPED,@NVALFRET,@NVALDESP,@NVALDESC,@NVALST)
 
-        //MaFisEnd()
-        oPrinter:EndPage()
-        oPrinter:Print()
-        FreeObj(oPrinter)
+    OPRINTER:ENDPAGE()
+    OPRINTER:PRINT()
+    FREEOBJ(OPRINTER)
+ENDIF
 
-        //+----------------------------------------------------------------------------------------
-        // Condições Gerais
-        //+----------------------------------------------------------------------------------------
-    EndIf
-Return
+RETURN 
 
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function M02RICabIt(oPrinter,oFont12B,nRow)
-    Local nRowStep      := 45
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION M02RICABIT(OPRINTER,OFONT12B,NROW)
+LOCAL NROWSTEP := 45
 
-    nRow += nRowStep
+NROW += NROWSTEP
 
-    oPrinter:Box(nRow,0100,nRow + nRowStep * 2.5,3200)
-//  oPrinter:Box(nRow,0100,nRow + nRowStep * 2,0200)                        // SQ
+OPRINTER:BOX(NROW,100,NROW+(NROWSTEP) * (2.5),3200)
 
-    oPrinter:Box(nRow,0180,nRow + nRowStep * 2.5,0403)                      // Item
-//  oPrinter:Box(nRow,0400,nRow + nRowStep * 2,0700)                        // Código
+OPRINTER:BOX(NROW,180,NROW+(NROWSTEP) * (2.5),403)
 
-    oPrinter:Box(nRow,0650,nRow + nRowStep * 2.5,1250)                      // Descrição
-//  oPrinter:Box(nRow,1200,nRow + nRowStep * 2,1400)                        // MEDIDA
+OPRINTER:BOX(NROW,650,NROW+(NROWSTEP) * (2.5),1250)
 
-    oPrinter:Box(nRow,1400,nRow + nRowStep * 2.5,1500)                      // QTD
-//  oPrinter:Box(nRow,1500,nRow + nRowStep * 2,1700)                        // VALOR UNITÁRIO
+OPRINTER:BOX(NROW,1400,NROW+(NROWSTEP) * (2.5),1500)
 
-    oPrinter:Box(nRow,1700,nRow + nRowStep * 2.5,1950)                      // IPI
-    oPrinter:Box(nRow,1700,nRow + nRowStep * 1.25,1950)                     // IPI
-    oPrinter:Box(nRow + nRowStep * 1.30,1700,nRow + nRowStep * 2.5,1770)    // IPI
+OPRINTER:BOX(NROW,1700,NROW+(NROWSTEP) * (2.5),1950)
+OPRINTER:BOX(NROW,1700,NROW+(NROWSTEP) * (1.25),1950)
+OPRINTER:BOX(NROW+(NROWSTEP) * (1.3),1700,NROW+(NROWSTEP) * (2.5),1770)
 
-//  oPrinter:Box(nRow,1950,nRow + nRowStep * 2,2200)                        // ICMS
-    oPrinter:Box(nRow,1950,nRow + nRowStep * 1.25,2200)                     // ICMS
-    oPrinter:Box(nRow + nRowStep * 1.30,1950,nRow + nRowStep * 2.5,2020)    // ICMS
+OPRINTER:BOX(NROW,1950,NROW+(NROWSTEP) * (1.25),2200)
+OPRINTER:BOX(NROW+(NROWSTEP) * (1.3),1950,NROW+(NROWSTEP) * (2.5),2020)
 
-    oPrinter:Box(nRow,2200,nRow + nRowStep * 2.5,2450)                      // PIS/COFINS
-    oPrinter:Box(nRow,2200,nRow + nRowStep * 1.25,2450)                     // PIS/COFINS
-    oPrinter:Box(nRow + nRowStep * 1.30,2200,nRow + nRowStep * 2.5,2270)    // PIS/COFINS
+OPRINTER:BOX(NROW,2200,NROW+(NROWSTEP) * (2.5),2450)
+OPRINTER:BOX(NROW,2200,NROW+(NROWSTEP) * (1.25),2450)
+OPRINTER:BOX(NROW+(NROWSTEP) * (1.3),2200,NROW+(NROWSTEP) * (2.5),2270)
 
-//  oPrinter:Box(nRow,2450,nRow + nRowStep * 2,2700)                        // VALOR ICMS ST
-    oPrinter:Box(nRow,2700,nRow + nRowStep * 2.5,2950)                      // VALOR UNITARIO C/ IMPOSTOS
-//  oPrinter:Box(nRow,2950,nRow + nRowStep * 2,3200)                        // VALOR TOTAL
+OPRINTER:BOX(NROW,2700,NROW+(NROWSTEP) * (2.5),2950)
 
-    nRow += nRowStep
-    oPrinter:Say(nRow                ,0110                ,'ITEM'          ,oFont12B)
-    oPrinter:Say(nRow                ,0200                ,'DT.ENTREGA'    ,oFont12B)
-    oPrinter:Say(nRow                ,0480                ,'CÓDIGO'        ,oFont12B)
-    oPrinter:Say(nRow                ,0850                ,'DESCRIÇÃO'     ,oFont12B)
-    oPrinter:Say(nRow                ,1280                ,'MEDIDA'        ,oFont12B)
-    oPrinter:Say(nRow                ,1420                ,'QTD'           ,oFont12B)
-    oPrinter:Say(nRow                ,1550                ,'VALOR'         ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,1540                ,'UNITÁRIO'      ,oFont12B)
+NROW += NROWSTEP
+OPRINTER:SAY(NROW,110,"ITEM",OFONT12B)
+OPRINTER:SAY(NROW,200,"DT.ENTREGA",OFONT12B)
+OPRINTER:SAY(NROW,480,"CÓDIGO",OFONT12B)
+OPRINTER:SAY(NROW,850,"DESCRIÇÃO",OFONT12B)
+OPRINTER:SAY(NROW,1280,"MEDIDA",OFONT12B)
+OPRINTER:SAY(NROW,1420,"QTD",OFONT12B)
+OPRINTER:SAY(NROW,1550,"VALOR",OFONT12B)
+OPRINTER:SAY(NROW+NROWSTEP,1540,"UNITÁRIO",OFONT12B)
 
-    oPrinter:Say(nRow                ,1800                ,'IPI'            ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,1720                ,'%'              ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,1810                ,'VALOR'          ,oFont12B)
+OPRINTER:SAY(NROW,1800,"IPI",OFONT12B)
+OPRINTER:SAY(NROW+NROWSTEP,1720,"%",OFONT12B)
+OPRINTER:SAY(NROW+NROWSTEP,1810,"VALOR",OFONT12B)
 
-    oPrinter:Say(nRow                ,2040                ,'ICMS'           ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,1970                ,'%'              ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,2060                ,'VALOR'          ,oFont12B)
+OPRINTER:SAY(NROW,2040,"ICMS",OFONT12B)
+OPRINTER:SAY(NROW+NROWSTEP,1970,"%",OFONT12B)
+OPRINTER:SAY(NROW+NROWSTEP,2060,"VALOR",OFONT12B)
 
-    oPrinter:Say(nRow                ,2260                ,'PIS/COFINS'     ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,2220                ,'%'              ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,2300                ,'VALOR'          ,oFont12B)
+OPRINTER:SAY(NROW,2260,"PIS/COFINS",OFONT12B)
+OPRINTER:SAY(NROW+NROWSTEP,2220,"%",OFONT12B)
+OPRINTER:SAY(NROW+NROWSTEP,2300,"VALOR",OFONT12B)
 
-    oPrinter:Say(nRow                ,2490                ,'VALOR ICMS'     ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,2540                ,'ST'             ,oFont12B)
+OPRINTER:SAY(NROW,2490,"VALOR ICMS",OFONT12B)
+OPRINTER:SAY(NROW+NROWSTEP,2540,"ST",OFONT12B)
 
-    oPrinter:Say(nRow                ,2750                ,'VALOR TOTAL'    ,oFont12B)
-    oPrinter:Say(nRow + nRowStep     ,2750                ,'+ FRET/DESP'     ,oFont12B)
+OPRINTER:SAY(NROW,2750,"VALOR TOTAL",OFONT12B)
+OPRINTER:SAY(NROW+NROWSTEP,2750,"+ FRET/DESP",OFONT12B)
 
-    oPrinter:Say(nRow                ,2980                ,'VALOR TOTAL'     ,oFont12B)
-Return
+OPRINTER:SAY(NROW,2980,"VALOR TOTAL",OFONT12B)
+RETURN 
 
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function M02RIItens(oPrinter,oFont9,oFont12,oFont12B,nRow,nPage,cData,nTotPed,nValFret,nVAlDesp,nValDesc,nValST)
-    Local nRowStep      := 45
-    Local _cAlias       := GetNextAlias()
-    Local nItem         := 0
-    Local _nTotal       := 0
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION M02RIITENS(OPRINTER,OFONT9,OFONT12,OFONT12B,NROW,NPAGE,CDATA,NTOTPED,NVALFRET,NVALDESP,NVALDESC,NVALST)
+LOCAL NROWSTEP := 45
+LOCAL _CALIAS := GETNEXTALIAS()
+LOCAL NITEM := 0
+LOCAL _NTOTAL := 0
 
-    M02RICabIt(oPrinter,oFont12B,@nRow)
+M02RICABIT(OPRINTER,OFONT12B,@NROW)
 
- // MR05GetValue(@_cAlias)
-    MR02Planil(SC7->C7_NUM,@_cAlias,@_nTotal)
+MR02PLANIL(SC7->C7_NUM,@_CALIAS,@_NTOTAL)
 
-     nRow += nRowStep + 10
+NROW += NROWSTEP+10
 
-    (_cAlias)->(DbGoTop())
+(_CALIAS)->(DBGOTOP())
 
-    While (_cAlias)->(!EOF())
-        nItem++
-        MR02ImpItem(_cAlias,oPrinter,@nRow,oFont9,oFont12B,nItem,@nTotPed,@nValFret,@nValDesp,@nValDesc,@nValST)
+WHILE !(_CALIAS)->(EOF())
+ 
+    NITEM++
+    MR02IMPITEM(_CALIAS,OPRINTER,@NROW,OFONT9,OFONT12B,NITEM,@NTOTPED,@NVALFRET,@NVALDESP,@NVALDESC,@NVALST)
 
-        MR02EndPag(oPrinter,oFont12,oFont12B,@nRow,nRowStep,@nPage,cData,nItem,_nTotal)
+    MR02ENDPAG(OPRINTER,OFONT12,OFONT12B,@NROW,NROWSTEP,@NPAGE,CDATA,NITEM,_NTOTAL)
 
-        (_cAlias)->(DbSkip())
-    EndDo
-Return
+    (_CALIAS)->(DBSKIP())
+    ENDDO
 
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MR02ImpItem(_cAlias,oPrinter,nRow,oFont9,oFont12B,nItem,nTotPed,nValFret,nValDesp,nValDesc,nValST)
-    Local nDesc         := 1
-    Local nRowStep      := 45
-    Local aDesc         := {}
-    Local cDescB5		:= ""    
-    Local cPicVal       := "@E 99,999,999.99"
-    Local cPicAliq      := "@E 999.99"
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR02IMPITEM(_CALIAS,OPRINTER,NROW,OFONT9,OFONT12B,NITEM,NTOTPED,NVALFRET,NVALDESP,NVALDESC,NVALST)
+LOCAL NDESC := 1
+LOCAL NROWSTEP := 45
+LOCAL ADESC := {}
+LOCAL CDESCB5 := ""
+LOCAL CPICVAL := "@E 99,999,999.99"
+LOCAL CPICALIQ := "@E 999.99"
+
+LOCAL NTAXACOF := SUPERGETMV("MV_TXCOFIN", .F. ,0)
+LOCAL NTAXAPIS := SUPERGETMV("MV_TXPIS", .F. ,0)
+PRIVATE CPICQTD := "@E 999999.99"
+
+CDESCB5 := POSICIONE("SB5",1,XFILIAL("SB5")+_CALIAS->_PRODUTO,"B5_CEME")
+
+ADESC := M02RDESCR( ALLTRIM(_CALIAS->_PRODUTO),IIF(!(EMPTY(CDESCB5)), ALLTRIM(CDESCB5),"PRODUTO SEM COMPLEMENTO"), ALLTRIM(_CALIAS->_DESCRI),0,0,0,_CALIAS->_ITEM)
+
+OPRINTER:BOX(NROW,100,NROW+((NROWSTEP) * (1.25)) * ( LEN(ADESC)),3200)
+OPRINTER:BOX(NROW,180,NROW+((NROWSTEP) * (1.25)) * ( LEN(ADESC)),403)
+OPRINTER:BOX(NROW,650,NROW+((NROWSTEP) * (1.25)) * ( LEN(ADESC)),1250)
+OPRINTER:BOX(NROW,1400,NROW+((NROWSTEP) * (1.25)) * ( LEN(ADESC)),1500)
+OPRINTER:BOX(NROW,1700,NROW+((NROWSTEP) * (1.25)) * ( LEN(ADESC)),1950)
+OPRINTER:BOX(NROW,1700,NROW+((NROWSTEP) * (1.25)) * ( LEN(ADESC)),1770)
+OPRINTER:BOX(NROW,1950,NROW+((NROWSTEP) * (1.25)) * ( LEN(ADESC)),2200)
+OPRINTER:BOX(NROW,1950,NROW+((NROWSTEP) * (1.25)) * ( LEN(ADESC)),2020)
+OPRINTER:BOX(NROW,2200,NROW+((NROWSTEP) * (1.25)) * ( LEN(ADESC)),2450)
+OPRINTER:BOX(NROW,2200,NROW+((NROWSTEP) * (1.25)) * ( LEN(ADESC)),2270)
+OPRINTER:BOX(NROW,2700,NROW+((NROWSTEP) * (1.25)) * ( LEN(ADESC)),2950)
+
+NROW += NROWSTEP
+
+OPRINTER:SAY(NROW-8,120, SUBSTR( ALLTRIM(_CALIAS->_ITEM),1,15),OFONT9)
+OPRINTER:SAY(NROW-8,225, SUBSTR(_CALIAS->_DATPRF,7,2)+"/"+ SUBSTR(_CALIAS->_DATPRF,5,2)+"/"+ SUBSTR(_CALIAS->_DATPRF,1,4),OFONT9)
+OPRINTER:SAY(NROW-8,415,_CALIAS->_PRODUTO,OFONT9)
+OPRINTER:SAY(NROW-8,1267,POSICIONE("SB1",1,XFILIAL("SB1")+_CALIAS->_PRODUTO,"B1_UM"),OFONT9)
+OPRINTER:SAY(NROW-8,1414,TRANSFORM(NOROUND(_CALIAS->_QTDCOM,2),"@E 999999.99"),OFONT9)
+OPRINTER:SAY(NROW-8,1540,TRANSFORM(NOROUND(_CALIAS->_PRUNIT,2),CPICVAL),OFONT9)
+OPRINTER:SAY(NROW-8,1709,TRANSFORM(NOROUND(_CALIAS->_IPI,2),CPICALIQ),OFONT9)
+OPRINTER:SAY(NROW-8,1810,TRANSFORM(NOROUND(_CALIAS->_VALIPI,2),CPICVAL),OFONT9)
+OPRINTER:SAY(NROW-8,1954,TRANSFORM(NOROUND(_CALIAS->_PICM,2),CPICALIQ),OFONT9)
+OPRINTER:SAY(NROW-8,2050,TRANSFORM(NOROUND(_CALIAS->_VALICM,2),CPICVAL),OFONT9)
+OPRINTER:SAY(NROW-8,2210,TRANSFORM(NOROUND(NTAXACOF+NTAXAPIS,2),CPICALIQ),OFONT9)
+OPRINTER:SAY(NROW-8,2290,TRANSFORM(NOROUND(_CALIAS->_VALIMP5+_CALIAS->_VALIMP6,2),CPICVAL),OFONT9)
+OPRINTER:SAY(NROW-8,2550,TRANSFORM(NOROUND(_CALIAS->_ICMSRET,2),CPICVAL),OFONT9)
+OPRINTER:SAY(NROW-8,2780,TRANSFORM(NOROUND(_CALIAS->_TOTAL+_CALIAS->_FRETE+_CALIAS->_DESPESA+(_CALIAS->_VALIPI) / (_CALIAS->_QTDCOM),2),CPICVAL),OFONT9)
+OPRINTER:SAY(NROW-8,3010,TRANSFORM(NOROUND(_CALIAS->_TOTAL+_CALIAS->_FRETE+_CALIAS->_DESPESA+_CALIAS->_VALIPI,2),CPICVAL),OFONT12B)
+
+NTOTPED += _CALIAS->_TOTAL+_CALIAS->_VALIPI+_CALIAS->_FRETE+_CALIAS->_DESPESA
+NVALFRET += _CALIAS->_VALFRE
+NVALDESP += _CALIAS->_DESPESA
+NVALDESC += _CALIAS->_DESCONT
+NVALST += _CALIAS->_ICMSRET
+
+FOR NDESC := 1 TO  LEN(ADESC)
+    OPRINTER:SAY(NROW-8,660,ADESC[NDESC],OFONT9)
+    NROW += NROWSTEP
+NEXT
+
+NROW -= NROWSTEP
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION M02RDESCR(CPROD,CDESCSB1,CDESCSC6,NCOMP,NLAR,NALT,CITEM)
+LOCAL ARET := {}
+LOCAL CAUX := ""
+LOCAL CLETRAS := ""
+LOCAL CRET := ""
+LOCAL I := 0
+LOCAL NTAM := 45
+LOCAL NINI := 1
+LOCAL NQUEBRA := 1
+LOCAL CPIC := "@E 999999"
+
+IF CPROD=="N/A"
+    CDESC := CDESCSC6
+ELSE 
+    CDESC := CDESCSB1
     
-    Local nTaxaCof		:= SuperGetMv("MV_TXCOFIN", .F. , 0)
-    Local nTaxaPis		:= SuperGetMv("MV_TXPIS", .F. , 0)
-    Private cPicQtd       := "@E 999999.99"
+    IF NCOMP>0 .AND. NLAR>0 .AND. NALT>0
+        CDESC += " - MEDINDO: "+ ALLTRIM(TRANSFORM(NCOMP,CPIC))+" X "+ ALLTRIM(TRANSFORM(NLAR,CPIC))+" X "+ ALLTRIM(TRANSFORM(NALT,CPIC))
+    ENDIF
+ENDIF
+
+REPLACE(CDESC,CHR(13)," ")
+
+FOR I := 1 TO  LEN(CDESC)-1
+    CLETRAS :=  SUBSTR(CDESC,I,2)
     
-    cDescB5 := Posicione("SB5",1,xFilial("SB5")+(_cAlias)->_PRODUTO,"B5_CEME")
+    IF CLETRAS<>"  "
+        CRET += LEFT(CLETRAS,1)
+    ENDIF
+NEXT
+
+IF I>0 .AND. CLETRAS<>"  "
+    CRET += RIGHT(CLETRAS,1)
+ENDIF
+
+CDESC := CRET
+
+WHILE  LEN(CDESC)>0
+ 
+    CAUX := SUBSTRING(CDESC,1,NTAM)
     
-    aDesc	:= M02RDescr(AllTrim((_cAlias)->_PRODUTO),IIF(!Empty(cDescB5),AllTrim(cDescB5),"PRODUTO SEM COMPLEMENTO"), AllTrim((_cAlias)->_DESCRI),0 ,0 ,0,(_cAlias)->_ITEM)
-
-    oPrinter:Box(nRow,0100,nRow + (nRowStep * 1.25 * Len(aDesc)),3200)                     // SQ
-    oPrinter:Box(nRow,0180,nRow + (nRowStep * 1.25 * Len(aDesc)),0403)                     // Item
-    oPrinter:Box(nRow,0650,nRow + (nRowStep * 1.25 * Len(aDesc)),1250)                     // Descrição
-    oPrinter:Box(nRow,1400,nRow + (nRowStep * 1.25 * Len(aDesc)),1500)                     // QTD
-    oPrinter:Box(nRow,1700,nRow + (nRowStep * 1.25 * Len(aDesc)),1950)                     // IPI %
-    oPrinter:Box(nRow,1700,nRow + (nRowStep * 1.25 * Len(aDesc)),1770)                     // IPI Valor
-    oPrinter:Box(nRow,1950,nRow + (nRowStep * 1.25 * Len(aDesc)),2200)                     // ICMS %
-    oPrinter:Box(nRow,1950,nRow + (nRowStep * 1.25 * Len(aDesc)),2020)                     // ICMS
-    oPrinter:Box(nRow,2200,nRow + (nRowStep * 1.25 * Len(aDesc)),2450)                     // PIS/COFINS %
-    oPrinter:Box(nRow,2200,nRow + (nRowStep * 1.25 * Len(aDesc)),2270)                     // PIS/COFINS
-    oPrinter:Box(nRow,2700,nRow + (nRowStep * 1.25 * Len(aDesc)),2950)                     // VALOR UNITARIO C/ IMPOSTOS
-
-    nRow += nRowStep
-
-    oPrinter:Say(nRow - 0008   ,0120    ,SubStr(AllTrim((_cAlias)->_ITEM),1,15)                                                                                                 ,oFont9)    // ITEM
-    oPrinter:Say(nRow - 0008   ,0225    ,Substr((_cAlias)->_DATPRF,7,2)+"/"+Substr((_cAlias)->_DATPRF,5,2)+"/"+Substr((_cAlias)->_DATPRF,1,4)                                   ,oFont9)    // DT.ENTREGA
-    oPrinter:Say(nRow - 0008   ,0415    ,(_cAlias)->_PRODUTO                                                                                                                    ,oFont9)    // CÓDIGO
-    oPrinter:Say(nRow - 0008   ,1267    ,Posicione("SB1",1,xFilial("SB1")+(_cAlias)->_PRODUTO,"B1_UM")                                                                          ,oFont9)    // MEDIDA
-    oPrinter:Say(nRow - 0008   ,1414    ,Transform(NoRound((_cAlias)->_QTDCOM,2) ,"@E 999999.99")                                                                               ,oFont9)   // QTD
-    oPrinter:Say(nRow - 0008   ,1540    ,Transform(NoRound((_cAlias)->_PRUNIT,2) ,cPicVal)                                                                                      ,oFont9)    // VALOR UNITÁRIO
-    oPrinter:Say(nRow - 0008   ,1709    ,Transform(NoRound((_cAlias)->_IPI,2) ,cPicAliq)                                                                                        ,oFont9)    // % IPI
-    oPrinter:Say(nRow - 0008   ,1810    ,Transform(NoRound((_cAlias)->_VALIPI,2) ,cPicVal)                                                                                      ,oFont9)    // VALOR IPI
-    oPrinter:Say(nRow - 0008   ,1954    ,Transform(NoRound((_cAlias)->_PICM,2), cPicAliq)                                                                                       ,oFont9)    // % ICMS
-    oPrinter:Say(nRow - 0008   ,2050    ,Transform(NoRound((_cAlias)->_VALICM,2),cPicVal)                                                                                       ,oFont9)    // VALOR ICMS
-    oPrinter:Say(nRow - 0008   ,2210    ,Transform(NoRound(nTaxaCof + nTaxaPis,2),cPicAliq)                                                                                     ,oFont9)    // % PIS/COFINS
-    oPrinter:Say(nRow - 0008   ,2290    ,Transform(NoRound((_cAlias)->_VALIMP5 + (_cAlias)->_VALIMP6,2),cPicVal)                                                                ,oFont9)    // VALOR PIS/COFINS
-    oPrinter:Say(nRow - 0008   ,2550    ,Transform(NoRound((_cAlias)->_ICMSRET,2),cPicVal)                                                                                      ,oFont9)    // VALOR ICMS ST
-    oPrinter:Say(nRow - 0008   ,2780    ,Transform(NoRound((_cAlias)->_TOTAL + ((_cAlias)->_FRETE + (_cAlias)->_DESPESA) + (_cAlias)->_VALIPI / (_cAlias)->_QTDCOM,2),cPicVal)  ,oFont9)    // VALOR UNIT C/ IMPOSTOS
-    oPrinter:Say(nRow - 0008   ,3010    ,Transform(NoRound((_cAlias)->_TOTAL + ((_cAlias)->_FRETE + (_cAlias)->_DESPESA ) + (_cAlias)->_VALIPI,2) ,cPicVal)                     ,oFont12B)  // VALOR TOTAL
-    
-    //Adiciona valor nas variáveis totalizadoras para uso no rodapé
-    nTotPed += 	((_cAlias)->_TOTAL + (_cAlias)->_VALIPI + (_cAlias)->_FRETE + (_cAlias)->_DESPESA) 
-    nValFret += (_cAlias)->_VALFRE
-    nValDesp += (_cAlias)->_DESPESA
-    nValDesc += (_cAlias)->_DESCONT
-    nValST   += (_cAlias)->_ICMSRET
-
-    For nDesc := 1 to Len(aDesc)
-        oPrinter:Say(nRow - 0008       ,0660           ,aDesc[nDesc]                                                                                                           ,oFont9)     // DESCRIÇÃO
-        nRow += nRowStep
-    Next
-
-    nRow -= nRowStep
-Return
-
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function M02RDescr(cProd,cDescSB1,cDescSC6,nComp,nLar,nAlt,cItem)
-    Local aRet      := {}
-    Local cAux      := ""
-    Local cLetras   := ""
-    Local cRet      := ""
-    Local i         := 0
-    Local nTam      := 45
-    Local nIni      := 1
-    Local nQuebra   := 1
-    Local cPic      := "@E 999999"
-
-    If cProd == 'N/A'
-        cDesc   := cDescSC6
-    Else
-        cDesc   := cDescSB1
-
-        If nComp > 0 .And. nLar > 0 .And. nAlt > 0
-            cDesc += ' - MEDINDO: ' + AllTrim(Transform(nComp,cPic)) + ' X ' + AllTrim(Transform(nLar,cPic)) + ' X ' + AllTrim(Transform(nAlt,cPic))
-        EndIf
-    EndIf
-    
-    // Retira enter da descrição
-    Replace( cDesc , chr(13) ," ")
-
-    // Retira espaçoes duplicados
-    For i := 1 to Len( cDesc ) - 1
-        cLetras := Substr( cDesc , i , 2 )
-
-        If cLetras <> "  "
-            cRet += Left(cLetras,1)
-        EndIf
-    Next
-
-    If i > 0 .and. cLetras <> "  "
-        cRet += Right(cLetras,1)
-    EndIf
-
-    cDesc := cRet
-
-    While Len(cDesc) > 0
-        cAux    := SubString(cDesc,1,nTam)       // Quebra linha
-
-        If nTam <= Len(cDesc)
-            nQuebra := Rat(" ",cAux)                    // Tamanho da quebra
-
-            AAdd(aRet, SubString(cDesc,1,nQuebra) )
-        Else
-            AAdd(aRet, cDesc )
-            Exit
-        EndIf
-
-        nIni    := nQuebra++
-        cDesc   := SubString(cDesc,nIni,Len(cDesc))
-    EndDo
-Return AClone(aRet)
-
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MR02Posiciona()
-    Local lRet  := .T.
-
-    SA2->(DbSetOrder(1))
-    SA2->(DbGoTop())
-
-    If !SA2->(DbSeek( xFilial('SA2')  + SC7->(C7_FORNECE + C7_LOJA)))
-        MsgInfo(I18N('Não foram encontrados dados do fornecedor #1 loja #2.' + CRLF + 'Verifique.',{SC7->C7_FORNECE,SC7->C7_LOJA}),"Atenção")
-        lRet := .F.
-    EndIf
-
-Return lRet
-
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function M02RFont(oFont9,oFont12,oFont12B,oFont14B,oFont18T)
-    oFont9      := TFont():New('Arial',,9)
-    oFont12     := TFont():New('Arial',,12)
-    oFont12B    := TFont():New('Arial',,12,.T.,.T.)
-    oFont14B    := TFont():New('Arial',,14,.T.,.T.)
-    oFont18T    := TFont():New('Arial',,18,.T.,.T.)
-Return
-
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MR02Cab1(oPrinter,oFont14B,oFont12,nRow)
-    Local cNome         := 'HOSHIZAKI MACOM LTDA'
-    Local cEndC         := 'Av Julia Gaiolli, 474, Bonsucesso, Guarulhos-SP, CEP 07251-500'
-    Local cCGC          := 'CNPJ: 43.553.668/0001-79 I.E.: 336.179.661.113'
-    Local cTel          := 'Telefone: 55 11 2085-7000'
-    Local cMail         := 'www.acosmacom.com.br'
-    Local nRowStep      := 45
-
-    oPrinter:SayBitmap(nRow ,0100,GetSrvProfString("Startpath","") + 'LOGO_M05R02.BMP', 751 ,178 )
-
-    oPrinter:Say(nRow                 ,2404         , cNome     ,oFont14B)
-    oPrinter:Say(nRow += nRowStep     ,2404         , cEndC     ,oFont12)
-    oPrinter:Say(nRow += nRowStep     ,2404         , cCGC      ,oFont12)
-    oPrinter:Say(nRow += nRowStep     ,2404         , cTel      ,oFont12)
-    oPrinter:Say(nRow += nRowStep     ,2404         , cMail     ,oFont12)
-
-    nRow += nRowStep
-Return
-
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MR02Cab2(oPrinter,oFont12,oFont18T,nRow,oFont14B)
-    Local lRet          := .T.
-    Local cMascCPF      := "@R 999.999.999-99"
-    Local cMascCNPJ     := "@R 99.999.999/9999-99"
-    Local nRowStep      := 45
-
-    If lRet
-        nRow += nRowStep
-
-        oPrinter:Say(nRow += nRowStep     ,0100    , Upper(AllTrim(SA2->A2_NOME))     ,oFont18T)      // Fornecedor
-        oPrinter:Say(nRow                 ,1800    , 'CNPJ/CPF: '                     ,oFont12)
-        oPrinter:Say(nRow                 ,2000    , Transform( AllTrim(SA2->A2_CGC), IIF(SA2->A2_TIPO == 'F',cMascCPF,cMascCNPJ))     ,oFont12)
-        oPrinter:Say(nRow += nRowStep     ,0100    , Upper(AllTrim(SA2->A2_END))     ,oFont12)
-        oPrinter:Say(nRow                 ,1800    , 'IE.: '                         ,oFont12)
-        oPrinter:Say(nRow                 ,2000    , Transform( AllTrim(SA2->A2_INSCR), "@R 999.999.999.999" ) ,oFont12)
-        oPrinter:Say(nRow                 ,2700    , 'GUARULHOS, ' + MR02Date() ,oFont12)
-        oPrinter:Say(nRow += nRowStep     ,0100    , Upper(AllTrim(SA2->A2_BAIRRO)) + ' - ' + Upper(AllTrim(SA2->A2_MUN)) + ' - ' + Upper(AllTrim(SA2->A2_EST)) + ' - CEP: ' + Transform(AllTrim(SA2->A2_CEP), "@R 99999-999" ) ,oFont12)
-
-        nRow += nRowStep
-        oPrinter:Line(nRow, 0100,nRow, 3200)
-        oPrinter:Say(nRow + 70            ,1000    , 'AUTORIZACAO DE ENTREGA - CONTRATO DE PARCERIA'          ,oFont18T)
+    IF NTAM<= LEN(CDESC)
+        NQUEBRA := RAT(" ",CAUX)
         
-    EndIf
-Return lRet
-
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MR05Cab3(oPrinter,oFont12,nRow)
-
-Local nRowStep      := 45
-Local cAliasCont    := GetNextAlias()
-Local cEntidade     := 'SA1'
-Local cCodEnt       := PadR(SC5->(C5_CLIENTE + C5_LOJACLI),TamSX3('AC8_CODENT')[1])
-Local cPic1          := "@R 9999-99999"
-Local cPic2          := "@R (999)"
-
-BeginSql Alias cAliasCont
-
-	SELECT U5_CODCONT,U5_CONTAT,U5_EMAIL,U5_FCOM1,U5_DDD,U5_CELULAR,UM_DESC
-    FROM %Table:AC8% AC8
-    LEFT  JOIN %Table:SU5% SU5 ON SU5.%NotDel% AND U5_FILIAL = %xFilial:SU5% AND U5_CODCONT = AC8_CODCON
-    INNER JOIN %Table:SUM% SUM ON SUM.%NotDel% AND UM_FILIAL = %xFilial:SUM% AND UM_CARGO = U5_FUNCAO
-    WHERE AC8_FILIAL = %xFilial:AC8% 
-    AND AC8_ENTIDA = %Exp:cEntidade%
-    AND AC8_CODENT = %Exp:cCodEnt%
-    AND AC8.%NotDel%
-
-EndSql
-
-If Empty(SC5->C5_XCONT) .And. Empty(SC5->C5_XCONT2) .And. Empty(SC5->C5_XCONT3) .And. Empty(SC5->C5_XCONT4) .And. Empty(SC5->C5_XCONT5)  
-    If (cAliasCont)->(!EOF())
-        While (cAliasCont)->(!EOF())
-
-            oPrinter:Say(nRow += nRowStep     ,0100    , 'CONTATO: '                                ,oFont12)
-            oPrinter:Say(nRow                 ,0260    , AllTrim((cAliasCont)->U5_CONTAT)           ,oFont12)
-            oPrinter:Say(nRow                 ,0820    , Upper(AllTrim((cAliasCont)->UM_DESC))      ,oFont12)
-            oPrinter:Say(nRow                 ,1360    , Upper(AllTrim((cAliasCont)->U5_EMAIL))     ,oFont12)
-            oPrinter:Say(nRow                 ,2120    , 'CELULAR: '                                ,oFont12)
-            oPrinter:Say(nRow                 ,2300    , TransForm((cAliasCont)->U5_DDD,cPic2) + ' ' + TransForm((cAliasCont)->U5_CELULAR,cPic1)    ,oFont12)
-            oPrinter:Say(nRow                 ,2700    , 'COMERCIAL: '                              ,oFont12)
-            oPrinter:Say(nRow                 ,2900    , TransForm((cAliasCont)->U5_DDD,cPic2) + ' ' + TransForm((cAliasCont)->U5_FCOM1,cPic1)    ,oFont12)
-			(cAliasCont)->(DbSkip())
-        EndDo
-    EndIf
-Else
-	While (cAliasCont)->(!EOF())
-		If 	(cAliasCont)->U5_CODCONT == SC5->C5_XCONT .Or. (cAliasCont)->U5_CODCONT == SC5->C5_XCONT2 .Or. (cAliasCont)->U5_CODCONT == SC5->C5_XCONT3 .Or. (cAliasCont)->U5_CODCONT == SC5->C5_XCONT4 .Or. (cAliasCont)->U5_CODCONT == SC5->C5_XCONT5  
-            oPrinter:Say(nRow += nRowStep     ,0100    , 'CONTATO: '                                ,oFont12)
-            oPrinter:Say(nRow                 ,0260    , AllTrim((cAliasCont)->U5_CONTAT)           ,oFont12)
-
-            oPrinter:Say(nRow                 ,0820    , Upper(AllTrim((cAliasCont)->UM_DESC))      ,oFont12)
-
-            oPrinter:Say(nRow                 ,1360    , Upper(AllTrim((cAliasCont)->U5_EMAIL))     ,oFont12)
-
-            oPrinter:Say(nRow                 ,2120    , 'CELULAR: '                                ,oFont12)
-            oPrinter:Say(nRow                 ,2300    , TransForm((cAliasCont)->U5_DDD,cPic2) + ' ' + TransForm((cAliasCont)->U5_CELULAR,cPic1)    ,oFont12)
-
-            oPrinter:Say(nRow                 ,2700    , 'COMERCIAL: '                              ,oFont12)
-            oPrinter:Say(nRow                 ,2900    , TransForm((cAliasCont)->U5_DDD,cPic2) + ' ' + TransForm((cAliasCont)->U5_FCOM1,cPic1)    ,oFont12)
-        Endif
-		(cAliasCont)->(DbSkip())
-	End
-Endif
-	   
-Return
-
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MR02Cab4(oPrinter,oFont12,oFont14B,oFont18T,nRow)
-    Local nRowStep  := 45
-    Private oBrush    := TBrush():New( , RGB( 240 ,240 ,240))
-
-    nRow += (nRowStep * 2)
-
-    oPrinter:Line(nRow,0100,nRow, 3200)
-
-    oPrinter:Say(nRow += nRowStep     ,0100    , 'AUTORIZAÇÃO DE ENTREGA : '     ,oFont12)
-    oPrinter:Say(nRow                 ,0640    , SC7->C7_NUM  		      ,oFont14B)
-
-	oPrinter:Say(nRow                 ,2700    , 'FORNECEDOR/LOJA:'    ,oFont12)
-    oPrinter:Say(nRow                 ,3050    , SC7->C7_FORNECE + '/' + SC7->C7_LOJA   ,oFont12)
-
-    oPrinter:Say(nRow += nRowStep     ,0100    , 'COND PAG: '                           ,oFont12)
-    oPrinter:Say(nRow                 ,0440    , MR02GetCPg()                           ,oFont12)
+        AADD(ARET,SUBSTRING(CDESC,1,NQUEBRA))
+    ELSE 
+        AADD(ARET,CDESC)
+        EXIT 
+    ENDIF
     
-    oPrinter:Say(nRow                 ,2700    , 'SOLIC. COMPRA: '                      ,oFont12)
-    oPrinter:Say(nRow                 ,3050    , SC7->C7_NUMSC                          ,oFont12) 
-    
-    oPrinter:Say(nRow += nRowStep     ,0100    ,'OBSERVAÇÕES'     ,oFont12)
-    oPrinter:Say(nRow                 ,0440    ,AllTrim(SC7->C7_OBS)                    ,oFont12)
+    NINI := NQUEBRA++
+    CDESC := SUBSTRING(CDESC,NINI, LEN(CDESC))
+    ENDDO
 
-    oPrinter:Say(nRow += nRowStep     ,0100    ,'COMPRADOR RESPONSÁVEL'                 ,oFont12)
-    oPrinter:Say(nRow                 ,0550    ,AllTrim(USRFULLNAME(SC7->C7_USER))      ,oFont12)
+RETURN ACLONE(ARET)
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR02POSICIONA()
+LOCAL LRET :=  .T. 
+
+SA2->(DBSETORDER(1))
+SA2->(DBGOTOP())
+
+IF !(SA2->(DBSEEK(XFILIAL("SA2")+(SC7)->(C7_FORNECE+C7_LOJA))))
+    IIF(FINDFUNCTION("APMSGINFO"),MSGINFO(I18N("NÃO FORAM ENCONTRADOS DADOS DO FORNECEDOR #1 LOJA #2." + CRLF+"VERIFIQUE.",{SC7->C7_FORNECE,SC7->C7_LOJA}),"ATENÇÃO"),MSGINFO(I18N("NÃO FORAM ENCONTRADOS DADOS DO FORNECEDOR #1 LOJA #2." + CRLF+"VERIFIQUE.",{SC7->C7_FORNECE,SC7->C7_LOJA}),"ATENÇÃO"))
+    LRET :=  .F. 
+ENDIF
+
+RETURN LRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION M02RFONT(OFONT9,OFONT12,OFONT12B,OFONT14B,OFONT18T)
+OFONT9 := TFONT():NEW("ARIAL",,9)
+OFONT12 := TFONT():NEW("ARIAL",,12)
+OFONT12B := TFONT():NEW("ARIAL",,12, .T. , .T. )
+OFONT14B := TFONT():NEW("ARIAL",,14, .T. , .T. )
+OFONT18T := TFONT():NEW("ARIAL",,18, .T. , .T. )
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR02CAB1(OPRINTER,OFONT14B,OFONT12,NROW)
+LOCAL CNOME := " AÇOS MACOM INDÚSTRIA E COMERCIO LTDA"
+LOCAL CENDC := "AV JULIA GAIOLLI, 474, BONSUCESSO, GUARULHOS-SP, CEP 07251-500"
+LOCAL CCGC := " CNPJ: 43.553.668/0001-79 I.E.: 336.179.661.113"
+LOCAL CTEL := "TELEFONE: 55 11 2085-7000"
+LOCAL CMAIL := "WWW.ACOSMACOM.COM.BR"
+LOCAL NROWSTEP := 45
+
+OPRINTER:SAYBITMAP(NROW,100,GETSRVPROFSTRING("STARTPATH","")+"LOGO_M05R02.BMP",751,178)
+
+OPRINTER:SAY(NROW,2450,CNOME,OFONT14B)
+OPRINTER:SAY(NROW += NROWSTEP,2404,CENDC,OFONT12)
+OPRINTER:SAY(NROW += NROWSTEP,2600,CCGC,OFONT12)
+OPRINTER:SAY(NROW += NROWSTEP,2880,CTEL,OFONT12)
+OPRINTER:SAY(NROW += NROWSTEP,2900,CMAIL,OFONT12)
+
+NROW += NROWSTEP
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR02CAB2(OPRINTER,OFONT12,OFONT18T,NROW,OFONT14B)
+LOCAL LRET :=  .T. 
+LOCAL CMASCCPF := "@R 999.999.999-99"
+LOCAL CMASCCNPJ := "@R 99.999.999/9999-99"
+LOCAL NROWSTEP := 45
+
+IF LRET
+    NROW += NROWSTEP
+
+    OPRINTER:SAY(NROW += NROWSTEP,100, UPPER( ALLTRIM(SA2->A2_NOME)),OFONT18T)
+    OPRINTER:SAY(NROW,1800,"CNPJ/CPF: ",OFONT12)
+    OPRINTER:SAY(NROW,2000,TRANSFORM( ALLTRIM(SA2->A2_CGC),IIF(SA2->A2_TIPO=="F",CMASCCPF,CMASCCNPJ)),OFONT12)
+    OPRINTER:SAY(NROW += NROWSTEP,100, UPPER( ALLTRIM(SA2->A2_END)),OFONT12)
+    OPRINTER:SAY(NROW,1800,"IE.: ",OFONT12)
+    OPRINTER:SAY(NROW,2000,TRANSFORM( ALLTRIM(SA2->A2_INSCR),"@R 999.999.999.999"),OFONT12)
+    OPRINTER:SAY(NROW,2700,"GUARULHOS, "+MR02DATE(),OFONT12)
+    OPRINTER:SAY(NROW += NROWSTEP,100, UPPER( ALLTRIM(SA2->A2_BAIRRO))+" - "+ UPPER( ALLTRIM(SA2->A2_MUN))+" - "+ UPPER( ALLTRIM(SA2->A2_EST))+" - CEP: "+TRANSFORM( ALLTRIM(SA2->A2_CEP),"@R 99999-999"),OFONT12)
+
+    NROW += NROWSTEP
+    OPRINTER:LINE(NROW,100,NROW,3200)
+    OPRINTER:SAY(NROW+70,1000,"AUTORIZACAO DE ENTREGA - CONTRATO DE PARCERIA",OFONT18T)
+ENDIF
+
+RETURN LRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR05CAB3(OPRINTER,OFONT12,NROW)
+
+LOCAL NROWSTEP := 45
+LOCAL CALIASCONT := GETNEXTALIAS()
+LOCAL CENTIDADE := "SA1"
+LOCAL CCODENT := PADR(SC5->(C5_CLIENTE+C5_LOJACLI),TAMSX3("AC8_CODENT")[1])
+LOCAL CPIC1 := "@R 9999-99999"
+LOCAL CPIC2 := "@R (999)"
+
+_cQry := " SELECT U5_CODCONT, "
+_cQry += "        U5_CONTAT, "
+_cQry += "        U5_EMAIL, "
+_cQry += "        U5_FCOM1, "
+_cQry += "        U5_DDD, "
+_cQry += "        U5_CELULAR, "
+_cQry += "        UM_DESC "
+_cQry += " FROM "+RETSQLNAME("AC8")+" AC8 "
+_cQry += " LEFT JOIN "+RETSQLNAME("SU5")+" SU5 ON SU5.D_E_L_E_T_= ' ' "
+_cQry += " AND U5_FILIAL = '"+XFILIAL("SU5")+"' "
+_cQry += " AND U5_CODCONT = AC8_CODCON "
+_cQry += " INNER JOIN "+RETSQLNAME("SUM")+" SUM ON SUM.D_E_L_E_T_= ' ' "
+_cQry += " AND UM_FILIAL = '"+XFILIAL("SUM")+"' "
+_cQry += " AND UM_CARGO = U5_FUNCAO "
+_cQry += " WHERE AC8_FILIAL = '"+XFILIAL("AC8")+"' "
+_cQry += "   AND AC8_ENTIDA = "+___SQLGETVALUE(CENTIDADE)+" "
+_cQry += "   AND AC8_CODENT = "+___SQLGETVALUE(CCODENT)+" "
+_cQry += "   AND AC8.D_E_L_E_T_= ' ' "
+__EXECSQL(CALIASCONT,_cQry,{}, .F. )
+
+IF EMPTY(SC5->C5_XCONT) .AND. EMPTY(SC5->C5_XCONT2) .AND. EMPTY(SC5->C5_XCONT3) .AND. EMPTY(SC5->C5_XCONT4) .AND. EMPTY(SC5->C5_XCONT5)
     
-    oPrinter:Say(nRow                 ,2700    , 'CONTATO: '                            ,oFont12)
-    oPrinter:Say(nRow                 ,3050    , SC7->C7_CONTATO                        ,oFont12)     
+    IF !(CALIASCONT)->(EOF())
+        WHILE !(CALIASCONT)->(EOF())
         
-    nRow += (nRowStep * 0.50)
-    oPrinter:Line(nRow, 0100,nRow, 3200)
-Return
+            OPRINTER:SAY(NROW += NROWSTEP,100,"CONTATO: ",OFONT12)
+            OPRINTER:SAY(NROW,260, ALLTRIM(CALIASCONT->U5_CONTAT),OFONT12)
+            OPRINTER:SAY(NROW,820, UPPER( ALLTRIM(CALIASCONT->UM_DESC)),OFONT12)
+            OPRINTER:SAY(NROW,1360, UPPER( ALLTRIM(CALIASCONT->U5_EMAIL)),OFONT12)
+            OPRINTER:SAY(NROW,2120,"CELULAR: ",OFONT12)
+            OPRINTER:SAY(NROW,2300,TRANSFORM(CALIASCONT->U5_DDD,CPIC2)+" "+TRANSFORM(CALIASCONT->U5_CELULAR,CPIC1),OFONT12)
+            OPRINTER:SAY(NROW,2700,"COMERCIAL: ",OFONT12)
+            OPRINTER:SAY(NROW,2900,TRANSFORM(CALIASCONT->U5_DDD,CPIC2)+" "+TRANSFORM(CALIASCONT->U5_FCOM1,CPIC1),OFONT12)
+            (CALIASCONT)->(DBSKIP())
+            ENDDO
+    ENDIF
+ELSE 
 
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MR02Rod(oPrinter,oFont12,oFont12B,oFont14B,nRow,nPage,cData,nTotPed,nValFret,nValDesp,nValDesc,nValST)
-	
-    Local nRowStep      := 45
-    Private cPicVal       := "@E 99,999,999.99"
-    Private cPicAliq      := "@E 999.99"
-    Private cPicQtd       := "@E 999999.99"
-    Private cPolitic      := 'A MACOM adota a política de proibição de oferta e/ou recebimento de presentes/brindes em transações comerciais, prezando por sua legitimidade, transparência e imparcialidade.'
-    Private aArea			:= {}
-//    Local cDespesa      := Transfor(NoRound(MaFisRet(,"NF_DESPESA"),2),cPicVal)
-//    Local cFrete        := Transfor(NoRound(IIF(SC5->C5_TPFRETE == 'C',MaFisRet(,"NF_FRETE"),0),2),cPicVal)
-//    Local cTotal        := Transfor(NoRound(MaFisRet(,"NF_TOTAL"),2),cPicVal)
-//    Local cSubTot       := Transfor( NoRound(( MaFisRet(,"NF_TOTAL") - ( MaFisRet(,"NF_FRETE") + MaFisRet(,"NF_DESPESA") ) ),2),cPicVal)
-//    Local cMoeda        := AllTrim(GetMv('MV_MOEDA' + cValToChar(SC5->C5_MOEDA),,''))
-
-    nRow += (nRowStep * 5)
-
-    oPrinter:Say(nRow + 1260                ,0100        , cPolitic  ,oFont14b)
-
-    If nRow > 1600
-        nRow := 2100 + nRowStep
-
-        oPrinter:Say(nRow += nRowStep     ,0100    , I18N('Contrato de Parceria #1 impresso em #2.',{SC7->C7_NUM,cData })  ,oFont12)
-        oPrinter:Say(nRow                 ,3000    , I18N('Pág. #1',{oPrinter:nPageCount  })  ,oFont12)
-
-        oPrinter:EndPage()
-        oPrinter:StartPage()
-        nRow := 0000
-
-        nPage++
-    EndIf
-
-//    oPrinter:Say(nRow += nRowStep     ,0100     ,'TIPO FRETE: '                ,oFont12)
-//    oPrinter:Say(nRow                 ,0300     ,M05RTpFret()                  ,oFont12)
-
-//    oPrinter:Line(nRow - nRowStep * 1.25, 2350,nRow - nRowStep* 1.25 , 3200)
-    oPrinter:Say(nRow                 ,2450     ,'DESCONTO:'                                     ,oFont12)
-    oPrinter:Say(nRow                 ,2900     ,Transform(NoRound(nValDesc,2) ,"@E 999999.99")  ,oFont12)
-
-//    oPrinter:Say(nRow += nRowStep     ,0100     ,'DESCONTO: '                                    ,oFont12)
-//    oPrinter:Say(nRow                 ,0300     ,Transform(NoRound(nValDesc,2) ,"@E 999999.99")  ,oFont12)
+    WHILE !(CALIASCONT)->(EOF())
     
-    oPrinter:Say(nRow += nRowStep     ,2450     ,'VALOR FRETE: '                                 ,oFont12)
-    oPrinter:Say(nRow                 ,2900     ,Transform(NoRound(nValFret,2) ,"@E 999999.99")  ,oFont12)
+        IF (CALIASCONT->U5_CODCONT==SC5->C5_XCONT) .OR. ((CALIASCONT->U5_CODCONT==SC5->C5_XCONT2) .OR. ((CALIASCONT->U5_CODCONT==SC5->C5_XCONT3) .OR. ((CALIASCONT->U5_CODCONT==SC5->C5_XCONT4) .OR. (CALIASCONT->U5_CODCONT==SC5->C5_XCONT5))))
+            OPRINTER:SAY(NROW += NROWSTEP,100,"CONTATO: ",OFONT12)
+            OPRINTER:SAY(NROW,260, ALLTRIM(CALIASCONT->U5_CONTAT),OFONT12)
 
-    oPrinter:Say(nRow += nRowStep     ,2450     ,'DESPESA'                     ,oFont12)
-    oPrinter:Say(nRow                 ,2900     ,Transform(NoRound(nValDesp,2) ,"@E 999999.99")  ,oFont12)
+            OPRINTER:SAY(NROW,820, UPPER( ALLTRIM(CALIASCONT->UM_DESC)),OFONT12)
 
-    nRow += nRowStep
+            OPRINTER:SAY(NROW,1360, UPPER( ALLTRIM(CALIASCONT->U5_EMAIL)),OFONT12)
 
-    oPrinter:Line(nRow - nRowStep * 0.5, 2350,nRow - nRowStep * 0.5, 3200)
-    oPrinter:Say(nRow += (nRowStep )  ,2450     ,'TOTAL GERAL'                                              ,oFont14B)
-    oPrinter:Say(nRow                 ,2900     ,Transform(NoRound(nTotPed + nValFret + nValST - nValDesc,2) ,"@E 9,999,999.99")   ,oFont14B) 
-                                                 
-    nRow += nRowStep
-    nRow += nRowStep
+            OPRINTER:SAY(NROW,2120,"CELULAR: ",OFONT12)
+            OPRINTER:SAY(NROW,2300,TRANSFORM(CALIASCONT->U5_DDD,CPIC2)+" "+TRANSFORM(CALIASCONT->U5_CELULAR,CPIC1),OFONT12)
 
-    oPrinter:Say(nRow += nRowStep     ,2450    , 'HOSHIZAKI MACOM LTDA'         ,oFont12B)
-//	aArea := SA3->(GetArea())
-//  oPrinter:Say(nRow += nRowStep     ,2450    , 'GERÊNCIA: ' + AllTrim(Posicione("SA3",1,xFilial("SA3")+SA3->A3_GEREN,"SA3->A3_NOME"))          ,oFont12)
+            OPRINTER:SAY(NROW,2700,"COMERCIAL: ",OFONT12)
+            OPRINTER:SAY(NROW,2900,TRANSFORM(CALIASCONT->U5_DDD,CPIC2)+" "+TRANSFORM(CALIASCONT->U5_FCOM1,CPIC1),OFONT12)
+        ENDIF
+        (CALIASCONT)->(DBSKIP())
+        ENDDO
+ENDIF
 
-    nRow += nRowStep
+RETURN 
 
-//	RestArea(aArea)
-//    oPrinter:Say(nRow += nRowStep     ,2450    , 'REPRESENTANTE COMERCIAL '                     ,oFont12)
-//    oPrinter:Say(nRow += nRowStep     ,2450    , AllTrim(SA3->A3_NOME)                          ,oFont12)
-    //oPrinter:Say(nRow += nRowStep     ,2450    , AllTrim(SA3->A3_NREDUZ),oFont12)
-//    oPrinter:Say(nRow += nRowStep     ,2450    , SA3->A3_DDDTEL + ' ' + Transform(AllTrim(SA3->A3_TEL), "@R 9999-99999" ) ,oFont12)
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR02CAB4(OPRINTER,OFONT12,OFONT14B,OFONT18T,NROW)
+LOCAL NROWSTEP := 45
+PRIVATE OBRUSH := TBRUSH():NEW(,240+(240) * (256)+(240) * (65536))
 
-    nRow := 2100 + nRowStep
+NROW += (NROWSTEP) * (2)
 
-    oPrinter:Say(nRow += nRowStep     ,0100    , I18N('Contrato de Parceria #1 impresso em #2.',{SC7->C7_NUM,cData })  ,oFont12)
-    oPrinter:Say(nRow                 ,3000    , I18N('Pág. #1',{oPrinter:nPageCount  })  ,oFont12)
+OPRINTER:LINE(NROW,100,NROW,3200)
+
+OPRINTER:SAY(NROW += NROWSTEP,100,"AUTORIZAÇÃO DE ENTREGA : ",OFONT12)
+OPRINTER:SAY(NROW,640,SC7->C7_NUM,OFONT14B)
+
+OPRINTER:SAY(NROW,2700,"FORNECEDOR/LOJA:",OFONT12)
+OPRINTER:SAY(NROW,3050,SC7->C7_FORNECE+"/"+SC7->C7_LOJA,OFONT12)
+
+OPRINTER:SAY(NROW += NROWSTEP,100,"COND PAG: ",OFONT12)
+OPRINTER:SAY(NROW,440,MR02GETCPG(),OFONT12)
+
+OPRINTER:SAY(NROW,2700,"SOLIC. COMPRA: ",OFONT12)
+OPRINTER:SAY(NROW,3050,SC7->C7_NUMSC,OFONT12)
+
+OPRINTER:SAY(NROW += NROWSTEP,100,"OBSERVAÇÕES",OFONT12)
+OPRINTER:SAY(NROW,440, ALLTRIM(SC7->C7_OBS),OFONT12)
+
+OPRINTER:SAY(NROW += NROWSTEP,100,"COMPRADOR RESPONSÁVEL",OFONT12)
+OPRINTER:SAY(NROW,550, ALLTRIM(USRFULLNAME(SC7->C7_USER)),OFONT12)
+
+OPRINTER:SAY(NROW,2700,"CONTATO: ",OFONT12)
+OPRINTER:SAY(NROW,3050,SC7->C7_CONTATO,OFONT12)
+
+NROW += (NROWSTEP) * (0.5)
+OPRINTER:LINE(NROW,100,NROW,3200)
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR02ROD(OPRINTER,OFONT12,OFONT12B,OFONT14B,NROW,NPAGE,CDATA,NTOTPED,NVALFRET,NVALDESP,NVALDESC,NVALST)
+
+LOCAL NROWSTEP := 45
+PRIVATE CPICVAL := "@E 99,999,999.99"
+PRIVATE CPICALIQ := "@E 999.99"
+PRIVATE CPICQTD := "@E 999999.99"
+PRIVATE CPOLITIC := "A MACOM ADOTA A POLÍTICA DE PROIBIÇÃO DE OFERTA E/OU RECEBIMENTO DE PRESENTES/BRINDES EM TRANSAÇÕES COMERCIAIS, PREZANDO POR SUA LEGITIMIDADE, TRANSPARÊNCIA E IMPARCIALIDADE."
+PRIVATE AAREA := {}
+
+NROW += (NROWSTEP) * (5)
+
+OPRINTER:SAY(NROW+1260,100,CPOLITIC,OFONT14B)
+
+IF NROW>1600
+    NROW := 2100+NROWSTEP
+
+    OPRINTER:SAY(NROW += NROWSTEP,100,I18N("CONTRATO DE PARCERIA #1 IMPRESSO EM #2.",{SC7->C7_NUM,CDATA}),OFONT12)
+    OPRINTER:SAY(NROW,3000,I18N("PÁG. #1",{OPRINTER:NPAGECOUNT}),OFONT12)
+
+    OPRINTER:ENDPAGE()
+    OPRINTER:STARTPAGE()
+    NROW := 0
+
+    NPAGE++
+ENDIF
+
+OPRINTER:SAY(NROW,2450,"DESCONTO:",OFONT12)
+OPRINTER:SAY(NROW,2900,TRANSFORM(NOROUND(NVALDESC,2),"@E 999999.99"),OFONT12)
+
+OPRINTER:SAY(NROW += NROWSTEP,2450,"VALOR FRETE: ",OFONT12)
+OPRINTER:SAY(NROW,2900,TRANSFORM(NOROUND(NVALFRET,2),"@E 999999.99"),OFONT12)
+
+OPRINTER:SAY(NROW += NROWSTEP,2450,"DESPESA",OFONT12)
+OPRINTER:SAY(NROW,2900,TRANSFORM(NOROUND(NVALDESP,2),"@E 999999.99"),OFONT12)
+
+NROW += NROWSTEP
+
+OPRINTER:LINE(NROW-(NROWSTEP) * (0.5),2350,NROW-(NROWSTEP) * (0.5),3200)
+OPRINTER:SAY(NROW += NROWSTEP,2450,"TOTAL GERAL",OFONT14B)
+OPRINTER:SAY(NROW,2900,TRANSFORM(NOROUND(NTOTPED+NVALFRET+NVALST-NVALDESC,2),"@E 9,999,999.99"),OFONT14B)
+
+NROW += NROWSTEP
+NROW += NROWSTEP
+
+OPRINTER:SAY(NROW += NROWSTEP,2450,"AÇOS MACOM INDÚSTRIA E COMERCIO LTDA",OFONT12B)
+
+NROW += NROWSTEP
+
+NROW := 2100+NROWSTEP
+
+OPRINTER:SAY(NROW += NROWSTEP,100,I18N("CONTRATO DE PARCERIA #1 IMPRESSO EM #2.",{SC7->C7_NUM,CDATA}),OFONT12)
+OPRINTER:SAY(NROW,3000,I18N("PÁG. #1",{OPRINTER:NPAGECOUNT}),OFONT12)
+
+OPRINTER:SAY(NROW += NROWSTEP,100,"NOTA: SÓ ACEITAREMOS A MERCADORIA SE NA SUA NOTA FISCAL CONSTAR O NUMERO DE NOSSO CONTRATO",OFONT12)
+OPRINTER:SAY(NROW += NROWSTEP,100,"AS FATURAS/BOLETOS PARA PAGAMENTOS AOS FORNECEDORES SERÃO EFETUADOS SOMENTE AS SEXTAS-FEIRAS, RESPEITANDO O PRAZO MÍNIMO ACORDADO EM CONTRATO DE FORNECIMENTO.",OFONT12)
+
+OPRINTER:ENDPAGE()
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION M05RTPFRET()
+LOCAL CRET := ""
+
+DO CASE 
+ CASE SC5->C5_TPFRETE=="C"
+CRET := "CIF"
+CASE SC5->C5_TPFRETE=="F"
+CRET := "FOB"
+CASE SC5->C5_TPFRETE=="T"
+CRET := "POR CONTA DE TERCEIROS"
+CASE SC5->C5_TPFRETE=="S"
+CRET := "SEM FRETE"
+ENDCASE
+
+RETURN CRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION M05RTPISNT()
+LOCAL CRET := ""
+
+DO CASE 
+ CASE SC5->C5_XTPINST=="1"
+CRET := "SEM INSTALAÇÃO"
+CASE SC5->C5_XTPINST=="2"
+CRET := "CREDENCIADA (VIDE CONDIÇÕES GERAIS DE FORNECIMENTO)"
+CASE SC5->C5_XTPINST=="3"
+CRET := "MACOM"
+CASE SC5->C5_XTPINST=="4"
+CRET := "RATEIO NO PRODUTO"
+ENDCASE
+
+RETURN CRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR02GETCPG()
+LOCAL CRET := ""
+
+SE4->(DBSETORDER(1))
+SE4->(DBGOTOP())
+
+IF SE4->(DBSEEK(XFILIAL("SE4")+SC7->C7_COND))
+    CRET :=  ALLTRIM(SE4->E4_CODIGO)+": "+ ALLTRIM(SE4->E4_DESCRI)
+ENDIF
+RETURN CRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR02DATE()
+LOCAL CDAY :=  STRZERO(DAY(SC7->C7_EMISSAO),2)
+LOCAL NMON := MONTH(SC7->C7_EMISSAO)
+LOCAL CMON := ""
+LOCAL CYEAR := CVALTOCHAR(YEAR(SC7->C7_EMISSAO))
+
+DO CASE 
+ CASE NMON==1
+CMON := "JANEIRO"
+CASE NMON==2
+CMON := "FEVEREIRO"
+CASE NMON==3
+CMON := "MARÇO"
+CASE NMON==4
+CMON := "ABRIL"
+CASE NMON==5
+CMON := "MAIO"
+CASE NMON==6
+CMON := "JUNHO"
+CASE NMON==7
+CMON := "JULHO"
+CASE NMON==8
+CMON := "AGOSTO"
+CASE NMON==9
+CMON := "SETEMBRO"
+CASE NMON==10
+CMON := "OUTUBRO"
+CASE NMON==11
+CMON := "NOVEMBRO"
+CASE NMON==12
+CMON := "DEZEMBRO"
+ENDCASE
+
+CRET := CDAY+" DE "+CMON+" DE "+CYEAR
+RETURN CRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR02ENDPAG(OPRINTER,OFONT12,OFONT12B,NROW,NROWSTEP,NPAGE,CDATA,NITEM,_NTOTAL)
+IF NROW>2000
     
-    oPrinter:Say(nRow += nRowStep     ,0100    , 'NOTA: Só aceitaremos a mercadoria se na sua Nota Fiscal constar o numero de nosso Contrato'                                                      ,oFont12)
-    oPrinter:Say(nRow += nRowStep     ,0100    , 'As faturas/Boletos para pagamentos aos fornecedores serão efetuados somente as SEXTAS-FEIRAS, respeitando o prazo mínimo acordado em contrato de fornecimento.'  ,oFont12)        
+    NROW := 2100+NROWSTEP
     
+    OPRINTER:SAY(NROW += NROWSTEP,100,I18N("CONTRATO DE FORNECIMENTO #1 IMPRESSO EM #2.",{SC7->C7_NUM,CDATA}),OFONT12)
+    OPRINTER:SAY(NROW,3000,I18N("PÁG. #1",{OPRINTER:NPAGECOUNT}),OFONT12)
+    OPRINTER:SAY(NROW += NROWSTEP,2450,"AÇOS MACOM INDÚSTRIA E COMERCIO LTDA",OFONT12B)
+    OPRINTER:ENDPAGE()
+    OPRINTER:STARTPAGE()
+    NROW := 0
+    
+    NPAGE++
+ENDIF
+RETURN 
 
-    oPrinter:EndPage()
-Return
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR02PLANIL(CNUM,CALIASPED,_NTOTAL)
 
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function M05RTpFret()
-    Local cRet  := ''
+PRIVATE NBASEICM := 0
+PRIVATE NVALICM := 0
+PRIVATE NVALIPI := 0
+PRIVATE NBASERET := 0
+PRIVATE NVALRET := 0
+PRIVATE NVLRTOT := 0
+PRIVATE NBASEISS := 0
+PRIVATE VVALISS := 0
+PRIVATE NTOTVALDESC := 0
+PRIVATE NC5DESC1 := 0
+PRIVATE NC5DESC2 := 0
+PRIVATE NC5DESC3 := 0
+PRIVATE NC5DESC4 := 0
+PRIVATE NC5FRETE := 0
+PRIVATE NC5SEGURO := 0
+PRIVATE NC5DESPESA := 0
 
-    Do Case
-    Case SC5->C5_TPFRETE == 'C'
-        cRet := 'CIF'
-    Case SC5->C5_TPFRETE == 'F'
-        cRet := 'FOB'
-    Case SC5->C5_TPFRETE == 'T'
-        cRet := 'Por Conta de Terceiros'
-    Case SC5->C5_TPFRETE == 'S'
-        cRet := 'Sem Frete'
+PRIVATE CCONDICAO := ""
+PRIVATE APARCELAS := {}
+PRIVATE APEDCLI := {}
+PRIVATE AC5RODAPE := {}
+PRIVATE AFISGET := NIL
+PRIVATE AFISGETSC5 := NIL
+PRIVATE CKEY := ""
+PRIVATE CALIASSC7 := "SC7"
+PRIVATE CQRYAD := ""
+PRIVATE CPEDIDO := ""
+PRIVATE CCLIENT := ""
+PRIVATE CNFORI := NIL
+PRIVATE CSERIORI := NIL
+PRIVATE NDESCONTO := 0
+PRIVATE NPESLIQ := 0
+PRIVATE NRECNOSD1 := NIL
+PRIVATE NG := 0
+PRIVATE NFRETE := 0
+PRIVATE NSEGURO := 0
+PRIVATE NFRETAUT := 0
+PRIVATE NDESPESA := 0
+PRIVATE NDESCCAB := 0
+PRIVATE NPDESCAB := 0
+PRIVATE NY := 0
+PRIVATE NVALMERC := 0
+PRIVATE NPRCLISTA := 0
+PRIVATE NACRESFIN := 0
+PRIVATE NCONT := 0
+PRIVATE AITEMPED := {}
+PRIVATE ACABPED := {}
+PRIVATE NVLRTOTAL := 0
+PRIVATE NVALSOL := 0
 
-    End Case
-Return cRet
+CALIASPED:=CALIASSC7:=GETNEXTALIAS()
 
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function M05RTpIsnt()
-    Local cRet  := ''
+_cQry := " SELECT SC7.R_E_C_N_O_ AS REC_CAB, "
+_cQry += "        SC7.R_E_C_N_O_ AS REC_ITEM, "
+_cQry += "        SC7.C7_FILIAL AS _FILIAL, "
+_cQry += "        SC7.C7_NUM AS _NUM, "
+_cQry += "        SC7.C7_FORNECE AS _FORNECE, "
+_cQry += "        SC7.C7_LOJA AS _LOJA, "
+_cQry += "        SC7.C7_EMISSAO AS _EMISSAO, "
+_cQry += "        SC7.C7_DATPRF AS _DATPRF, "
+_cQry += "        SC7.C7_COND AS _CONDPAG, "
+_cQry += "        SC7.C7_FRETE AS _FRETE, "
+_cQry += "        SC7.C7_TPFRETE AS _TFRETE, "
+_cQry += "        SC7.C7_DESPESA AS _DESPESA, "
+_cQry += "        SC7.C7_SEGURO AS _SEGURO, "
+_cQry += "        SC7.C7_MOEDA AS _MOEDA, "
+_cQry += "        SC7.C7_PRODUTO AS _PRODUTO, "
+_cQry += "        SC7.C7_TES AS _TES, "
+_cQry += "        SC7.C7_QUANT AS _QTDCOM, "
+_cQry += "        SC7.C7_PRECO AS _PRUNIT, "
+_cQry += "        SC7.C7_CODTAB AS _CODTAB, "
+_cQry += "        SC7.C7_TOTAL AS _TOTAL, "
+_cQry += "        SC7.C7_DESC AS _VALDESC, "
+_cQry += "        SC7.C7_ITEM AS _ITEM, "
+_cQry += "        SC7.C7_DESCRI AS _DESCRI, "
+_cQry += "        SC7.C7_UM AS _UM, "
+_cQry += "        SC7.C7_DATPRF AS _ENTREG, "
+_cQry += "        SC7.C7_VLDESC AS _DESCONT, "
+_cQry += "        SC7.C7_LOCAL AS _LOCAL, "
+_cQry += "        SC7.C7_VALFRE AS _VALFRE, "
+_cQry += "        SC7.C7_REAJUST AS _REAJUST, "
+_cQry += "        SC7.C7_IPI AS _IPI, "
+_cQry += "        SC7.C7_VALIPI AS _VALIPI, "
+_cQry += "        SC7.C7_PICM AS _PICM, "
+_cQry += "        SC7.C7_VALICM AS _VALICM, "
+_cQry += "        SC7.C7_VALIMP5 AS _VALIMP5, "
+_cQry += "        SC7.C7_VALIMP6 AS _VALIMP6, "
+_cQry += "        SC7.C7_ICMSRET AS _ICMSRET, "
+_cQry += "        SC7.C7_OBS AS _OBS, "
+_cQry += "        SC7.C7_USER AS _CODUSR "
+_cQry += " FROM "+RETSQLNAME("SC7")+" SC7 "
+_cQry += " WHERE SC7.C7_FILIAL = '"+XFILIAL("SC7")+"' "
+_cQry += "   AND SC7.C7_NUM = "+___SQLGETVALUE(CNUM)+" "
+_cQry += "   AND SC7.D_E_L_E_T_= ' ' "
+_cQry += " ORDER BY SC7.C7_ITEM "
+__EXECSQL(CALIASPED,_cQry,{}, .F. )
 
-    Do Case
-    Case SC5->C5_XTPINST == '1'
-        cRet := 'Sem Instalação'
-    Case SC5->C5_XTPINST == '2'
-        cRet := 'Credenciada (Vide condições gerais de fornecimento)'
-    Case SC5->C5_XTPINST == '3'
-        cRet := 'Macom'
-    Case SC5->C5_XTPINST == '4'
-        cRet := 'Rateio no Produto'
+(CALIASPED)->(DBGOTOP())
+RETURN 
 
-    End Case
-Return cRet
-
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MR02GetCPg()
-    Local cRet  := ''
-
-    SE4->(DbSetOrder(1))
-    SE4->(DbGotop())
-
-    If SE4->(DbSeek( xFilial('SE4') + SC7->C7_COND ))
-        cRet := AllTrim(SE4->E4_CODIGO) + ': ' + AllTrim(SE4->E4_DESCRI) //+ ' - '  + AllTrim(SC5->C5_XDESPAG)
-    EndIf
-Return cRet
-
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MR02Date()
-    Local cDay  := StrZero(Day(SC7->C7_EMISSAO),2)   //StrZero(Day(Date()),2) -- Modelo Antigo
-    Local nMon  := Month(SC7->C7_EMISSAO) 			 //Month(Date())		  -- Modelo Antigo
-    Local cMon  := ''
-    Local cYear := cValToChar(Year(SC7->C7_EMISSAO))
-
-    Do Case
-    Case nMon == 1
-        cMon    := 'JANEIRO'
-    Case nMon == 2
-        cMon    := 'FEVEREIRO'
-    Case nMon == 3
-        cMon    := 'MARÇO'
-    Case nMon == 4
-        cMon    := 'ABRIL'
-    Case nMon == 5
-        cMon    := 'MAIO'
-    Case nMon == 6
-        cMon    := 'JUNHO'
-    Case nMon == 7
-        cMon    := 'JULHO'
-    Case nMon == 8
-        cMon    := 'AGOSTO'
-    Case nMon == 9
-        cMon    := 'SETEMBRO'
-    Case nMon == 10
-        cMon    := 'OUTUBRO'
-    Case nMon == 11
-        cMon    := 'NOVEMBRO'
-    Case nMon == 12
-        cMon    := 'DEZEMBRO'
-    EndCase
-
-    cRet := cDay + ' DE ' + cMon + ' DE ' +  cYear
-Return cRet
-
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MR02EndPag(oPrinter,oFont12,oFont12B,nRow,nRowStep,nPage,cData,nItem,_nTotal)
-    If nRow > 2000
-
-        nRow := 2100 + nRowStep
-
-        oPrinter:Say(nRow += nRowStep     ,0100    , I18N('Contrato de Fornecimento #1 impresso em #2.',{SC7->C7_NUM,cData })  ,oFont12)
-        oPrinter:Say(nRow                 ,3000    , I18N('Pág. #1',{oPrinter:nPageCount  })  ,oFont12)
-		oPrinter:Say(nRow += nRowStep     ,2450    , 'AÇOS MACOM INDÚSTRIA E COMERCIO LTDA'         ,oFont12B)	
-        oPrinter:EndPage()
-        oPrinter:StartPage()
-        nRow := 0000
-
-        nPage++
-    EndIf
-Return
-
-//+------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MR02Planil(cNum,cAliasPed,_nTotal)
-
-    Private nBaseIcm      := 0
-    Private nValIcm       := 0
-    Private nValIPI       := 0
-    Private nBaseRet      := 0
-    Private nValRet       := 0
-    Private nVlrTot       := 0
-    Private nBaseISS      := 0
-    Private vValISS       := 0
-    Private nTotValdesc  := 0
-    Private nC5Desc1      := 0
-    Private nC5Desc2      := 0
-    Private nC5Desc3      := 0
-    Private nC5Desc4      := 0
-    Private nC5Frete      := 0
-    Private nC5Seguro     := 0
-    Private nC5Despesa    := 0
-
-    Private cCondicao     := ""
-    Private aParcelas     := {}
-    Private aPedCli       := {}
-    Private aC5Rodape     := {}
-    Private aFisGet       := Nil
-    Private aFisGetSC5    := Nil
-    Private cKey          := ""
-    Private cAliasSC7     := "SC7"
-    Private cQryAd        := ""
-    Private cPedido       := ""
-    Private cCliEnt       := ""
-    Private cNfOri        := Nil
-    Private cSeriOri      := Nil
-    Private nDesconto     := 0
-    Private nPesLiq       := 0
-    Private nRecnoSD1     := Nil
-    Private nG            := 0
-    Private nFrete        := 0
-    Private nSeguro       := 0
-    Private nFretAut      := 0
-    Private nDespesa      := 0
-    Private nDescCab      := 0
-    Private nPDesCab      := 0
-    Private nY            := 0
-    Private nValMerc      := 0
-    Private nPrcLista     := 0
-    Private nAcresFin     := 0
-    Private nCont         := 0
-    Private aItemPed      := {}
-    Private aCabPed       := {}
-    Private nVlrtotal     := 0
-    Private nValSOL       := 0
-
-    cAliasPed := cAliasSC7 := GetNextAlias()
-    BeginSql Alias cAliasPed
-        SELECT SC7.R_E_C_N_O_       AS REC_CAB
-            ,SC7.R_E_C_N_O_         AS REC_ITEM
-            ,SC7.C7_FILIAL          AS _FILIAL
-            ,SC7.C7_NUM             AS _NUM
-            ,SC7.C7_FORNECE         AS _FORNECE
-            ,SC7.C7_LOJA            AS _LOJA
-            ,SC7.C7_EMISSAO         AS _EMISSAO
-            ,SC7.C7_DATPRF          AS _DATPRF
-            ,SC7.C7_COND         	AS _CONDPAG
-            ,SC7.C7_FRETE           AS _FRETE
-            ,SC7.C7_TPFRETE         AS _TFRETE            
-            ,SC7.C7_DESPESA         AS _DESPESA
-            ,SC7.C7_SEGURO          AS _SEGURO
-            ,SC7.C7_MOEDA           AS _MOEDA
-            ,SC7.C7_PRODUTO         AS _PRODUTO
-            ,SC7.C7_TES             AS _TES
-            ,SC7.C7_QUANT           AS _QTDCOM
-            ,SC7.C7_PRECO           AS _PRUNIT
-            ,SC7.C7_CODTAB          AS _CODTAB
-            ,SC7.C7_TOTAL           AS _TOTAL            
-            ,SC7.C7_DESC            AS _VALDESC
-            ,SC7.C7_ITEM            AS _ITEM
-            ,SC7.C7_DESCRI          AS _DESCRI
-            ,SC7.C7_UM              AS _UM
-            ,SC7.C7_DATPRF          AS _ENTREG
-            ,SC7.C7_VLDESC          AS _DESCONT
-            ,SC7.C7_LOCAL           AS _LOCAL
-            ,SC7.C7_VALFRE          AS _VALFRE
-            ,SC7.C7_REAJUST         AS _REAJUST
-            ,SC7.C7_IPI             AS _IPI
-            ,SC7.C7_VALIPI          AS _VALIPI
-            ,SC7.C7_PICM            AS _PICM
-            ,SC7.C7_VALICM          AS _VALICM
-            ,SC7.C7_VALIMP5         AS _VALIMP5
-            ,SC7.C7_VALIMP6         AS _VALIMP6
-            ,SC7.C7_ICMSRET         AS _ICMSRET
-            ,SC7.C7_OBS         	AS _OBS
-            ,SC7.C7_USER            AS _CODUSR
-        FROM %Table:SC7% SC7
-        WHERE   SC7.C7_FILIAL = %xFilial:SC7% AND
-                SC7.C7_NUM = %Exp:cNum% AND
-                SC7.%notdel% 
-        ORDER BY SC7.C7_ITEM
-    EndSql
-
-    (cAliasPed)->(DbGoTop())
-Return
