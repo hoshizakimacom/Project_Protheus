@@ -65,9 +65,9 @@ Return
 //+----------------------------------------------------------------------------------------------------------------
 Static Function M04EMain(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 
-	BeginTran()
+	BEGIN TRANSACTION //BeginTran()
 	M04EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
-	EndTran()
+	END TRANSACTION //EndTran()
 	MsUnlockAll()
 
 Return
