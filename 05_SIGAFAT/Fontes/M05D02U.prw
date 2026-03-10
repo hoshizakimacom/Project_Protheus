@@ -1,163 +1,169 @@
-#Include 'Protheus.ch'
-#include "Fileio.ch"
-#Include 'TBICONN.ch'
+#INCLUDE "protheus.ch"
+STATIC _CARQLOG := ""
 
-Static _cArqLog     := ''
-//Static _lSimulacao  := .T.
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M05D02U()
+LOCAL _ASAYS := {}
+LOCAL _ABUTTON := {}
+LOCAL _CTITULO :=  SUBSTR(FUNNAME(),3,20)
+PRIVATE _LSIMULACAO :=  .T. 
 
-//+---------------------------------------------------------------------------
-// Rotina de ajuste de grupo de tributação por Origem, Ex NCM e NCM
-//+---------------------------------------------------------------------------
-User Function M05D02U()
-    Local   _aSays          := {}
-    Local   _aButton        := {}
-    Local   _cTitulo        := Substr(FunName(),3,20)
-    Private _lSimulacao := .T.
+_LSIMULACAO := MSGYESNO("DESEJA EXECUTAR EM MODO SIMULAÇÃO?","ATENÇÃO")
 
-    _lSimulacao := MsgYesNo('Deseja executar em modo SIMULAÇÃO?','Atenção')
+IF _LSIMULACAO
+    AADD(_ASAYS,OEMTOANSI("!!! SIMULAÇÃO !!! "))
+ENDIF
 
-    If _lSimulacao
-        AADD(_aSays,OemToAnsi('!!! SIMULAÇÃO !!! '                                              ))
-    EndIf
+AADD(_ASAYS,OEMTOANSI("ATUALIZAÇÃO DO GRUPO TRIBUTÁRIO DE ACORDO COM AS SEGUINTES REGRAS:"))
+AADD(_ASAYS,OEMTOANSI(" REGRAS:"))
+AADD(_ASAYS,OEMTOANSI(" - SE ORIGEM IGUAL A 1, ATUALIZAR UTILIZANDO YD_XGRIMP"))
+AADD(_ASAYS,OEMTOANSI(" - SE ORIGEM IGUAL A 8 E TIPO PA, ATUALIZAR UTILIZANDO YD_XGRTRIB"))
+AADD(_ASAYS,OEMTOANSI(" - SE ORIGEM IGUAL A 2,3 OU 8, ATUALIZAR UTILIZANDO YD_XGRREVE"))
+AADD(_ASAYS,OEMTOANSI(" - DEMAIS ATUALIZAR UTILIZANDO YD_XGRTRIB"))
 
-    AADD(_aSays,OemToAnsi("Atualização do grupo tributário de acordo com as seguintes regras:"  ))
-    AADD(_aSays,OemToAnsi(" REGRAS:"                                                            ))
-    AADD(_aSays,OemToAnsi(" - se ORIGEM IGUAL a 1, atualizar utilizando YD_XGRIMP"              ))
-    AADD(_aSays,OemToAnsi(" - se ORIGEM IGUAL a 8 e Tipo PA, atualizar utilizando YD_XGRTRIB"   ))
-    AADD(_aSays,OemToAnsi(" - se ORIGEM IGUAL a 2,3 ou 8, atualizar utilizando YD_XGRREVE"      ))
-    AADD(_aSays,OemToAnsi(" - DEMAIS atualizar utilizando YD_XGRTRIB"                           ))
+AADD(_ABUTTON,{1, .T. ,{||PROCESSA({||MD05OK()},"AGUARDE...","", .F. ),FECHABATCH()}})
+AADD(_ABUTTON,{2, .T. ,{||FECHABATCH()}})
 
-    aAdd( _aButton, { 1, .T., {|| Processa( {|| MD05Ok() }, "Aguarde...", "",.F.),FechaBatch()}})
-    aAdd( _aButton, { 2, .T., {|| FechaBatch()                  }}  )
+FORMBATCH(_CTITULO,_ASAYS,_ABUTTON)
 
-    FormBatch( _cTitulo, _aSays, _aButton )
+_CARQLOG := ""
+RETURN 
 
-    _cArqLog        := ''
-Return
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05OK()
+LOCAL _ODLG := NIL
+LOCAL _CTITLE := "ATUALIZAÇÃO DE GRUPO TRIBUTÁRIO"
+LOCAL _OARQLOG := NIL
+PRIVATE _OARQORI := NIL
 
-//+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MD05Ok()
-    Local _oDlg         := Nil
-    Local _cTitle       := 'Atualização de Grupo Tributário'
-    Local _oArqLog      := Nil
-    Private _oArqOri      := Nil
+IF _LSIMULACAO
+    _CTITLE += OEMTOANSI(" *** SIMULAÇÃO *** ")
+ENDIF
 
-    If _lSimulacao
-        _cTitle += OemToAnsi(' *** SIMULAÇÃO *** ')
-    EndIf
+_ODLG := MSDIALOG():NEW(0,0,300,900,_CTITLE,,, .F. ,128,,,,, .T. ,,, .F. )
 
-    Define MsDialog _oDlg Title _cTitle Style DS_MODALFRAME From 000,000 To 300,900 Pixel
+TSAY():NEW(40,20,{||"ARQUIVO LOG:"},_ODLG,,, .F. , .F. , .F. , .T. ,,,,, .F. , .F. , .F. , .F. , .F. , .F. )
+_OARQLOG := TGET():NEW(37,80,{ | U |IIF(PCOUNT()==0,_CARQLOG,_CARQLOG := U)},_ODLG,300,10,,,,,, .F. ,, .T. ,, .F. ,{|| .F. }, .F. , .F. ,, .F. , .F. ,,"_CARQLOG",,,)
 
-    @040,020 Say  'Arquivo Log:' Of _oDlg Pixel
-    @037,080 Get _oArqLog Var _cArqLog Size 300,010 Of _oDlg Pixel WHEN .F.
+TBUTTON():NEW(37,400,"SELEC. ARQUIVO",_ODLG,{||MD05ARQLOG()},40,15,,, .F. , .T. , .F. ,, .F. ,,, .F. )
 
-    @037,400 BUTTON "Selec. Arquivo"    SIZE 040, 015 PIXEL OF _oDlg ACTION ( MD05ArqLog() )
+TBUTTON():NEW(120,170,"CONFIRMAR",_ODLG,{||MD05CONF()},40,12,,, .F. , .T. , .F. ,, .F. ,,, .F. )
+TBUTTON():NEW(120,220,"CANCELAR",_ODLG,{||_ODLG:END()},40,12,,, .F. , .T. , .F. ,, .F. ,,, .F. )
 
-    @120,170 BUTTON "Confirmar"     SIZE 040, 012 PIXEL OF _oDlg ACTION ( MD05Conf() )
-    @120,220 BUTTON "Cancelar"      SIZE 040, 012 PIXEL OF _oDlg ACTION (_oDlg:End())
+_ODLG:ACTIVATE(_ODLG:BLCLICKED,_ODLG:BMOVED,_ODLG:BPAINTED, .T. ,,,,_ODLG:BRCLICKED,)
 
-    Activate MsDialog _oDlg Centered
+_CARQLOG := ""
+RETURN 
 
-    _cArqLog       := ''
-Return
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05CONF()
+LOCAL _CALIAS := GETNEXTALIAS()
+LOCAL _NREG := 0
+LOCAL _NREGALT := 0
 
-//+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MD05Conf()
-    Local _cAlias   := GetNextAlias()
-    Local _nReg     := 0
-    Local _nRegAlt  := 0
+LOCAL _CLOG := ""
+LOCAL _CMSG := "TOTAL DE PRODUTOS ALTERADOS: #1 ." + CRLF
+LOCAL _NHANDLE := 0
+LOCAL _CGRTRIB := ""
 
-    Local _cLog     := ''
-    Local _cMsg     := 'Total de produtos alterados: #1 .' + CRLF
-    Local _nHandle  := 0
-    Local _cGrTrib  := ''
+PRIVATE _NTOTAL := 0
 
-    Private _nTotal := 0
+IF !(EMPTY(_CARQLOG))
 
-    If !Empty(_cArqLog)
+_cQry := " SELECT B1_COD, "
+_cQry += "        B1_ORIGEM, "
+_cQry += "        B1_GRTRIB, "
+_cQry += "        SB1.R_E_C_N_O_ AS B1_RECNO, "
+_cQry += "        B1_POSIPI, "
+_cQry += "        B1_EX_NCM, "
+_cQry += "        B1_TIPO, "
+_cQry += "        YD_XGRREVE, "
+_cQry += "        YD_TEC, "
+_cQry += "        YD_XGRTRIB, "
+_cQry += "        YD_XGRIMP, "
+_cQry += "        YD_PER_IPI "
+_cQry += " FROM "+RETSQLNAME("SB1")+" SB1 "
+_cQry += " INNER JOIN "+RETSQLNAME("SYD")+" SYD ON SYD.D_E_L_E_T_= ' ' "
+_cQry += " AND YD_FILIAL = '"+XFILIAL("SYD")+"' "
+_cQry += " AND B1_POSIPI = YD_TEC "
+_cQry += " AND B1_EX_NCM = YD_EX_NCM "
+_cQry += " WHERE SB1.D_E_L_E_T_= ' ' "
+_cQry += "   AND B1_FILIAL = '"+XFILIAL("SB1")+"' "
+_cQry += "   AND B1_ORIGEM <> '' "
+_cQry += " ORDER BY B1_COD "
+__EXECSQL(_CALIAS,_cQry,{}, .F. )
 
-        BeginSql Alias _cAlias
-            SELECT   B1_COD         ,B1_ORIGEM      ,B1_GRTRIB      ,SB1.R_E_C_N_O_ AS B1_RECNO
-                    ,B1_POSIPI      ,B1_EX_NCM      ,B1_TIPO        ,YD_XGRREVE
-                    ,YD_TEC         ,YD_XGRTRIB     ,YD_XGRIMP      ,YD_PER_IPI
-                FROM  %Table:SB1% SB1
-                INNER JOIN %Table:SYD% SYD  ON  SYD.%NotDel%
-                                            AND YD_FILIAL = %xFilial:SYD%
-                                            AND B1_POSIPI = YD_TEC
-                                            AND B1_EX_NCM = YD_EX_NCM
-                WHERE   SB1.%NotDel%
-                AND B1_FILIAL = %xFilial:SB1%
-                AND B1_ORIGEM <> ''
-            ORDER BY B1_COD
-        EndSql
+    _NTOTAL := 0
+    DBEVAL({||_NTOTAL := _NTOTAL+1}, .F. )
+    PROCREGUA(_NTOTAL)
 
-        Count To _nTotal
-        ProcRegua(_nTotal)
+    (_CALIAS)->(DBGOTOP())
 
-        (_cAlias)->(DBGoTop())
+    IF !(_CALIAS)->(EOF())
+        WHILE !(_CALIAS)->(EOF())
+        
+            INCPROC("ATUALIZANDO PRODUTO "+CVALTOCHAR(++_NREG)+" DE "+CVALTOCHAR(_NTOTAL)+".")
 
-        If (_cAlias)->(!EOF())
-            While  (_cAlias)->(!EOF())
-                IncProc('Atualizando produto ' + CValToChar(++_nReg) + ' de ' + CValToChar(_nTotal) + '.')
+            SB1->(DBGOTO(_CALIAS->B1_RECNO))
 
-                SB1->(DbGoTo( (_cAlias)->B1_RECNO ))
+            IF !SB1->(EOF())
 
-                If SB1->(!EOF())
-                    Do Case
-                    Case (_cAlias)->B1_ORIGEM == '1'
-                        _cGrTrib    := (_cAlias)->YD_XGRIMP
+                DO CASE 
+                CASE _CALIAS->B1_ORIGEM=="1"
+                _CGRTRIB := _CALIAS->YD_XGRIMP
 
-                    Case (_cAlias)->B1_ORIGEM == '8' .And. (_cAlias)->B1_TIPO == 'PA'
-                        _cGrTrib    := (_cAlias)->YD_XGRTRIB
+                CASE _CALIAS->B1_ORIGEM=="8" .AND. _CALIAS->B1_TIPO=="PA"
+                _CGRTRIB := _CALIAS->YD_XGRTRIB
 
-                    Case (_cAlias)->B1_ORIGEM $ '2|3|8'
-                        _cGrTrib    := (_cAlias)->YD_XGRREVE
+                CASE (_CALIAS->B1_ORIGEM) $ ("2|3|8")
+                _CGRTRIB := _CALIAS->YD_XGRREVE
+                OTHERWISE
 
-                    OtherWise
-                        _cGrTrib    := (_cAlias)->YD_XGRTRIB
-                    EndCase
+                _CGRTRIB := _CALIAS->YD_XGRTRIB
+                ENDCASE
 
-                    If AllTrim((_cAlias)->B1_GRTRIB) <> AllTrim(_cGrTrib)
-                        _nRegAlt++
-                        If !_lSimulacao
-                            RecLock('SB1',.F.)
-                            SB1->B1_GRTRIB := _cGrTrib
-                            SB1->(MsUnLock())
-                        EndIf
+                IF  ALLTRIM(_CALIAS->B1_GRTRIB)<> ALLTRIM(_CGRTRIB)
+                    _NREGALT++
+                    
+                    IF !(_LSIMULACAO)
+                        RECLOCK("SB1", .F. )
+                        SB1->B1_GRTRIB := _CGRTRIB
+                        SB1->(MSUNLOCK())
+                    ENDIF
 
-                        _cLog   += 'Produto: '          + SB1->B1_COD;
-                            + ' Tipo: '             + SB1->B1_TIPO;
-                            + ' Origem: '               + SB1->B1_ORIGEM;
-                            + ' NCM: '                  + (_cAlias)->B1_POSIPI;
-                            + ' EX NCM: '               + (_cAlias)->B1_EX_NCM;
-                            + ' Grp. Trib.: '       + (_cAlias)->B1_GRTRIB ;
-                            + ' Grp. Trib. NOVO: '  + _cGrTrib;
-                            + CRLF
-                    EndIf
-                EndIf
+                    _CLOG += "PRODUTO: "+SB1->B1_COD+" TIPO: "+SB1->B1_TIPO+" ORIGEM: "+SB1->B1_ORIGEM+" NCM: "+_CALIAS->B1_POSIPI+" EX NCM: "+_CALIAS->B1_EX_NCM+" GRP. TRIB.: "+_CALIAS->B1_GRTRIB+" GRP. TRIB. NOVO: "+_CGRTRIB + CRLF
+                ENDIF
+            ENDIF
 
-                (_cAlias)->(DbSkip())
-            EndDo
+            (_CALIAS)->(DBSKIP())
+            ENDDO
 
-            _nHandle    := FCREATE(_cArqLog)
+        _NHANDLE := FCREATE(_CARQLOG)
 
-            If _nHandle = -1
-                _cMsg   += " Erro ao criar arquivo - ferror " + Str(Ferror())
-            Else
-                _cMsg += ' Verifique arquivo de log gerado: ' + CRLF + '#2 ' + CRLF
-                FWrite(_nHandle, _cLog)
-                FClose(_nHandle)
-            EndIf
-        EndIf
+        IF _NHANDLE=- (1)
+            _CMSG += " ERRO AO CRIAR ARQUIVO - FERROR "+STR(FERROR())
+        ELSE 
+            _CMSG += " VERIFIQUE ARQUIVO DE LOG GERADO: " + CRLF+"#2 " + CRLF
+            FWRITE(_NHANDLE,_CLOG)
+            FCLOSE(_NHANDLE)
+        ENDIF
+    ENDIF
 
-        Aviso('Atenção',I18N( _cMsg,{_nRegAlt,_cArqLog}),{'OK'},3)
-    EndIf
-Return
+    AVISO("ATENÇÃO",I18N(_CMSG,{_NREGALT,_CARQLOG}),{"OK"},3)
+ENDIF
+RETURN 
 
-//+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Static Function MD05ArqLog()
-    Local _cArq     :=  cGetFile('*.TXT'    ,'Informe diretorio para arquivo de log'    ,0,'',.F.           ,nOR( GETF_LOCALHARD, GETF_LOCALFLOPPY, GETF_RETDIRECTORY ),.F., .T. )
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05ARQLOG()
+LOCAL _CARQ := CGETFILE("*.TXT","INFORME DIRETORIO PARA ARQUIVO DE LOG",0,"", .F. ,NOR(48,8,128), .F. , .T. )
 
-    _cArqLog := _cArq + DToS(Date()) + '_' + (StrTran(Time(),':','')) + '.TXT'
-Return
-
+_CARQLOG := _CARQ+DTOS(DATE())+"_"+STRTRAN(TIME(),":","")+".TXT"
+RETURN 
