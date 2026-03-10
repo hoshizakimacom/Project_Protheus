@@ -11,7 +11,7 @@ Local cPerg    := "M04M02"
 
 MsgStop("Última Estrutura Gerada - "+GetMv("AM_PROCZG1"))
 
-ValidPerg(cPerg)
+//ValidPerg(cPerg)
 If Pergunte(cPerg)
     FWMsgRun(, {|| _lRet := U_M04M02Ger()},,'Gerando Estruturas.CSV ...')
 Endif
@@ -32,16 +32,16 @@ If nH == -1
 Endif
 
 cQuery := "SELECT ZG1_COD PRODUTO, "
-cQuery += " (SELECT MAX(B1_TIPO) FROM " + RetsqlName("SB1") + " SB1 WHERE B1_FILIAL = '"+xFilial("SB1")+"' AND B1_COD = ZG1_COD AND D_E_L_E_T_ <> '*') TIPO_COD,
+cQuery += " (SELECT MAX(B1_TIPO) FROM " + RetsqlName("SB1") + " SB1 WHERE B1_FILIAL = '"+xFilial("SB1")+"' AND B1_COD = ZG1_COD AND D_E_L_E_T_ = ' ') TIPO_COD,
 cQuery += " ZG1_COMP COMPONENTE, 
-cQuery += " (SELECT MAX(B1_TIPO) FROM " + RetsqlName("SB1") + " SB1 WHERE B1_FILIAL = '"+xFilial("SB1")+"' AND B1_COD = ZG1_COMP AND D_E_L_E_T_ <> '*') TIPO_COMP,
+cQuery += " (SELECT MAX(B1_TIPO) FROM " + RetsqlName("SB1") + " SB1 WHERE B1_FILIAL = '"+xFilial("SB1")+"' AND B1_COD = ZG1_COMP AND D_E_L_E_T_ = ' ') TIPO_COMP,
 cQuery += " ZG1_QUANT QUANT"
 cQuery += " FROM " + RetsqlName("ZG1") + " ZG1 "
 cQuery += " WHERE ZG1_FILIAL = '"+xFilial("ZG1")+"' "
 cQuery += " AND ZG1_DTINCL = '"+Dtos(mv_par01)+"' "
 cQuery += " AND ZG1_COD BETWEEN '"+mv_par02+"' AND '"+mv_par03+"'"
 cQuery += " AND LEFT(ZG1_COMP,3) <> 'MO-'
-cQuery += " AND D_E_L_E_T_ <> '*' "
+cQuery += " AND D_E_L_E_T_ = ' ' "
 cQuery += " ORDER BY ZG1_COD, ZG1_COMP "
 
 TcQuery cQuery New Alias (cAlias := GetNextAlias())
@@ -83,35 +83,35 @@ Return
 ±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-/*/
-Static Function ValidPerg(c_Perg)
-
-Local _sAlias := Alias()
-Local aRegs := {}
-Local i,j
-
-dbSelectArea("SX1")
-dbSetOrder(1)
-c_Perg := PADR(c_Perg,Len(SX1->X1_GRUPO))
-
-//              Grupo /Ordem /Pergunta               /PERSPA  / PERENG/Variavel/Tipo   /Tamanho  /Decimal/Presel /GSC /Valid/Var01      /Def01      /DEFSPA1 /DEFENG1 /Cnt01 /Var02     /Def02           /DEFSPA2 /DEFENG2 /Cnt02 /Var03     /Def03          /DEFSPA3 /DEFENG3 /Cnt03 /Var04     /Def04          /DEFSPA4 /DEFENG4 /Cnt04 /Var05     /Def05          /DEFSPA5/DEFENG5  /Cnt05 /F3   /PYME/GRPSXG
-Aadd(aRegs,{c_Perg,"01","Data Referencia ?"	    ,"","","mv_ch1","D",08,0,0,"G","",	"MV_PAR01","",	"","","",	"","",	"","","","","","","","","","","","","","","","","","","","","","","" })
-Aadd(aRegs,{c_Perg,"02","Do Produto ?"	        ,"","","mv_ch2","C",15,0,0,"G","",	"MV_PAR02","",	"","","",	"","",	"","","","","","","","","","","","","","","","","","","SB1","","","","" })
-Aadd(aRegs,{c_Perg,"03","Ate o Produto ?"       ,"","","mv_ch3","C",15,0,0,"G","",	"MV_PAR03","",	"","","",	"","",	"","","","","","","","","","","","","","","","","","","SB1","","","","" })
-Aadd(aRegs,{c_Perg,"04","Local/Arquivo .CSV ?"  ,"","","mv_ch4","C",50,0,0,"G","",	"MV_PAR04","",	"","","",	"","",	"","","","","","","","","","","","","","","","","","","","","","","" })
-
-For i:=1 to Len(aRegs)
-	If !dbSeek(c_Perg+aRegs[i,2])
-		RecLock("SX1",.T.)
-		For j:=1 to FCount()
-			If j <= Len(aRegs[i])
-				FieldPut(j,aRegs[i,j])
-			Endif
-		Next
-		MsUnlock()
-	EndIf	
-Next
-
-dbSelectArea(_sAlias)
-
-Return Nil
+///*/
+//Static Function ValidPerg(c_Perg)
+//
+//Local _sAlias := Alias()
+//Local aRegs := {}
+//Local i,j
+//
+//dbSelectArea("SX1")
+//dbSetOrder(1)
+//c_Perg := PADR(c_Perg,Len(SX1->X1_GRUPO))
+//
+////              Grupo /Ordem /Pergunta               /PERSPA  / PERENG/Variavel/Tipo   /Tamanho  /Decimal/Presel /GSC /Valid/Var01      /Def01      /DEFSPA1 /DEFENG1 /Cnt01 /Var02     /Def02           /DEFSPA2 /DEFENG2 /Cnt02 /Var03     /Def03          /DEFSPA3 /DEFENG3 /Cnt03 /Var04     /Def04          /DEFSPA4 /DEFENG4 /Cnt04 /Var05     /Def05          /DEFSPA5/DEFENG5  /Cnt05 /F3   /PYME/GRPSXG
+//Aadd(aRegs,{c_Perg,"01","Data Referencia ?"	    ,"","","mv_ch1","D",08,0,0,"G","",	"MV_PAR01","",	"","","",	"","",	"","","","","","","","","","","","","","","","","","","","","","","" })
+//Aadd(aRegs,{c_Perg,"02","Do Produto ?"	        ,"","","mv_ch2","C",15,0,0,"G","",	"MV_PAR02","",	"","","",	"","",	"","","","","","","","","","","","","","","","","","","SB1","","","","" })
+//Aadd(aRegs,{c_Perg,"03","Ate o Produto ?"       ,"","","mv_ch3","C",15,0,0,"G","",	"MV_PAR03","",	"","","",	"","",	"","","","","","","","","","","","","","","","","","","SB1","","","","" })
+//Aadd(aRegs,{c_Perg,"04","Local/Arquivo .CSV ?"  ,"","","mv_ch4","C",50,0,0,"G","",	"MV_PAR04","",	"","","",	"","",	"","","","","","","","","","","","","","","","","","","","","","","" })
+//
+//For i:=1 to Len(aRegs)
+//	If !dbSeek(c_Perg+aRegs[i,2])
+//		RecLock("SX1",.T.)
+//		For j:=1 to FCount()
+//			If j <= Len(aRegs[i])
+//				FieldPut(j,aRegs[i,j])
+//			Endif
+//		Next
+//		MsUnlock()
+//	EndIf	
+//Next
+//
+//dbSelectArea(_sAlias)
+//
+//Return Nil
