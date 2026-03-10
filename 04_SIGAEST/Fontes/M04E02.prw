@@ -16,6 +16,8 @@ User Function M04E02()
 	Local _cPedido		:= Space(TamSX3('C5_NUM')[1])
 	Local _cItem		:= Space(TamSX3('C6_ITEM')[1])
 	Local _cSerie		:= Space(TamSX3('B1_SERIE')[1])
+	Local _nQtdVen		:= 1
+
 	Private _lRetusr		:= .T.
 	
 	If !RetCodUsr() $GETMV("MV_XPALB07")
@@ -23,9 +25,9 @@ User Function M04E02()
 		MsgStop("Não é possível emitir a etiqueta, usuário não autorizado","Atenção")
 	Else
 		
-		DEFINE MSDIALOG _oDlg TITLE _cTitulo Style DS_MODALFRAME FROM 000,000 TO 185,280 PIXEL
+		DEFINE MSDIALOG _oDlg TITLE _cTitulo Style DS_MODALFRAME FROM 000,000 TO 217,280 PIXEL
 
-		@ 002,002 TO 70, 140 OF _oDlg PIXEL
+		@ 002,002 TO 91, 140 OF _oDlg PIXEL
 
 		@ 010,010 SAY 'Pedido' 	SIZE 55, 07 OF _oDlg PIXEL
 		@ 010,050 MSGET _cPedido SIZE 80, 11 F3 'SC5' OF _oDlg PIXEL
@@ -36,15 +38,18 @@ User Function M04E02()
 		@ 050,010 SAY 'Num. Série' SIZE 55, 07 OF _oDlg PIXEL
 		@ 050,050 MSGET _cSerie SIZE 80, 11 OF _oDlg PIXEL
 
-		DEFINE SBUTTON FROM 75, 40 TYPE 1 ACTION (_nOpca := 1,(M04EMain(@_cPedido,@_cItem,@_cSerie))) ENABLE OF _oDlg
-		DEFINE SBUTTON FROM 75, 80 TYPE 2 ACTION (_nOpca := 2,_oDlg:End()) ENABLE OF _oDlg
+		@ 070,010 SAY 'Quantidade' SIZE 55, 07 OF _oDlg PIXEL
+		@ 070,050 MSGET _nQtdVen SIZE 80, 11 OF _oDlg Picture '@E 99999.99' PIXEL
+
+		DEFINE SBUTTON FROM 94, 40 TYPE 1 ACTION (_nOpca := 1,(M04EMain(@_cPedido,@_cItem,@_cSerie,@_nQtdVen))) ENABLE OF _oDlg
+		DEFINE SBUTTON FROM 94, 80 TYPE 2 ACTION (_nOpca := 2,_oDlg:End()) ENABLE OF _oDlg
 
 		ACTIVATE MSDIALOG _oDlg CENTERED
 	EndIf
 Return
 //+----------------------------------------------------------------------------------------------------------------
 
-Static Function M04EMain(_cPedido,_cItem,_cSerie)
+Static Function M04EMain(_cPedido,_cItem,_cSerie,_nQtdVen,nQuant)
 Local _lPosZA0
 Local _lPosZAB
 Local _aDescr		:= {}
@@ -69,9 +74,9 @@ dbSelectArea("ZAB")
 dbSetOrder(1) //ZAB_FILIAL+ZAB_NUMSER
  
  // Valida se Campos obrigatórios foram informados
-		If M04EValObr(@_cPedido,@_cItem,_cSerie)
+		If M04EValObr(@_cPedido,@_cItem,@_cSerie,@_nQtdVen)
 		
-			M10EGetInf(_cPedido,_cItem,@_cProd,@_aDescr,@_cCliente,@_cFantasia,@_cXItemP,@_cSerie,@_cNum,@_cHora)
+			M10EGetInf(_cPedido,_cItem,@_cProd,@_aDescr,@_cCliente,@_cFantasia,@_cXItemP,@_cSerie,@_cNum,@_cHora,@_nQtdVen)
 
 			_cFamili := Posicione("SB1",1, xFilial("SB1") + _cProd, "B1_XFAMILI")
 			
@@ -104,7 +109,9 @@ dbSetOrder(1) //ZAB_FILIAL+ZAB_NUMSER
 							ZA0->ZA0_ITEMPV	:= _cItem
 							MsUnlock()
 							
-							M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_cXItemP,_cSerie,_cNum,_cHora)
+							M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_cXItemP,_cSerie,_cNum,_cHora,_nQtdVen)
+							
+							_nQtdVen := 1
 							
 							M04ESetSC6(_cPedido,_cItem,'F')
 							
@@ -133,9 +140,11 @@ dbSetOrder(1) //ZAB_FILIAL+ZAB_NUMSER
 										 	)
 							If _lRet
 
-								M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_cXItemP,_cSerie,_cNum,_cHora)
+								M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_cXItemP,_cSerie,_cNum,_cHora,_nQtdVen)
 
-                                M04ESetSC6(ZAB->ZAB_NUMPV,ZAB->ZAB_ITEMPV,'F')
+                                _nQtdVen := 1
+
+								M04ESetSC6(ZAB->ZAB_NUMPV,ZAB->ZAB_ITEMPV,'F')
 
 								RecLock("ZAB",.F.)
 								ZAB->ZAB_NUMPV := _cPedido
@@ -168,8 +177,10 @@ dbSetOrder(1) //ZAB_FILIAL+ZAB_NUMSER
 							ZAB->ZAB_NOTA  := _cNota
 							MsUnlock()
 							
-							M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_cXItemP,_cSerie,_cNum,_cHora)						
+							M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_cXItemP,_cSerie,_cNum,_cHora,_nQtdVen)						
 							
+							_nQtdVen := 1
+
 							MsgInfo("Produto: " + Posicione("SB1",1,xFilial("SB1") + ZAB->ZAB_CODPRO, "B1_DESC") + CRLF + CRLF;
 										+ "Alocado para o pedido: " + _cPedido + " Item: " + _cItem, "Atenção")
 										
@@ -184,7 +195,7 @@ dbSetOrder(1) //ZAB_FILIAL+ZAB_NUMSER
 							+ 'Cliente.....: '		+ _cCliente	+ CRLF;
 						)
 				If _lRet
-					M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_cXItemP,_cSerie,_cNum,_cHora)
+					M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_cXItemP,_cSerie,_cNum,_cHora,_nQtdVen)
 							
 							RecLock("ZA0",.T.)
 							ZA0->ZA0_FILIAL := xFilial("ZA0")
@@ -209,12 +220,14 @@ dbSetOrder(1) //ZAB_FILIAL+ZAB_NUMSER
 Return
 		
 //+----------------------------------------------------------------------------------------------------------------		
-Static Function M04EValObr(_cPedido,_cItem,_cSerie)
+Static Function M04EValObr(_cPedido,_cItem,_cSerie,_nQtdVen)
 	Local _lRet 	:= .T.
 	Local _cFamilia := ""
 
 	_cPedido		:= StrZero(Val(_cPedido),TamSX3('C5_NUM')[1])
 	_cItem			:= UPPER(IIF(Len(AllTrim(_cItem)) < TamSX3('C6_ITEM')[1],StrZero(Val(_cItem),TamSX3('C6_ITEM')[1]),_cItem))
+	//_nQtdVen 		:= StrZero(cValtoChar(_nQtdVen),TamSX3('C6_QTDVEN')[1])
+	//_nQtdVen 		:= 1
 
 
 	If !(_lRet := !Empty(_cPedido))
@@ -227,6 +240,10 @@ Static Function M04EValObr(_cPedido,_cItem,_cSerie)
 
 	If _lRet .And. !(_lRet := !Empty(_cSerie))
 		MsgInfo('Número de Série é obrigatório.')
+	EndIf
+
+	If _lRet .And. !(_lRet := !Empty(_nQtdVen))
+		MsgInfo('Quantidade deve ser maior que zero.','Atenção!')
 	EndIf
 
 	If _lRet
@@ -264,13 +281,13 @@ Static Function M04EValObr(_cPedido,_cItem,_cSerie)
 
 Return _lRet
 //+----------------------------------------------------------------------------------------------------------------
-Static Function M10EGetInf(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_cXItemP,_cSerie,_cNum,_cHora)
+Static Function M10EGetInf(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_cXItemP,_cSerie,_cNum,_cHora,_nQtdVen)
 	Local _cDescr	:= ''
 	_cHora			:= Time()
 	_cCliente 		:= Posicione('SA1',1,xFilial('SA1') + SC5->(C5_CLIENTE + C5_LOJACLI),'A1_NOME')
 	_cFantasia 		:= Posicione('SA1',1,xFilial('SA1') + SC5->(C5_CLIENTE + C5_LOJACLI),'A1_NREDUZ')
 
-	_cXItemP		:= SubStr(AllTrim(SC6->C6_XITEMP),1,10)
+	//_cXItemP		:= cValtoChar(SC6->C6_QTDVEN)
 	_cNum			:= AllTrim(SC6->C6_FILIAL + SC6->C6_NUM + SC6->C6_ITEM + _cSerie)
 	_cProd			:= AllTrim(SC6->C6_PRODUTO)
 	_cDescr			:= Posicione('SB1',1,xFilial('SB1') + SC6->C6_PRODUTO,'B1_DESC')
@@ -302,7 +319,7 @@ Static Function M10ESep(_cValor)
 Return AClone(_aRet)
 
 //+----------------------------------------------------------------------------------------------------------------
-Static Function M04ESetSC6(_cPedido,_cItem,_cEtapa,_cHora)
+Static Function M04ESetSC6(_cPedido,_cItem,_cEtapa,_cHora,_nQtdVen)
 
 	Default _cHora := Time()
 
@@ -325,7 +342,7 @@ Static Function M04ESetSC6(_cPedido,_cItem,_cEtapa,_cHora)
 Return
 
 //+----------------------------------------------------------------------------------------------------------------
-Static Function M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_cXItemP,_cSerie,_cNum,_cHora)
+Static Function M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_cXItemP,_cSerie,_cNum,_cHora,_nQtdVen)
 	Local _oPrinter		:= Nil
 	Local _nX				:= 0
 	Local _nRow 			:= 60
@@ -338,7 +355,7 @@ Static Function M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_c
 	Local _nCol03			:= _nCol02 + 600
 	Local _nCol04			:= _nCol03 + 120
 	Local _nNextLin		:= 60
-	Private _nAlin			:= 10 - Len(_cXItemP)
+	//Private _nAlin			:= 10 - Len(_cXItemP)
 	Private _oFontG2 		:= TFont():New('Arial',,28,.T.,.T.)
 	
 		_oPrinter := FWMSPrinter():New('M10E001' + StrTran(Time(),':',''), IMP_SPOOL, .T./*_lAdjustToLegacy*/, /*cPathInServer*/, .T.,/*[ lTReport]*/, /*[ @oPrintSetup]*/, /*[ cPrinter]*/, /*[ lServer]*/, /*[ lPDFAsPNG]*/, /*[ lRaw]*/, /*[ lViewPDF]*/,2)
@@ -381,17 +398,20 @@ Static Function M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_c
 
 		_nRow += _nNextLin * 2.5
 
-		_oPrinter:Say(_nRow,_nCol03,'Item:',_oFontP2)
-		_oPrinter:Say(_nRow,_nCol04,AllTrim(_cXItemP),_oFontM1)
+		//_oPrinter:Say(_nRow,_nCol03,'Item:',_oFontP2)
+		//_oPrinter:Say(_nRow,_nCol04,AllTrim(_cXItemP),_oFontM1)
+
+		_oPrinter:Say(_nRow - 17,_nCol03,'Seq:',_oFontP2)
+		_oPrinter:Say(_nRow - 17,_nCol04,_cItem,_oFontM1)
 
 		_nRow += _nNextLin * 0.8
 
 		_oPrinter:Say(_nRow,_nColIni,'Pedido:',_oFontP2)
 		_oPrinter:Say(_nRow,_nCol02,_cPedido,_oFontG1)
 
-		_oPrinter:Say(_nRow + 05,_nCol03,'Seq:',_oFontP2)
-		_oPrinter:Say(_nRow + 05,_nCol04,_cItem,_oFontM1)
-
+		_oPrinter:Say(_nRow,_nCol03,'Quant.:',_oFontP2)
+		_oPrinter:Say(_nRow,_nCol04, cValtochar(_nQtdVen),_oFontG2)
+		
 		//+-------------------------------------------------------------------------
 		// Area 3
 		//+-------------------------------------------------------------------------
