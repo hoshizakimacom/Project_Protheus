@@ -550,10 +550,28 @@ Static Function FisGetInit(aFisGet,aFisGetSC5)
     Local cReferencia := ""
     Local nPosIni     := 0
     Local nLen        := 0
+    Local aDados      := {}
+    Local nX
 
     If aFisGet == Nil
         aFisGet := {}
-        dbSelectArea("SX3")
+        //Busca todos os campos da tabela de produtos
+        aDados := FwSX3Util():GetAllFields("SCK")
+        for nX := 1 to len(aDados)
+            cValid := UPPER(GetSX3Cache(aDados[nX], "X3_VALID")+GetSX3Cache(aDados[nX], "X3_VLDUSER"))
+            If 'MAFISGET("'$cValid
+                nPosIni     := AT('MAFISGET("',cValid)+10
+                nLen        := AT('")',Substr(cValid,nPosIni,Len(cValid)-nPosIni))-1
+                cReferencia := Substr(cValid,nPosIni,nLen)
+                aAdd(aFisGet,{cReferencia,aDados[nX],MaFisOrdem(cReferencia)})
+            EndIf
+            If 'MAFISREF("'$cValid
+                nPosIni     := AT('MAFISREF("',cValid) + 10
+                cReferencia :=Substr(cValid,nPosIni,AT('","MT410",',cValid)-nPosIni)
+                aAdd(aFisGet,{cReferencia,aDados[nX],MaFisOrdem(cReferencia)})
+            EndIf
+        next
+        /*dbSelectArea("SX3")
         dbSetOrder(1)
         MsSeek("SCK")
         While !Eof().And.X3_ARQUIVO=="SCK"
@@ -570,13 +588,29 @@ Static Function FisGetInit(aFisGet,aFisGetSC5)
                 aAdd(aFisGet,{cReferencia,X3_CAMPO,MaFisOrdem(cReferencia)})
             EndIf
             dbSkip()
-        EndDo
+        EndDo*/
         aSort(aFisGet,,,{|x,y| x[3]<y[3]})
     EndIf
 
     If aFisGetSC5 == Nil
         aFisGetSC5  := {}
-        dbSelectArea("SX3")
+        //Busca todos os campos da tabela de produtos
+        aDados := FwSX3Util():GetAllFields("SCJ")
+        for nX := 1 to len(aDados)
+            cValid := UPPER(GetSX3Cache(aDados[nX], "X3_VALID")+GetSX3Cache(aDados[nX], "X3_VLDUSER"))
+            If 'MAFISGET("'$cValid
+                nPosIni     := AT('MAFISGET("',cValid)+10
+                nLen        := AT('")',Substr(cValid,nPosIni,Len(cValid)-nPosIni))-1
+                cReferencia := Substr(cValid,nPosIni,nLen)
+                aAdd(aFisGetSC5,{cReferencia,aDados[nX],MaFisOrdem(cReferencia)})
+            EndIf
+            If 'MAFISREF("'$cValid
+                nPosIni     := AT('MAFISREF("',cValid) + 10
+                cReferencia :=Substr(cValid,nPosIni,AT('","MT410",',cValid)-nPosIni)
+                aAdd(aFisGetSC5,{cReferencia,aDados[nX],MaFisOrdem(cReferencia)})
+            EndIf
+        next
+        /*dbSelectArea("SX3")
         dbSetOrder(1)
         MsSeek("SCJ")
         While !Eof().And.X3_ARQUIVO=="SCJ"
@@ -593,7 +627,7 @@ Static Function FisGetInit(aFisGet,aFisGetSC5)
                 aAdd(aFisGetSC5,{cReferencia,X3_CAMPO,MaFisOrdem(cReferencia)})
             EndIf
             dbSkip()
-        EndDo
+        EndDo*/
         aSort(aFisGetSC5,,,{|x,y| x[3]<y[3]})
     EndIf
     MaFisEnd()
