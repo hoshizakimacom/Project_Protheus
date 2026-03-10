@@ -7,7 +7,7 @@ User Function M05R01()
     Local _oReport      := Nil
     Local _cPerg        := 'M05R01   '
 
-    MR05PutSX1(_cPerg)
+    //MR05PutSX1(_cPerg)
 
     If FindFunction('TRepInUse') .And. TRepInUse(.F.)    //verifica se relatorios personalizaveis esta disponivel
         If Pergunte(_cPerg, .T.)
@@ -113,7 +113,7 @@ Static Function MR05GetSB1(_cAlias,_oReport)
 Return
 
 //+-----------------------------------------------------------------------------------------------------
-Static Function MR05PutSX1(_cPerg)
+/*Static Function MR05PutSX1(_cPerg)
     Local _aAreaSX1     := SX1->(GetArea())
 
     SX1->(DbGoTop())
@@ -128,6 +128,6 @@ Static Function MR05PutSX1(_cPerg)
 
     RestArea(_aAreaSX1)
 
-Return
+Return*/
 
 //+-----------------------------------------------------------------------------------------------------
