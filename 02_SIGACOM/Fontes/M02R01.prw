@@ -752,13 +752,13 @@ While !oReport:Cancel() .And. !SC7->(Eof()) .And. SC7->C7_FILIAL == xFilial("SC7
 		If !Empty(SC7->C7_APROV) .Or. (Empty(SC7->C7_APROV) .And. SCR->CR_TIPO == "IP")
 			
 			lNewAlc := .T.
-			cComprador := UsrFullName(SC7->C7_USER)
+			cComprador := retusr(SC7->C7_USER)
 			If SC7->C7_CONAPRO != "B"
 				lLiber := .T.
 			EndIf
 
 			While !Eof() .And. SCR->CR_FILIAL+Alltrim(SCR->CR_NUM) == xFilial("SCR")+Alltrim(SC7->C7_NUM) .And. SCR->CR_TIPO $ "PC|AE|IP"
-				cAprov += AllTrim(UsrFullName(SCR->CR_USER))+" ["
+				cAprov += AllTrim(retusr(SCR->CR_USER))+" ["
 				Do Case
 					Case SCR->CR_STATUS=="02" //Pendente
         				cAprov += "BLQ"
@@ -787,7 +787,7 @@ While !oReport:Cancel() .And. !SC7->(Eof()) .And. SC7->C7_FILIAL == xFilial("SC7
 								LOOP
 							EndIf 
 						EndIf
-						cAlter += AllTrim(UsrFullName(SAJ->AJ_USER))+"/"
+						cAlter += AllTrim(retusr(SAJ->AJ_USER))+"/"
 					EndIf
 					dbSelectArea("SAJ")
 					dbSkip()
@@ -1017,6 +1017,12 @@ dbSetOrder(1)
 
 Return
 
+static function retusr(cVar)
+
+return UsrFullName(cVar)
+
+
+
 /*/
 ‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
@@ -1214,10 +1220,10 @@ Pergunte("MTR110",.F.)
 //≥ se o tamanho do C7_CC no SX3 estiver > que 9 o relatorio sera impresso comprrimido com espaco para o campo ≥
 //≥ C7_CC centro de custo para ate 20 posicoes,Obs.desabilitando a selecao do modo de impresso retrato/paisagem≥
 //¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ
-dbSelectArea("SX3")
-dbSetOrder(2)
+//dbSelectArea("SX3")
+//dbSetOrder(2)
 If dbSeek("C7_CC")
-	If SX3->X3_TAMANHO == 9
+	If getsx3cache("C7_CC","X3_TAMANHO") == 9
 		nDifColCC := 11
 		Tamanho   := "M"
 	Else
@@ -2279,7 +2285,7 @@ EndIf
 dbSelectArea("SC7")
 If !Empty(SC7->C7_APROV) .Or. (Empty(SC7->C7_APROV) .And. SCR->CR_TIPO == "IP")
 	lNewAlc := .T.
-	cComprador := UsrFullName(SC7->C7_USER)
+	cComprador := retusr(SC7->C7_USER)
 	If C7_CONAPRO != "B"
 		lLiber := .T.
 	EndIf
@@ -2287,7 +2293,7 @@ If !Empty(SC7->C7_APROV) .Or. (Empty(SC7->C7_APROV) .And. SCR->CR_TIPO == "IP")
 	dbSetOrder(1)
 	dbSeek(xFilial("SCR")+"PC"+SC7->C7_NUM)
 	While !Eof() .And. SCR->CR_FILIAL+Alltrim(SCR->CR_NUM)==xFilial("SCR")+Alltrim(SC7->C7_NUM) .And. SCR->CR_TIPO $ "PC|AE|IP"
-		cAprov += AllTrim(UsrFullName(SCR->CR_USER))+" ["
+		cAprov += AllTrim(retusr(SCR->CR_USER))+" ["
         Do Case
         	Case SCR->CR_STATUS=="02" //Pendente
         		cAprov += "BLQ"
@@ -2316,7 +2322,7 @@ If !Empty(SC7->C7_APROV) .Or. (Empty(SC7->C7_APROV) .And. SCR->CR_TIPO == "IP")
 						LOOP
 					EndIf 
 				EndIf
-				cAlter += AllTrim(UsrFullName(SAJ->AJ_USER))+"/"
+				cAlter += AllTrim(retusr(SAJ->AJ_USER))+"/"
 			EndIf
 			dbSelectArea("SAJ")
 			dbSkip()
@@ -2701,7 +2707,7 @@ dbSelectArea("SC7")
 lNewAlc := .F.
 If !Empty(C7_APROV)   
 	lNewAlc := .T.
-	cComprador := UsrFullName(SC7->C7_USER)
+	cComprador := retusr(SC7->C7_USER)
 	If C7_CONAPRO != "B"
 		lLiber := .T.
 	EndIf
@@ -2709,7 +2715,7 @@ If !Empty(C7_APROV)
 	dbSetOrder(1)
 	dbSeek(xFilial("SCR")+"AE"+SC7->C7_NUM)
 	While !Eof() .And. SCR->CR_FILIAL+Alltrim(SCR->CR_NUM)==xFilial("SCR")+Alltrim(SC7->C7_NUM) .And. SCR->CR_TIPO == "AE"
-		cAprov += AllTrim(UsrFullName(SCR->CR_USER))+" ["
+		cAprov += AllTrim(retusr(SCR->CR_USER))+" ["
         Do Case
         	Case SCR->CR_STATUS=="03" //Liberado
         		cAprov += "Ok"
@@ -2736,7 +2742,7 @@ If !Empty(C7_APROV)
 						LOOP
 					EndIf 
 				EndIf
-				cAlter += AllTrim(UsrFullName(SAJ->AJ_USER))+"/"
+				cAlter += AllTrim(retusr(SAJ->AJ_USER))+"/"
 			EndIf
 			dbSelectArea("SAJ")
 			dbSkip()
@@ -3110,20 +3116,26 @@ If dbSeek(xFilial("SC7")+cPedido+cItemDe+Alltrim(cSequen))
 		// Inicia a Carga do item nas funcoes MATXFIS  
 		nItem++
 		MaFisIniLoad(nItem)
-		dbSelectArea("SX3")
-		dbSetOrder(1)
-		dbSeek('SC7')
-		While !EOF() .AND. (X3_ARQUIVO == 'SC7')
-			cValid	:= StrTran(UPPER(SX3->X3_VALID)," ","")
+//		dbSelectArea("SX3")
+//		dbSetOrder(1)
+//		dbSeek('SC7')
+
+_aCmp := FWSX3Util():GetAllFields( "SC7" , .T. )
+		//While !Eof() .And. SX3->X3_ARQUIVO=="CNF"
+	For nCont := 1 to Len(_aCmp)
+
+		//While !EOF() .AND. (X3_ARQUIVO == 'SC7')
+			cValid	:= StrTran(UPPER(getsx3xache(_aCmp[nCont],"X3_VALID"))," ","")
 			cValid	:= StrTran(cValid,"'",'"')
 			If "MAFISREF" $ cValid
 				nPosRef  := AT('MAFISREF("',cValid) + 10
 				cRefCols := Substr(cValid,nPosRef,AT('","MT120",',cValid)-nPosRef )
 				// Carrega os valores direto do SC7.           
-				MaFisLoad(cRefCols,&("SC7->"+ SX3->X3_CAMPO),nItem)
+				MaFisLoad(cRefCols,&("SC7->"+ getsx3xache(_aCmp[nCont],"X3_CAMPO")),nItem)
 			EndIf
 			dbSkip()
-		End
+	//	End
+	next
 		MaFisEndLoad(nItem,2)
 		dbSelectArea('SC7')
 		dbSkip()
@@ -3134,6 +3146,9 @@ RestArea(aAreaSC7)
 RestArea(aArea)
 
 Return .T.
+
+
+
 
 /*
 ‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹
