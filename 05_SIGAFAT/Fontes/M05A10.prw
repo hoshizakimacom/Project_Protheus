@@ -44,8 +44,7 @@ User Function M05A10(_nRecSC5,_nRecSF2)
     //+----------------------------------------------------
     If MA10Valid(_cPedido,_cRAPre,@_aRA,@_nRATotal)
 
-        BeginTran()     // Controle de transação
-
+        BEGIN Transaction //BeginTrans()
             //+----------------------------------------------------
             // Retorna total de titulos gerados no faturamento
             //  atual do pedido NF e os deleta
@@ -54,7 +53,7 @@ User Function M05A10(_nRecSC5,_nRecSF2)
 
             //+----------------------------------------------------
             // Percorre RA e cria titulo NF correspondente caso
-            //  ainda não possua e inclui titulo correspondente ao
+            //  ainda nï¿½o possua e inclui titulo correspondente ao
             //  PVA
             //+----------------------------------------------------
             If !_lErro
@@ -69,8 +68,8 @@ User Function M05A10(_nRecSC5,_nRecSF2)
             EndIf
 
             //+------------------------------------------------------------------------
-            // Gera Titulo da diferença entre o valor da NF e dos adiantamentos
-            // utilizando a condição de pagamento do PV
+            // Gera Titulo da diferenï¿½a entre o valor da NF e dos adiantamentos
+            // utilizando a condiï¿½ï¿½o de pagamento do PV
             //+------------------------------------------------------------------------
             If !_lErro
                 MA10PutNF()
@@ -82,11 +81,11 @@ User Function M05A10(_nRecSC5,_nRecSF2)
             If _lErro
                 DisarmTransaction()
             Else
-                EndTran()
+                    EndIf
+        END Transaction //EndTrans()
             EndIf
 
-        MsUnLockAll()       // Fim do controle de transação
-    EndIf
+        MsUnLockAll()       // Fim do controle de transaï¿½ï¿½o
 
     RestArea(_aAreaSC6)
     RestArea(_aAreaSC5)
@@ -148,7 +147,7 @@ Static Function MA10VldCF(_cPedido)
 Return _lRet
 
 //+-----------------------------------------------------------------------------------------------
-// Somente considera condição de pagamento diferente de 9
+// Somente considera condiï¿½ï¿½o de pagamento diferente de 9
 //+-----------------------------------------------------------------------------------------------
 Static Function MA10VldPag(_cPedido)
     Local _lRet := .T.
@@ -231,7 +230,7 @@ Return _nRet
 Static Function MA10DelTit(_cSF2Num,_nNFTotal,_cNFNum,_cNFPre,_cNFTip,_cNFNat,_cNFCli,_cNFLoj,_dNFVenc,_dNFVenR,_nNFValor,_cNFTitPed,_cNFPedido,_cNFVend,_nNFComis1)
     Local _cAlias       := GetNextAlias()
     Local _nX           := 0
-    Local _nOpc     	:= 5 // Exclusão
+    Local _nOpc     	:= 5 // Exclusï¿½o
     Local _aNf          := {}
 
     // Chave unica: E1_FILIAL+E1_PREFIXO+E1_NUM+E1_PARCELA+E1_TIPO
@@ -266,7 +265,7 @@ Static Function MA10DelTit(_cSF2Num,_nNFTotal,_cNFNum,_cNFPre,_cNFTip,_cNFNat,_c
         SE1->(DbGoTo(_aNF[_nX]))
 
         //+----------------------------------------------------
-        // Guarda informações para geração de NF por RA
+        // Guarda informaï¿½ï¿½es para geraï¿½ï¿½o de NF por RA
         //+----------------------------------------------------
         _cNFNum     := SE1->E1_NUM
         _cNFPre     := SE1->E1_PREFIXO
@@ -290,12 +289,12 @@ Static Function MA10DelTit(_cSF2Num,_nNFTotal,_cNFNum,_cNFPre,_cNFTip,_cNFNat,_c
 Return
 
 //+-----------------------------------------------------------------------------------------------
-// Cria titulo correspondente ao RA recebido caso ainda não exista
+// Cria titulo correspondente ao RA recebido caso ainda nï¿½o exista
 //+-----------------------------------------------------------------------------------------------
 Static Function MA10PutRA(_nRecnoRA,_nNFTotal,_cNFPar,_cNFNum,_cNFPre,_cNFTip,_cNFNat,_cNFCli,_cNFLoj,_cNFTitPed,_cNFPedido,_cNFVend,_nNFComis1)
     Local _nSaldoRA 	:= 0
     
-    Local _nOpc     	:= 3 // inclusão
+    Local _nOpc     	:= 3 // inclusï¿½o
     Local _nValor       := 0
     Local _cRAOri       := ''
     Local _dEmissao		:= CTOD("  /  /  ")
@@ -314,7 +313,7 @@ Static Function MA10PutRA(_nRecnoRA,_nNFTotal,_cNFPar,_cNFNum,_cNFPre,_cNFTip,_c
         _nSaldoRA   := SE1->E1_VALOR - MA10SelTot(_cRAOri)
 
         //+----------------------------------------------------
-        // Se existir diferença entre PV e NF, gera titulo
+        // Se existir diferenï¿½a entre PV e NF, gera titulo
         //  com valor correspondente
         //+----------------------------------------------------
         If  _nSaldoRA > 0
@@ -328,9 +327,9 @@ Static Function MA10PutRA(_nRecnoRA,_nNFTotal,_cNFPar,_cNFNum,_cNFPre,_cNFTip,_c
             EndIf
             
 	        //+----------------------------------------------------
-    	    // Se a data de vencimento for menor que a emissão, 
-        	// altero a data para a database do sistema para não 
-        	// ocasionar erro na emissão da NFE.
+    	    // Se a data de vencimento for menor que a emissï¿½o, 
+        	// altero a data para a database do sistema para nï¿½o 
+        	// ocasionar erro na emissï¿½o da NFE.
         	//+----------------------------------------------------
             _dEmissao	:= IIF( SE1->E1_EMISSAO < dDataBase, dDataBase, _dEmissao)
             _dVencto	:= IIF( SE1->E1_VENCTO < dDataBase, dDataBase, _dVencto)
@@ -403,7 +402,7 @@ Static Function MA10PutNF()
 Return
 
 //+-----------------------------------------------------------------------------------------------
-// Execução automática FINA040 - inclusão/exclusão de titulos
+// Execuï¿½ï¿½o automï¿½tica FINA040 - inclusï¿½o/exclusï¿½o de titulos
 //+-----------------------------------------------------------------------------------------------
 Static Function M05ExecAut( _nOpc           ,_cPrefix       ,_cNum      ,_cParc     ,_cTipo;
                                 ,_cNaturez      ,_cCliente      ,_cLoja ,_dEmiss        ,_dVencto;
@@ -455,6 +454,8 @@ Static Function M05ExecAut( _nOpc           ,_cPrefix       ,_cNum      ,_cParc 
     MSExecAuto( {|x,y| FINA040(x,y) } , _aTitulo , _nOpc )
 
     If lMsErroAuto
-       MostraErro()
+        If !IsBlind()
+            MostraErro()
+        Endif
     EndIf
 Return !lMsErroAuto
