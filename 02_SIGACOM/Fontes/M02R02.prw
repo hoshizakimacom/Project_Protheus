@@ -379,18 +379,35 @@ Static Function MR02Cab1(oPrinter,oFont14B,oFont12,nRow)
     Local cEndC         := 'Av Julia Gaiolli, 474, Bonsucesso, Guarulhos-SP, CEP 07251-500'
     Local cCGC          := 'CNPJ: 43.553.668/0001-79 I.E.: 336.179.661.113'
     Local cTel          := 'Telefone: 55 11 2085-7000'
-    Local cMail         := 'www.acosmacom.com.br'
+    Local cMail         := 'www.hoshizakimacom.com.br'
     Local nRowStep      := 45
+
+    Local cNome2         := 'HOSHIZAKI MACOM LTDA'
+    Local cEndC2         := 'Rua Desembargador João Paes, 302, Boa Viagem, Recife-PE, CEP 51021-360'
+    Local cCGC2          := 'CNPJ: 43.553.668/0005-00 I.E.: 0795345-38'
+    Local cTel2          := 'Telefone: 55 81 3325-1565'
+    Local cMail2         := 'www.hoshizakimacom.com.br'
+    Local nRowStep2      := 45
 
     oPrinter:SayBitmap(nRow ,0100,GetSrvProfString("Startpath","") + 'LOGO_M05R02.BMP', 751 ,178 )
 
-    oPrinter:Say(nRow                 ,2404         , cNome     ,oFont14B)
-    oPrinter:Say(nRow += nRowStep     ,2404         , cEndC     ,oFont12)
-    oPrinter:Say(nRow += nRowStep     ,2404         , cCGC      ,oFont12)
-    oPrinter:Say(nRow += nRowStep     ,2404         , cTel      ,oFont12)
-    oPrinter:Say(nRow += nRowStep     ,2404         , cMail     ,oFont12)
+    IF SC7->C7_FILIAL $ "01"
+    	oPrinter:Say(nRow                 ,2404         , cNome     ,oFont14B)
+    	oPrinter:Say(nRow += nRowStep     ,2404         , cEndC     ,oFont12)
+    	oPrinter:Say(nRow += nRowStep     ,2404         , cCGC      ,oFont12)
+    	oPrinter:Say(nRow += nRowStep     ,2404         , cTel      ,oFont12)
+    	oPrinter:Say(nRow += nRowStep     ,2404         , cMail     ,oFont12)
 
-    nRow += nRowStep
+    	nRow += nRowStep
+    Else
+        oPrinter:Say(nRow                  ,2250         , cNome2     ,oFont14B)
+    	oPrinter:Say(nRow += nRowStep2     ,2250         , cEndC2     ,oFont12)
+    	oPrinter:Say(nRow += nRowStep2     ,2250         , cCGC2      ,oFont12)
+    	oPrinter:Say(nRow += nRowStep2     ,2250         , cTel2      ,oFont12)
+    	oPrinter:Say(nRow += nRowStep2     ,2250         , cMail2     ,oFont12)
+
+    	nRow += nRowStep2
+   EndIf
 Return
 
 //+------------------------------------------------------------------------------------------------------------------------------------------------------
