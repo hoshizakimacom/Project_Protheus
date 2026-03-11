@@ -54,7 +54,7 @@ Private CITEMD  := ""
 Private CITEMC  := ""
 Private NVALCTB := 0 
 
-	BeginTran()
+	BEGIN TRANSACTION //BeginTran()
 
 		If M06EValid(_cCodCli,_cLoja,_cTipo)
 
@@ -123,7 +123,7 @@ Private NVALCTB := 0
 
 		EndIf
 
-	EndTran()
+	 END TRANSACTION //EndTran()
 	MsUnlockAll()
 
 Return
