@@ -1,296 +1,222 @@
-#INCLUDE "PROTHEUS.CH"
+#INCLUDE "protheus.ch"
 
-//ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-//±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-//±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-//±±ºPrograma  ³ M34A01  ºAutor  ³Éder Fonseca Moraesº    Data: 02/01/2023  º±±
-//±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-//±±ºDesc.     ³Cadastro de Buget e importação de csv			            º±±
-//±±º          ³                                                            º±±
-//±±º          ³                                                            º±±
-//±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-//±±ºUso       ³ ACOS MACOM                                                 º±±
-//±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-//±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-//ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M34A01()
 
-User Function M34A01()
+PRIVATE CCADASTRO := "CADASTRO DE BUDGET"
 
-	Private cCadastro 	:= "Cadastro de Budget" 
+PRIVATE CDELFUNC := ".T."
+PRIVATE CALIAS := "SZA"
+PRIVATE _CARQCSV
+PRIVATE _ALINHAS
+PRIVATE CFILE := ""
+PRIVATE CEND := "C:\WINDOWS\TEMP\"
+PRIVATE CDTHR := DTOS(DDATABASE)+"-"+ SUBSTR(TIME(),1,2)+"-"+ SUBSTR(TIME(),4,2)+"-"+ SUBSTR(TIME(),7,2)
+PRIVATE CNOMELOG := "LOGBUDGET"+CDTHR+"_LOG.TXT"
+PRIVATE CARQ := CEND+CNOMELOG
+PRIVATE _CLINHA
 
-	Private cDelFunc	:= ".T." 
-	Private cAlias 	:= "SZA"
-	Private  _cArqCsv
-	Private  _aLinhas
-	Private	 cFile		:= ""
-	Private cEnd		:= "C:\Windows\Temp\"
-	Private cDtHr 		:= DtoS(dDataBase)+"-"+Substr(time(),1,2)+"-"+Substr(time(),4,2)+"-"+Substr(time(),7,2)
-	Private cNomeLog	:=	"Logbudget"+cDtHr+"_Log.txt"
-	Private cArq		:=	cEnd+cNomeLog
-	Private _cLinha
+PRIVATE AROTINA := {{"PESQUISAR","AXPESQUI",0,1},{"VISUALIZAR","AXVISUAL",0,2},{"INCLUIR","AXINCLUI",0,3},{"ALTERAR","AXALTERA",0,4},{"EXCLUIR","AXDELETA",0,5},{"IMPORT .CSV","U_IMPCSV",0,3}}
 
+DBSELECTAREA("SZA")
+DBSETORDER(1)
 
-	//------------------------------------------------------------------+
-	// Monta um aRotina. 												|
-	// Menus de AÃ§Ã£o na tela											|
-	// Utilizando a funÃ§Ã£o padrÃ£o AxCadastro							|
-	//------------------------------------------------------------------+
-	Private aRotina := { {"Pesquisar", "AxPesqui",0,1},; 
-						 {"Visualizar","AxVisual",0,2} ,;
-						 {"Incluir","AxInclui",0,3} ,;
-						 {"Alterar","AxAltera",0,4} ,;
-						 {"Excluir","AxDeleta",0,5} ,;
-						 {"Import .CSV","u_IMPCSV",0,3}}
-						
-	//--------------------------------------+
-	//Selecionando a tabela a ser utilizada |
-	//--------------------------------------+
-	dbSelectArea("SZA")
-	dbSetOrder(1)
+DBSELECTAREA(CALIAS)
+MBROWSE(6,1,22,75,CALIAS)
 
-	dbSelectArea(cAlias)
-	mBrowse(6,1,22,75,cAlias)
+RETURN 
 
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION IMPCSV()
 
-Return
+LOCAL LOK :=  .T. 
+LOCAL CARQ := ""
 
+CARQ := GETPLAN()
 
-//ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-//±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-//±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-//±±ºPrograma  ³IMPCSV  ºAutor  ³Éder Fonseca Moraesº    Data:   02/01/2023 º±±
-//±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-//±±ºDesc.     ³Função IMPCSV .csv na tabela SZA	    		            º±±
-//±±º          ³                                                            º±±
-//±±º          ³                                                            º±±
-//±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-//±±ºUso       ³ ACOS MACOM                                                 º±±
-//±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-//±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-//ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+IF !(EMPTY(CARQ))
 
-User Function IMPCSV()
+    IF MSGYESNO("DESEJA MESMO IMPORTAR A PLANILHA?","ATENÇÃO!")
 
-	Local lOk 	:= .T.
-	Local cArq 	:= ""
-	
-	cArq := GetPlan() 
-	
-	If !Empty(cArq)
-	
-		If MsgYesNo( "Deseja mesmo importar a planilha?", "Atenção!" )
-		
-			MsgRun("Processando","Importação da planilha",{|| Processa(cArq) })	
-			
-		Else
-			lOk := .F.	
-		EndIf
-		
-	Else
-		lOk := .F.	
-	EndIf
-	
-Return lOk
+        MSGRUN("PROCESSANDO","IMPORTAÇÃO DA PLANILHA",{||PROCESSA(CARQ)})
+    ELSE 
 
-//ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-//±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-//±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-//±±ºPrograma  ³GetPlan  ºAutor  ³Éder Fonseca Moraesº    Data: 02/01/2023	º±±
-//±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-//±±ºDesc.     ³Função busca arquivo .csv no diretório    		            º±±
-//±±º          ³                                                            º±±
-//±±º          ³                                                            º±±
-//±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-//±±ºUso       ³ ACOS MACOM                                                 º±±
-//±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-//±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-//ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+        LOK :=  .F. 
+    ENDIF
+ELSE 
 
-Static Function GetPlan()
-	
-	Local cCadastro	:= "Budget"
-	Local cArq		:= ""
-	Local nOpca		:= 0
-	
-	Local aSays		:= {}
-	Local aButtons	:= {}
-	
-	aAdd(aSays, "Esta rotina tem por objetivo efetuar a importação ")
-	aAdd(aSays, "de arquivo .csv de Budget")
-	
-	aAdd(aButtons, { 14,.T.,{|| cArq 	:= cGetFile("Arquivo CSV (*.csv) | *.csv|", "",,,.f., GETF_LOCALHARD+GETF_NETWORKDRIVE,.f., .T.)}} )
-	aAdd(aButtons, { 1,.T. ,{|| nOpca   := 1, FechaBatch() 																				}} )
-	aAdd(aButtons, { 2,.T. ,{|| FechaBatch() 																							}} )
-	
-	FormBatch( cCadastro, aSays, aButtons)
-	
-	If nOpca == 1
-		
-		If Empty(cArq)			
-			Alert("Arquivo inválido!.",FunName())		
-		EndIf
-			
-    Else
-    	Alert(" Importação cancelada")
-    EndIf
-		
-Return cArq 
+    LOK :=  .F. 
+ENDIF
 
-//ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-//±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-//±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-//±±ºPrograma  ³Processa  ºAutor  ³Éder Fonseca Moraesº    Data: 02/01/2023	º±±
-//±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-//±±ºDesc.     ³Função Processa .csv na tabela SZA			                º±±
-//±±º          ³                                                            º±±
-//±±º          ³                                                            º±±
-//±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-//±±ºUso       ³ ACOS MACOM                                                 º±±
-//±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-//±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-//ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+RETURN LOK
 
-Static Function Processa(cArq)
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION GETPLAN()
 
-	Local lOk 	 := .T.
-	Local nTdoc	 := 0
-	
-	Local nLinha := 0
-		
-	Local aLinha := {}
-	
-	Local cLinha := "" 
-	Local cErro  := ""
-	
-	Default cArq 	:= ""
-		
-	If !Empty(cArq)
-	
-		nTdoc := FT_FUse(cArq) //funcao que abre um arquivo
-		
-		If nTdoc = -1
-			lOk := .F.	
-		Else
-				
-				FT_FGOTOP()
-				
-				While !FT_FEOF()
-					
-					If nLinha == 0 //pular cabeçalho
-						FT_FSKIP()	
-					EndIf
+LOCAL CCADASTRO := "BUDGET"
+LOCAL CARQ := ""
+LOCAL NOPCA := 0
 
-					aLinha := {}
-					
-					cLinha := FT_FREADLN()
-					nLinha ++
-					
-					aLinha := StrTokArr2(cLinha,";",.T.)
+LOCAL ASAYS := {}
+LOCAL ABUTTONS := {}
 
-					If !ImpDados(aLinha)
-						cErro += AllTrim(Str(nLinha)) + Chr(13) + Chr(10)
-					EndIf
-	
-					FT_FSKIP()	
-				EndDo
+AADD(ASAYS,"ESTA ROTINA TEM POR OBJETIVO EFETUAR A IMPORTAÇÃO ")
+AADD(ASAYS,"DE ARQUIVO .CSV DE BUDGET")
 
-			FClose(nTdoc)
-		EndIf	
-		
-	Else
-		lOk := .F.
-	EndIf
-	
-	Alert ("Planilha importada com sucesso!")
-	//Alert ("Linhas com erros e/ou nao impressas:" + MostraErro(cErro))
-	
-Return lOk
+AADD(ABUTTONS,{14, .T. ,{||CARQ := CGETFILE("ARQUIVO CSV (*.CSV) | *.CSV|","",,, .F. ,48+0, .F. , .T. )}})
+AADD(ABUTTONS,{1, .T. ,{||NOPCA := 1,FECHABATCH()}})
+AADD(ABUTTONS,{2, .T. ,{||FECHABATCH()}})
 
-//ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-//±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-//±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-//±±ºPrograma  ³ImpDados ºAutor  ³Éder Fonseca Moraesº    Data:  14/02/2019	º±±
-//±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-//±±ºDesc.     ³Função Importa dados							            º±±
-//±±º          ³                                                            º±±
-//±±º          ³                                                            º±±
-//±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-//±±ºUso       ³ Prox	                                                    º±±
-//±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-//±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-//ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-Static Function ImpDados(aLinha)
+FORMBATCH(CCADASTRO,ASAYS,ABUTTONS)
 
-	
+IF NOPCA==1
 
-	Local lRet 	:= .T.
-	Local nTotal := Val(aLinha[4])
-	Local nJan	 := Val(aLinha[5])
-	Local nFev	 := Val(aLinha[6])
-	Local nMar	 := Val(aLinha[7])
-	Local nAbr	 := Val(aLinha[8])
-	Local nMai	 := Val(aLinha[9])
-	Local nJun	 := Val(aLinha[10])
-	Local nJul	 := Val(aLinha[11])
-	Local nAgo	 := Val(aLinha[12])
-	Local nSet	 := Val(aLinha[13])
-	Local nOut	 := Val(aLinha[14])
-	Local nNov	 := Val(aLinha[15])
-	Local nDez	 := Val(aLinha[16])
+    IF EMPTY(CARQ)
+        ALERT("ARQUIVO INVÁLIDO!.",FUNNAME())
+    ENDIF
+ELSE 
 
-	Local lseek := ""
-	
-	Default aLinha := {}
-	
-	If Len(aLinha) >= 0 //.And. Len(aLinha) = 16 //se tiver o ; 
+    ALERT(" IMPORTAÇÃO CANCELADA")
+ENDIF
 
-		SZA->(DbSetOrder(1))
-		lseek := SZA->(DbSeek(xFilial("SZA") + Padr(aLinha[2],TamSX3("ZA_CCUSTO")[1]) + Padr(aLinha[3],TamSX3("ZA_CONTAB")[1]) + Padr(aLinha[1],TamSX3("ZA_ANOBUDT")[1])))
+RETURN CARQ
 
-		IF lseek
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION PROCESSA(CARQ)
 
-			Reclock("SZA",.F.)
-			SZA->ZA_BUDTOTA		:= nTotal
-			SZA->ZA_VALJANE		:= nJan
-			SZA->ZA_VALFEVE		:= nFev
-			SZA->ZA_VALMARC		:= nMar
-			SZA->ZA_VALABRI		:= nAbr
-			SZA->ZA_VALMAIO		:= nMai
-			SZA->ZA_VALJUNH		:= nJun
-			SZA->ZA_VALJULH		:= nJul
-			SZA->ZA_VALAGOS		:= nAgo
-			SZA->ZA_VALSETE		:= nSet
-			SZA->ZA_VALOUTU		:= nOut
-			SZA->ZA_VALNOVE		:= nNov
-			SZA->ZA_VALDEZE		:= nDez
-			
-		Else
+LOCAL LOK :=  .T. 
+LOCAL NTDOC := 0
 
-			Reclock("SZA",.T.) 
-			SZA->ZA_FILIAL		:= xFilial("SZA")
-			SZA->ZA_CCUSTO		:= aLinha[2]
-			SZA->ZA_CONTAB		:= aLinha[3]
-			SZA->ZA_ANOBUDT 	:= aLinha[1]
-			SZA->ZA_BUDTOTA		:= nTotal
-			SZA->ZA_VALJANE		:= nJan
-			SZA->ZA_VALFEVE		:= nFev
-			SZA->ZA_VALMARC		:= nMar
-			SZA->ZA_VALABRI		:= nAbr
-			SZA->ZA_VALMAIO		:= nMai
-			SZA->ZA_VALJUNH		:= nJun
-			SZA->ZA_VALJULH		:= nJul
-			SZA->ZA_VALAGOS		:= nAgo
-			SZA->ZA_VALSETE		:= nSet
-			SZA->ZA_VALOUTU		:= nOut
-			SZA->ZA_VALNOVE		:= nNov
-			SZA->ZA_VALDEZE		:= nDez
+LOCAL NLINHA := 0
 
-		ENDIF
+LOCAL ALINHA := {}
 
-		SZA->(MsUnLock())
-	
-	Else
-		lRet := .F.
-	EndIf 
+LOCAL CLINHA := ""
+LOCAL CERRO := ""
 
-Return lRet
+CARQ := IIF(CARQ==NIL,"",CARQ)
+
+IF !(EMPTY(CARQ))
+
+    NTDOC := FT_FUSE(CARQ)
+
+    IF NTDOC=- (1)
+        LOK :=  .F. 
+    ELSE 
+
+        FT_FGOTOP()
+
+        WHILE !(FT_FEOF())
+        
+            IF NLINHA==0
+                FT_FSKIP()
+            ENDIF
+
+            ALINHA := {}
+
+            CLINHA := FT_FREADLN()
+            NLINHA++
+
+            ALINHA := STRTOKARR2(CLINHA,";", .T. )
+
+            IF !(IMPDADOS(ALINHA))
+                CERRO +=  ALLTRIM(STR(NLINHA)) + CRLF
+            ENDIF
+
+            FT_FSKIP()
+            ENDDO
+
+        FCLOSE(NTDOC)
+    ENDIF
+ELSE 
+
+    LOK :=  .F. 
+ENDIF
+
+ALERT("PLANILHA IMPORTADA COM SUCESSO!")
+
+RETURN LOK
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION IMPDADOS(ALINHA)
+
+LOCAL LRET :=  .T. 
+LOCAL NTOTAL :=  VAL(ALINHA[4])
+LOCAL NJAN :=  VAL(ALINHA[5])
+LOCAL NFEV :=  VAL(ALINHA[6])
+LOCAL NMAR :=  VAL(ALINHA[7])
+LOCAL NABR :=  VAL(ALINHA[8])
+LOCAL NMAI :=  VAL(ALINHA[9])
+LOCAL NJUN :=  VAL(ALINHA[10])
+LOCAL NJUL :=  VAL(ALINHA[11])
+LOCAL NAGO :=  VAL(ALINHA[12])
+LOCAL NSET :=  VAL(ALINHA[13])
+LOCAL NOUT :=  VAL(ALINHA[14])
+LOCAL NNOV :=  VAL(ALINHA[15])
+LOCAL NDEZ :=  VAL(ALINHA[16])
+
+LOCAL LSEEK := ""
+
+ALINHA := IIF(ALINHA==NIL,{},ALINHA)
+
+IF  LEN(ALINHA)>=0
+
+    (SZA)->(DBSETORDER(1))
+    LSEEK := (SZA)->(DBSEEK(XFILIAL("SZA")+PADR(ALINHA[2],TAMSX3("ZA_CCUSTO")[1])+PADR(ALINHA[3],TAMSX3("ZA_CONTAB")[1])+PADR(ALINHA[1],TAMSX3("ZA_ANOBUDT")[1])))
+
+    IF LSEEK
+
+        RECLOCK("SZA", .F. )
+        SZA->ZA_BUDTOTA := NTOTAL
+        SZA->ZA_VALJANE := NJAN
+        SZA->ZA_VALFEVE := NFEV
+        SZA->ZA_VALMARC := NMAR
+        SZA->ZA_VALABRI := NABR
+        SZA->ZA_VALMAIO := NMAI
+        SZA->ZA_VALJUNH := NJUN
+        SZA->ZA_VALJULH := NJUL
+        SZA->ZA_VALAGOS := NAGO
+        SZA->ZA_VALSETE := NSET
+        SZA->ZA_VALOUTU := NOUT
+        SZA->ZA_VALNOVE := NNOV
+   SZA->ZA_VALDEZE := NDEZ
+    ELSE 
+
+        RECLOCK("SZA", .T. )
+        SZA->ZA_FILIAL := XFILIAL("SZA")
+        SZA->ZA_CCUSTO := ALINHA[2]
+        SZA->ZA_CONTAB := ALINHA[3]
+        SZA->ZA_ANOBUDT := ALINHA[1]
+        SZA->ZA_BUDTOTA := NTOTAL
+        SZA->ZA_VALJANE := NJAN
+        SZA->ZA_VALFEVE := NFEV
+        SZA->ZA_VALMARC := NMAR
+        SZA->ZA_VALABRI := NABR
+        SZA->ZA_VALMAIO := NMAI
+        SZA->ZA_VALJUNH := NJUN
+        SZA->ZA_VALJULH := NJUL
+        SZA->ZA_VALAGOS := NAGO
+        SZA->ZA_VALSETE := NSET
+        SZA->ZA_VALOUTU := NOUT
+        SZA->ZA_VALNOVE := NNOV
+        SZA->ZA_VALDEZE := NDEZ
+    ENDIF
+
+    (SZA)->(MSUNLOCK())
+ELSE 
+
+    LRET :=  .F. 
+ENDIF
+
+RETURN LRET
+
