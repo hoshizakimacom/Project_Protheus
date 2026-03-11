@@ -1,102 +1,69 @@
-#Include 'Protheus.ch'
+#INCLUDE "protheus.ch"
 
-//+-------------------------------------------------------------------------------
-//	Fonte responsável pelo anexo de arquivos na OP
-//	Chamado pelo PE MA650BUT
-//+-------------------------------------------------------------------------------
-User Function M10A02A()
-	Local _cMascara  	:= 'Todos os arquivos|*.*'
-	Local _cTitulo   	:= 'Escolha o arquivo'
-	Local _nMascpad  	:= 0
-	Local _cDirOri   	:= 'C:\'
-	Local _cDirDes	:= AllTrim(GetMv('AM_10A02_A',.T.,''))
-	Local _lSalvar   	:= .F. /*.F. = Salva || .T. = Abre*/
-	Local _nOpcoes   	:= GETF_LOCALHARD
-	Local _lArvore   	:= .F. /*.T. = apresenta o árvore do servidor || .F. = não apresenta*/
-	Local _lOk			:= .F.
-	Private _aArquivo	:= {}
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M10A02A()
+LOCAL _CMASCARA := "TODOS OS ARQUIVOS|*.*"
+LOCAL _CTITULO := "ESCOLHA O ARQUIVO"
+LOCAL _NMASCPAD := 0
+LOCAL _CDIRORI := "C:\"
+LOCAL _CDIRDES :=  ALLTRIM(GETMV("AM_10A02_A", .T. ,""))
+LOCAL _LSALVAR :=  .F. 
+LOCAL _NOPCOES := 48
+LOCAL _LARVORE :=  .F. 
+LOCAL _LOK :=  .F. 
+PRIVATE _AARQUIVO := {}
 
-	If Empty(_cDirDes)
-		Aviso('Atenção','É obrigatório informar o diretório de armazenamento no parâmetro AM_10A02_A.',{'OK'},3)
-	Else
-		_cDirDes	+= AllTrim(SC2->(C2_FILIAL+C2_NUM+C2_ITEM+C2_SEQUEN+C2_ITEMGRD)) + '\'
-		_cDirOri 	:= cGetFile( _cMascara, _cTitulo, _nMascpad, _cDirOri, _lSalvar, _nOpcoes, _lArvore)
+IF EMPTY(_CDIRDES)
+    AVISO("ATENÇÃO","É OBRIGATÓRIO INFORMAR O DIRETÓRIO DE ARMAZENAMENTO NO PARÂMETRO AM_10A02_A.",{"OK"},3)
+ELSE 
+    _CDIRDES +=  ALLTRIM(SC2->(C2_FILIAL+C2_NUM+C2_ITEM+C2_SEQUEN+C2_ITEMGRD))+"\"
+    _CDIRORI := CGETFILE(_CMASCARA,_CTITULO,_NMASCPAD,_CDIRORI,_LSALVAR,_NOPCOES,_LARVORE)
 
-		If !Empty(_cDirOri)
-			_aFiles := Directory(_cDirOri, "D")
+    IF !(EMPTY(_CDIRORI))
+        _AFILES := DIRECTORY(_CDIRORI,"D")
 
-			MakeDir(_cDirDes)
+        MAKEDIR(_CDIRDES)
 
-			If !(_lOk := !File(_cDirDes + _aFiles[1][1]))
-				If MsgYesNo('Arquivo já anexado a esta OP.' + CRLF + 'Deseja atualizar o arquivo?')
-					If !(_lOk := FErase(_cDirDes + _aFiles[1][1]) <> -1)
-						MsgAlert('Erro ao apagar arquivo: ' + STR(FERROR()))
-					EndIf
-				EndIf
-			EndIf
+        IF !(_LOK := !(FILE(_CDIRDES+_AFILES[1][1])))
+            
+            IF MSGYESNO("ARQUIVO JÁ ANEXADO A ESTA OP." + CRLF+"DESEJA ATUALIZAR O ARQUIVO?",)
+                
+                IF !(_LOK := FERASE(_CDIRDES+_AFILES[1][1])<>- (1))
+                    MSGALERT("ERRO AO APAGAR ARQUIVO: "+STR(FERROR()),)
+                ENDIF
+            ENDIF
+        ENDIF
 
-			If _lOk
-				__CopyFile(_cDirOri,_cDirDes + _aFiles[1][1])
+        IF _LOK
+            __COPYFILE(_CDIRORI,_CDIRDES+_AFILES[1][1])
 
-				If File(_cDirDes + _aFiles[1][1])
-					MsgInfo('Arquivo anexado com sucesso!')
-				Else
-					Alert('Erro ao anexar arquivo.')
-				EndIf
-			EndIf
-		Else
-			Alert('Arquivo não informado!')
-		EndIf
-	EndIf
-Return
+            IF FILE(_CDIRDES+_AFILES[1][1])
+                MSGINFO("ARQUIVO ANEXADO COM SUCESSO!",)
+            ELSE 
+                ALERT("ERRO AO ANEXAR ARQUIVO.")
+            ENDIF
+        ENDIF
+    ELSE 
+        ALERT("ARQUIVO NÃO INFORMADO!")
+    ENDIF
+ENDIF
+RETURN 
 
-//+-------------------------------------------------------------------------------
-//	Fonte responsável pela visualização dos anexos da OP
-//	Chamado pelo PE MA650BUT
-//+-------------------------------------------------------------------------------
-User Function M10A02B()
-	Local _cDir		:= AllTrim(GetMv('AM_10A02_A',.T.,''))
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M10A02B()
+LOCAL _CDIR :=  ALLTRIM(GETMV("AM_10A02_A", .T. ,""))
 
-	If Empty(_cDir)
-		Aviso('Atenção','É obrigatório informar o diretório de armazenamento no parâmetro AM_10A02_A.',{'OK'},3)
-	Else
-		_cDir	+= AllTrim(SC2->(C2_FILIAL+C2_NUM+C2_ITEM+C2_SEQUEN+C2_ITEMGRD)) + '\'
+IF EMPTY(_CDIR)
+    AVISO("ATENÇÃO","É OBRIGATÓRIO INFORMAR O DIRETÓRIO DE ARMAZENAMENTO NO PARÂMETRO AM_10A02_A.",{"OK"},3)
+ELSE 
+    _CDIR +=  ALLTRIM(SC2->(C2_FILIAL+C2_NUM+C2_ITEM+C2_SEQUEN+C2_ITEMGRD))+"\"
 
-		MakeDir(_cDir)
-		WinExec('explorer.exe ' + _cDir)
-	EndIf
-Return
+    MAKEDIR(_CDIR)
+    WINEXEC("EXPLORER.EXE "+_CDIR)
+ENDIF
+RETURN 
 
-/*
-User Function M10A001B()
-	Local _cDir		:= AllTrim(GetMv('AM_10A02_A',.T.,''))
-	Local _bBaixar	:= {|| alert(oBrowse:nAt) }
-	Local _oDlg		:= Nil
-	Local _oBrowse	:= Nil
-	Local _aFiles		:= {}
-
-	If Empty(_cDir)
-		Aviso('Atenção','É obrigatório informar o diretório de armazenamento no parâmetro AM_10A02_A.',{'OK'},3)
-	Else
-
-		DEFINE DIALOG _oDlg TITLE _cTitle FROM 180,180 TO 550,700 PIXEL
-			_cDir	+= AllTrim(SC2->(C2_FILIAL+C2_NUM+C2_ITEM+C2_SEQUEN+C2_ITEMGRD)) + '\'
-
-			MakeDir(_cDir)
-
-			_aFiles 	:= Directory(_cDir, "D")
-
-			_oBrowse 	:= FWMBrowse():New(001,001,400,400,,{'Arquivo','Tamanho','Data'},{100,50,50},_oDlg,,,,,{||},,,,,,,.F.,,.T.,,.F.,,, )
-			_oBrowse:SetDataArray()
-			_oBrowse:SetArray(_aFiles)
-
-			_oBrowse:AddColumn( TCColumn():New('Arquivo'	,{ || _aFiles[_oBrowse:nAt,1] },,,,"LEFT",,.F.,.T.,,,,.F.,) )
-			_oBrowse:AddColumn( TCColumn():New('Tamanho' 	,{ || _aFiles[_oBrowse:nAt,2] },,,,"RIGHT",,.F.,.T.,,,,.F.,) )
-			_oBrowse:AddColumn( TCColumn():New('Data' 	,{ || _aFiles[_oBrowse:nAt,3] },,,,"LEFT",,.F.,.T.,,,,.F.,) )
-
-			TButton():New( 172, 002, "Baixar", _oDlg,_bBaixar,40,010,,,.F.,.T.,.F.,,.F.,,,.F. )
-
-		ACTIVATE DIALOG _oDlg CENTERED
-	EndIf
-Return
-*/
