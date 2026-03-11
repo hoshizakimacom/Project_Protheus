@@ -395,11 +395,11 @@ Static Function M02EPrin(_cCodOpi,_nQtd,_cNumSer)
 		_oPrinter:SetDevice(IMP_SPOOL)
 		_oPrinter:StartPage()
 
-		_oPrinter:SayBitMap( _nRow -40 , 50 ,GetSrvProfString("Startpath","") + "M10E001.bmp", 100 * 4.0 , 30 * 4.0)
-		_oPrinter:Say(_nRow + 100 , 70 , "Grupo HOSHIZAKI",_oFontMI) 
-		_oPrinter:Say(_nRow ,800 , "HOSHIZAKI MACOM Ltda",_oFontP) /**#7666**/
-		_oPrinter:Say(_nRow += _nNextLin ,800 , "CNPJ: 43.553.668/0001-79",_oFontP)
-		_oPrinter:Say(_nRow + _nNextLin ,800 , "Telefone: (011) 2085-7000",_oFontP)
+		_oPrinter:SayBitMap( _nRow -40 , 50 ,GetSrvProfString("Startpath","") + "M10E006.bmp", 100 * 4.0 , 30 * 4.0)
+		_oPrinter:Say(_nRow ,650 , "HOSHIZAKI MACOM Ltda",_oFontP)
+		_oPrinter:Say(_nRow += 38 ,650 , "CNPJ: 43.553.668/0001-79",_oFontP)
+		_oPrinter:Say(_nRow + 40 ,650 , "Telefone: (011) 2085-7000",_oFontP)
+		_oPrinter:Say(_nRow + 77 ,650 , "Acesse o site: www.hoshizakimacom.com.br",_oFontP)
 		_oPrinter:Say(_nRow + 140 ,70, "Modelo: ",_OFontP)
 		_oPrinter:Say(_nRow + 140 , 200, Alltrim(_cCodOpi),_OFontGG)
 		_oPrinter:Say(_nRow + 190 , 70, "Desc.: ",_OFontP)
@@ -419,18 +419,24 @@ Static Function M02EPrin(_cCodOpi,_nQtd,_cNumSer)
 
 		_oPrinter:Say(_nRow + 370 , 70, "Data Fab: " + AllTrim(DTOC(_dDtFab)) ,_OFontP)
 		_oPrinter:Say(_nRow + 450 , 70, "BCode Serial: " ,_OFontP)
+		//_oPrinter:Say(_nRow + 525 ,813 , "Manual do Produto",_oFontP)
 		_oPrinter:FWMSBAR('CODE128',12.4/*nRow*/,6/*nCol*/,AllTrim(_cNumSer),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/)
-		_oPrinter:Say(_nRow + 505 , 270, Alltrim(_cNumSer),_OFontGG)
+		_oPrinter:Say(_nRow + 525 , 270, Alltrim(_cNumSer),_OFontGG)
 		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-FB-008 Rev.00", _OFontP) /**#7666**/
+
+		If NaoVazio(_cQRCode)
+			_oPrinter:QrCode(625,810,_cQRCode, 065)
+			_oPrinter:Say(_nRow + 525 ,813 , "Manual do Produto",_oFontP)
+		Endif
 		
 		If _cINMETRO =="1"
-			_oPrinter:SayBitMap( 500, 900 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 30 * 4.0 , 30 * 4.0) // *** Valdemir - 03/03/2023 *** // #7976 de 800 para 900 
+			_oPrinter:SayBitMap( _nRow + 300, 1060 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 60 * 2.5 , 60 * 2.5) 
 			//_oPrinter:SayBitMap( _nRow + 260, 1000 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 60 * 4.0 , 60 * 4.0)
 		Endif
 
-		_oPrinter:QrCode(635,950,_cQRCode, 070)  // *** Valdemir - 03/03/2023 *** //
+		//_oPrinter:QrCode(635,950,_cQRCode, 070)  // *** Valdemir - 03/03/2023 *** //
 		
-		_oPrinter:Say(_nRow + 530 , 450, "ESPECIFICAÇÕES TÉCNICAS: " ,_OFontP)
+		_oPrinter:Say(_nRow + 560 , 70, "ESPECIFICAÇÕES TÉCNICAS: " ,_OFontP)
 	
 		If _cFamilia == "000001"
             If _cTpFluido == "1"
@@ -571,23 +577,24 @@ Static Function M02EPri1(_cCodOpi,_nQtd,_cNumSer)
 	_oPrinter:SetDevice(IMP_SPOOL)
 	_oPrinter:StartPage()
 
-	_oPrinter:SayBitMap( _nRow -40 , 50 ,GetSrvProfString("Startpath","") + "M10E001.bmp", 100 * 4.0 , 30 * 4.0)
-	_oPrinter:Say(_nRow + 100 , 70 , "Grupo HOSHIZAKI",_oFontMI)
-	_oPrinter:Say(_nRow ,800 , "HOSHIZAKI MACOM Ltda",_oFontP)
-	_oPrinter:Say(_nRow += _nNextLin ,800 , "CNPJ: 43.553.668/0001-79",_oFontP)
-	_oPrinter:Say(_nRow + _nNextLin ,800 , "Telefone: (011) 2085-7000",_oFontP)
+	_oPrinter:SayBitMap( _nRow -40 , 50 ,GetSrvProfString("Startpath","") + "M10E006.bmp", 100 * 4.0 , 30 * 4.0)
+	//_oPrinter:Say(_nRow + 100 , 70 , "Grupo HOSHIZAKI",_oFontMI)
+	_oPrinter:Say(_nRow ,650 , "HOSHIZAKI MACOM Ltda",_oFontP)
+	_oPrinter:Say(_nRow += 38 ,650 , "CNPJ: 43.553.668/0001-79",_oFontP)
+	_oPrinter:Say(_nRow + 40 ,650 , "Telefone: (011) 2085-7000",_oFontP)
+	_oPrinter:Say(_nRow + 82 ,650 , "Acesse o site: www.hoshizakimacom.com.br",_oFontP)
 	_oPrinter:Say(_nRow + 140 ,70, "Modelo: ",_OFontP)
 	_oPrinter:Say(_nRow + 140 , 250, Alltrim(_cCodOpi),_OFontGG)
-	_oPrinter:Say(_nRow + 510 , 70, "OP.: ",_OFontP)
+	_oPrinter:Say(_nRow + 515 , 70, "OP.: ",_OFontP)
 //	_oPrinter:Say(_nRow + 510 , 150, AllTrim(_cOP) ,_OFontP) //#7032
-	_oPrinter:Say(_nRow + 510 , 150, AllTrim(_cOP+_cItem+_cSequen) ,_OFontP) //#7032
+	_oPrinter:Say(_nRow + 515 , 150, AllTrim(_cOP+_cItem+_cSequen) ,_OFontP) //#7032
 
 	_oPrinter:Say(_nRow + 390 , 70, "BCode OP: " ,_OFontP)
 //	_oPrinter:FWMSBAR('CODE128',12.9/*nRow*/,1.5/*nCol*/,AllTrim(_cOP),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/) //#7032
 	_oPrinter:FWMSBAR('CODE128',12.9/*nRow*/,1.5/*nCol*/,AllTrim(_cOP+_cItem+_cSequen),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/) //#7032
 	
-	_oPrinter:Say(_nRow + 510 , 700, "Pedido.:" ,_OFontP)
-	_oPrinter:Say(_nRow + 510 , 880, AllTrim(_cPedido) ,_OFontP)
+	_oPrinter:Say(_nRow + 515 , 700, "Pedido.:" ,_OFontP)
+	_oPrinter:Say(_nRow + 515 , 880, AllTrim(_cPedido) ,_OFontP)
 
 	_oPrinter:Say(_nRow + 180 , 70, "BCode Model: " ,_OFontP)
 	_oPrinter:FWMSBAR('CODE128',7.8/*nRow*/,1.5/*nCol*/,AllTrim(_cCodOpi),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/)
@@ -595,7 +602,7 @@ Static Function M02EPri1(_cCodOpi,_nQtd,_cNumSer)
 	_oPrinter:Say(_nRow + 180 , 700, "Nº de Série: " ,_OFontP)
 	_oPrinter:Say(_nRow + 180 , 880, Alltrim(_cNumSer) ,_OFontGG)
 
-	_oPrinter:Say(_nRow + 278 , 700, "BCode Serial: " ,_OFontP)
+	_oPrinter:Say(_nRow + 298 , 700, "BCode Serial: " ,_OFontP)
 	_oPrinter:FWMSBAR('CODE128',10.2/*nRow*/,15.5/*nCol*/,AllTrim(_cNumSer),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/)
 		
 	_oPrinter:Say(_nRow + 560 , 70, "DESCRICAO.: " ,_OFontP)
