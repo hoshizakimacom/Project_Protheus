@@ -34,7 +34,7 @@ Return
 //+----------------------------------------------------------------------------------------------------------------
 Static Function M10EMain(_cNumOP,_nQtd)
 
-	BeginTran()
+	BEGIN TRANSACTION  //BeginTran()
 
 		If M10EValid(_cNumOP,_nQtd)
 
@@ -44,7 +44,7 @@ Static Function M10EMain(_cNumOP,_nQtd)
 			_nQtd		:= 1
 		EndIf
 
-	EndTran()
+	END TRANSACTION //EndTran()
 	MsUnlockAll()
 
 Return
