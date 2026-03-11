@@ -153,7 +153,7 @@ Local aModInf   := {}
 //юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
 dbSelectArea("SB1")		// Itens do Pedido de Vendas
 dbSetOrder(1)			// Produto,Numero
-#IFDEF TOP
+//#IFDEF TOP
 	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
 	//ЁQuery do relatСrio da secao 1                                           Ё
 	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
@@ -181,7 +181,7 @@ dbSetOrder(1)			// Produto,Numero
 	//Ё                                                                        Ё
 	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
 	oReport:Section(1):EndQuery(/*Array com os parametros do tipo Range*/)
-#ENDIF		
+//#ENDIF		
 
 //здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
 //ЁInicio da impressao do fluxo do relatСrio                               Ё
