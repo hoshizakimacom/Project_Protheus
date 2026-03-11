@@ -149,7 +149,7 @@ Static Function ReportPrint(oReport,cAliasQry,oVenProd)
 //юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
 dbSelectArea("SC6")		// Itens do Pedido de Vendas
 dbSetOrder(2)			// Produto,Numero
-#IFDEF TOP
+//#IFDEF TOP
 	//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
 	//ЁQuery do relatСrio da secao 1                                           Ё
 	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
@@ -181,7 +181,7 @@ dbSetOrder(2)			// Produto,Numero
 	//Ё                                                                        Ё
 	//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
 	oReport:Section(1):EndQuery(/*Array com os parametros do tipo Range*/)
-#ENDIF		
+//#ENDIF		
 
 //здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
 //ЁInicio da impressao do fluxo do relatСrio                               Ё
