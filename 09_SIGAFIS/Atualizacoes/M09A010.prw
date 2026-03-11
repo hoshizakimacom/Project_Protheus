@@ -1,125 +1,129 @@
-#INCLUDE "Protheus.ch"
-#include "Fileio.ch"
+#INCLUDE "protheus.ch"
 
-//+---------------------------------------------------------------------------
-// Rotina de ajuste de grupo de tributação por Origem, Ex NCM e NCM
-//+---------------------------------------------------------------------------
-User Function M09A010()
-	Local	_aSays			:= {}
-	Local	_aButton		:= {}
-	Local	_cTitulo		:= Substr(FunName(),3,20)
-	Private _lSimulacao	:= .T.
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M09A010()
+LOCAL _ASAYS := {}
+LOCAL _ABUTTON := {}
+LOCAL _CTITULO :=  SUBSTR(FUNNAME(),3,20)
+PRIVATE _LSIMULACAO :=  .T. 
 
-	_lSimulacao := MsgYesNo('Deseja executar em modo SIMULAÇÃO?')
+_LSIMULACAO := IIF(FINDFUNCTION("MSGINFO"),MSGINFO("DESEJA EXECUTAR EM MODO SIMULAÇÃO?",),(CMSGYESNO := "MSGYESNO", &CMSGYESNO.("DESEJA EXECUTAR EM MODO SIMULAÇÃO?",)))
 
-	If _lSimulacao
-		AADD(_aSays,OemToAnsi('!!! SIMULAÇÃO !!! '											))
-	EndIf
+IF _LSIMULACAO
+    AADD(_ASAYS,OEMTOANSI("!!! SIMULAÇÃO !!! "))
+ENDIF
 
-	AADD(_aSays,OemToAnsi("Processar todos os produtos de acordo com o POSIPI e EX_NCM: " 	))
-	AADD(_aSays,OemToAnsi(" - acertar informação de Grupo de tributacao (B1_GRTRIB)"		))
-	AADD(_aSays,OemToAnsi(" REGRAS:"														))
-	AADD(_aSays,OemToAnsi(" - se ORIGEM IGUAL a 1, atualizar utilizando YD_GRPIMP"			))
-	AADD(_aSays,OemToAnsi(" - se ORIGEM IGUAL a 2,3 ou 8, atualizar utilizando YD_GRPREVE"	))
-	AADD(_aSays,OemToAnsi(" - DEMAIS atualizar utilizando YD_GRPTRIB"						))
+AADD(_ASAYS,OEMTOANSI("PROCESSAR TODOS OS PRODUTOS DE ACORDO COM O POSIPI E EX_NCM: "))
+AADD(_ASAYS,OEMTOANSI(" - ACERTAR INFORMAÇÃO DE GRUPO DE TRIBUTACAO (B1_GRTRIB)"))
+AADD(_ASAYS,OEMTOANSI(" REGRAS:"))
+AADD(_ASAYS,OEMTOANSI(" - SE ORIGEM IGUAL A 1, ATUALIZAR UTILIZANDO YD_GRPIMP"))
+AADD(_ASAYS,OEMTOANSI(" - SE ORIGEM IGUAL A 2,3 OU 8, ATUALIZAR UTILIZANDO YD_GRPREVE"))
+AADD(_ASAYS,OEMTOANSI(" - DEMAIS ATUALIZAR UTILIZANDO YD_GRPTRIB"))
 
-	aAdd( _aButton, { 1, .T., {|| Processa( {|| M09010Proc() }, "Aguarde...", "",.F.),FechaBatch()}}	)
-	aAdd( _aButton, { 2, .T., {|| FechaBatch()					}}	)
+AADD(_ABUTTON,{1, .T. ,{||PROCESSA({||M09010PROC()},"AGUARDE...","", .F. ),FECHABATCH()}})
+AADD(_ABUTTON,{2, .T. ,{||FECHABATCH()}})
 
-	FormBatch( _cTitulo, _aSays, _aButton )
-Return
+FORMBATCH(_CTITULO,_ASAYS,_ABUTTON)
+RETURN 
 
-//+---------------------------------------------------------------------------
-Static Function M09010Proc()
-//Local cTmpB1YD	:= GetNextAlias()
-//Local cQuery		:= ""
-//Local _nRec		:= 0
-Local _cAlias		:= GetNextAlias()
-Local _nReg		:= 0
-Local _nRegAlt	:= 0
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION M09010PROC()
 
-Local _cLog		:= ''
-Local _cArq		:=  cGetFile('*.TXT'	,'Informe diretorio'	,0,'',.T.			,nOR( GETF_LOCALHARD, GETF_LOCALFLOPPY, GETF_RETDIRECTORY ),.F., .T. )
+LOCAL _CALIAS := GETNEXTALIAS()
+LOCAL _NREG := 0
+LOCAL _NREGALT := 0
 
-Local _cMsg		:= 'Total de produtos alterados: #1 .' + CRLF
-Local _nHandle	:= 0
-Local _cGrTrib	:= ''
+LOCAL _CLOG := ""
+LOCAL _CARQ := CGETFILE("*.TXT","INFORME DIRETORIO",0,"", .T. ,NOR(48,8,128), .F. , .T. )
 
-Private _nTotal	:= 0
+LOCAL _CMSG := "TOTAL DE PRODUTOS ALTERADOS: #1 ." + CRLF
+LOCAL _NHANDLE := 0
+LOCAL _CGRTRIB := ""
 
-If !Empty(_cArq)
-	_cArq += (StrTran(Time(),':','')) + '.TXT'
+PRIVATE _NTOTAL := 0
 
-	BeginSql Alias _cAlias
-		SELECT	 B1_COD		,B1_ORIGEM		,B1_GRTRIB		,SB1.R_E_C_N_O_ AS B1_RECNO
-				,B1_POSIPI		,B1_EX_NCM		,B1_TIPO
-				,YD_TEC		,YD_XGRTRIB	,YD_XGRIMP		,YD_PER_IPI
-				,YD_XGRREVE
-		FROM  %Table:SB1% SB1
-		INNER JOIN %Table:SYD% SYD
-			ON	SYD.%NotDel%
-			AND YD_FILIAL = %xFilial:SYD%
-			AND B1_POSIPI = YD_TEC
-			AND B1_EX_NCM = YD_EX_NCM
-		WHERE	SB1.%NotDel%
-			AND B1_FILIAL = %xFilial:SB1%
-			AND B1_ORIGEM <> ''
-		ORDER BY B1_COD
-	EndSql
+IF !(EMPTY(_CARQ))
+    _CARQ += STRTRAN(TIME(),":","")+".TXT"
+    
+_cQry := " SELECT B1_COD, "
+_cQry += "        B1_ORIGEM, "
+_cQry += "        B1_GRTRIB, "
+_cQry += "        SB1.R_E_C_N_O_ AS B1_RECNO, "
+_cQry += "        B1_POSIPI, "
+_cQry += "        B1_EX_NCM, "
+_cQry += "        B1_TIPO, "
+_cQry += "        YD_TEC, "
+_cQry += "        YD_XGRTRIB, "
+_cQry += "        YD_XGRIMP, "
+_cQry += "        YD_PER_IPI, "
+_cQry += "        YD_XGRREVE "
+_cQry += " FROM "+RETSQLNAME("SB1")+" SB1 "
+_cQry += " INNER JOIN "+RETSQLNAME("SYD")+" SYD ON SYD.D_E_L_E_T_= ' ' "
+_cQry += " AND YD_FILIAL = '"+XFILIAL("SYD")+"' "
+_cQry += " AND B1_POSIPI = YD_TEC "
+_cQry += " AND B1_EX_NCM = YD_EX_NCM "
+_cQry += " WHERE SB1.D_E_L_E_T_= ' ' "
+_cQry += "   AND B1_FILIAL = '"+XFILIAL("SB1")+"' "
+_cQry += "   AND B1_ORIGEM <> '' "
+_cQry += " ORDER BY B1_COD "
+__EXECSQL(_CALIAS,_cQry,{}, .F. )
 
-	Count To _nTotal
-	ProcRegua(_nTotal)
-
-	(_cAlias)->(DBGoTop())
-
-	If (_cAlias)->(!EOF())
-			
-		_nHandle	:= FCREATE(_cArq)
-				
-		While  (_cAlias)->(!EOF())
-			IncProc('Atualizando produto ' + CValToChar(++_nReg) + ' de ' + CValToChar(_nTotal) + '.')
-			_cLog := ""
-			SB1->(DbGoTo( (_cAlias)->B1_RECNO ))
-
-			If SB1->(!EOF())
-				Do Case
-					Case (_cAlias)->B1_ORIGEM == '1'
-						_cGrTrib 	:= (_cAlias)->YD_XGRIMP
-					Case (_cAlias)->B1_ORIGEM $ '2|3|8'
-						_cGrTrib 	:=  (_cAlias)->YD_XGRREVE   //(_cAlias)->YD_GRPREVE
-					OtherWise
-						_cGrTrib	:= (_cAlias)->YD_XGRTRIB
-				EndCase
-
-				If AllTrim((_cAlias)->B1_GRTRIB) <> AllTrim(_cGrTrib)
-					_nRegAlt++
-					If !_lSimulacao
-						RecLock('SB1',.F.)
-							SB1->B1_GRTRIB := _cGrTrib
-						SB1->(MsUnLock())
-					EndIf
-						_cLog 	+= 'Produto: ' 			+ SB1->B1_COD;
-								+ ' Tipo: '	 			+ SB1->B1_TIPO;
-								+ ' Origem: '	 		+ SB1->B1_ORIGEM;
-								+ ' NCM: '				+ (_cAlias)->B1_POSIPI;
-								+ ' EX NCM: '			+ (_cAlias)->B1_EX_NCM;						
-								+ ' Grp. Trib.: ' 		+ (_cAlias)->B1_GRTRIB ;
-								+ ' Grp. Trib. NOVO: ' 	+ _cGrTrib;
-								+ CRLF
-			        FWrite(_nHandle, _cLog)					
-					EndIf
-			EndIf
-				(_cAlias)->(DbSkip())
-		EndDo
-//			_nHandle	:= FCREATE(_cArq)
-			If _nHandle = -1
-		 	_cMsg 	+= " Erro ao criar arquivo - ferror " + Str(Ferror())
-	    Else
-	        _cMsg += ' Verifique arquivo de log gerado: ' + CRLF + '#2 ' + CRLF
-//		        FWrite(_nHandle, _cLog)
-	        FClose(_nHandle)
-	    EndIf
-	EndIf
-		Aviso('Atenção',I18N( _cMsg,{_nRegAlt,_cArq}),{'OK'},3)
-EndIf
-Return
+    _NTOTAL := 0
+    DBEVAL({||_NTOTAL := _NTOTAL+1}, .F. )
+    PROCREGUA(_NTOTAL)
+    
+    (_CALIAS)->(DBGOTOP())
+    
+    IF !(_CALIAS)->(EOF())
+        
+        _NHANDLE := FCREATE(_CARQ)
+        
+        WHILE !(_CALIAS)->(EOF())
+        
+            INCPROC("ATUALIZANDO PRODUTO "+CVALTOCHAR(++_NREG)+" DE "+CVALTOCHAR(_NTOTAL)+".")
+            _CLOG := ""
+            SB1->(DBGOTO(_CALIAS->B1_RECNO))
+            
+            IF !SB1->(EOF())
+                
+                DO CASE 
+                CASE _CALIAS->B1_ORIGEM=="1"
+                _CGRTRIB := _CALIAS->YD_XGRIMP
+                
+                CASE (_CALIAS->B1_ORIGEM) $ ("2|3|8")
+                _CGRTRIB := _CALIAS->YD_XGRREVE
+                OTHERWISE
+                _CGRTRIB := _CALIAS->YD_XGRTRIB
+                ENDCASE
+                
+                IF  ALLTRIM(_CALIAS->B1_GRTRIB)<> ALLTRIM(_CGRTRIB)
+                    _NREGALT++
+                    
+                    IF !(_LSIMULACAO)
+                        RECLOCK("SB1", .F. )
+                   SB1->B1_GRTRIB := _CGRTRIB
+                        SB1->(MSUNLOCK())
+                    ENDIF
+                    
+                    _CLOG += "PRODUTO: "+SB1->B1_COD+" TIPO: "+SB1->B1_TIPO+" ORIGEM: "+SB1->B1_ORIGEM+" NCM: "+_CALIAS->B1_POSIPI+" EX NCM: "+_CALIAS->B1_EX_NCM+" GRP. TRIB.: "+_CALIAS->B1_GRTRIB+" GRP. TRIB. NOVO: "+_CGRTRIB + CRLF
+                    FWRITE(_NHANDLE,_CLOG)
+                ENDIF
+            ENDIF
+            (_CALIAS)->(DBSKIP())
+            ENDDO
+        
+        IF _NHANDLE=- (1)
+            _CMSG += " ERRO AO CRIAR ARQUIVO - FERROR "+STR(FERROR())
+        ELSE 
+            _CMSG += " VERIFIQUE ARQUIVO DE LOG GERADO: " + CRLF+"#2 " + CRLF
+            
+            FCLOSE(_NHANDLE)
+        ENDIF
+    ENDIF
+    AVISO("ATENÇÃO",I18N(_CMSG,{_NREGALT,_CARQ}),{"OK"},3)
+ENDIF
+RETURN 
