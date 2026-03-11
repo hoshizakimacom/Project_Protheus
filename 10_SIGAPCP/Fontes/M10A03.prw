@@ -150,7 +150,7 @@ Else
 			cQuery += " WHERE ZAB_FILIAL = '"+xFilial("ZAB")+"'"
 			cQuery += " AND LEFT(ZAB_NUMSER,2) = '1"+_cAno+"' "
 			cQuery += " AND SUBSTRING(ZAB_NUMSER,9,1) = '"+_cMes+"' "
-			cQuery += " AND D_E_L_E_T_ <> '*' "
+			cQuery += " AND D_E_L_E_T_ = '' "
 
 			TcQuery cQuery New Alias "QUERY"
 			dbSelectArea("QUERY")
@@ -187,12 +187,12 @@ Else
 					ZAB->(MsUnlock())
 				
 					DBSelectArea("SX6")
-					GetMV("AM_NUMSER")
-					//PutSX6("AM_NUMSER",lltrim(STR(_nSerial)))
+					
+					PutSX6("AM_NUMSER",Alltrim(STR(_nSerial)))
 
-					RecLock("SX6",.F.)
+					/*RecLock("SX6",.F.)
 					SX6->X6_CONTEUD := Alltrim(STR(_nSerial))
-					MsUnlock()
+					MsUnlock()*/
 				EndIf
 			Next _nX
 			
