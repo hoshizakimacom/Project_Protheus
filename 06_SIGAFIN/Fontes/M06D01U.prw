@@ -1,359 +1,391 @@
-#Include 'Protheus.ch'
-#Include 'TBICONN.ch'
+#INCLUDE "protheus.ch"
+STATIC _CARQORI := "", _CARQLOG := ""
 
-Static _cArqOri     := ''
-Static _cArqLog     := ''
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M06D01U()
+LOCAL _ASAYS := {}
+LOCAL _ABUTTON := {}
+LOCAL _CTITULO := FUNNAME()
 
-//+-------------------------------------------------------------------------------------------------
-//  Rotina de alteração de produtos a partir de arquivo CSV
-//+-------------------------------------------------------------------------------------------------
-User Function M06D01U()
-    Local   _aSays          := {}
-    Local   _aButton        := {}
-    Local   _cTitulo        := FunName()
+AADD(_ASAYS,OEMTOANSI("ESTA ROTINA TEM COMO OBJETIVO ALTERAR O CÓDIGO DE VENDEDOR E PERCENTUAL DOS  "))
+AADD(_ASAYS,OEMTOANSI("TÍTULOS A PARTIR DE UM ARQUIVO CSV. "))
+AADD(_ASAYS,OEMTOANSI("  "))
+AADD(_ASAYS,OEMTOANSI("ESSA ROTINA É DE USO PROVISÓRIO E ESTÁ DISPONÍVEL ATÉ 30/09/2017."))
 
-    AADD(_aSays,OemToAnsi("Esta rotina tem como objetivo alterar o código de vendedor e percentual dos  "))
-    AADD(_aSays,OemToAnsi("títulos a partir de um arquivo CSV. "))
-    AADD(_aSays,OemToAnsi("  "))
-    AADD(_aSays,OemToAnsi("Essa rotina é de uso provisório e está disponível até 30/09/2017."))
+AADD(_ABUTTON,{1, .T. ,{||PROCESSA({||MD05PROC()}),FECHABATCH()}})
+AADD(_ABUTTON,{2, .T. ,{||FECHABATCH()}})
 
-    aAdd( _aButton, { 1, .T., {|| Processa({||MD05Proc()}),FechaBatch()}}   )
-    aAdd( _aButton, { 2, .T., {|| FechaBatch()                  }}  )
+FORMBATCH(_CTITULO,_ASAYS,_ABUTTON)
 
-    FormBatch( _cTitulo, _aSays, _aButton )
+_CARQORI := ""
+_CARQLOG := ""
+RETURN 
 
-    _cArqOri        := ''
-    _cArqLog        := ''
-Return
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05PROC()
+LOCAL _ODLG := NIL
+LOCAL _CTITLE := "ALTERAÇÃO DE VENDEDORES/COMISSÕES"
+LOCAL _OARQORI := NIL
+LOCAL _OARQLOG := NIL
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05Proc()
-Local _oDlg         := Nil
-Local _cTitle       := 'Alteração de Vendedores/Comissões'
-Local _oArqOri      := Nil
-Local _oArqLog      := Nil
+IF DDATABASE<CTOD("30/09/2017")
+    _ODLG := MSDIALOG():NEW(0,0,300,900,_CTITLE,,, .F. ,128,,,,, .T. ,,, .F. )
 
-If ddatabase < CTOD("30/09/2017")
-    Define MsDialog _oDlg Title _cTitle Style DS_MODALFRAME From 000,000 To 300,900 Pixel
+    TSAY():NEW(20,20,{||"ARQUIVO ORIGEM *.CSV:"},_ODLG,,, .F. , .F. , .F. , .T. ,,,,, .F. , .F. , .F. , .F. , .F. , .F. )
+    _OARQORI := TGET():NEW(17,80,{ | U |IIF(PCOUNT()==0,_CARQORI,_CARQORI := U)},_ODLG,300,10,,,,,, .F. ,, .T. ,, .F. ,{|| .F. }, .F. , .F. ,, .F. , .F. ,,"_CARQORI",,,)
 
-    @020,020 Say  'Arquivo Origem *.CSV:' Of _oDlg Pixel
-    @017,080 Get _oArqOri Var _cArqOri Size 300,010 Of _oDlg Pixel WHEN .F.
+    TBUTTON():NEW(17,400,"SELEC. ARQUIVO",_ODLG,{||MD05ARQORI()},40,15,,, .F. , .T. , .F. ,, .F. ,,, .F. )
 
-    @017,400 BUTTON "Selec. Arquivo"    SIZE 040, 015 PIXEL OF _oDlg ACTION ( MD05ArqOri() )
+    TSAY():NEW(40,20,{||"ARQUIVO LOG:"},_ODLG,,, .F. , .F. , .F. , .T. ,,,,, .F. , .F. , .F. , .F. , .F. , .F. )
+    _OARQLOG := TGET():NEW(37,80,{ | U |IIF(PCOUNT()==0,_CARQLOG,_CARQLOG := U)},_ODLG,300,10,,,,,, .F. ,, .T. ,, .F. ,{|| .F. }, .F. , .F. ,, .F. , .F. ,,"_CARQLOG",,,)
 
-    @040,020 Say  'Arquivo Log:' Of _oDlg Pixel
-    @037,080 Get _oArqLog Var _cArqLog Size 300,010 Of _oDlg Pixel WHEN .F.
+    TBUTTON():NEW(37,400,"SELEC. ARQUIVO",_ODLG,{||MD05ARQLOG()},40,15,,, .F. , .T. , .F. ,, .F. ,,, .F. )
 
-    @037,400 BUTTON "Selec. Arquivo"    SIZE 040, 015 PIXEL OF _oDlg ACTION ( MD05ArqLog() )
+    TBUTTON():NEW(120,170,"CONFIRMAR",_ODLG,{||MD05OK()},40,12,,, .F. , .T. , .F. ,, .F. ,,, .F. )
+    TBUTTON():NEW(120,220,"CANCELAR",_ODLG,{||_ODLG:END()},40,12,,, .F. , .T. , .F. ,, .F. ,,, .F. )
 
-    @120,170 BUTTON "Confirmar"     SIZE 040, 012 PIXEL OF _oDlg ACTION ( MD05Ok() )
-    @120,220 BUTTON "Cancelar"      SIZE 040, 012 PIXEL OF _oDlg ACTION (_oDlg:End())
+    _ODLG:ACTIVATE(_ODLG:BLCLICKED,_ODLG:BMOVED,_ODLG:BPAINTED, .T. ,,,,_ODLG:BRCLICKED,)
 
-    Activate MsDialog _oDlg Centered
+    _CARQORI := ""
+    _CARQLOG := ""
+ELSE 
+    MSGSTOP("PRAZO DE USO DA ROTINA EXPIROU !","ATENÇÃO!")
+ENDIF
 
-    _cArqOri        := ''
-    _cArqLog        := ''
-Else
-	MsgStop("Prazo de uso da rotina expirou !","Atenção!")
-Endif
+RETURN 
 
-Return
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05ARQORI()
+_CARQORI := CGETFILE("CSV | *.CSV","SELECIONE ARQUIVO DE TITULOS",,"", .T. ,0+48+8)
+RETURN 
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05ArqOri()
-    _cArqOri    := cGetFile("CSV | *.csv","Selecione arquivo de Titulos",,"",.T.,GETF_NETWORKDRIVE+GETF_LOCALHARD+GETF_LOCALFLOPPY )
-Return
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05ARQLOG()
+LOCAL _CARQ := CGETFILE("*.TXT","INFORME DIRETORIO PARA ARQUIVO DE LOG",0,"", .F. ,NOR(48,8,128), .F. , .T. )
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05ArqLog()
-    Local _cArq     :=  cGetFile('*.TXT'    ,'Informe diretorio para arquivo de log'    ,0,'',.F.           ,nOR( GETF_LOCALHARD, GETF_LOCALFLOPPY, GETF_RETDIRECTORY ),.F., .T. )
+_CARQLOG := _CARQ+DTOS(DATE())+"_"+STRTRAN(TIME(),":","")+".TXT"
+RETURN 
 
-    _cArqLog := _cArq + DToS(Date()) + '_' + (StrTran(Time(),':','')) + '.TXT'
-Return
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05OK()
+LOCAL _LVALID :=  .T. 
+LOCAL _AITENS := {}
+LOCAL _AFIELD := {}
+LOCAL _NTOTAL := 0
+LOCAL _NITEM := 0
+LOCAL _NREG := 0
+LOCAL _CLOG := "INICIO "+DTOC(DATE())+" "+TIME() + CRLF + CRLF
+LOCAL _CMSG := ""
+LOCAL _NERR := 0
+LOCAL _NINC := 0
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05Ok()
-    Local _lValid   := .T.
-    Local _aItens   := {}
-    Local _aField   := {}
-    Local _nTotal   := 0
-    Local _nItem    := 0
-    Local _nReg     := 0
-    Local _cLog     := 'Inicio ' + DToC(Date()) + ' ' + Time() + CRLF + CRLF
-    Local _cMsg     := ''
-    Local _nErr     := 0
-    Local _nInc     := 0
+_LVALID := MD05VLDARQ(@_AFIELD,@_AITENS,@_NTOTAL)
 
-    _lValid := MD05VldArq(@_aField,@_aItens,@_nTotal)
+IF _LVALID
 
-    If _lValid
+    FOR _NITEM := 1 TO  LEN(_AITENS)
+        FWMSGRUN(,{||MD05EXEC(_AFIELD,_AITENS[_NITEM],@_CLOG,@_NERR,@_NINC)},,I18N("ALTERANDO TÍTULO #1 DE #2 ...",{++_NREG,_NTOTAL}))
+    NEXT
 
+    _CMSG := MD05LOG(_CARQLOG,_CMSG,@_CLOG,_NERR,_NINC)
 
-        // Percorre itens do array
-        For _nItem := 1 To Len(_aItens)
-            FWMsgRun(, {||MD05Exec(_aField,_aItens[_nItem],@_cLog,@_nErr,@_nInc) },,I18N('Alterando título #1 de #2 ...',{++_nReg,_nTotal}))
-        Next
+    AVISO("ATENÇÃO",I18N(_CMSG,{_NTOTAL,_CARQLOG}),{"OK"},3)
 
-        _cMsg := MD05Log(_cArqLog,_cMsg,@_cLog,_nErr,_nInc)
+    _CARQORI := ""
+    _CARQLOG := ""
+ENDIF
+RETURN 
 
-        Aviso('Atenção',I18N( _cMsg,{_nTotal,_cArqLog}),{'OK'},3)
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05LOG(_CARQLOG,_CMSG,_CLOG,_NERR,_NINC)
+LOCAL _NHANDLE := 0
 
-        _cArqOri        := ''
-        _cArqLog        := ''
-    EndIf
-Return
+_NHANDLE := FCREATE(_CARQLOG)
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05Log(_cArqLog,_cMsg,_cLog,_nErr,_nInc)
-    Local _nHandle      := 0
+_CLOG := CHR(13)+CHR(10) + CRLF+I18N("TÍTULO ALTERADO: #1",{_NINC}) + CRLF+I18N("TÍTULOS NÃO ALTERADOS (ERRO): #1",{_NERR}) + CRLF + CRLF+_CLOG
+_CLOG += CHR(13)+CHR(10) + CRLF+"FIM "+DTOC(DATE())+" "+TIME() + CRLF + CRLF
 
-    _nHandle    := FCREATE(_cArqLog)
+IF _NHANDLE=- (1)
+    _CMSG += " ERRO AO CRIAR ARQUIVO - FERROR "+STR(FERROR())
+ELSE 
+    _CMSG += " VERIFIQUE ARQUIVO DE LOG GERADO: " + CRLF + CRLF+"#2 " + CRLF
+    FWRITE(_NHANDLE,_CLOG)
+    FCLOSE(_NHANDLE)
+ENDIF
+RETURN _CMSG
 
-    _cLog := CRLF + CRLF + I18N('Título alterado: #1',{_nInc})  +  CRLF + I18N('Títulos não alterados (erro): #1',{_nErr}) + CRLF + CRLF + _cLog
-    _cLog += CRLF + CRLF + 'Fim ' + DToC(Date()) + ' ' + Time() + CRLF + CRLF
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05EXEC(_AFIELD,_AITEM,_CLOG,_NERR,_NINC)
+LOCAL _CCOD := ""
+LOCAL _CMSGLOG := ""
+LOCAL APROD := {}
+LOCAL ACOMP := {}
+PRIVATE NPOS := 0
 
-    If _nHandle = -1
-        _cMsg   += " Erro ao criar arquivo - ferror " + Str(Ferror())
-    Else
-        _cMsg += ' Verifique arquivo de log gerado: ' + CRLF + CRLF + '#2 ' + CRLF
-        FWrite(_nHandle, _cLog)
-        FClose(_nHandle)
-    EndIf
-Return _cMsg
+DBSELECTAREA("SE1")
+DBSETORDER(1)
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05Exec(_aField,_aItem,_cLog,_nErr,_nInc)
-    Local _cCod         := ''
-    Local _cMsgLog      := ''
-    Local aProd         := {}
-    Local aComp         := {}
-    Private nPos          := 0
+APROD := M05DPROD(_AFIELD,_AITEM)
+ACOMP := M05DCOMP(_AFIELD,_AITEM)
 
-	dbSelectArea("SE1")
-	dbSetOrder(1)
+IF _AITEM[1]=="1"
+    _AITEM[1] := "1  "
+ENDIF
 
-    aProd   := M05DProd(_aField,_aItem)
-    aComp   := M05DComp(_aField,_aItem)
+IF  LEN(_AITEM[2])==6
+    _AITEM[2] := _AITEM[2]+"   "
+ENDIF
 
-	If _aItem[1] == '1'
-		_aItem[1] := '1  '
-	Endif
-	
-	If Len(_aItem[2]) == 6
-		_aItem[2] := _aItem[2]+Space(3)
-	Endif
-	
-	If MsSeek(xFilial("SE1")+_aItem[1]+_aItem[2]+_aItem[3])
-		If SE1->E1_TIPO $ 'NF |BOL'
-			RecLock('SE1',.F.)
-			SE1->E1_VEND1 	:= _aItem[9]
-			SE1->E1_COMIS1	:= Val(_aItem[4])
-			SE1->E1_VEND2 	:= _aItem[10]
-			SE1->E1_COMIS2	:= Val(_aItem[5])
-			SE1->E1_VEND3 	:= _aItem[11]
-			SE1->E1_COMIS3	:= Val(_aItem[6])
-			SE1->E1_VEND4 	:= _aItem[12]
-			SE1->E1_COMIS4	:= Val(_aItem[7])
-			SE1->E1_VEND5 	:= _aItem[13]
-			SE1->E1_COMIS5	:= Val(_aItem[8])			
-			If _aItem[3] <> "0"
-				SE1->E1_PEDIDO := _aItem[14]
-			Endif
-			MsUnlock()
-			_cCod 		:= SE1->E1_NUM
-			_cMsgLog	:= 	"Alterado com Sucesso."
-		Endif
-	Else
-		_cCod 		:= _aItem[2]
-		_cMsgLog	:= 	"Não encontrado"
-	Endif
-	
-	MD05PutSB1(aProd,aComp,@_cMsgLog,@_nErr,@_nInc)
-	
-    MD05GetLog(_cCod,_cMsgLog,@_cLog)
-
-Return
-
-//+-------------------------------------------------------------------------------------------------
-// verifica se o campo existe no top
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05VldFld(aField)
-    Local aAreaSX3  := SX3->(GetArea())
-    Local lRet      := .T.
-    Local Nx        := 0
-    Local aAuxaField    := AClone(aField)
-
-    aField          := {}
-
-    DbSelectArea('SX3')
-
-
-    For Nx := 1 to Len(aAuxaField)
-        SX3->(DbSetOrder(2))
-        SX3->(DbgoTop())
-
-        cCampo  := PadR(AllTrim(aAuxaField[Nx]),10)
-
-        If SX3->(DBSeek( cCampo ))
-            AAdd(aField,{cCampo,SX3->X3_TIPO })
-        Else
-            lErro   := .T.
-            Exit
-        EndIf
-    Next
-
-
-    If !lRet
-        MsgInfo(I18N('Campo #1 informado no arquivo origem não existe na base de dados.' + CRLF + 'Verifique',{AllTrim(cCampo)}), 'Atenção')
-    EndIf
-
-    RestArea(aAreaSX3)
-Return lRet
-
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05GetLog(_cCod,_cMsgLog,_cLog)
-    _cLog += CRLF
-    _cLog += ' | Título: '      + _cCod   + ' |'
-    _cLog += ' | STATUS: '      + AllTrim(_cMsgLog) + ' |'
-Return
-
-//+-------------------------------------------------------------------------------------------------
-Static Function M05DProd(aField,aItem)
-    Local aRet      := {}
-    Local nX        := 0
-
-    For nX := 1 To Len(aField)
-
-        If SubStr(aField[nX][1],1,2) == 'B5'
-            Do Case
-            Case aField[nX][2] == 'N'
-                AAdd(aRet ,{aField[nX][1]   ,Val(aItem[nX])                     ,Nil})
-            Case aField[nX][2] == 'C'
-                AAdd(aRet ,{aField[nX][1]   ,aItem[nX]                          ,Nil})
-            Case aField[nX][2] == 'L'
-                AAdd(aRet ,{aField[nX][1]   ,IFF(aItem[nX] == '.T.',.T.,.F.)     ,Nil})
-            Case aField[nX][2] == 'D'
-                AAdd(aRet ,{aField[nX][1]   ,SToD(aItem[nX])                    ,Nil})
-            EndCase
-       EndIf
-    Next
-
-    aRet := FWVetByDic(aRet,'SB5')
-Return AClone(aRet)
-
-//+-------------------------------------------------------------------------------------------------
-Static Function M05DComp(aField,aItem)
-    Local aRet      := {}
-    Local nX        := 0
-
-    For nX := 1 To Len(aField)
-
-        If SubStr(aField[nX][1],1,2) == 'B5'
-            Do Case
-            Case aField[nX][2] == 'N'
-                AAdd(aRet ,{aField[nX][1]   ,Val(aItem[nX])                     ,Nil})
-            Case aField[nX][2] == 'C'
-                AAdd(aRet ,{aField[nX][1]   ,aItem[nX]                          ,Nil})
-            Case aField[nX][2] == 'L'
-                AAdd(aRet ,{aField[nX][1]   ,IFF(aItem[nX] == '.T.',.T.,.F.)     ,Nil})
-            Case aField[nX][2] == 'D'
-                AAdd(aRet ,{aField[nX][1]   ,SToD(aItem[nX])                    ,Nil})
-            EndCase
-        EndIf
-    Next
-
-    aRet := FWVetByDic(aRet,'SB5')
-Return AClone(aRet)
-
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05PutSB1(aProd,aComp,_cMsgLog,_nErr,_nInc)
-
-        lMsErroAuto := .F.
-
-        If lMsErroAuto
-            ++_nErr
-            _cMsgLog    := MD05GetErr()
-        Else
-            _cMsgLog    := ' Alterado'
-            ++_nInc
-        EndIf
+IF MSSEEK(XFILIAL("SE1")+_AITEM[1]+_AITEM[2]+_AITEM[3])
+    
+    IF (SE1->E1_TIPO) $ ("NF |BOL")
+        RECLOCK("SE1", .F. )
+        SE1->E1_VEND1 := _AITEM[9]
+        SE1->E1_COMIS1 :=  VAL(_AITEM[4])
+        SE1->E1_VEND2 := _AITEM[10]
+        SE1->E1_COMIS2 :=  VAL(_AITEM[5])
+        SE1->E1_VEND3 := _AITEM[11]
+        SE1->E1_COMIS3 :=  VAL(_AITEM[6])
+        SE1->E1_VEND4 := _AITEM[12]
+        SE1->E1_COMIS4 :=  VAL(_AITEM[7])
+        SE1->E1_VEND5 := _AITEM[13]
+        SE1->E1_COMIS5 :=  VAL(_AITEM[8])
         
-    MsUnlockAll()
-Return
+        IF _AITEM[3]<>"0"
+            SE1->E1_PEDIDO := _AITEM[14]
+        ENDIF
+        MSUNLOCK()
+        _CCOD := SE1->E1_NUM
+        _CMSGLOG := "ALTERADO COM SUCESSO."
+    ENDIF
+ELSE 
+    _CCOD := _AITEM[2]
+  _CMSGLOG := "NÃO ENCONTRADO"
+ENDIF
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05GetErr()
-    Local _cRet         := ''
-    Local _cFileError   := NomeAutoLog()
-    Local _cMemo            := MemoRead( _cFileError )
-    Local _nY               := 0
-    Local _cAux         := ''
-    Local _lTitulo      := .T.
+MD05PUTSB1(APROD,ACOMP,@_CMSGLOG,@_NERR,@_NINC)
 
-    For _nY := 1 To MLCount(_cMemo)
-        _cAux := AllTrim(MemoLine(_cMemo,,_nY))
+MD05GETLOG(_CCOD,_CMSGLOG,@_CLOG)
 
-        If Len(_cAux) > 0 .And. _lTitulo
-            _cRet += _cAux + " "
-        Else
-            If At("< --", _cAux) > 0
-                _cRet += " | " + _cAux
-            EndIf
-            _lTitulo    := .F.
-        EndIf
-    Next _nY
+RETURN 
 
-    Ferase(_cFileError)
-Return _cRet
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05VLDFLD(AFIELD)
+LOCAL AAREASX3 := SX3->(GETAREA())
+LOCAL LRET :=  .T. 
+LOCAL NX := 0
+LOCAL AAUXAFIELD := ACLONE(AFIELD)
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05VldArq(_aField,_aItens,_nTotal)
-    Local _lRet := .T.
+AFIELD := {}
 
-    If !(_lRet := !(Empty(_cArqOri) .Or. Empty (_cArqLog)))
-        MsgInfo('Arquivo Origem e Arquivo de Log são obrigatórios.' + CRLF + 'Verifique.', 'Atenção!')
-    EndIf
+DBSELECTAREA("SX3")
 
-    If _lRet
-        MD05ArqInf(@_aField,@_aItens,@_nTotal) // carrega dados do arquivo no array
-    EndIf
+FOR NX := 1 TO  LEN(AAUXAFIELD)
+    SX3->(DBSETORDER(2))
+    SX3->(DBGOTOP())
 
-    If _lRet
-        _lRet  := MD05VldFld(@_aField)
-    EndIf
+    CCAMPO := PADR( ALLTRIM(AAUXAFIELD[NX]),10)
 
-Return _lRet
+   IF!Empty(FWSX3Util():GetFieldType(CCAMPO))
+        AADD(AFIELD,{CCAMPO,getsx3cache(CCAMPO,"X3_TIPO")})
+    ELSE 
+        LERRO :=  .T. 
+        EXIT 
+    ENDIF
+NEXT
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD05ArqInf(_aField,_aItens,_nTotal)
-    Local _aLinha   := {}
-    Local _cLinha   := ''
-    Local _nArq     := FOpen(_cArqOri, 0)
-    Local lField    := .T.
+IF !(LRET)
+    IIF(FINDFUNCTION("MSGINFO"),MSGINFO(I18N("CAMPO #1 INFORMADO NO ARQUIVO ORIGEM NÃO EXISTE NA BASE DE DADOS." + CRLF+"VERIFIQUE",{ ALLTRIM(CCAMPO)}),"ATENÇÃO"),MSGINFO(I18N("CAMPO #1 INFORMADO NO ARQUIVO ORIGEM NÃO EXISTE NA BASE DE DADOS." + CRLF+"VERIFIQUE",{ ALLTRIM(CCAMPO)}),"ATENÇÃO"))
+ENDIF
 
-    FT_FUSE(_cArqOri)
-    FT_FGOTOP()
+RESTAREA(AAREASX3)
+RETURN LRET
 
-    While !FT_FEOF()
-        _cLinha     := FT_FREADLN()
-        _aLinha     := {}
-        _aLinha     := Separa(_cLinha,";",.T.)
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05GETLOG(_CCOD,_CMSGLOG,_CLOG)
+_CLOG += CHR(13)+CHR(10)
+_CLOG += " | TÍTULO: "+_CCOD+" |"
+_CLOG += " | STATUS: "+ ALLTRIM(_CMSGLOG)+" |"
+RETURN 
 
-        If Len(_aLinha) > 0
-            If lField
-                lField := .F.
-                _aField := AClone(_aLinha)
-            Else
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION M05DPROD(AFIELD,AITEM)
+LOCAL ARET := {}
+LOCAL NX := 0
 
-                AAdd(_aItens,_aLinha)
-            EndIf
-        EndIf
+FOR NX := 1 TO  LEN(AFIELD)
 
-        FT_FSKIP()
-    EndDo
+    IF  SUBSTR(AFIELD[NX][1],1,2)=="B5"
 
-    _nTotal := Len(_aItens)
+        DO CASE 
+        CASE AFIELD[NX][2]=="N"
+        AADD(ARET,{AFIELD[NX][1], VAL(AITEM[NX]),NIL})
+        
+        CASE AFIELD[NX][2]=="C"
+        AADD(ARET,{AFIELD[NX][1],AITEM[NX],NIL})
+        
+        CASE AFIELD[NX][2]=="L"
+        AADD(ARET,{AFIELD[NX][1],IFF(AITEM[NX]==".T.", .T. , .F. ),NIL})
+        
+        CASE AFIELD[NX][2]=="D"
+        AADD(ARET,{AFIELD[NX][1],STOD(AITEM[NX]),NIL})
+        ENDCASE
+    ENDIF
+NEXT
 
-    FT_FUse()
-    FClose(_nArq)
-Return
+ARET := FWVETBYDIC(ARET,"SB5")
+RETURN ACLONE(ARET)
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION M05DCOMP(AFIELD,AITEM)
+LOCAL ARET := {}
+LOCAL NX := 0
+
+FOR NX := 1 TO  LEN(AFIELD)
+    
+    IF  SUBSTR(AFIELD[NX][1],1,2)=="B5"
+        
+        DO CASE 
+        CASE AFIELD[NX][2]=="N"
+AADD(ARET,{AFIELD[NX][1], VAL(AITEM[NX]),NIL})
+        
+        CASE AFIELD[NX][2]=="C"
+        AADD(ARET,{AFIELD[NX][1],AITEM[NX],NIL})
+        
+        CASE AFIELD[NX][2]=="L"
+        AADD(ARET,{AFIELD[NX][1],IFF(AITEM[NX]==".T.", .T. , .F. ),NIL})
+        
+        CASE AFIELD[NX][2]=="D"
+        AADD(ARET,{AFIELD[NX][1],STOD(AITEM[NX]),NIL})
+        ENDCASE
+    ENDIF
+NEXT
+
+ARET := FWVETBYDIC(ARET,"SB5")
+RETURN ACLONE(ARET)
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05PUTSB1(APROD,ACOMP,_CMSGLOG,_NERR,_NINC)
+
+LMSERROAUTO :=  .F. 
+
+IF LMSERROAUTO
+    ++_NERR
+    _CMSGLOG := MD05GETERR()
+ELSE 
+    _CMSGLOG := " ALTERADO"
+    ++_NINC
+ENDIF
+
+MSUNLOCKALL()
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05GETERR()
+LOCAL _CRET := ""
+LOCAL _CFILEERROR := NOMEAUTOLOG()
+LOCAL _CMEMO := MEMOREAD(_CFILEERROR)
+LOCAL _NY := 0
+LOCAL _CAUX := ""
+LOCAL _LTITULO :=  .T. 
+
+FOR _NY := 1 TO MLCOUNT(_CMEMO)
+    _CAUX :=  ALLTRIM(MEMOLINE(_CMEMO,,_NY))
+
+    IF  LEN(_CAUX)>0 .AND. _LTITULO
+        _CRET += _CAUX+" "
+    ELSE 
+        
+        IF AT("< --",_CAUX)>0
+            _CRET += " | "+_CAUX
+        ENDIF
+        _LTITULO :=  .F. 
+    ENDIF
+NEXT
+
+FERASE(_CFILEERROR)
+RETURN _CRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05VLDARQ(_AFIELD,_AITENS,_NTOTAL)
+LOCAL _LRET :=  .T. 
+
+IF !(_LRET := !((EMPTY(_CARQORI)) .OR. (EMPTY(_CARQLOG))))
+    IIF(FINDFUNCTION("MSGINFO"),MSGINFO("ARQUIVO ORIGEM E ARQUIVO DE LOG SÃO OBRIGATÓRIOS." + CRLF+"VERIFIQUE.","ATENÇÃO!"),MSGINFO("ARQUIVO ORIGEM E ARQUIVO DE LOG SÃO OBRIGATÓRIOS." + CRLF+"VERIFIQUE.","ATENÇÃO!"))
+ENDIF
+
+IF _LRET
+    MD05ARQINF(@_AFIELD,@_AITENS,@_NTOTAL)
+ENDIF
+
+IF _LRET
+    _LRET := MD05VLDFLD(@_AFIELD)
+ENDIF
+
+RETURN _LRET
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD05ARQINF(_AFIELD,_AITENS,_NTOTAL)
+LOCAL _ALINHA := {}
+LOCAL _CLINHA := ""
+LOCAL _NARQ := FOPEN(_CARQORI,0)
+LOCAL LFIELD :=  .T. 
+
+FT_FUSE(_CARQORI)
+FT_FGOTOP()
+
+WHILE !(FT_FEOF())
+ 
+    _CLINHA := FT_FREADLN()
+    _ALINHA := {}
+    _ALINHA := SEPARA(_CLINHA,";", .T. )
+    
+    IF  LEN(_ALINHA)>0
+        
+        IF LFIELD
+            LFIELD :=  .F. 
+            _AFIELD := ACLONE(_ALINHA)
+        ELSE 
+            
+            AADD(_AITENS,_ALINHA)
+        ENDIF
+    ENDIF
+    
+    FT_FSKIP()
+    ENDDO
+
+_NTOTAL :=  LEN(_AITENS)
+
+FT_FUSE()
+FCLOSE(_NARQ)
+RETURN 
