@@ -1,427 +1,317 @@
-#INCLUDE "MATR225.CH"
-#INCLUDE "PROTHEUS.CH"
-#Include "TopConn.ch"
-#Include 'RptDef.ch'
-#Include 'FWPrintSetup.ch
+#INCLUDE "protheus.ch"
+STATIC LPCPREVATU := FINDFUNCTION("PCPREVATU") .AND. SUPERGETMV("MV_REVFIL", .F. , .F. )
 
-STATIC lPCPREVATU	:= FindFunction('PCPREVATU')  .AND.  SuperGetMv("MV_REVFIL",.F.,.F.)
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Fun‡…o    ³ MATR225  ³ Autor ³ Marcos V. Ferreira    ³ Data ³ 08/09/92 ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri‡…o ³ Relacao simplificada das estruturas                        ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Uso      ³ Generico                                                   ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Uso      ³ MATR225			                                          ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-*/
-User Function M10R18()
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M10R18()
 
-Local oReport
+LOCAL OREPORT
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³Interface de impressao                                                  ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-oReport:= u_RportDef()
-oReport:PrintDialog()
+OREPORT := U_RPORTDEF()
+OREPORT:PRINTDIALOG()
 
-Return
+RETURN 
 
-/*/
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Programa  ³ReportDef ³ Autor ³ Marcos V. Ferreira    ³ Data ³16.05.2006³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri‡…o ³A funcao estatica ReportDef devera ser criada para todos os ³±±
-±±³          ³relatorios que poderao ser agendados pelo usuario.          ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Parametros³Nenhum                                                      ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Uso      ³ MATR225			                                          ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-/*/
-User Function RportDef()
-Local oReport
-Local oSection1
-Local oSection2
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION RPORTDEF()
+LOCAL OREPORT
+LOCAL OSECTION1
+LOCAL OSECTION2
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³Criacao do componente de impressao                                      ³
-//³                                                                        ³
-//³TReport():New                                                           ³
-//³ExpC1 : Nome do relatorio                                               ³
-//³ExpC2 : Titulo                                                          ³
-//³ExpC3 : Pergunte                                                        ³
-//³ExpB4 : Bloco de codigo que sera executado na confirmacao da impressao  ³
-//³ExpC5 : Descricao                                                       ³
-//³                                                                        ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-oReport:= TReport():New("M10R18",OemToAnsi(STR0001),"M10R18", {|oReport| U_RportPrint(oReport)},OemToAnsi(STR0002)+" "+OemToAnsi(STR0003)+" "+OemToAnsi(STR0004))  //"Este programa emite a relacao de estrutura de um determinado produto"##"selecionado pelo usuario. Esta relacao nao demonstra custos. Caso o"##"produto use opcionais, sera listada a estrutura com os opcionais padrao."
-oReport:SetLandscape()
+OREPORT := TREPORT():NEW("M10R18",OEMTOANSI(IIF((CPAISLOC) $ ("ANG|PTG"),"RELAÇÃO SIMPLIFICADA DAS ESTRUTURAS","RELACAO SIMPLIFICADA DAS ESTRUTURAS")),"M10R18",{|OREPORT|U_RPORTPRINT(OREPORT)},OEMTOANSI(IIF((CPAISLOC) $ ("ANG|PTG"),"ESTE PROGRAMA EMITE A RELAÇÃO DE ESTRUTURA DE UM DETERMINADO ARTIGO","ESTE PROGRAMA EMITE A RELAÇÄO DE ESTRUTURA DE UM DETERMINADO PRODUTO"))+" "+OEMTOANSI(IIF((CPAISLOC) $ ("ANG|PTG"),"SELECCIONADO PELO UTILIZADOR. ESTA RELAÇÃO NÄO DEMONSTRA CUSTOS. CASO O","SELECIONADO PELO USUÁRIO. ESTA RELAÇÄO NÄO DEMONSTRA CUSTOS. CASO O"))+" "+OEMTOANSI(IIF((CPAISLOC) $ ("ANG|PTG"),"PRODUTO USE OPCIONAIS, SERÁ LISTADA A ESTRUTURA COM OS OPCIONAIS PADRÃO.","PRODUTO USE OPCIONAIS, SERÁ LISTADA A ESTRUTURA COM OS OPCIONAIS PADRÄO.")))
+OREPORT:SETLANDSCAPE()
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Verifica as perguntas selecionadas                           ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Variaveis utilizadas para parametros ³
-//³ mv_par01   // Produto de             ³
-//³ mv_par02   // Produto ate            ³
-//³ mv_par03   // Tipo de                ³
-//³ mv_par04   // Tipo ate               ³
-//³ mv_par05   // Grupo de               ³
-//³ mv_par06   // Grupo ate              ³
-//³ mv_par07   // Salta Pagina: Sim/Nao  ³
-//³ mv_par08   // Qual Rev da Estrut     ³
-//³ mv_par09   // Imprime Ate Nivel ?    ³
-//³ mv_par10   // Data de referência?    ³
-//  mv_par11   // Considera Bloqueados   ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-Pergunte(oReport:uParam,.F.)
+PERGUNTE(OREPORT:UPARAM, .F. )
 
-//Verifica se o MV_PAR10 existe no pergunte MTR225 -> Protecao de fonte.
-//U_AjstPergt()
+OSECTION1 := TRSECTION():NEW(OREPORT,IIF((CPAISLOC) $ ("ANG|PTG"),"DETALHES DO ARTIGO PAI","DETALHES DO PRODUTO PAI"),{"SG1","SB1"})
+OSECTION1:SETLINESTYLE()
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³Criacao da secao utilizada pelo relatorio                               ³
-//³                                                                        ³
-//³TRSection():New                                                         ³
-//³ExpO1 : Objeto TReport que a secao pertence                             ³
-//³ExpC2 : Descricao da seçao                                              ³
-//³ExpA3 : Array com as tabelas utilizadas pela secao. A primeira tabela   ³
-//³        sera considerada como principal para a secao.                   ³
-//³ExpA4 : Array com as Ordens do relatorio                                ³
-//³ExpL5 : Carrega campos do SX3 como celulas                              ³
-//³        Default : False                                                 ³
-//³ExpL6 : Carrega ordens do Sindex                                        ³
-//³        Default : False                                                 ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+NB1_COD := TAMSX3("B1_COD")[1]+1
+NB1_DESC := TAMSX3("B1_DESC")[1]+1
+NB1_TIPO := TAMSX3("B1_TIPO")[1]+1
+NB1_GRUPO := TAMSX3("B1_GRUPO")[1]+1
+NB1_UM := TAMSX3("B1_UM")[1]+1
+NB1_QB := TAMSX3("B1_QB")[1]+1
+NB1_OPC := TAMSX3("B1_OPC")[1]+1
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Sessao 1                                                     ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-oSection1 := TRSection():New(oReport,STR0036,{"SG1","SB1"}) //"Detalhes do produto Pai"
-oSection1:SetLineStyle()
+TRCELL():NEW(OSECTION1,"G1_COD","SG1",,,NB1_COD,,)
+TRCELL():NEW(OSECTION1,"B1_DESC","SB1",,,NB1_DESC,,)
+TRCELL():NEW(OSECTION1,"B1_TIPO","SB1",,,NB1_TIPO,,)
+TRCELL():NEW(OSECTION1,"B1_GRUPO","SB1",,,NB1_GRUPO,,)
+TRCELL():NEW(OSECTION1,"B1_UM","SB1",,,NB1_UM,,)
+TRCELL():NEW(OSECTION1,"B1_QB","SB1",,,NB1_QB,,{||IIF(RETFLDPROD(SB1->B1_COD,"B1_QB")==0,1,RETFLDPROD(SB1->B1_COD,"B1_QB"))})
+TRCELL():NEW(OSECTION1,"B1_OPC","SB1",,,NB1_OPC,,{||RETFLDPROD(SB1->B1_COD,"B1_OPC")})
 
-nB1_cod   := tamSX3('B1_COD')[1] + 1
-nB1_desc  := tamSX3('B1_DESC')[1] + 1
-nB1_tipo  := tamSX3('B1_TIPO')[1] + 1
-nB1_grupo := tamSX3('B1_GRUPO')[1] + 1
-nB1_um    := tamSX3('B1_UM')[1] + 1
-nB1_qb    := tamSX3('B1_QB')[1] + 1
-nB1_opc   := tamSX3('B1_OPC')[1] + 1
+OSECTION1:SETNOFILTER("SB1")
 
-TRCell():New(oSection1,'G1_COD'	    ,'SG1',/*Titulo*/,/*Picture*/,nB1_cod,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection1,'B1_DESC'   	,'SB1',/*Titulo*/,/*Picture*/,nB1_desc,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection1,'B1_TIPO'   	,'SB1',/*Titulo*/,/*Picture*/,nB1_tipo,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection1,'B1_GRUPO'  	,'SB1',/*Titulo*/,/*Picture*/,nB1_grupo,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection1,'B1_UM'	    ,'SB1',/*Titulo*/,/*Picture*/,nB1_um,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection1,'B1_QB'		,'SB1',/*Titulo*/,/*Picture*/,nB1_qb,/*lPixel*/, {|| IIf(RetFldProd(SB1->B1_COD,"B1_QB")==0,1,RetFldProd(SB1->B1_COD,"B1_QB"))})
-TRCell():New(oSection1,'B1_OPC'		,'SB1',/*Titulo*/,/*Picture*/,nB1_opc,/*lPixel*/, {|| RetFldProd(SB1->B1_COD,"B1_OPC")})
+OSECTION2 := TRSECTION():NEW(OSECTION1,"ESTRUTURAS",{"SG1","SB1"})
 
-oSection1:SetNoFilter("SB1")
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Sessao 2                                                     ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-oSection2 := TRSection():New(oSection1,STR0037,{'SG1','SB1'}) // "Estruturas"
+TRCELL():NEW(OSECTION2,"NIVEL","   ",IIF((CPAISLOC) $ ("ANG|PTG"),"NÍVEL","NIVEL"),,10,,)
+TRCELL():NEW(OSECTION2,"G1_COMP","SG1",IIF((CPAISLOC) $ ("ANG|PTG"),"CÓDIGO","CODIGO"),,NB1_COD,,)
+TRCELL():NEW(OSECTION2,"G1_TRT","SG1",IIF((CPAISLOC) $ ("ANG|PTG"),"TRT","TRT"),,,,)
+TRCELL():NEW(OSECTION2,"B1_TIPO","SB1",IIF((CPAISLOC) $ ("ANG|PTG"),"TP.","TP"),,,,)
+TRCELL():NEW(OSECTION2,"B1_GRUPO","SB1",IIF((CPAISLOC) $ ("ANG|PTG"),"GRUP","GRUP"),,,,)
+IF NB1_DESC>30
+    TRCELL():NEW(OSECTION2,"B1_DESC","SB1",IIF((CPAISLOC) $ ("ANG|PTG"),"DESCRIÇÃO","DESCRIÇÃO"),,30,,)
+ELSE 
+    TRCELL():NEW(OSECTION2,"B1_DESC","SB1",IIF((CPAISLOC) $ ("ANG|PTG"),"DESCRIÇÃO","DESCRIÇÃO"),,NB1_DESC,,)
+ENDIF
 
-TRCell():New(oSection2,'NIVEL'		,'   ',STR0019	,/*Picture*/					,10			,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection2,'G1_COMP'	,'SG1',STR0020	,/*Picture*/					,nB1_cod,/*lPixel*/,/*{|| code-block de impressao }*/) //B1_COD deve ter o mesmo tamanho que G1_COMP, por isso usei a variável que já tinha a informação na memória, sem realizar a busca novamente na tabela 
-TRCell():New(oSection2,'G1_TRT'		,'SG1',STR0021	,/*Picture*/					,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection2,'B1_TIPO'	,'SB1',STR0022	,/*Picture*/					,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection2,'B1_GRUPO'	,'SB1',STR0023	,/*Picture*/					,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/)
-If nB1_desc > 30
-	TRCell():New(oSection2,'B1_DESC'	,'SB1',STR0024	,/*Picture*/					,30,/*lPixel*/,/*{|| code-block de impressao }*/)
-Else
-	TRCell():New(oSection2,'B1_DESC'	,'SB1',STR0024	,/*Picture*/					,nB1_desc,/*lPixel*/,/*{|| code-block de impressao }*/)
-EndIf
+TRCELL():NEW(OSECTION2,"G1_OBSERV","SG1",IIF((CPAISLOC) $ ("ANG|PTG"),"OBSERVAÇÃO","OBSERVAÇÃO"),,45,,)
+TRCELL():NEW(OSECTION2,"QUANTITEM","   ",IIF((CPAISLOC) $ ("ANG|PTG"),"QTDE.NECESSÁRIA","QTDE.NECESSARIA"),PESQPICT("SG1","G1_QUANT",14),14,,)
+TRCELL():NEW(OSECTION2,"B1_UM","SB1",IIF((CPAISLOC) $ ("ANG|PTG"),"UM","UM"),,,,)
+TRCELL():NEW(OSECTION2,"G1_PERDA","SG1",IIF((CPAISLOC) $ ("ANG|PTG"),"PERDA %","PERDA %"),,,,)
+TRCELL():NEW(OSECTION2,"G1_QUANT","SG1",IIF((CPAISLOC) $ ("ANG|PTG"),"QUANTIDADE","QUANTIDADE"),,,,)
+TRCELL():NEW(OSECTION2,"B1_QB","SB1",IIF((CPAISLOC) $ ("ANG|PTG"),"QTD. BASE","QTD. BASE"),,,,{||IIF(RETFLDPROD(SB1->B1_COD,"B1_QB")==0,1,RETFLDPROD(SB1->B1_COD,"B1_QB"))})
+TRCELL():NEW(OSECTION2,"G1_FIXVAR","SG1",IIF((CPAISLOC) $ ("ANG|PTG"),"TIPO DE QUANTIDADE","TIPO QUANTIDADE"),,,,)
+TRCELL():NEW(OSECTION2,"G1_INI","SG1",IIF((CPAISLOC) $ ("ANG|PTG"),"INI. DA VALIDADE","INI.VALID"),,,,)
+TRCELL():NEW(OSECTION2,"G1_FIM","SG1",IIF((CPAISLOC) $ ("ANG|PTG"),"FIM DA VALIDADE","FIM VALID"),,,,)
+TRCELL():NEW(OSECTION2,"G1_GROPC","SG1",IIF((CPAISLOC) $ ("ANG|PTG"),"GRP. OPC.","GRP. OPC."),,,,)
+TRCELL():NEW(OSECTION2,"G1_OPC","SG1",IIF((CPAISLOC) $ ("ANG|PTG"),"ELEMENTO OPC.","ITEM OPC."),,,,)
 
-TRCell():New(oSection2,'G1_OBSERV'	,'SG1',STR0025	,/*Picture*/					,45,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection2,'QUANTITEM'	,'   ',STR0026	,PesqPict('SG1','G1_QUANT',14)	,14	   		,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection2,'B1_UM'		,'SB1',STR0027	,/*Picture*/					,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection2,'G1_PERDA'	,'SG1',STR0028	,/*Picture*/					,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection2,'G1_QUANT'	,'SG1',STR0029	,/*Picture*/					,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection2,'B1_QB'		,'SB1',STR0030	,/*Picture*/					,/*Tamanho*/,/*lPixel*/,{||If(RetFldProd(SB1->B1_COD,"B1_QB")==0,1,RetFldProd(SB1->B1_COD,"B1_QB"))})
-TRCell():New(oSection2,'G1_FIXVAR'	,'SG1',STR0031	,/*Picture*/					,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection2,'G1_INI'		,'SG1',STR0032	,/*Picture*/					,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection2,'G1_FIM'		,'SG1',STR0033	,/*Picture*/					,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection2,'G1_GROPC'	,'SG1',STR0034	,/*Picture*/					,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection2,'G1_OPC'		,'SG1',STR0035	,/*Picture*/					,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/)
+OSECTION2:SETHEADERPAGE()
+OSECTION2:SETNOFILTER("SB1")
 
-oSection2:SetHeaderPage()
-oSection2:SetNoFilter("SB1")
+RETURN OREPORT
 
-Return(oReport)
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION RPORTPRINT(OREPORT)
 
-/*/
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Programa  ³RportPrint ³ Autor ³Marcos V. Ferreira   ³ Data ³16.05.2006³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri‡…o ³A funcao estatica RportPrint devera ser criada para todos  ³±±
-±±³          ³os relatorios que poderao ser agendados pelo usuario.       ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Retorno   ³Nenhum                                                      ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Parametros³ExpO1: Objeto Report do Relatorio                           ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Uso      ³ MATR225			                                          ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-/*/
-User Function RportPrint(oReport)
+LOCAL OSECTION1 := OREPORT:SECTION(1)
+LOCAL OSECTION2 := OREPORT:SECTION(1):SECTION(1)
+LOCAL CPRODUTO := ""
+LOCAL NNIVEL := 0
+LOCAL LCONTINUA :=  .T. 
+LOCAL LDATREF := !(EMPTY(MV_PAR10))
+PRIVATE LNEGESTR := GETMV("MV_NEGESTR")
+PRIVATE CNEGATIVO :=  ALLTRIM(STR(MV_PAR11))
+PRIVATE CSEQZG1
+PRIVATE CPRODPAI
 
-Local oSection1 := oReport:Section(1)
-Local oSection2 := oReport:Section(1):Section(1)
-Local cProduto 	:= ""
-Local nNivel   	:= 0
-Local lContinua := .T.
-Local lDatRef   := !Empty(mv_par10)
-Private lNegEstr:=GETMV("MV_NEGESTR")
-Private cNegativo:=ALLTRIM(STR(MV_PAR11))
-Private cSeqZG1 
-Private cProdPai
+DBSELECTAREA("ZG1")
 
-dbSelectArea("ZG1")
+MV_PAR10 := DATE()
 
-mv_par10 := ddatabase  // Date()  // Colocar em parametro no Schedule depois
+IF MV_PAR13==1
+    CQUERY := "DELETE FROM "+RETSQLNAME("ZG1")
+    CQUERY += " WHERE ZG1_FILIAL = '"+XFILIAL("ZG1")+"' "
+    CQUERY += " AND ZG1_DTINCL = '"+DTOS(DATE())+"' "
+    TCSQLEXEC(CQUERY)
+ENDIF
 
-// Deleta Registros Tabela ZG1
-If mv_par13 == 1 // Gera ZG1 - Apagar no Inicio o Produto em Questao ou pelo Parametro
-	cQuery := "DELETE FROM "+RetSqlName("ZG1")
-	cQuery += " WHERE ZG1_FILIAL = '"+xFilial("ZG1")+"' "
-	cQuery += " AND ZG1_DTINCL = '"+Dtos(mv_par10)+"' "
-	TcSqlExec(cQuery)
-EndIf 
+CQUERY := " SELECT SG1.R_E_C_N_O_ REGSG1, SG1.G1_COD, SG1.G1_COMP, SG1.G1_TRT"
+CQUERY += " FROM "+RETSQLNAME("SG1")+" SG1 ,"+RETSQLNAME("SB1")+" SB1 "
+CQUERY += " WHERE SG1.G1_FILIAL = '"+XFILIAL("SG1")+"' "
+CQUERY += " AND SG1.G1_COD BETWEEN '"+MV_PAR01+"' AND '"+MV_PAR02+"'"
+CQUERY += " AND SG1.D_E_L_E_T_ = '' "
+CQUERY += " AND SB1.B1_FILIAL = '"+XFILIAL("SB1")+"' "
+CQUERY += " AND SB1.B1_COD = SG1.G1_COD "
+CQUERY += " AND SB1.B1_TIPO  BETWEEN '"+MV_PAR03+"' AND '"+MV_PAR04+"'"
+CQUERY += " AND SB1.B1_GRUPO BETWEEN '"+MV_PAR05+"' AND '"+MV_PAR06+"'"
 
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³	Processando a Sessao 1                                       ³
-//³	Processando a Sessao 1                                       ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-//dbSelectArea('SG1')
-//dbSetOrder(1)
-//MsSeek(xFilial('SG1')+mv_par01,.T.)
+IF !(EMPTY(MV_PAR12))
+    CQUERY += " AND SB1.B1_TIPO IN "+FORMATIN(MV_PAR12,"/")
+ENDIF
 
-cQuery := " SELECT SG1.R_E_C_N_O_ REGSG1, SG1.G1_COD, SG1.G1_COMP, SG1.G1_TRT"
-cQuery += " FROM "+RetSqlName("SG1")+" SG1 ,"+ RetSqlName("SB1")+" SB1 "
-cQuery += " WHERE SG1.G1_FILIAL = '"+xFilial("SG1")+"' "
-cQuery += " AND SG1.G1_COD BETWEEN '"+mv_par01+"' AND '"+mv_par02+"'"
-cQuery += " AND SG1.D_E_L_E_T_ <> '*' "
-cQuery += " AND SB1.B1_FILIAL = '"+xFilial("SB1")+"' "
-cQuery += " AND SB1.B1_COD = SG1.G1_COD "
-cQuery += " AND SB1.B1_TIPO  BETWEEN '"+mv_par03+"' AND '"+mv_par04+"'"
-cQuery += " AND SB1.B1_GRUPO BETWEEN '"+mv_par05+"' AND '"+mv_par06+"'"
+IF MV_PAR11==2
+    CQUERY += " AND SB1.B1_MSBLQL <> '1' "
+ENDIF
 
-If !Empty(mv_par12)
-	cQuery += " AND SB1.B1_TIPO IN " + FormatIn(mv_par12, "/")
-EndIf
+IF MV_PAR14<>4
 
-If mv_par11 == 2  // Imprime Bloqueados se for Sim - 1 (não faz nada e carrega todos os produtos)
-	cQuery += " AND SB1.B1_MSBLQL <> '1' " // *** Produtos diferentes de bloqueados - Branco ou "2"
-EndIf
+    IF MV_PAR14==1
+        CDATAINI := DTOS(DDATABASE-90)
+    ELSEIF MV_PAR14==2
+        CDATAINI := DTOS(DDATABASE-180)
+    ELSEIF MV_PAR14==3
+        CDATAINI := DTOS(DDATABASE-365)
+    ENDIF
 
-cQuery += " AND SB1.D_E_L_E_T_ <> '*' "
-cQuery += " ORDER BY SG1.G1_COD, SG1.G1_COMP, SG1.G1_TRT ASC "
+    CQUERY += " AND (SELECT COUNT(*) FROM "+RETSQLNAME("SC6")+" SC6 "
+    CQUERY += " WHERE SC6.C6_FILIAL <> 'XX' "
+    CQUERY += " AND SC6.C6_PRODUTO = G1_COD "
+    CQUERY += " AND SC6.C6_QTDVEN > SC6.C6_QTDENT "
+    CQUERY += " AND C6_BLQ <> 'R' "
+    CQUERY += " AND SC6.D_E_L_E_T_ = '' ) > 0 "
 
-cQuery := ChangeQuery(cQuery)
-TCQUERY cQuery NEW ALIAS "SG1TRB"
+    CQUERY += " OR (SELECT COUNT(*) FROM "+RETSQLNAME("SC6")+" SC6, "+RETSQLNAME("SC5")+" SC5 "
+    CQUERY += " WHERE SC6.C6_FILIAL <> 'XX' "
+    CQUERY += " AND SC6.C6_PRODUTO = G1_COD "
+    CQUERY += " AND SC6.D_E_L_E_T_ = '' "
+    CQUERY += " AND SC5.C5_FILIAL = SC6.C6_FILIAL  "
+    CQUERY += " AND SC5.C5_NUM = SC6.C6_NUM "
+    CQUERY += " AND SC5.C5_EMISSAO >= '"+CDATAINI+"'"
+    CQUERY += " AND SC5.D_E_L_E_T_ = '' ) > 0 "
 
+    CQUERY += " OR (SELECT COUNT(*) FROM "+RETSQLNAME("SC2")+" SC2  "
+    CQUERY += " WHERE SC2.C2_FILIAL = '"+XFILIAL("SC2")+"' "
+    CQUERY += " AND SC2.C2_PRODUTO = G1_COD "
+    CQUERY += " AND (SC2.C2_EMISSAO >= '"+CDATAINI+"' OR SC2.C2_DATRF = ' ' )"
+    CQUERY += " AND SC2.D_E_L_E_T_ = '' ) > 0 "
+ENDIF
 
-//ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
-//º Montagem do Array para Retorno                                           º
-//ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍSilvio CazelaÍ¼
-dbSelectArea("SG1TRB")
+CQUERY += " AND SB1.D_E_L_E_T_ = '' "
+CQUERY += " ORDER BY SG1.G1_COD, SG1.G1_COMP, SG1.G1_TRT ASC "
 
-oReport:SetMeter(SG1TRB->(LastRec()))
-oSection1:Init(.F.)
+CQUERY := CHANGEQUERY(CQUERY)
+DBUSEAREA( .T. ,"TOPCONN",TCGENQRY(,,CQUERY),"SG1TRB", .F. , .T. )
 
-While !oReport:Cancel() .And. SG1TRB->(!Eof())  //.And. SG1->G1_FILIAL+SG1->G1_COD <= xFilial('SG1')+mv_par02
+DBSELECTAREA("SG1TRB")
 
-	oReport:IncMeter()
+OREPORT:SETMETER((SG1TRB)->(LASTREC()))
+OSECTION1:INIT( .F. )
 
-	// ***
-	dbSelectArea("SG1")
-	dbGoto(SG1TRB->REGSG1)
+WHILE !(OREPORT:CANCEL) .AND. !(SG1TRB)->(EOF())
+ 
+    OREPORT:INCMETER()
 
-	If lDatRef .And. (G1_INI > mv_par10 .Or. G1_FIM < mv_par10)
-	    dbSelectArea("SG1TRB")
-		SG1TRB->(dbSkip())
-		Loop
-	EndIf
+    DBSELECTAREA("SG1")
+    DBGOTO(SG1TRB->REGSG1)
 
-	cProduto  := SG1->G1_COD
-	cProdPai  := SG1->G1_COD
-	nNivel    := 2
-    lContinua := .T.
-	cSeqZG1 := "001"
+    IF LDATREF .AND. ((G1_INI>MV_PAR10) .OR. (G1_FIM<MV_PAR10))
+        DBSELECTAREA("SG1TRB")
+        (SG1TRB)->(DBSKIP())
+        LOOP 
+    ENDIF
 
-	dbSelectArea('SB1')
-	MsSeek(xFilial('SB1')+cProduto)
-	If Eof() .Or. SB1->B1_TIPO < mv_par03 .Or. SB1->B1_TIPO > mv_par04 .Or. SB1->B1_GRUPO < mv_par05 .Or. SB1->B1_GRUPO > mv_par06
-		dbSelectArea('SG1')
-		While !oReport:Cancel() .And. !Eof() .And. xFilial('SG1')+cProduto == SG1TRB->G1_FILIAL+SG1TRB->G1_COD
-			dbSkip()
-			oReport:IncMeter()
-		EndDo
-		lContinua := .F.
-	EndIf
+    CPRODUTO := SG1->G1_COD
+    CPRODPAI := SG1->G1_COD
+    NNIVEL := 2
+    LCONTINUA :=  .T. 
+    CSEQZG1 := "001"
 
-	If lContinua	
-		
-		oSection1:Init(.F.)
-		oReport:SkipLine()     
+    DBSELECTAREA("SB1")
+    MSSEEK(XFILIAL("SB1")+CPRODUTO)
+    
+    IF (EOF()) .OR. ((SB1->B1_TIPO<MV_PAR03) .OR. ((SB1->B1_TIPO>MV_PAR04) .OR. ((SB1->B1_GRUPO<MV_PAR05) .OR. (SB1->B1_GRUPO>MV_PAR06))))
+        DBSELECTAREA("SG1")
+        WHILE !(OREPORT:CANCEL()) .AND. !(EOF()) .AND. XFILIAL("SG1")+CPRODUTO==SG1TRB->G1_FILIAL+SG1TRB->G1_COD
+        
+            DBSKIP()
+            OREPORT:INCMETER()
+            ENDDO
 
-		//--  Imprime grupo de opcionais.
-		If !Empty(RetFldProd(SB1->B1_COD,"B1_OPC"))
-			oSection1:Cell('B1_OPC'):Show()
-		Else
-			oSection1:Cell('B1_OPC'):Hide()
-		EndIf                
+        LCONTINUA :=  .F. 
+    ENDIF
 
-		oSection1:PrintLine()
-		oReport:SkipLine()     
-		oSection1:Finish()
+    IF LCONTINUA
 
-		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-		//³	Impressao da Sessao 2                                        ³
-		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-		oSection2:Init()
-		
-		//-- Explode Estrutura
-		U_MTR225ExplG(oReport,oSection2,cProduto,IIf(RetFldProd(SB1->B1_COD,"B1_QB")==0,1,RetFldProd(SB1->B1_COD,"B1_QB")),nNivel,RetFldProd(SB1->B1_COD,"B1_OPC"),IIf(RetFldProd(SB1->B1_COD,"B1_QB")==0,1,RetFldProd(SB1->B1_COD,"B1_QB"))	,IIf(Empty(mv_par08),IIF(lPCPREVATU , PCPREVATU(SB1->B1_COD), SB1->B1_REVATU ),mv_par08))
+     OSECTION1:INIT( .F. )
+        OREPORT:SKIPLINE()
 
-		oSection2:Finish()
-		
-		//-- Verifica se salta ou nao pagina
-		If mv_par07 == 1
-			oSection1:SetPageBreak(.T.)
-		Else    
-			oReport:ThinLine() //-- Impressao de Linha Simples
-	 	EndIf	 
-	
-	EndIf
-	
-	// Pula todos os SG1 com o mesmo Codigo Pai
-	dbSelectArea("SG1TRB")
-	While SG1TRB->G1_COD == cProduto
-		dbSkip()
-	EndDo
-EndDo
+        IF !(EMPTY(RETFLDPROD(SB1->B1_COD,"B1_OPC")))
+            OSECTION1:CELL("B1_OPC"):SHOW()
+        ELSE 
+            OSECTION1:CELL("B1_OPC"):HIDE()
+        ENDIF
 
-dbSelectArea("SG1TRB")
-dbClosearea()
+        OSECTION1:PRINTLINE()
+        OREPORT:SKIPLINE()
+        OSECTION1:FINISH()
 
-//-- Devolve a condicao original do arquivo principal
-dbSelectArea("SG1")
-Set Filter To
-dbSetOrder(1)
+        OSECTION2:INIT()
 
-Return
+        U_MTR225EXPLG(OREPORT,OSECTION2,CPRODUTO,IIF(RETFLDPROD(SB1->B1_COD,"B1_QB")==0,1,RETFLDPROD(SB1->B1_COD,"B1_QB")),NNIVEL,RETFLDPROD(SB1->B1_COD,"B1_OPC"),IIF(RETFLDPROD(SB1->B1_COD,"B1_QB")==0,1,RETFLDPROD(SB1->B1_COD,"B1_QB")),IIF(EMPTY(MV_PAR08),IIF(LPCPREVATU,PCPREVATU(SB1->B1_COD),SB1->B1_REVATU),MV_PAR08))
 
-/*
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³ Fun‡…o   ³MTR225ExplG³ Autor ³ Marcos V. Ferreira    ³ Data ³ 17/05/06 ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Descri‡…o³ Faz a explosao de uma estrutura                            ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Sintaxe  ³ MR225Expl(ExpO1,ExpO2,ExpC3,ExpN4,ExpN5,ExpC6,ExpN7,ExpC8) ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Parametros³ ExpO1 = Objeto do Relatorio                                ³±±
-±±³          ³ ExpO2 = Sessao a ser impressa                              ³±±
-±±³          ³ ExpC3 = Codigo do produto a ser explodido                  ³±±
-±±³          ³ ExpN4 = Quantidade do pai a ser explodida                  ³±±
-±±³          ³ ExpN5 = Nivel a ser impresso                               ³±±
-±±³          ³ ExpC6 = Opcionais do produto                               ³±±
-±±³          ³ ExpN7 = Quantidade do Produto Nivel Anterior               ³±±
-±±³          ³ ExpC8 = Numero da Revisao                                  ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³ Uso      ³ Generico                                                   ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-*/
-User Function MTR225ExplG(oReport,oSection2,cProduto,nQuantPai,nNivel,cOpcionais,nQtdBase,cRevisao)
+        OSECTION2:FINISH()
 
-Local nReg 		  := 0
-Local nQuantItem  := 0
-Local nPrintNivel := 0
-Local cAteNiv     := If(mv_par09=Space(3),"999",mv_par09)
-Local cRevEst	  := ''
-Local lDatRef     := !Empty(mv_par10)
-Local lVlOpc      := .T.
+        IF MV_PAR07==1
+            OSECTION1:SETPAGEBREAK( .T. )
+        ELSE 
+            OREPORT:THINLINE()
+        ENDIF
+    ENDIF
 
-dbSelectArea('SG1')
-While !oReport:Cancel() .And. !Eof() .And. SG1->G1_FILIAL+SG1->G1_COD == xFilial('SG1')+cProduto
-	oSection2:IncMeter()
-	nReg       := Recno()
-	
-	//Se não existir nenhum grupo/opcional default, deverá listar todos os opcionais
-	If Empty(cOpcionais) .Or. cOpcionais == Nil
-		lVlOpc := .F.
-	EndIf
-		
-	nQuantItem := ExplEstr(nQuantPai,Iif(lDatRef,mv_par10,Nil),cOpcionais,cRevisao,,,,,,,,,lVlOpc)
-	dbSelectArea('SG1')
-	If nNivel <= Val(cAteNiv) // Verifica ate qual Nivel devera ser impresso
-		If (lNegEstr .Or. (!lNegEstr .And. QtdComp(nQuantItem,.T.) > QtdComp(0) )) .And. (QtdComp(nQuantItem,.T.) # QtdComp(0,.T.))
-		
-			dbSelectArea('SB1')
-			dbSetOrder(1)
-			MsSeek(xFilial('SB1')+SG1->G1_COMP)
+    DBSELECTAREA("SG1TRB")
+    WHILE SG1TRB->G1_COD==CPRODUTO
+    
+        DBSKIP()
+        ENDDO
+        ENDDO
 
-			//If SB1->B1_TIPO $ 'PA|PI|MI|BN|EM|MP|MC'
+DBSELECTAREA("SG1TRB")
+DBCLOSEAREA()
 
-				//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-				//³ Impressao da Sessao 2			                ³
-				//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-				nPrintNivel:=IIf(nNivel>17,17,nNivel-2)
-				oSection2:Cell('NIVEL'		):SetValue(Space(nPrintNivel)+StrZero(nNivel,3))
-				oSection2:Cell('QUANTITEM'	):SetValue(nQuantItem)
-				oSection2:PrintLine()
-			
-				//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-				//³ Verifica se existe sub-estrutura                ³
-				//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-				dbSelectArea('SG1')
-				MsSeek(xFilial('SG1')+SG1->G1_COMP)
-				cRevEst := IIF(lPCPREVATU , PCPREVATU(SB1->B1_COD), SB1->B1_REVATU )
-				If Found()
-					u_MTR225ExplG(oReport,oSection2,SG1->G1_COD,nQuantItem,nNivel+1,SB1->B1_OPC,IIf(RetFldProd(SB1->B1_COD,"B1_QB")==0,1,RetFldProd(SB1->B1_COD,"B1_QB")),If(!Empty(cRevEst),cRevEst,mv_par08))
-				EndIf
-				dbGoto(nReg)
+DBSELECTAREA("SG1")
+DBCLEARFILTER()
+DBSETORDER(1)
 
-				If mv_par13 == 1 // Gera ZG1 - Apagar no Inicio o Produto em Questao ou pelo Parametro
-					RecLock("ZG1",.T.)
-					ZG1->ZG1_FILIAL := xFilial("ZG1")
-					ZG1->ZG1_COD    := cProdPai  //SG1->G1_COD
-					ZG1->ZG1_SEQ    := cSeqZG1
-					ZG1->ZG1_COMP   := SG1->G1_COMP
-					ZG1->ZG1_NIVEL  := StrZero(nNivel,3)
-					ZG1->ZG1_QUANT  := nQuantItem
-					ZG1->ZG1_QTBASE := IIf(RetFldProd(SB1->B1_COD,"B1_QB")==0,1,RetFldProd(SB1->B1_COD,"B1_QB"))
-					ZG1->ZG1_PERDA  := SG1->G1_PERDA
-					ZG1->ZG1_FIXVAR := SG1->G1_FIXVAR
-					ZG1->ZG1_DTINCL := dDataBase
-					MsUnLock()
-				EndIf
-				dbSelectArea('SG1')
+RETURN 
 
-				cSeqZG1 := Soma1(cSeqZG1)  // Incrementa Sequencia
-			//Else
-			//	dbSkip()
-			//EndIf
-		EndIf
-	EndIf
-	dbSkip()
-EndDo
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION MTR225EXPLG(OREPORT,OSECTION2,CPRODUTO,NQUANTPAI,NNIVEL,COPCIONAIS,NQTDBASE,CREVISAO)
 
-Return
+LOCAL NREG := 0
+LOCAL NQUANTITEM := 0
+LOCAL NPRINTNIVEL := 0
+LOCAL CATENIV := IIF(MV_PAR09="   ","999",MV_PAR09)
+LOCAL CREVEST := ""
+LOCAL LDATREF := !(EMPTY(MV_PAR10))
+LOCAL LVLOPC :=  .T. 
+
+DBSELECTAREA("SG1")
+WHILE !(OREPORT:CANCEL()) .AND. !(EOF()) .AND. SG1->G1_FILIAL+SG1->G1_COD==XFILIAL("SG1")+CPRODUTO
+ 
+    OSECTION2:INCMETER()
+    NREG := RECNO()
+    
+    IF (EMPTY(COPCIONAIS)) .OR. (COPCIONAIS==NIL)
+        LVLOPC :=  .F. 
+    ENDIF
+    
+    NQUANTITEM := EXPLESTR(NQUANTPAI,IIF(LDATREF,MV_PAR10,NIL),COPCIONAIS,CREVISAO,,,,,,,,,LVLOPC)
+    DBSELECTAREA("SG1")
+    
+    IF NNIVEL<= VAL(CATENIV)
+        
+        IF ((LNEGESTR) .OR. (!(LNEGESTR) .AND. QTDCOMP(NQUANTITEM, .T. )>QTDCOMP(0))) .AND. QTDCOMP(NQUANTITEM, .T. )<>QTDCOMP(0, .T. )
+            
+            DBSELECTAREA("SB1")
+            DBSETORDER(1)
+            MSSEEK(XFILIAL("SB1")+SG1->G1_COMP)
+            
+            NPRINTNIVEL := IIF(NNIVEL>17,17,NNIVEL-2)
+            OSECTION2:CELL("NIVEL"):SETVALUE(SPACE(NPRINTNIVEL)+ STRZERO(NNIVEL,3))
+            OSECTION2:CELL("QUANTITEM"):SETVALUE(NQUANTITEM)
+            OSECTION2:PRINTLINE()
+            
+            DBSELECTAREA("SG1")
+            MSSEEK(XFILIAL("SG1")+SG1->G1_COMP)
+            CREVEST := IIF(LPCPREVATU,PCPREVATU(SB1->B1_COD),SB1->B1_REVATU)
+            
+            IF FOUND()
+                U_MTR225EXPLG(OREPORT,OSECTION2,SG1->G1_COD,NQUANTITEM,NNIVEL+1,SB1->B1_OPC,IIF(RETFLDPROD(SB1->B1_COD,"B1_QB")==0,1,RETFLDPROD(SB1->B1_COD,"B1_QB")),IIF(!(EMPTY(CREVEST)),CREVEST,MV_PAR08))
+            ENDIF
+            DBGOTO(NREG)
+            
+            IF MV_PAR13==1
+                RECLOCK("ZG1", .T. )
+                ZG1->ZG1_FILIAL := XFILIAL("ZG1")
+                ZG1->ZG1_COD := CPRODPAI
+                ZG1->ZG1_SEQ := CSEQZG1
+                ZG1->ZG1_COMP := SG1->G1_COMP
+                ZG1->ZG1_NIVEL :=  STRZERO(NNIVEL,3)
+                ZG1->ZG1_QUANT := NQUANTITEM
+                ZG1->ZG1_QTBASE := IIF(RETFLDPROD(SB1->B1_COD,"B1_QB")==0,1,RETFLDPROD(SB1->B1_COD,"B1_QB"))
+                ZG1->ZG1_PERDA := SG1->G1_PERDA
+                ZG1->ZG1_FIXVAR := SG1->G1_FIXVAR
+                ZG1->ZG1_DTINCL := DATE()
+                MSUNLOCK()
+            ENDIF
+            DBSELECTAREA("SG1")
+            
+            CSEQZG1 := SOMA1(CSEQZG1)
+        ENDIF
+    ENDIF
+    
+    DBSKIP()
+    ENDDO
+
+RETURN 
