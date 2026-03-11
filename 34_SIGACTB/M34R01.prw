@@ -1,538 +1,782 @@
-#Include 'Protheus.ch'
+#INCLUDE "protheus.ch"
 
-//+------------------------------------------------------------------------
-//  Relatï¿½rio de Comparativo contï¿½bil
-//+------------------------------------------------------------------------
-User Function M34R01()
-//    Local _oReport      := Nil
-Local _cPerg        := 'M34R01'
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M34R01()
 
-MR34PutSX1(_cPerg)
-
-If Pergunte(_cPerg, .T.)
-        _oReport := MR34RepDef(_oReport, _cPerg)
-        _oReport:PrintDialog()
-EndIf
+LOCAL _CPERG := "M34R01"
+//MR34PUTSX1(_CPERG)
  
-   // U_M34R03()
-Return
-
-//+------------------------------------------------------------------------
-Static Function MR34RepDef(_oReport, _cPerg)
-    Local _cTitle       := 'Relatï¿½rio Mensal de Conta Contï¿½bil'
-    Local _cHelp        := 'Permite gerar relatï¿½rio mensal das contas contï¿½beis'
-    Local _cAlias1      := GetNextAlias()
-    Local _cAlias2      := GetNextAlias()
-    Local _oCCCusto     := Nil
-    Local _oCCCustoA    := Nil
-    Local _oSCCustoA    := Nil
-
-    _oReport    := TReport():New('M34R01   ',_cTitle,_cPerg,{|_oReport| MR34Print(_oReport,_cAlias1,_cAlias2)},_cHelp)
-    _oReport:SetMeter(3)
-
-    //+-------------------------------------------
-    //| Centro de Custo     - Sim
-    //| Acumulado           - Nï¿½o
-    //+-------------------------------------------
-    _oCCCusto := TRSection():New(_oReport,'Com CCusto',{_cAlias1})
-
-    TRCell():New(_oCCCusto,'TIPO'               , _cAlias1)
-    TRCell():New(_oCCCusto,'CONTA'              , _cAlias1)
-    TRCell():New(_oCCCusto,'CONTA_DESC'     , _cAlias1)
-    TRCell():New(_oCCCusto,'CCUSTO'             , _cAlias1)
-    TRCell():New(_oCCCusto,'CCUSTO_DESC'        , _cAlias1)
-    TRCell():New(_oCCCusto,'JANEIRO'            , _cAlias1)
-    TRCell():New(_oCCCusto,'FEVEREIRO'          , _cAlias1)
-    TRCell():New(_oCCCusto,'MARCO'              , _cAlias1)
-    TRCell():New(_oCCCusto,'ABRIL'              , _cAlias1)
-    TRCell():New(_oCCCusto,'MAIO'               , _cAlias1)
-    TRCell():New(_oCCCusto,'JUNHO'              , _cAlias1)
-    TRCell():New(_oCCCusto,'JULHO'              , _cAlias1)
-    TRCell():New(_oCCCusto,'AGOSTO'             , _cAlias1)
-    TRCell():New(_oCCCusto,'SETEMBRO'           , _cAlias1)
-    TRCell():New(_oCCCusto,'OUTUBRO'            , _cAlias1)
-    TRCell():New(_oCCCusto,'NOVEMBRO'           , _cAlias1)
-    TRCell():New(_oCCCusto,'DEZEMBRO'           , _cAlias1)
-
-    _oCCCusto:oReport:cFontBody                 := 'Calibri'
-    _oCCCusto:oReport:nFontBody                 := 11
-
-    //+-------------------------------------------
-    //| Centro de Custo     - Sim
-    //| Acumulado           - Sim
-    //+-------------------------------------------
-    _oCCCustoA := TRSection():New(_oReport,'Com CCusto Acum',{_cAlias1})
-
-    TRCell():New(_oCCCustoA,'TIPO'              , _cAlias1)
-    TRCell():New(_oCCCustoA,'CONTA'             , _cAlias1)
-    TRCell():New(_oCCCustoA,'CONTA_DESC'        , _cAlias1)
-    TRCell():New(_oCCCustoA,'CCUSTO'            , _cAlias1)
-    TRCell():New(_oCCCustoA,'CCUSTO_DESC'       , _cAlias1)
-    TRCell():New(_oCCCustoA,'JANEIRO'           , _cAlias1)
-    TRCell():New(_oCCCustoA,'FEVEREIRO'         , _cAlias1)
-    TRCell():New(_oCCCustoA,'MARCO'             , _cAlias1)
-    TRCell():New(_oCCCustoA,'ABRIL'             , _cAlias1)
-    TRCell():New(_oCCCustoA,'MAIO'              , _cAlias1)
-    TRCell():New(_oCCCustoA,'JUNHO'             , _cAlias1)
-    TRCell():New(_oCCCustoA,'JULHO'             , _cAlias1)
-    TRCell():New(_oCCCustoA,'AGOSTO'            , _cAlias1)
-    TRCell():New(_oCCCustoA,'SETEMBRO'          , _cAlias1)
-    TRCell():New(_oCCCustoA,'OUTUBRO'           , _cAlias1)
-    TRCell():New(_oCCCustoA,'NOVEMBRO'          , _cAlias1)
-    TRCell():New(_oCCCustoA,'DEZEMBRO'          , _cAlias1)
-
-    _oCCCusto:oReport:cFontBody                 := 'Calibri'
-    _oCCCusto:oReport:nFontBody                 := 11
-
-
-    //+-------------------------------------------
-    //| Centro de Custo     - Nï¿½o
-    //| Acumulado           - Nï¿½o
-    //+-------------------------------------------
-    _oSCCustoA := TRSection():New(_oReport,'Sem CCusto Acum',{_cAlias2})
-
-    TRCell():New(_oSCCustoA,'CONTA'             , _cAlias2)
-    TRCell():New(_oSCCustoA,'CONTA_DESC'        , _cAlias2)
-    TRCell():New(_oSCCustoA,'SALDO'             , _cAlias2)
-    TRCell():New(_oSCCustoA,'JANEIRO'           , _cAlias2)
-    TRCell():New(_oSCCustoA,'FEVEREIRO'         , _cAlias2)
-    TRCell():New(_oSCCustoA,'MARCO'             , _cAlias2)
-    TRCell():New(_oSCCustoA,'ABRIL'             , _cAlias2)
-    TRCell():New(_oSCCustoA,'MAIO'              , _cAlias2)
-    TRCell():New(_oSCCustoA,'JUNHO'             , _cAlias2)
-    TRCell():New(_oSCCustoA,'JULHO'             , _cAlias2)
-    TRCell():New(_oSCCustoA,'AGOSTO'            , _cAlias2)
-    TRCell():New(_oSCCustoA,'SETEMBRO'          , _cAlias2)
-    TRCell():New(_oSCCustoA,'OUTUBRO'           , _cAlias2)
-    TRCell():New(_oSCCustoA,'NOVEMBRO'          , _cAlias2)
-    TRCell():New(_oSCCustoA,'DEZEMBRO'          , _cAlias2)
-
-    _oSCCustoA:oReport:cFontBody                := 'Calibri'
-    _oSCCustoA:oReport:nFontBody                := 11
-
-Return(_oReport)
-
-//+------------------------------------------------------------------------
-Static Function MR34Print(_oReport,_cAlias1,_cAlias2)
-  
-    Local _nTotal           := 0
-    Private _oSection         := _oReport:Section(1)
-    Private _cChave           := ''
-
-    //+-------------------------------------------
-    //| Inicio da impressao
-    //+-------------------------------------------
-    MR34GetCCC(_cAlias1,@_nTotal)
-    MR34GetSCC(_cAlias2,@_nTotal)
-
-    _oReport:SetMeter(_nTotal)
-    _oReport:IncMeter()
-
-    MR34Print1(_cAlias1,_oReport)       // Centro de Custo (S) | Acumulado (N)
-    MR34Print2(_cAlias1,_oReport)       // Centro de Custo (S) | Acumulado (S)
-    MR34Print3(_cAlias2,_oReport)       // Centro de Custo (N) | Acumulado (S)
-
-    (_cAlias1)->(DbCloseArea())
-    (_cAlias2)->(DbCloseArea())
-return
-
-//+------------------------------------------------------------------------
-Static Function MR34Print1(_cAlias1,_oReport)
-    _oReport:IncMeter()
-
-    _oReport:Section(1):Init()
-    (_cAlias1)->(DbGoTop())
-
-    While !_oReport:Cancel() .And. (_cAlias1)->(!EOF())
-        _oReport:Section(1):Cell('TIPO'                     ):SetBlock( {||(_cAlias1)->TIPO })
-        _oReport:Section(1):Cell('CONTA'                    ):SetBlock( {||(_cAlias1)->CONTA })
-        _oReport:Section(1):Cell('CONTA_DESC'               ):SetBlock( {||(_cAlias1)->CONTA_DESC })
-        _oReport:Section(1):Cell('CCUSTO'                   ):SetBlock( {||(_cAlias1)->CCUSTO })
-        _oReport:Section(1):Cell('CCUSTO_DESC'              ):SetBlock( {||(_cAlias1)->CCUSTO_DESC })
-        _oReport:Section(1):Cell('JANEIRO'                  ):SetBlock( {||(_cAlias1)->JANEIRO })
-        _oReport:Section(1):Cell('FEVEREIRO'                ):SetBlock( {||(_cAlias1)->FEVEREIRO })
-        _oReport:Section(1):Cell('MARCO'                    ):SetBlock( {||(_cAlias1)->MARCO })
-        _oReport:Section(1):Cell('ABRIL'                    ):SetBlock( {||(_cAlias1)->ABRIL })
-        _oReport:Section(1):Cell('MAIO'                     ):SetBlock( {||(_cAlias1)->MAIO })
-        _oReport:Section(1):Cell('JUNHO'                    ):SetBlock( {||(_cAlias1)->JUNHO })
-        _oReport:Section(1):Cell('JULHO'                    ):SetBlock( {||(_cAlias1)->JULHO })
-        _oReport:Section(1):Cell('AGOSTO'                   ):SetBlock( {||(_cAlias1)->AGOSTO })
-        _oReport:Section(1):Cell('SETEMBRO'                 ):SetBlock( {||(_cAlias1)->SETEMBRO })
-        _oReport:Section(1):Cell('OUTUBRO'                  ):SetBlock( {||(_cAlias1)->OUTUBRO })
-        _oReport:Section(1):Cell('NOVEMBRO'                 ):SetBlock( {||(_cAlias1)->NOVEMBRO })
-        _oReport:Section(1):Cell('DEZEMBRO'                 ):SetBlock( {||(_cAlias1)->DEZEMBRO })
-
-        _oReport:Section(1):PrintLine()
-
-        (_cAlias1)->(DbSkip())
-    EndDo
-
-    _oReport:Section(1):Finish()
-Return
-
-//+------------------------------------------------------------------------
-Static Function MR34Print2(_cAlias1,_oReport)
-
-    _oReport:Section(2):Init()
-    (_cAlias1)->(DbGoTop())
-
-    While !_oReport:Cancel() .And. (_cAlias1)->(!EOF())
-        _oReport:IncMeter()
-
-        _oReport:Section(2):Cell('TIPO'              ):SetBlock( {||(_cAlias1)->TIPO })
-        _oReport:Section(2):Cell('CONTA'             ):SetBlock( {||(_cAlias1)->CONTA })
-        _oReport:Section(2):Cell('CONTA_DESC'        ):SetBlock( {||(_cAlias1)->CONTA_DESC })
-        _oReport:Section(2):Cell('CCUSTO'            ):SetBlock( {||(_cAlias1)->CCUSTO })
-        _oReport:Section(2):Cell('CCUSTO_DESC'       ):SetBlock( {||(_cAlias1)->CCUSTO_DESC })
-        _oReport:Section(2):Cell('JANEIRO'           ):SetBlock( {||(_cAlias1)->JANEIRO })
-        _oReport:Section(2):Cell('FEVEREIRO'         ):SetBlock( {||(_cAlias1)->JANEIRO + (_cAlias1)->FEVEREIRO })
-        _oReport:Section(2):Cell('MARCO'             ):SetBlock( {||(_cAlias1)->JANEIRO + (_cAlias1)->FEVEREIRO + (_cAlias1)->MARCO })
-        _oReport:Section(2):Cell('ABRIL'             ):SetBlock( {||(_cAlias1)->JANEIRO + (_cAlias1)->FEVEREIRO + (_cAlias1)->MARCO + (_cAlias1)->ABRIL })
-        _oReport:Section(2):Cell('MAIO'              ):SetBlock( {||(_cAlias1)->JANEIRO + (_cAlias1)->FEVEREIRO + (_cAlias1)->MARCO + (_cAlias1)->ABRIL + (_cAlias1)->MAIO })
-        _oReport:Section(2):Cell('JUNHO'             ):SetBlock( {||(_cAlias1)->JANEIRO + (_cAlias1)->FEVEREIRO + (_cAlias1)->MARCO + (_cAlias1)->ABRIL + (_cAlias1)->MAIO + (_cAlias1)->JUNHO })
-        _oReport:Section(2):Cell('JULHO'             ):SetBlock( {||(_cAlias1)->JANEIRO + (_cAlias1)->FEVEREIRO + (_cAlias1)->MARCO + (_cAlias1)->ABRIL + (_cAlias1)->MAIO + (_cAlias1)->JUNHO + (_cAlias1)->JULHO })
-        _oReport:Section(2):Cell('AGOSTO'            ):SetBlock( {||(_cAlias1)->JANEIRO + (_cAlias1)->FEVEREIRO + (_cAlias1)->MARCO + (_cAlias1)->ABRIL + (_cAlias1)->MAIO + (_cAlias1)->JUNHO + (_cAlias1)->JULHO + (_cAlias1)->AGOSTO })
-        _oReport:Section(2):Cell('SETEMBRO'          ):SetBlock( {||(_cAlias1)->JANEIRO + (_cAlias1)->FEVEREIRO + (_cAlias1)->MARCO + (_cAlias1)->ABRIL + (_cAlias1)->MAIO + (_cAlias1)->JUNHO + (_cAlias1)->JULHO + (_cAlias1)->AGOSTO + (_cAlias1)->SETEMBRO })
-        _oReport:Section(2):Cell('OUTUBRO'           ):SetBlock( {||(_cAlias1)->JANEIRO + (_cAlias1)->FEVEREIRO + (_cAlias1)->MARCO + (_cAlias1)->ABRIL + (_cAlias1)->MAIO + (_cAlias1)->JUNHO + (_cAlias1)->JULHO + (_cAlias1)->AGOSTO + (_cAlias1)->SETEMBRO + (_cAlias1)->OUTUBRO })
-        _oReport:Section(2):Cell('NOVEMBRO'          ):SetBlock( {||(_cAlias1)->JANEIRO + (_cAlias1)->FEVEREIRO + (_cAlias1)->MARCO + (_cAlias1)->ABRIL + (_cAlias1)->MAIO + (_cAlias1)->JUNHO + (_cAlias1)->JULHO + (_cAlias1)->AGOSTO + (_cAlias1)->SETEMBRO + (_cAlias1)->OUTUBRO + (_cAlias1)->NOVEMBRO })
-        _oReport:Section(2):Cell('DEZEMBRO'          ):SetBlock( {||(_cAlias1)->JANEIRO + (_cAlias1)->FEVEREIRO + (_cAlias1)->MARCO + (_cAlias1)->ABRIL + (_cAlias1)->MAIO + (_cAlias1)->JUNHO + (_cAlias1)->JULHO + (_cAlias1)->AGOSTO + (_cAlias1)->SETEMBRO + (_cAlias1)->OUTUBRO + (_cAlias1)->NOVEMBRO + (_cAlias1)->DEZEMBRO })
-
-        _oReport:Section(2):PrintLine()
-
-        (_cAlias1)->(DbSkip())
-    EndDo
-
-    _oReport:Section(2):Finish()
-Return
-
-//+------------------------------------------------------------------------
-Static Function MR34Print3(_cAlias2,_oReport)
-
-    _oReport:Section(3):Init()
-    (_cAlias2)->(DbGoTop())
-
-    While !_oReport:Cancel() .And. (_cAlias2)->(!EOF())
-
-        _oReport:IncMeter()
-
-        _oReport:Section(3):Cell('JANEIRO'          ):SetBlock( {||(_cAlias2)->SALDO + (_cAlias2)->MOVJAN})
-        _oReport:Section(3):Cell('FEVEREIRO'        ):SetBlock( {||(_cAlias2)->SAFEV + (_cAlias2)->MOVFEV})
-        _oReport:Section(3):Cell('MARCO'            ):SetBlock( {||(_cAlias2)->SAMAR + (_cAlias2)->MOVMAR})
-        _oReport:Section(3):Cell('ABRIL'            ):SetBlock( {||(_cAlias2)->SAABR + (_cAlias2)->MOVABR})
-        _oReport:Section(3):Cell('MAIO'             ):SetBlock( {||(_cAlias2)->SAMAI + (_cAlias2)->MOVMAI})
-        _oReport:Section(3):Cell('JUNHO'            ):SetBlock( {||(_cAlias2)->SAJUN + (_cAlias2)->MOVJUN})
-        _oReport:Section(3):Cell('JULHO'            ):SetBlock( {||(_cAlias2)->SAJUL + (_cAlias2)->MOVJUL})
-        _oReport:Section(3):Cell('AGOSTO'           ):SetBlock( {||(_cAlias2)->SAAGO + (_cAlias2)->MOVAGO})
-        _oReport:Section(3):Cell('SETEMBRO'         ):SetBlock( {||(_cAlias2)->SASET + (_cAlias2)->MOVSET})
-        _oReport:Section(3):Cell('OUTUBRO'          ):SetBlock( {||(_cAlias2)->SAOUT + (_cAlias2)->MOVOUT})
-        _oReport:Section(3):Cell('NOVEMBRO'         ):SetBlock( {||(_cAlias2)->SANOV + (_cAlias2)->MOVNOV})
-        _oReport:Section(3):Cell('DEZEMBRO'         ):SetBlock( {||(_cAlias2)->SADEZ + (_cAlias2)->MOVDEZ})
-
-        _oReport:Section(3):PrintLine()
-
-        (_cAlias2)->(DbSkip())
-    EndDo
-
-    _oReport:Section(3):Finish()
-Return
-
-//+------------------------------------------------------------------------
-Static Function MR34GetCCC(_cAlias1,_nTotal)
-    Local _cJanIni      := AllTrim(MV_PAR01)+'0101'
-    Local _cJanFin      := AllTrim(MV_PAR01)+'0131'
-
-    Local _cFevIni      := AllTrim(MV_PAR01)+'0201'
-    Local _cFevFin      := AllTrim(MV_PAR01)+'0229'
-
-    Local _cMarIni      := AllTrim(MV_PAR01)+'0301'
-    Local _cMarFin      := AllTrim(MV_PAR01)+'0331'
-
-    Local _cAbrIni      := AllTrim(MV_PAR01)+'0401'
-    Local _cAbrFin      := AllTrim(MV_PAR01)+'0430'
-
-    Local _cMaiIni      := AllTrim(MV_PAR01)+'0501'
-    Local _cMaiFin      := AllTrim(MV_PAR01)+'0531'
-
-    Local _cJunIni      := AllTrim(MV_PAR01)+'0601'
-    Local _cJunFin      := AllTrim(MV_PAR01)+'0630'
-
-    Local _cJulIni      := AllTrim(MV_PAR01)+'0701'
-    Local _cJulFin      := AllTrim(MV_PAR01)+'0731'
-
-    Local _cAgoIni      := AllTrim(MV_PAR01)+'0801'
-    Local _cAgoFin      := AllTrim(MV_PAR01)+'0831'
-
-    Local _cSetIni      := AllTrim(MV_PAR01)+'0901'
-    Local _cSetFin      := AllTrim(MV_PAR01)+'0930'
-
-    Local _cOutIni      := AllTrim(MV_PAR01)+'1001'
-    Local _cOutFin      := AllTrim(MV_PAR01)+'1031'
-
-    Local _cNovIni      := AllTrim(MV_PAR01)+'1101'
-    Local _cNovFin      := AllTrim(MV_PAR01)+'1130'
-
-    Local _cDezIni      := AllTrim(MV_PAR01)+'1201'
-    Local _cDezFin      := AllTrim(MV_PAR01)+'1231'
-
-    BeginSQL Alias _cAlias1
-        SELECT  DISTINCT  X.TIPO            AS TIPO
-                    ,X.CT3_CONTA                AS CONTA
-                    ,Y.CT1_DESC01               AS CONTA_DESC
-                    ,X.CT3_CUSTO                AS CCUSTO
-                    ,Z.CTT_DESC01               AS CCUSTO_DESC
-                    ,JAN.SALDO              AS JANEIRO
-                    ,FEV.SALDO              AS FEVEREIRO
-                    ,MAR.SALDO              AS MARCO
-                    ,ABR.SALDO              AS ABRIL
-                    ,MAI.SALDO              AS MAIO
-                    ,JUN.SALDO              AS JUNHO
-                    ,JUL.SALDO              AS JULHO
-                    ,AGO.SALDO              AS AGOSTO
-                    ,SETE.SALDO                 AS SETEMBRO
-                    ,OUT.SALDO              AS OUTUBRO
-                    ,NOV.SALDO              AS NOVEMBRO
-                    ,DEZ.SALDO              AS DEZEMBRO
-            FROM        (SELECT DISTINCT    CT3_CUSTO   ,CT3_CONTA  ,SUBSTRING(CT3_CUSTO,1,1) TIPO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                        ) X
-            LEFT JOIN (SELECT CT1_CONTA,CT1_DESC01
-                            FROM %Table:CT1% WHERE  %NotDel%
-                        ) Y ON X.CT3_CONTA = Y.CT1_CONTA
-            LEFT JOIN (SELECT CTT_CUSTO,CTT_DESC01
-                            FROM %Table:CTT% WHERE  %NotDel%
-                        ) Z ON X.CT3_CUSTO = Z.CTT_CUSTO
-            LEFT JOIN  (SELECT CT3_CUSTO,CT3_CONTA,SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_DATA BETWEEN %Exp:_cJanIni% AND %Exp:_cJanFin% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                            GROUP BY CT3_CUSTO, CT3_CONTA
-                        ) JAN ON X.CT3_CONTA = JAN.CT3_CONTA AND X.CT3_CUSTO = JAN.CT3_CUSTO
-            LEFT JOIN  (SELECT CT3_CUSTO,CT3_CONTA,SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_DATA BETWEEN %Exp:_cFevIni% AND %Exp:_cFevFin% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                            GROUP BY CT3_CUSTO, CT3_CONTA
-                        ) FEV ON X.CT3_CONTA = FEV.CT3_CONTA AND X.CT3_CUSTO = FEV.CT3_CUSTO
-            LEFT JOIN  (SELECT CT3_CUSTO,CT3_CONTA,SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_DATA BETWEEN %Exp:_cMarIni% AND %Exp:_cMarFin% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                            GROUP BY CT3_CUSTO, CT3_CONTA
-                        ) MAR ON X.CT3_CONTA = MAR.CT3_CONTA AND X.CT3_CUSTO = MAR.CT3_CUSTO
-            LEFT JOIN  (SELECT CT3_CUSTO,CT3_CONTA,SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_DATA BETWEEN %Exp:_cAbrIni% AND %Exp:_cAbrFin% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                            GROUP BY CT3_CUSTO, CT3_CONTA
-                        ) ABR ON X.CT3_CONTA = ABR.CT3_CONTA AND X.CT3_CUSTO = ABR.CT3_CUSTO
-            LEFT JOIN  (SELECT CT3_CUSTO,CT3_CONTA,SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_DATA BETWEEN %Exp:_cMaiIni% AND %Exp:_cMaiFin% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                            GROUP BY CT3_CUSTO, CT3_CONTA
-                        ) MAI ON X.CT3_CONTA = MAI.CT3_CONTA AND X.CT3_CUSTO = MAI.CT3_CUSTO
-            LEFT JOIN  (SELECT CT3_CUSTO,CT3_CONTA,SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_DATA BETWEEN %Exp:_cJunIni% AND %Exp:_cJunFin% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                            GROUP BY CT3_CUSTO, CT3_CONTA
-                        ) JUN ON X.CT3_CONTA = JUN.CT3_CONTA AND X.CT3_CUSTO = JUN.CT3_CUSTO
-            LEFT JOIN  (SELECT CT3_CUSTO,CT3_CONTA,SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_DATA BETWEEN %Exp:_cJulIni% AND %Exp:_cJulFin% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                            GROUP BY CT3_CUSTO, CT3_CONTA
-                        ) JUL ON X.CT3_CONTA = JUL.CT3_CONTA AND X.CT3_CUSTO = JUL.CT3_CUSTO
-            LEFT JOIN  (SELECT CT3_CUSTO,CT3_CONTA,SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_DATA BETWEEN %Exp:_cAgoIni% AND %Exp:_cAgoFin% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                            GROUP BY CT3_CUSTO, CT3_CONTA
-                        ) AGO ON X.CT3_CONTA = AGO.CT3_CONTA AND X.CT3_CUSTO = AGO.CT3_CUSTO
-            LEFT JOIN  (SELECT CT3_CUSTO,CT3_CONTA,SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_DATA BETWEEN %Exp:_cSetIni% AND %Exp:_cSetFin% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                            GROUP BY CT3_CUSTO, CT3_CONTA
-                        ) SETE ON X.CT3_CONTA = SETE.CT3_CONTA AND X.CT3_CUSTO = SETE.CT3_CUSTO
-            LEFT JOIN  (SELECT CT3_CUSTO,CT3_CONTA,SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_DATA BETWEEN %Exp:_cOutIni% AND %Exp:_cOutFin% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                            GROUP BY CT3_CUSTO, CT3_CONTA
-                        ) OUT ON X.CT3_CONTA = OUT.CT3_CONTA AND X.CT3_CUSTO = OUT.CT3_CUSTO
-            LEFT JOIN  (SELECT CT3_CUSTO,CT3_CONTA,SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_DATA BETWEEN %Exp:_cNovIni% AND %Exp:_cNovFin% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                            GROUP BY CT3_CUSTO, CT3_CONTA
-                        ) NOV ON X.CT3_CONTA = NOV.CT3_CONTA AND X.CT3_CUSTO = NOV.CT3_CUSTO
-            LEFT JOIN  (SELECT CT3_CUSTO,CT3_CONTA,SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO
-                            FROM %Table:CT3% WHERE  %NotDel% AND CT3_DATA BETWEEN %Exp:_cDezIni% AND %Exp:_cDezFin% AND CT3_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                            GROUP BY CT3_CUSTO, CT3_CONTA
-                        ) DEZ ON X.CT3_CONTA = DEZ.CT3_CONTA AND X.CT3_CUSTO = DEZ.CT3_CUSTO
-        ORDER BY  X.TIPO, X.CT3_CONTA, X.CT3_CUSTO
-    EndSql
-
-    //+-------------------------------------------
-    // Atualiza regua de processamento
-    //+-------------------------------------------
-    (_cAlias1)->( dbEval( {|| _nTotal++ } ) )
-Return
-
-//+------------------------------------------------------------------------
-Static Function MR34GetSCC(_cAlias2,_nTotal)
-    Local _cJanIni      := AllTrim(MV_PAR01)+'0101'
-    Local _cJanFin      := AllTrim(MV_PAR01)+'0131'
-
-    Local _cFevIni      := AllTrim(MV_PAR01)+'0201'
-    Local _cFevFin      := AllTrim(MV_PAR01)+'0229'
-
-    Local _cMarIni      := AllTrim(MV_PAR01)+'0301'
-    Local _cMarFin      := AllTrim(MV_PAR01)+'0331'
-
-    Local _cAbrIni      := AllTrim(MV_PAR01)+'0401'
-    Local _cAbrFin      := AllTrim(MV_PAR01)+'0430'
-
-    Local _cMaiIni      := AllTrim(MV_PAR01)+'0501'
-    Local _cMaiFin      := AllTrim(MV_PAR01)+'0531'
-
-    Local _cJunIni      := AllTrim(MV_PAR01)+'0601'
-    Local _cJunFin      := AllTrim(MV_PAR01)+'0630'
-
-    Local _cJulIni      := AllTrim(MV_PAR01)+'0701'
-    Local _cJulFin      := AllTrim(MV_PAR01)+'0731'
-
-    Local _cAgoIni      := AllTrim(MV_PAR01)+'0801'
-    Local _cAgoFin      := AllTrim(MV_PAR01)+'0831'
-
-    Local _cSetIni      := AllTrim(MV_PAR01)+'0901'
-    Local _cSetFin      := AllTrim(MV_PAR01)+'0930'
-
-    Local _cOutIni      := AllTrim(MV_PAR01)+'1001'
-    Local _cOutFin      := AllTrim(MV_PAR01)+'1031'
-
-    Local _cNovIni      := AllTrim(MV_PAR01)+'1101'
-    Local _cNovFin      := AllTrim(MV_PAR01)+'1130'
-
-    Local _cDezIni      := AllTrim(MV_PAR01)+'1201'
-    Local _cDezFin      := AllTrim(MV_PAR01)+'1231'
-
-    BeginSql Alias _cAlias2
-        SELECT   X.CT7_CONTA                                AS CONTA
-                    ,Y.CT1_DESC01                               AS CONTA_DESC
-                    ,JAN1.SALDOANT                          AS SALDO
-                    ,JAN2.MOVIMENTO                             AS MOVJAN
-                    ,JAN1.SALDOANT + JAN2.MOVIMENTO         AS JANEIRO
-                    ,FEV1.SALDOANT                          AS SAFEV
-                    ,FEV2.MOVIMENTO                             AS MOVFEV
-                    ,FEV1.SALDOANT + FEV2.MOVIMENTO         AS FEVEREIRO
-                    ,MAR1.SALDOANT                          AS SAMAR
-                    ,MAR2.MOVIMENTO                             AS MOVMAR
-                    ,MAR1.SALDOANT + MAR2.MOVIMENTO         AS MARCO
-                    ,ABR1.SALDOANT                          AS SAABR
-                    ,ABR2.MOVIMENTO                             AS MOVABR
-                    ,ABR1.SALDOANT + ABR2.MOVIMENTO         AS ABRIL
-                    ,MAI1.SALDOANT                          AS SAMAI
-                    ,MAI2.MOVIMENTO                             AS MOVMAI
-                    ,MAI1.SALDOANT + MAI2.MOVIMENTO         AS MAIO
-                    ,JUN1.SALDOANT                          AS SAJUN
-                    ,JUN2.MOVIMENTO                             AS MOVJUN
-                    ,JUN1.SALDOANT + JUN2.MOVIMENTO         AS JUNHO
-                    ,JUL1.SALDOANT                          AS SAJUL
-                    ,JUL2.MOVIMENTO                             AS MOVJUL
-                    ,JUL1.SALDOANT + JUL2.MOVIMENTO         AS JULHO
-                    ,AGO1.SALDOANT                          AS SAAGO
-                    ,AGO2.MOVIMENTO                             AS MOVAGO
-                    ,AGO1.SALDOANT + AGO2.MOVIMENTO         AS AGOSTO
-                    ,SET1.SALDOANT                          AS SASET
-                    ,SET2.MOVIMENTO                             AS MOVSET
-                    ,SET1.SALDOANT + SET2.MOVIMENTO         AS SETEMBRO
-                    ,OUT1.SALDOANT                          AS SAOUT
-                    ,OUT2.MOVIMENTO                             AS MOVOUT
-                    ,OUT1.SALDOANT + OUT2.MOVIMENTO         AS OUTUBRO
-                    ,NOV1.SALDOANT                          AS SANOV
-                    ,NOV2.MOVIMENTO                             AS MOVNOV
-                    ,NOV1.SALDOANT + NOV2.MOVIMENTO         AS NOVEMBRO
-                    ,DEZ1.SALDOANT                          AS SADEZ
-                    ,DEZ2.MOVIMENTO                             AS MOVDEZ
-                    ,DEZ1.SALDOANT + DEZ2.MOVIMENTO         AS DEZEMBRO
-                    ,' ' A
-            FROM (SELECT DISTINCT CT7_CONTA
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03% )  X
-            INNER JOIN (SELECT CT1_CONTA,CT1_DESC01
-                    FROM %Table:CT1% WHERE  %NotDel% )  Y ON X.CT7_CONTA = Y.CT1_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA < %Exp:_cJanIni% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  JAN1 ON X.CT7_CONTA = JAN1.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_DEBITO) DEBITO,SUM(CT7_CREDIT) CREDITO,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA BETWEEN %Exp:_cJanIni% AND %Exp:_cJanFin% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  JAN2 ON X.CT7_CONTA = JAN2.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA < %Exp:_cFevIni% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  FEV1 ON X.CT7_CONTA = FEV1.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_DEBITO) DEBITO,SUM(CT7_CREDIT) CREDITO,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA BETWEEN %Exp:_cFevIni% AND %Exp:_cFevFin% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  FEV2 ON X.CT7_CONTA = FEV2.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA < %Exp:_cMarIni% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  MAR1 ON X.CT7_CONTA = MAR1.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_DEBITO) DEBITO,SUM(CT7_CREDIT) CREDITO,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA BETWEEN %Exp:_cMarIni% AND %Exp:_cMarFin% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  MAR2 ON X.CT7_CONTA = MAR2.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA < %Exp:_cAbrIni% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  ABR1 ON X.CT7_CONTA = ABR1.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_DEBITO) DEBITO,SUM(CT7_CREDIT) CREDITO,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA BETWEEN %Exp:_cAbrIni% AND %Exp:_cAbrFin% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  ABR2 ON X.CT7_CONTA = ABR2.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA < %Exp:_cMaiIni% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  MAI1 ON X.CT7_CONTA = MAI1.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_DEBITO) DEBITO,SUM(CT7_CREDIT) CREDITO,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA BETWEEN %Exp:_cMaiIni% AND %Exp:_cMaiFin% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  MAI2 ON X.CT7_CONTA = MAI2.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA < %Exp:_cJunIni% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  JUN1 ON X.CT7_CONTA = JUN1.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_DEBITO) DEBITO,SUM(CT7_CREDIT) CREDITO,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA BETWEEN %Exp:_cJunIni% AND %Exp:_cJunFin% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  JUN2 ON X.CT7_CONTA = JUN2.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA < %Exp:_cJulIni% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  JUL1 ON X.CT7_CONTA = JUL1.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_DEBITO) DEBITO,SUM(CT7_CREDIT) CREDITO,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA BETWEEN %Exp:_cJulIni% AND %Exp:_cJulFin% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  JUL2 ON X.CT7_CONTA = JUL2.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA < %Exp:_cAgoIni% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  AGO1 ON X.CT7_CONTA = AGO1.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_DEBITO) DEBITO,SUM(CT7_CREDIT) CREDITO,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA BETWEEN %Exp:_cAgoIni% AND %Exp:_cAgoFin% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  AGO2 ON X.CT7_CONTA = AGO2.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA < %Exp:_cSetIni% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  SET1 ON X.CT7_CONTA = SET1.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_DEBITO) DEBITO,SUM(CT7_CREDIT) CREDITO,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA BETWEEN %Exp:_cSetIni% AND %Exp:_cSetFin% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  SET2 ON X.CT7_CONTA = SET2.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA < %Exp:_cOutIni% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  OUT1 ON X.CT7_CONTA = OUT1.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_DEBITO) DEBITO,SUM(CT7_CREDIT) CREDITO,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA BETWEEN %Exp:_cOutIni% AND %Exp:_cOutFin% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  OUT2 ON X.CT7_CONTA = OUT2.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA < %Exp:_cNovIni% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  NOV1 ON X.CT7_CONTA = NOV1.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_DEBITO) DEBITO,SUM(CT7_CREDIT) CREDITO,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA BETWEEN %Exp:_cNovIni% AND %Exp:_cNovFin% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  NOV2 ON X.CT7_CONTA = NOV2.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA < %Exp:_cDezIni% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  DEZ1 ON X.CT7_CONTA = DEZ1.CT7_CONTA
-            LEFT JOIN (SELECT CT7_CONTA,SUM(CT7_DEBITO) DEBITO,SUM(CT7_CREDIT) CREDITO,SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO
-                    FROM %Table:CT7% WHERE  %NotDel% AND CT7_DATA BETWEEN %Exp:_cDezIni% AND %Exp:_cDezFin% AND CT7_FILIAL BETWEEN %Exp:MV_PAR02% AND %Exp:MV_PAR03%
-                    GROUP BY CT7_CONTA )  DEZ2 ON X.CT7_CONTA = DEZ2.CT7_CONTA
-        ORDER BY  X.CT7_CONTA
-    EndSql
-
-    //+-------------------------------------------
-    // Atualiza regua de processamento
-    //+-------------------------------------------
-    (_cAlias2)->( dbEval( {|| _nTotal++ } ) )
-Return
-
-//+------------------------------------------------------------------------
-Static Function MR34PutSX1(_cPerg)
-    Local _aAreaSX1     := SX1->(GetArea())
-
-    SX1->(DbGoTop())
-    SX1->(DbSetOrder(1))
-
-    If !SX1->(DbSeek(_cPerg))
-        PutSX1(_cPerg,'01','Ano ?'                  ,'Ano ?'                    ,'Ano ?'                ,'mv_ch1','C',04,0, ,'G','','   ',,,'mv_par01',,,,Space(4))
-        PutSX1(_cPerg,'02','Filial De ?'            ,'Filial De ?'              ,'Filial De ?'          ,'mv_ch2','C',02,0, ,'G','','   ',,,'mv_par02',,,,Space(2))
-        PutSX1(_cPerg,'03','Filial Ate ?'           ,'Filial Ate ?'             ,'Filial Ate ?'         ,'mv_ch3','C',02,0, ,'G','','   ',,,'mv_par03',,,,Space(2))
-    EndIf
-
-    RestArea(_aAreaSX1)
-Return
+if !FWSX1Util():ExistPergunte(_CPERG)
+    MSGALERT( "Grupo de perguntas não encontrado!", _CPERG )
+    Return
+endif
+
+IF FINDFUNCTION("TREPINUSE") .AND. TREPINUSE( .F. )
+    
+    IF PERGUNTE(_CPERG, .T. )
+        _OREPORT := MR34REPDEF(_OREPORT,_CPERG)
+        _OREPORT:PRINTDIALOG()
+    ENDIF
+ENDIF
+
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR34REPDEF(_OREPORT,_CPERG)
+LOCAL _CTITLE := "RELATÏ¿½RIO MENSAL DE CONTA CONTÏ¿½BIL"
+LOCAL _CHELP := "PERMITE GERAR RELATÏ¿½RIO MENSAL DAS CONTAS CONTÏ¿½BEIS"
+LOCAL _CALIAS1 := GETNEXTALIAS()
+LOCAL _CALIAS2 := GETNEXTALIAS()
+LOCAL _OCCCUSTO := NIL
+LOCAL _OCCCUSTOA := NIL
+LOCAL _OSCCUSTOA := NIL
+
+_OREPORT := TREPORT():NEW("M34R01   ",_CTITLE,_CPERG,{|_OREPORT|MR34PRINT(_OREPORT,_CALIAS1,_CALIAS2)},_CHELP)
+_OREPORT:SETMETER(3)
+
+_OCCCUSTO := TRSECTION():NEW(_OREPORT,"COM CCUSTO",{_CALIAS1})
+
+TRCELL():NEW(_OCCCUSTO,"TIPO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"CONTA",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"CONTA_DESC",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"CCUSTO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"CCUSTO_DESC",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"JANEIRO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"FEVEREIRO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"MARCO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"ABRIL",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"MAIO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"JUNHO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"JULHO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"AGOSTO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"SETEMBRO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"OUTUBRO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"NOVEMBRO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTO,"DEZEMBRO",_CALIAS1)
+
+_OCCCUSTO:OREPORT:CFONTBODY := "CALIBRI"
+_OCCCUSTO:OREPORT:NFONTBODY := 11
+
+_OCCCUSTOA := TRSECTION():NEW(_OREPORT,"COM CCUSTO ACUM",{_CALIAS1})
+
+TRCELL():NEW(_OCCCUSTOA,"TIPO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"CONTA",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"CONTA_DESC",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"CCUSTO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"CCUSTO_DESC",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"JANEIRO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"FEVEREIRO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"MARCO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"ABRIL",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"MAIO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"JUNHO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"JULHO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"AGOSTO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"SETEMBRO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"OUTUBRO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"NOVEMBRO",_CALIAS1)
+TRCELL():NEW(_OCCCUSTOA,"DEZEMBRO",_CALIAS1)
+
+_OCCCUSTO:OREPORT:CFONTBODY := "CALIBRI"
+_OCCCUSTO:OREPORT:NFONTBODY := 11
+
+_OSCCUSTOA := TRSECTION():NEW(_OREPORT,"SEM CCUSTO ACUM",{_CALIAS2})
+
+TRCELL():NEW(_OSCCUSTOA,"CONTA",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"CONTA_DESC",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"SALDO",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"JANEIRO",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"FEVEREIRO",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"MARCO",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"ABRIL",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"MAIO",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"JUNHO",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"JULHO",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"AGOSTO",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"SETEMBRO",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"OUTUBRO",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"NOVEMBRO",_CALIAS2)
+TRCELL():NEW(_OSCCUSTOA,"DEZEMBRO",_CALIAS2)
+
+_OSCCUSTOA:OREPORT:CFONTBODY := "CALIBRI"
+_OSCCUSTOA:OREPORT:NFONTBODY := 11
+
+RETURN _OREPORT
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR34PRINT(_OREPORT,_CALIAS1,_CALIAS2)
+
+LOCAL _NTOTAL := 0
+PRIVATE _OSECTION := _OREPORT:SECTION(1)
+PRIVATE _CCHAVE := ""
+
+MR34GETCCC(_CALIAS1,@_NTOTAL)
+MR34GETSCC(_CALIAS2,@_NTOTAL)
+
+_OREPORT:SETMETER(_NTOTAL)
+_OREPORT:INCMETER()
+
+MR34PRINT1(_CALIAS1,_OREPORT)
+MR34PRINT2(_CALIAS1,_OREPORT)
+MR34PRINT3(_CALIAS2,_OREPORT)
+
+(_CALIAS1)->(DBCLOSEAREA())
+(_CALIAS2)->(DBCLOSEAREA())
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR34PRINT1(_CALIAS1,_OREPORT)
+_OREPORT:INCMETER()
+
+_OREPORT:SECTION(1):INIT()
+(_CALIAS1)->(DBGOTOP())
+
+WHILE !(_OREPORT:CANCEL) .AND. !(_CALIAS1)->(EOF())
+ 
+    _OREPORT:SECTION(1):CELL("TIPO"):SETBLOCK({||_CALIAS1->TIPO})
+    _OREPORT:SECTION(1):CELL("CONTA"):SETBLOCK({||_CALIAS1->CONTA})
+    _OREPORT:SECTION(1):CELL("CONTA_DESC"):SETBLOCK({||_CALIAS1->CONTA_DESC})
+    _OREPORT:SECTION(1):CELL("CCUSTO"):SETBLOCK({||_CALIAS1->CCUSTO})
+    _OREPORT:SECTION(1):CELL("CCUSTO_DESC"):SETBLOCK({||_CALIAS1->CCUSTO_DESC})
+    _OREPORT:SECTION(1):CELL("JANEIRO"):SETBLOCK({||_CALIAS1->JANEIRO})
+    _OREPORT:SECTION(1):CELL("FEVEREIRO"):SETBLOCK({||_CALIAS1->FEVEREIRO})
+    _OREPORT:SECTION(1):CELL("MARCO"):SETBLOCK({||_CALIAS1->MARCO})
+    _OREPORT:SECTION(1):CELL("ABRIL"):SETBLOCK({||_CALIAS1->ABRIL})
+    _OREPORT:SECTION(1):CELL("MAIO"):SETBLOCK({||_CALIAS1->MAIO})
+    _OREPORT:SECTION(1):CELL("JUNHO"):SETBLOCK({||_CALIAS1->JUNHO})
+    _OREPORT:SECTION(1):CELL("JULHO"):SETBLOCK({||_CALIAS1->JULHO})
+    _OREPORT:SECTION(1):CELL("AGOSTO"):SETBLOCK({||_CALIAS1->AGOSTO})
+    _OREPORT:SECTION(1):CELL("SETEMBRO"):SETBLOCK({||_CALIAS1->SETEMBRO})
+    _OREPORT:SECTION(1):CELL("OUTUBRO"):SETBLOCK({||_CALIAS1->OUTUBRO})
+_OREPORT:SECTION(1):CELL("NOVEMBRO"):SETBLOCK({||_CALIAS1->NOVEMBRO})
+    _OREPORT:SECTION(1):CELL("DEZEMBRO"):SETBLOCK({||_CALIAS1->DEZEMBRO})
+
+    _OREPORT:SECTION(1):PRINTLINE()
+
+    (_CALIAS1)->(DBSKIP())
+    ENDDO
+
+_OREPORT:SECTION(1):FINISH()
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR34PRINT2(_CALIAS1,_OREPORT)
+
+_OREPORT:SECTION(2):INIT()
+(_CALIAS1)->(DBGOTOP())
+
+WHILE !(_OREPORT:CANCEL) .AND. !(_CALIAS1)->(EOF())
+ 
+    _OREPORT:INCMETER()
+
+    _OREPORT:SECTION(2):CELL("TIPO"):SETBLOCK({||_CALIAS1->TIPO})
+    _OREPORT:SECTION(2):CELL("CONTA"):SETBLOCK({||_CALIAS1->CONTA})
+    _OREPORT:SECTION(2):CELL("CONTA_DESC"):SETBLOCK({||_CALIAS1->CONTA_DESC})
+    _OREPORT:SECTION(2):CELL("CCUSTO"):SETBLOCK({||_CALIAS1->CCUSTO})
+    _OREPORT:SECTION(2):CELL("CCUSTO_DESC"):SETBLOCK({||_CALIAS1->CCUSTO_DESC})
+    _OREPORT:SECTION(2):CELL("JANEIRO"):SETBLOCK({||_CALIAS1->JANEIRO})
+    _OREPORT:SECTION(2):CELL("FEVEREIRO"):SETBLOCK({||_CALIAS1->JANEIRO+_CALIAS1->FEVEREIRO})
+    _OREPORT:SECTION(2):CELL("MARCO"):SETBLOCK({||_CALIAS1->JANEIRO+_CALIAS1->FEVEREIRO+_CALIAS1->MARCO})
+    _OREPORT:SECTION(2):CELL("ABRIL"):SETBLOCK({||_CALIAS1->JANEIRO+_CALIAS1->FEVEREIRO+_CALIAS1->MARCO+_CALIAS1->ABRIL})
+    _OREPORT:SECTION(2):CELL("MAIO"):SETBLOCK({||_CALIAS1->JANEIRO+_CALIAS1->FEVEREIRO+_CALIAS1->MARCO+_CALIAS1->ABRIL+_CALIAS1->MAIO})
+    _OREPORT:SECTION(2):CELL("JUNHO"):SETBLOCK({||_CALIAS1->JANEIRO+_CALIAS1->FEVEREIRO+_CALIAS1->MARCO+_CALIAS1->ABRIL+_CALIAS1->MAIO+_CALIAS1->JUNHO})
+    _OREPORT:SECTION(2):CELL("JULHO"):SETBLOCK({||_CALIAS1->JANEIRO+_CALIAS1->FEVEREIRO+_CALIAS1->MARCO+_CALIAS1->ABRIL+_CALIAS1->MAIO+_CALIAS1->JUNHO+_CALIAS1->JULHO})
+    _OREPORT:SECTION(2):CELL("AGOSTO"):SETBLOCK({||_CALIAS1->JANEIRO+_CALIAS1->FEVEREIRO+_CALIAS1->MARCO+_CALIAS1->ABRIL+_CALIAS1->MAIO+_CALIAS1->JUNHO+_CALIAS1->JULHO+_CALIAS1->AGOSTO})
+    _OREPORT:SECTION(2):CELL("SETEMBRO"):SETBLOCK({||_CALIAS1->JANEIRO+_CALIAS1->FEVEREIRO+_CALIAS1->MARCO+_CALIAS1->ABRIL+_CALIAS1->MAIO+_CALIAS1->JUNHO+_CALIAS1->JULHO+_CALIAS1->AGOSTO+_CALIAS1->SETEMBRO})
+    _OREPORT:SECTION(2):CELL("OUTUBRO"):SETBLOCK({||_CALIAS1->JANEIRO+_CALIAS1->FEVEREIRO+_CALIAS1->MARCO+_CALIAS1->ABRIL+_CALIAS1->MAIO+_CALIAS1->JUNHO+_CALIAS1->JULHO+_CALIAS1->AGOSTO+_CALIAS1->SETEMBRO+_CALIAS1->OUTUBRO})
+    _OREPORT:SECTION(2):CELL("NOVEMBRO"):SETBLOCK({||_CALIAS1->JANEIRO+_CALIAS1->FEVEREIRO+_CALIAS1->MARCO+_CALIAS1->ABRIL+_CALIAS1->MAIO+_CALIAS1->JUNHO+_CALIAS1->JULHO+_CALIAS1->AGOSTO+_CALIAS1->SETEMBRO+_CALIAS1->OUTUBRO+_CALIAS1->NOVEMBRO})
+    _OREPORT:SECTION(2):CELL("DEZEMBRO"):SETBLOCK({||_CALIAS1->JANEIRO+_CALIAS1->FEVEREIRO+_CALIAS1->MARCO+_CALIAS1->ABRIL+_CALIAS1->MAIO+_CALIAS1->JUNHO+_CALIAS1->JULHO+_CALIAS1->AGOSTO+_CALIAS1->SETEMBRO+_CALIAS1->OUTUBRO+_CALIAS1->NOVEMBRO+_CALIAS1->DEZEMBRO})
+
+    _OREPORT:SECTION(2):PRINTLINE()
+
+    (_CALIAS1)->(DBSKIP())
+    ENDDO
+
+_OREPORT:SECTION(2):FINISH()
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR34PRINT3(_CALIAS2,_OREPORT)
+
+_OREPORT:SECTION(3):INIT()
+(_CALIAS2)->(DBGOTOP())
+
+WHILE !(_OREPORT:CANCEL) .AND. !(_CALIAS2)->(EOF())
+ 
+    _OREPORT:INCMETER()
+
+    _OREPORT:SECTION(3):CELL("JANEIRO"):SETBLOCK({||_CALIAS2->SALDO+_CALIAS2->MOVJAN})
+    _OREPORT:SECTION(3):CELL("FEVEREIRO"):SETBLOCK({||_CALIAS2->SAFEV+_CALIAS2->MOVFEV})
+    _OREPORT:SECTION(3):CELL("MARCO"):SETBLOCK({||_CALIAS2->SAMAR+_CALIAS2->MOVMAR})
+    _OREPORT:SECTION(3):CELL("ABRIL"):SETBLOCK({||_CALIAS2->SAABR+_CALIAS2->MOVABR})
+    _OREPORT:SECTION(3):CELL("MAIO"):SETBLOCK({||_CALIAS2->SAMAI+_CALIAS2->MOVMAI})
+    _OREPORT:SECTION(3):CELL("JUNHO"):SETBLOCK({||_CALIAS2->SAJUN+_CALIAS2->MOVJUN})
+    _OREPORT:SECTION(3):CELL("JULHO"):SETBLOCK({||_CALIAS2->SAJUL+_CALIAS2->MOVJUL})
+    _OREPORT:SECTION(3):CELL("AGOSTO"):SETBLOCK({||_CALIAS2->SAAGO+_CALIAS2->MOVAGO})
+    _OREPORT:SECTION(3):CELL("SETEMBRO"):SETBLOCK({||_CALIAS2->SASET+_CALIAS2->MOVSET})
+    _OREPORT:SECTION(3):CELL("OUTUBRO"):SETBLOCK({||_CALIAS2->SAOUT+_CALIAS2->MOVOUT})
+    _OREPORT:SECTION(3):CELL("NOVEMBRO"):SETBLOCK({||_CALIAS2->SANOV+_CALIAS2->MOVNOV})
+    _OREPORT:SECTION(3):CELL("DEZEMBRO"):SETBLOCK({||_CALIAS2->SADEZ+_CALIAS2->MOVDEZ})
+
+    _OREPORT:SECTION(3):PRINTLINE()
+
+    (_CALIAS2)->(DBSKIP())
+    ENDDO
+
+_OREPORT:SECTION(3):FINISH()
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR34GETCCC(_CALIAS1,_NTOTAL)
+LOCAL _CJANINI :=  ALLTRIM(MV_PAR01)+"0101"
+LOCAL _CJANFIN :=  ALLTRIM(MV_PAR01)+"0131"
+
+LOCAL _CFEVINI :=  ALLTRIM(MV_PAR01)+"0201"
+LOCAL _CFEVFIN :=  ALLTRIM(MV_PAR01)+"0229"
+
+LOCAL _CMARINI :=  ALLTRIM(MV_PAR01)+"0301"
+LOCAL _CMARFIN :=  ALLTRIM(MV_PAR01)+"0331"
+
+LOCAL _CABRINI :=  ALLTRIM(MV_PAR01)+"0401"
+LOCAL _CABRFIN :=  ALLTRIM(MV_PAR01)+"0430"
+
+LOCAL _CMAIINI :=  ALLTRIM(MV_PAR01)+"0501"
+LOCAL _CMAIFIN :=  ALLTRIM(MV_PAR01)+"0531"
+
+LOCAL _CJUNINI :=  ALLTRIM(MV_PAR01)+"0601"
+LOCAL _CJUNFIN :=  ALLTRIM(MV_PAR01)+"0630"
+
+LOCAL _CJULINI :=  ALLTRIM(MV_PAR01)+"0701"
+LOCAL _CJULFIN :=  ALLTRIM(MV_PAR01)+"0731"
+
+LOCAL _CAGOINI :=  ALLTRIM(MV_PAR01)+"0801"
+LOCAL _CAGOFIN :=  ALLTRIM(MV_PAR01)+"0831"
+
+LOCAL _CSETINI :=  ALLTRIM(MV_PAR01)+"0901"
+LOCAL _CSETFIN :=  ALLTRIM(MV_PAR01)+"0930"
+
+LOCAL _COUTINI :=  ALLTRIM(MV_PAR01)+"1001"
+LOCAL _COUTFIN :=  ALLTRIM(MV_PAR01)+"1031"
+
+LOCAL _CNOVINI :=  ALLTRIM(MV_PAR01)+"1101"
+LOCAL _CNOVFIN :=  ALLTRIM(MV_PAR01)+"1130"
+
+LOCAL _CDEZINI :=  ALLTRIM(MV_PAR01)+"1201"
+LOCAL _CDEZFIN :=  ALLTRIM(MV_PAR01)+"1231"
+
+_cQry := " SELECT DISTINCT X.TIPO AS TIPO, "
+_cQry += "                 X.CT3_CONTA AS CONTA, "
+_cQry += "                 Y.CT1_DESC01 AS CONTA_DESC, "
+_cQry += "                 X.CT3_CUSTO AS CCUSTO, "
+_cQry += "                 Z.CTT_DESC01 AS CCUSTO_DESC, "
+_cQry += "                 JAN.SALDO AS JANEIRO, "
+_cQry += "                 FEV.SALDO AS FEVEREIRO, "
+_cQry += "                 MAR.SALDO AS MARCO, "
+_cQry += "                 ABR.SALDO AS ABRIL, "
+_cQry += "                 MAI.SALDO AS MAIO, "
+_cQry += "                 JUN.SALDO AS JUNHO, "
+_cQry += "                 JUL.SALDO AS JULHO, "
+_cQry += "                 AGO.SALDO AS AGOSTO, "
+_cQry += "                 SETE.SALDO AS SETEMBRO, "
+_cQry += "                 OUT.SALDO AS OUTUBRO, "
+_cQry += "                 NOV.SALDO AS NOVEMBRO, "
+_cQry += "                 DEZ.SALDO AS DEZEMBRO "
+_cQry += " FROM "
+_cQry += "   (SELECT DISTINCT CT3_CUSTO, "
+_cQry += "                    CT3_CONTA, "
+_cQry += "                    SUBSTRING(CT3_CUSTO, 1, 1) TIPO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" ) X "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT1_CONTA, "
+_cQry += "           CT1_DESC01 "
+_cQry += "    FROM "+RETSQLNAME("CT1")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' ) Y ON X.CT3_CONTA = Y.CT1_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CTT_CUSTO, "
+_cQry += "           CTT_DESC01 "
+_cQry += "    FROM "+RETSQLNAME("CTT")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' ) Z ON X.CT3_CUSTO = Z.CTT_CUSTO "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT3_CUSTO, "
+_cQry += "           CT3_CONTA, "
+_cQry += "           SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_DATA BETWEEN "+___SQLGETVALUE(_CJANINI)+" AND "+___SQLGETVALUE(_CJANFIN)+" "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT3_CUSTO, "
+_cQry += "             CT3_CONTA) JAN ON X.CT3_CONTA = JAN.CT3_CONTA "
+_cQry += " AND X.CT3_CUSTO = JAN.CT3_CUSTO "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT3_CUSTO, "
+_cQry += "           CT3_CONTA, "
+_cQry += "           SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_DATA BETWEEN "+___SQLGETVALUE(_CFEVINI)+" AND "+___SQLGETVALUE(_CFEVFIN)+" "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT3_CUSTO, "
+_cQry += "             CT3_CONTA) FEV ON X.CT3_CONTA = FEV.CT3_CONTA "
+_cQry += " AND X.CT3_CUSTO = FEV.CT3_CUSTO "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT3_CUSTO, "
+_cQry += "           CT3_CONTA, "
+_cQry += "           SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_DATA BETWEEN "+___SQLGETVALUE(_CMARINI)+" AND "+___SQLGETVALUE(_CMARFIN)+" "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT3_CUSTO, "
+_cQry += "             CT3_CONTA) MAR ON X.CT3_CONTA = MAR.CT3_CONTA "
+_cQry += " AND X.CT3_CUSTO = MAR.CT3_CUSTO "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT3_CUSTO, "
+_cQry += "           CT3_CONTA, "
+_cQry += "           SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_DATA BETWEEN "+___SQLGETVALUE(_CABRINI)+" AND "+___SQLGETVALUE(_CABRFIN)+" "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT3_CUSTO, "
+_cQry += "             CT3_CONTA) ABR ON X.CT3_CONTA = ABR.CT3_CONTA "
+_cQry += " AND X.CT3_CUSTO = ABR.CT3_CUSTO "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT3_CUSTO, "
+_cQry += "           CT3_CONTA, "
+_cQry += "           SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_DATA BETWEEN "+___SQLGETVALUE(_CMAIINI)+" AND "+___SQLGETVALUE(_CMAIFIN)+" "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT3_CUSTO, "
+_cQry += "             CT3_CONTA) MAI ON X.CT3_CONTA = MAI.CT3_CONTA "
+_cQry += " AND X.CT3_CUSTO = MAI.CT3_CUSTO "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT3_CUSTO, "
+_cQry += "           CT3_CONTA, "
+_cQry += "           SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_DATA BETWEEN "+___SQLGETVALUE(_CJUNINI)+" AND "+___SQLGETVALUE(_CJUNFIN)+" "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT3_CUSTO, "
+_cQry += "             CT3_CONTA) JUN ON X.CT3_CONTA = JUN.CT3_CONTA "
+_cQry += " AND X.CT3_CUSTO = JUN.CT3_CUSTO "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT3_CUSTO, "
+_cQry += "           CT3_CONTA, "
+_cQry += "           SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_DATA BETWEEN "+___SQLGETVALUE(_CJULINI)+" AND "+___SQLGETVALUE(_CJULFIN)+" "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT3_CUSTO, "
+_cQry += "             CT3_CONTA) JUL ON X.CT3_CONTA = JUL.CT3_CONTA "
+_cQry += " AND X.CT3_CUSTO = JUL.CT3_CUSTO "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT3_CUSTO, "
+_cQry += "           CT3_CONTA, "
+_cQry += "           SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_DATA BETWEEN "+___SQLGETVALUE(_CAGOINI)+" AND "+___SQLGETVALUE(_CAGOFIN)+" "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT3_CUSTO, "
+_cQry += "             CT3_CONTA) AGO ON X.CT3_CONTA = AGO.CT3_CONTA "
+_cQry += " AND X.CT3_CUSTO = AGO.CT3_CUSTO "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT3_CUSTO, "
+_cQry += "           CT3_CONTA, "
+_cQry += "           SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_DATA BETWEEN "+___SQLGETVALUE(_CSETINI)+" AND "+___SQLGETVALUE(_CSETFIN)+" "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT3_CUSTO, "
+_cQry += "             CT3_CONTA) SETE ON X.CT3_CONTA = SETE.CT3_CONTA "
+_cQry += " AND X.CT3_CUSTO = SETE.CT3_CUSTO "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT3_CUSTO, "
+_cQry += "           CT3_CONTA, "
+_cQry += "           SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_DATA BETWEEN "+___SQLGETVALUE(_COUTINI)+" AND "+___SQLGETVALUE(_COUTFIN)+" "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT3_CUSTO, "
+_cQry += "             CT3_CONTA) OUT ON X.CT3_CONTA = OUT.CT3_CONTA "
+_cQry += " AND X.CT3_CUSTO = OUT.CT3_CUSTO "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT3_CUSTO, "
+_cQry += "           CT3_CONTA, "
+_cQry += "           SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_DATA BETWEEN "+___SQLGETVALUE(_CNOVINI)+" AND "+___SQLGETVALUE(_CNOVFIN)+" "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT3_CUSTO, "
+_cQry += "             CT3_CONTA) NOV ON X.CT3_CONTA = NOV.CT3_CONTA "
+_cQry += " AND X.CT3_CUSTO = NOV.CT3_CUSTO "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT3_CUSTO, "
+_cQry += "           CT3_CONTA, "
+_cQry += "           SUM(CT3_CREDIT) - SUM(CT3_DEBITO) SALDO "
+_cQry += "    FROM "+RETSQLNAME("CT3")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT3_DATA BETWEEN "+___SQLGETVALUE(_CDEZINI)+" AND "+___SQLGETVALUE(_CDEZFIN)+" "
+_cQry += "      AND CT3_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT3_CUSTO, "
+_cQry += "             CT3_CONTA) DEZ ON X.CT3_CONTA = DEZ.CT3_CONTA "
+_cQry += " AND X.CT3_CUSTO = DEZ.CT3_CUSTO "
+_cQry += " ORDER BY X.TIPO, "
+_cQry += "          X.CT3_CONTA, "
+_cQry += "          X.CT3_CUSTO "
+__EXECSQL(_CALIAS1,_cQry,{}, .F. )
+
+(_CALIAS1)->(DBEVAL({||_NTOTAL++}))
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MR34GETSCC(_CALIAS2,_NTOTAL)
+LOCAL _CJANINI :=  ALLTRIM(MV_PAR01)+"0101"
+LOCAL _CJANFIN :=  ALLTRIM(MV_PAR01)+"0131"
+
+LOCAL _CFEVINI :=  ALLTRIM(MV_PAR01)+"0201"
+LOCAL _CFEVFIN :=  ALLTRIM(MV_PAR01)+"0229"
+
+LOCAL _CMARINI :=  ALLTRIM(MV_PAR01)+"0301"
+LOCAL _CMARFIN :=  ALLTRIM(MV_PAR01)+"0331"
+
+LOCAL _CABRINI :=  ALLTRIM(MV_PAR01)+"0401"
+LOCAL _CABRFIN :=  ALLTRIM(MV_PAR01)+"0430"
+
+LOCAL _CMAIINI :=  ALLTRIM(MV_PAR01)+"0501"
+LOCAL _CMAIFIN :=  ALLTRIM(MV_PAR01)+"0531"
+
+LOCAL _CJUNINI :=  ALLTRIM(MV_PAR01)+"0601"
+LOCAL _CJUNFIN :=  ALLTRIM(MV_PAR01)+"0630"
+
+LOCAL _CJULINI :=  ALLTRIM(MV_PAR01)+"0701"
+LOCAL _CJULFIN :=  ALLTRIM(MV_PAR01)+"0731"
+
+LOCAL _CAGOINI :=  ALLTRIM(MV_PAR01)+"0801"
+LOCAL _CAGOFIN :=  ALLTRIM(MV_PAR01)+"0831"
+
+LOCAL _CSETINI :=  ALLTRIM(MV_PAR01)+"0901"
+LOCAL _CSETFIN :=  ALLTRIM(MV_PAR01)+"0930"
+
+LOCAL _COUTINI :=  ALLTRIM(MV_PAR01)+"1001"
+LOCAL _COUTFIN :=  ALLTRIM(MV_PAR01)+"1031"
+
+LOCAL _CNOVINI :=  ALLTRIM(MV_PAR01)+"1101"
+LOCAL _CNOVFIN :=  ALLTRIM(MV_PAR01)+"1130"
+
+LOCAL _CDEZINI :=  ALLTRIM(MV_PAR01)+"1201"
+LOCAL _CDEZFIN :=  ALLTRIM(MV_PAR01)+"1231"
+
+_cQry := " SELECT X.CT7_CONTA AS CONTA, "
+_cQry += "        Y.CT1_DESC01 AS CONTA_DESC, "
+_cQry += "        JAN1.SALDOANT AS SALDO, "
+_cQry += "        JAN2.MOVIMENTO AS MOVJAN, "
+_cQry += "        JAN1.SALDOANT + JAN2.MOVIMENTO AS JANEIRO, "
+_cQry += "        FEV1.SALDOANT AS SAFEV, "
+_cQry += "        FEV2.MOVIMENTO AS MOVFEV, "
+_cQry += "        FEV1.SALDOANT + FEV2.MOVIMENTO AS FEVEREIRO, "
+_cQry += "        MAR1.SALDOANT AS SAMAR, "
+_cQry += "        MAR2.MOVIMENTO AS MOVMAR, "
+_cQry += "        MAR1.SALDOANT + MAR2.MOVIMENTO AS MARCO, "
+_cQry += "        ABR1.SALDOANT AS SAABR, "
+_cQry += "        ABR2.MOVIMENTO AS MOVABR, "
+_cQry += "        ABR1.SALDOANT + ABR2.MOVIMENTO AS ABRIL, "
+_cQry += "        MAI1.SALDOANT AS SAMAI, "
+_cQry += "        MAI2.MOVIMENTO AS MOVMAI, "
+_cQry += "        MAI1.SALDOANT + MAI2.MOVIMENTO AS MAIO, "
+_cQry += "        JUN1.SALDOANT AS SAJUN, "
+_cQry += "        JUN2.MOVIMENTO AS MOVJUN, "
+_cQry += "        JUN1.SALDOANT + JUN2.MOVIMENTO AS JUNHO, "
+_cQry += "        JUL1.SALDOANT AS SAJUL, "
+_cQry += "        JUL2.MOVIMENTO AS MOVJUL, "
+_cQry += "        JUL1.SALDOANT + JUL2.MOVIMENTO AS JULHO, "
+_cQry += "        AGO1.SALDOANT AS SAAGO, "
+_cQry += "        AGO2.MOVIMENTO AS MOVAGO, "
+_cQry += "        AGO1.SALDOANT + AGO2.MOVIMENTO AS AGOSTO, "
+_cQry += "        SET1.SALDOANT AS SASET, "
+_cQry += "        SET2.MOVIMENTO AS MOVSET, "
+_cQry += "        SET1.SALDOANT + SET2.MOVIMENTO AS SETEMBRO, "
+_cQry += "        OUT1.SALDOANT AS SAOUT, "
+_cQry += "        OUT2.MOVIMENTO AS MOVOUT, "
+_cQry += "        OUT1.SALDOANT + OUT2.MOVIMENTO AS OUTUBRO, "
+_cQry += "        NOV1.SALDOANT AS SANOV, "
+_cQry += "        NOV2.MOVIMENTO AS MOVNOV, "
+_cQry += "        NOV1.SALDOANT + NOV2.MOVIMENTO AS NOVEMBRO, "
+_cQry += "        DEZ1.SALDOANT AS SADEZ, "
+_cQry += "        DEZ2.MOVIMENTO AS MOVDEZ, "
+_cQry += "        DEZ1.SALDOANT + DEZ2.MOVIMENTO AS DEZEMBRO, "
+_cQry += "        ' ' A "
+_cQry += " FROM "
+_cQry += "   (SELECT DISTINCT CT7_CONTA "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" ) X "
+_cQry += " INNER JOIN "
+_cQry += "   (SELECT CT1_CONTA, "
+_cQry += "           CT1_DESC01 "
+_cQry += "    FROM "+RETSQLNAME("CT1")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' ) Y ON X.CT7_CONTA = Y.CT1_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA < "+___SQLGETVALUE(_CJANINI)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) JAN1 ON X.CT7_CONTA = JAN1.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_DEBITO) DEBITO, "
+_cQry += "           SUM(CT7_CREDIT) CREDITO, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA BETWEEN "+___SQLGETVALUE(_CJANINI)+" AND "+___SQLGETVALUE(_CJANFIN)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) JAN2 ON X.CT7_CONTA = JAN2.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA < "+___SQLGETVALUE(_CFEVINI)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) FEV1 ON X.CT7_CONTA = FEV1.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_DEBITO) DEBITO, "
+_cQry += "           SUM(CT7_CREDIT) CREDITO, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA BETWEEN "+___SQLGETVALUE(_CFEVINI)+" AND "+___SQLGETVALUE(_CFEVFIN)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) FEV2 ON X.CT7_CONTA = FEV2.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA < "+___SQLGETVALUE(_CMARINI)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) MAR1 ON X.CT7_CONTA = MAR1.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_DEBITO) DEBITO, "
+_cQry += "           SUM(CT7_CREDIT) CREDITO, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA BETWEEN "+___SQLGETVALUE(_CMARINI)+" AND "+___SQLGETVALUE(_CMARFIN)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) MAR2 ON X.CT7_CONTA = MAR2.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA < "+___SQLGETVALUE(_CABRINI)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) ABR1 ON X.CT7_CONTA = ABR1.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_DEBITO) DEBITO, "
+_cQry += "           SUM(CT7_CREDIT) CREDITO, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA BETWEEN "+___SQLGETVALUE(_CABRINI)+" AND "+___SQLGETVALUE(_CABRFIN)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) ABR2 ON X.CT7_CONTA = ABR2.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA < "+___SQLGETVALUE(_CMAIINI)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) MAI1 ON X.CT7_CONTA = MAI1.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_DEBITO) DEBITO, "
+_cQry += "           SUM(CT7_CREDIT) CREDITO, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA BETWEEN "+___SQLGETVALUE(_CMAIINI)+" AND "+___SQLGETVALUE(_CMAIFIN)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) MAI2 ON X.CT7_CONTA = MAI2.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA < "+___SQLGETVALUE(_CJUNINI)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) JUN1 ON X.CT7_CONTA = JUN1.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_DEBITO) DEBITO, "
+_cQry += "           SUM(CT7_CREDIT) CREDITO, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA BETWEEN "+___SQLGETVALUE(_CJUNINI)+" AND "+___SQLGETVALUE(_CJUNFIN)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) JUN2 ON X.CT7_CONTA = JUN2.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA < "+___SQLGETVALUE(_CJULINI)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) JUL1 ON X.CT7_CONTA = JUL1.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_DEBITO) DEBITO, "
+_cQry += "           SUM(CT7_CREDIT) CREDITO, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA BETWEEN "+___SQLGETVALUE(_CJULINI)+" AND "+___SQLGETVALUE(_CJULFIN)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) JUL2 ON X.CT7_CONTA = JUL2.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA < "+___SQLGETVALUE(_CAGOINI)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) AGO1 ON X.CT7_CONTA = AGO1.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_DEBITO) DEBITO, "
+_cQry += "           SUM(CT7_CREDIT) CREDITO, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA BETWEEN "+___SQLGETVALUE(_CAGOINI)+" AND "+___SQLGETVALUE(_CAGOFIN)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) AGO2 ON X.CT7_CONTA = AGO2.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA < "+___SQLGETVALUE(_CSETINI)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) SET1 ON X.CT7_CONTA = SET1.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_DEBITO) DEBITO, "
+_cQry += "           SUM(CT7_CREDIT) CREDITO, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA BETWEEN "+___SQLGETVALUE(_CSETINI)+" AND "+___SQLGETVALUE(_CSETFIN)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) SET2 ON X.CT7_CONTA = SET2.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA < "+___SQLGETVALUE(_COUTINI)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) OUT1 ON X.CT7_CONTA = OUT1.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_DEBITO) DEBITO, "
+_cQry += "           SUM(CT7_CREDIT) CREDITO, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA BETWEEN "+___SQLGETVALUE(_COUTINI)+" AND "+___SQLGETVALUE(_COUTFIN)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) OUT2 ON X.CT7_CONTA = OUT2.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA < "+___SQLGETVALUE(_CNOVINI)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) NOV1 ON X.CT7_CONTA = NOV1.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_DEBITO) DEBITO, "
+_cQry += "           SUM(CT7_CREDIT) CREDITO, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA BETWEEN "+___SQLGETVALUE(_CNOVINI)+" AND "+___SQLGETVALUE(_CNOVFIN)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) NOV2 ON X.CT7_CONTA = NOV2.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) SALDOANT "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA < "+___SQLGETVALUE(_CDEZINI)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) DEZ1 ON X.CT7_CONTA = DEZ1.CT7_CONTA "
+_cQry += " LEFT JOIN "
+_cQry += "   (SELECT CT7_CONTA, "
+_cQry += "           SUM(CT7_DEBITO) DEBITO, "
+_cQry += "           SUM(CT7_CREDIT) CREDITO, "
+_cQry += "           SUM(CT7_CREDIT) - SUM(CT7_DEBITO) MOVIMENTO "
+_cQry += "    FROM "+RETSQLNAME("CT7")+" "
+_cQry += "    WHERE D_E_L_E_T_= ' ' "
+_cQry += "      AND CT7_DATA BETWEEN "+___SQLGETVALUE(_CDEZINI)+" AND "+___SQLGETVALUE(_CDEZFIN)+" "
+_cQry += "      AND CT7_FILIAL BETWEEN "+___SQLGETVALUE(MV_PAR02)+" AND "+___SQLGETVALUE(MV_PAR03)+" "
+_cQry += "    GROUP BY CT7_CONTA) DEZ2 ON X.CT7_CONTA = DEZ2.CT7_CONTA "
+_cQry += " ORDER BY X.CT7_CONTA "
+__EXECSQL(_CALIAS2,_cQry,{}, .F. )
+
+(_CALIAS2)->(DBEVAL({||_NTOTAL++}))
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+/*STATIC FUNCTION MR34PUTSX1(_CPERG)
+LOCAL _AAREASX1 := SX1->(GETAREA())
+
+SX1->(DBGOTOP())
+SX1->(DBSETORDER(1))
+
+IF !(SX1->(DBSEEK(_CPERG)))
+    PUTSX1(_CPERG,"01","ANO ?","ANO ?","ANO ?","MV_CH1","C",4,0,,"G","","   ",,,"MV_PAR01",,,,"    ")
+    PUTSX1(_CPERG,"02","FILIAL DE ?","FILIAL DE ?","FILIAL DE ?","MV_CH2","C",2,0,,"G","","   ",,,"MV_PAR02",,,,"  ")
+    PUTSX1(_CPERG,"03","FILIAL ATE ?","FILIAL ATE ?","FILIAL ATE ?","MV_CH3","C",2,0,,"G","","   ",,,"MV_PAR03",,,,"  ")
+ENDIF
+
+RESTAREA(_AAREASX1)
+RETURN*/
