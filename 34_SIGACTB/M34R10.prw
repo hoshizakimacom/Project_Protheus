@@ -14,7 +14,12 @@ User Function M34R10()
 
     If (__cUserID $ GetMV("MV_XBUDGET") ) .or. !Empty(cDepto1) .or. !Empty(cDepto2) .or. !Empty(cDepto3)
         
-        MR34PutSX1(_cPerg)
+        //MR34PutSX1(_cPerg)
+ 
+        if !FWSX1Util():ExistPergunte(_cPerg)
+            MSGALERT( "Grupo de perguntas não encontrado!", _cPerg )
+            Return
+        endif
 
         If FindFunction('TRepInUse') .And. TRepInUse(.F.)   //verifica se relatorios personalizaveis esta disponivel
             If Pergunte(_cPerg, .T.)
@@ -118,7 +123,7 @@ return
 //+------------------------------------------------------------------------
 Static Function MR34Print1(_cAlias1,_oReport)
 
-    //Local cPar := GetMV("MV_XBUDGET")
+    Local cMvBudget := GetMV("MV_XBUDGET")
     Local cDepto1 := Posicione("SZC",1, xFilial("SZC") + __cUserID , "ZC_DEPTO1")
     Local cDepto2 := Posicione("SZC",1, xFilial("SZC") + __cUserID , "ZC_DEPTO2")
     Local cDepto3 := Posicione("SZC",1, xFilial("SZC") + __cUserID , "ZC_DEPTO3")
@@ -127,10 +132,10 @@ Static Function MR34Print1(_cAlias1,_oReport)
 
     _oReport:Section(1):Init()
     (_cAlias1)->(DbGoTop())
-
+    cMvBudget := GetMV("MV_XBUDGET")
     While !_oReport:Cancel() .And. (_cAlias1)->(!EOF())
         
-      If __cUserID $ GetMV("MV_XBUDGET")
+      If __cUserID $ cMvBudget
 
             _oReport:Section(1):Cell('TIPO'                     ):SetBlock( {||(_cAlias1)->TIPO })
             _oReport:Section(1):Cell('CONTA'                    ):SetBlock( {||(_cAlias1)->CONTA })
@@ -347,7 +352,7 @@ Static Function MR34GetCCC(_cAlias1,_nTotal)
 Return
 
 //+------------------------------------------------------------------------
-Static Function MR34PutSX1(_cPerg)
+/*Static Function MR34PutSX1(_cPerg)
     Local _aAreaSX1     := SX1->(GetArea())
 
     SX1->(DbGoTop())
@@ -360,4 +365,4 @@ Static Function MR34PutSX1(_cPerg)
     EndIf
 
     RestArea(_aAreaSX1)
-Return
+Return*/
