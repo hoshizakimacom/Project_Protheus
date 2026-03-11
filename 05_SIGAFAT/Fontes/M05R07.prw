@@ -79,17 +79,17 @@ Local cAliasSF4  := ""
 cAliasSC5  := ""
 cAliasSC6  := "" 
 
-#IFNDEF TOP
+//#IFNDEF TOP
 	AliasSC5	:= "SC5"
 	cAliasSC6	:= "SC6" 
 	cAliasSC9	:= "SC9" 
 	cAliasSF4	:= "SF4"
-#ELSE
+/*#ELSE
 	cAliasSF4 := GetNextAlias()	
 	cAliasSC9 := cAliasSF4
 	cAliasSC6 := cAliasSC9
 	cAliasSC5 := cAliasSC6
-#ENDIF
+#ENDIF*/
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Criacao do componente de impressao                                      ³
@@ -237,17 +237,17 @@ Return(oReport)
 /*/
 Static Function ReportPrint(oReport,oCabec,oPedaFat,oTemp,cAliasSC5,cAliasSC6,cAliasSC9,cAliasSF4)
 
-#IFNDEF TOP
+/*#IFNDEF TOP
 	Local cCondicao := ""
-#ELSE	
+#ELSE*/	
 	Local cWhere := ""
-#ENDIF
+//#ENDIF
 
 Local cTrab		 := ""
 Local cDescOrdem := ""
 Local cTipo  	 := ""
 Local cPedido    := ""
-Local cFilter    := ""
+Local cFiltro    := ""
 Local cKey 	     := ""
 Local cCampo     := ""
 Local cVends     := ""
@@ -330,9 +330,18 @@ AADD(aCampos,{ "TB_COD"   ,"C",aTam[1],aTam[2] } )
 aTam:=TamSX3("B2_QATU")
 AADD(aCampos,{ "TB_SALDO" ,"N",aTam[1],aTam[2] } )
 
-cTrab:= CriaTrab(aCampos)
-USE &cTrab ALIAS STR NEW
-IndRegua("STR",cTrab,"TB_LOCAL+TB_COD",,,STR0058)		//"Selecionando Registros..."
+oTempTable := FWTemporaryTable():New("STR") //cNomArq := CriaTrab(aCampos)
+//Define as colunas usadas
+oTempTable:SetFields( aCampos )
+//Efetua a criação da tabela
+oTempTable:Create()
+//Cria índice com colunas setadas anteriormente
+oTempTable:AddIndex("1", {"VENDEDOR", "CLIENTE","NUMPED"} )
+dbselectarea("STR")
+
+/*cTrab:= CriaTrab(aCampos)
+USE &cTrab ALIAS STR NEW*/
+IndRegua("STR","STR","TB_LOCAL+TB_COD",,,STR0058)		//"Selecionando Registros..."
 dbSelectArea("SC6")
 dbSetOrder(nOrdem) 
 
@@ -347,7 +356,7 @@ MakeSqlExpr(oReport:uParam)
 //³                                                                        ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 cQueryAdd := ""
-#IFDEF TOP
+//#IFDEF TOP
 	If TcSrvType() <> "AS/400"
 		
 		lQuery    := .T.
@@ -569,38 +578,38 @@ cQueryAdd := ""
         EndIf
         
 	Else
-#ENDIF 
+//#ENDIF 
         //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
         //³ Definicao dos filtros dos arquivos C6 e C9 para codbase.    ³
         //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ	   			
 		dbSelectArea(cAliasSC9)
 		cKey := IndexKey()		                         
-		cFilter := 'C9_FILIAL == "'+xFilial("SC9")+'" .AND. '
-		cFilter += "C9_NFISCAL = '" + space(TamSx3("C9_NFISCAL")[1]) + "'"		 	
+		cFiltro := 'C9_FILIAL == "'+xFilial("SC9")+'" .AND. '
+		cFiltro += "C9_NFISCAL = '" + space(TamSx3("C9_NFISCAL")[1]) + "'"		 	
 		If mv_par06 <> 3
 			If mv_par06 == 1
-				cFilter += " .AND. C9_BLEST = '" + space(TamSx3("C9_BLEST")[1]) + "' .AND. "		 	
-				cFilter += "C9_BLCRED = '" + space(TamSx3("C9_BLCRED")[1]) + "' .AND. "		 	 				
-				cFilter += "C9_QTDLIB > 0"		 	 				
+				cFiltro += " .AND. C9_BLEST = '" + space(TamSx3("C9_BLEST")[1]) + "' .AND. "		 	
+				cFiltro += "C9_BLCRED = '" + space(TamSx3("C9_BLCRED")[1]) + "' .AND. "		 	 				
+				cFiltro += "C9_QTDLIB > 0"		 	 				
 			Else
-				cFilter += " .AND. (C9_BLEST <> '" + space(TamSx3("C9_BLEST")[1]) + "' .OR. "		 	
-     			cFilter += "C9_BLCRED <> '" + space(TamSx3("C9_BLCRED")[1]) + "')"		 	 								
+				cFiltro += " .AND. (C9_BLEST <> '" + space(TamSx3("C9_BLEST")[1]) + "' .OR. "		 	
+     			cFiltro += "C9_BLCRED <> '" + space(TamSx3("C9_BLCRED")[1]) + "')"		 	 								
 			EndIf	
 		EndIf	
-		oReport:Section(2):SetFilter(cFilter,cKey)
+		oReport:Section(2):SetFilter(cFiltro,cKey)
 		dbGoTop()
 		
-		cFilter:="" 
+		cFiltro:="" 
 		cAliasSC6 := "SC6"
 		dbSelectArea(cAliasSC6)
-		cFilter := If( Empty(dbFilter()),"","("+dbFilter()+") .AND. " )
-		cFilter += 'C6_FILIAL == "'+xFilial("SC6")+'" .AND. '
-		cFilter += '(C6_NUM >= "'+mv_par01+'" .AND. C6_NUM <= "'+mv_par02+'") .AND. '
-		cFilter += '(C6_PRODUTO >= "'+mv_par03+'" .AND. C6_PRODUTO <= "'+mv_par04+'") .AND. '
-		cFilter += 'Dtos(C6_ENTREG) >= "'+Dtos(mv_par10)+'" .AND. '
-		cFilter += 'Dtos(C6_ENTREG) <= "'+Dtos(mv_par11)+'" .AND. '
-		cFilter += 'C6_QTDVEN-C6_QTDENT > 0 .AND. ' 
-		cFilter += 'Alltrim(C6_BLQ) <> "R"'
+		cFiltro := If( Empty(dbFilter()),"","("+dbFilter()+") .AND. " )
+		cFiltro += 'C6_FILIAL == "'+xFilial("SC6")+'" .AND. '
+		cFiltro += '(C6_NUM >= "'+mv_par01+'" .AND. C6_NUM <= "'+mv_par02+'") .AND. '
+		cFiltro += '(C6_PRODUTO >= "'+mv_par03+'" .AND. C6_PRODUTO <= "'+mv_par04+'") .AND. '
+		cFiltro += 'Dtos(C6_ENTREG) >= "'+Dtos(mv_par10)+'" .AND. '
+		cFiltro += 'Dtos(C6_ENTREG) <= "'+Dtos(mv_par11)+'" .AND. '
+		cFiltro += 'C6_QTDVEN-C6_QTDENT > 0 .AND. ' 
+		cFiltro += 'Alltrim(C6_BLQ) <> "R"'
 		If nOrdem = 1
 			cDescOrdem:= STR0043	//	"Pedido"
 			cKey :="C6_FILIAL+C6_NUM+C6_ITEM"   
@@ -612,12 +621,12 @@ cQueryAdd := ""
 			cKey :="C6_FILIAL+DTOS(SC6->C6_ENTREG)+C6_ITEM"
 		EndIf
 		
-		oReport:Section(1):SetFilter(cFilter,cKey)
+		oReport:Section(1):SetFilter(cFiltro,cKey)
 		DbGoTop()
 		
-#IFDEF TOP
+//#IFDEF TOP
 	EndIf
-#EndIf	
+//#EndIf	
 
 If MV_PAR06 == 1
 	cTipo := STR0056		// " Aptos a Faturar "
@@ -1087,7 +1096,7 @@ LOCAL cQuery     := ""
 LOCAL cQryAd     := ""
 LOCAL cName      := ""
 LOCAL cPedido    := ""
-LOCAL cFilter    := ""
+LOCAL cFiltro    := ""
 LOCAL cIndexSC6  := ""
 LOCAL cIndexSC9  := ""
 LOCAL cKey 	     := ""
@@ -1169,15 +1178,22 @@ AADD(aCampos,{ "TB_COD"   ,"C",aTam[1],aTam[2] } )
 aTam:=TamSX3("B2_QATU")
 AADD(aCampos,{ "TB_SALDO" ,"N",aTam[1],aTam[2] } )
 
-cTrab:= CriaTrab(aCampos)
-
-USE &cTrab ALIAS STR NEW
-IndRegua("STR",cTrab,"TB_LOCAL+TB_COD",,,STR0012)		//"Selecionando Registros..."
+oTempTable := FWTemporaryTable():New("STR") //cNomArq := CriaTrab(aCampos)
+//Define as colunas usadas
+oTempTable:SetFields( aCampos )
+//Efetua a criação da tabela
+oTempTable:Create()
+//Cria índice com colunas setadas anteriormente
+oTempTable:AddIndex("1", {"VENDEDOR", "CLIENTE","NUMPED"} )
+dbselectarea("STR")
+/*cTrab:= CriaTrab(aCampos)
+USE &cTrab ALIAS STR NEW*/
+IndRegua("STR","STR","TB_LOCAL+TB_COD",,,STR0012)		//"Selecionando Registros..."
 dbSelectArea("SC6")
 dbSetOrder(nOrdem) 
 
 cQueryAdd := ""
-#IfDEF TOP
+//#IfDEF TOP
 	If TcSrvType() <> "AS/400"
 		
 		lQuery    := .T.
@@ -1384,42 +1400,42 @@ cQueryAdd := ""
             EndIf
         Next nSC9
 	Else
-#EndIf 
+//#EndIf 
         //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
         //³ Definicao dos filtros dos arquivos C6 e C9 para codbase.    ³
         //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ	   			
 		dbSelectArea(cAliasSC9)
 		cIndexSC9  := CriaTrab(NIL,.F.)
 		cKey := IndexKey()		                         
-		cFilter := 'C9_FILIAL == "'+xFilial("SC9")+'" .AND. '
-		cFilter += "C9_NFISCAL = '" + space(TamSx3("C9_NFISCAL")[1]) + "'"		 	
+		cFiltro := 'C9_FILIAL == "'+xFilial("SC9")+'" .AND. '
+		cFiltro += "C9_NFISCAL = '" + space(TamSx3("C9_NFISCAL")[1]) + "'"		 	
 		If mv_par06 <> 3
 			If mv_par06 == 1
-				cFilter += " .AND. C9_BLEST = '" + space(TamSx3("C9_BLEST")[1]) + "' .AND. "		 	
-				cFilter += "C9_BLCRED = '" + space(TamSx3("C9_BLCRED")[1]) + "' .AND. "		 	 				
-				cFilter += "C9_QTDLIB > 0"		 	 				
+				cFiltro += " .AND. C9_BLEST = '" + space(TamSx3("C9_BLEST")[1]) + "' .AND. "		 	
+				cFiltro += "C9_BLCRED = '" + space(TamSx3("C9_BLCRED")[1]) + "' .AND. "		 	 				
+				cFiltro += "C9_QTDLIB > 0"		 	 				
 			Else
-				cFilter += " .AND. (C9_BLEST <> '" + space(TamSx3("C9_BLEST")[1]) + "' .OR. "		 	
-     			cFilter += "C9_BLCRED <> '" + space(TamSx3("C9_BLCRED")[1]) + "')"		 	 								
+				cFiltro += " .AND. (C9_BLEST <> '" + space(TamSx3("C9_BLEST")[1]) + "' .OR. "		 	
+     			cFiltro += "C9_BLCRED <> '" + space(TamSx3("C9_BLCRED")[1]) + "')"		 	 								
 			EndIf	
 		EndIf	
-		IndRegua(cAliasSC9,cIndexSC9,cKey,,cFilter,STR0006)//"Selecionando Registros..."	   
-		#IfNDEF TOP
+		IndRegua(cAliasSC9,cIndexSC9,cKey,,cFiltro,STR0006)//"Selecionando Registros..."	   
+		/*#IfNDEF TOP
 			DbSetIndex(cIndexSC9+OrdBagExt())
-		#EndIf 
+		#EndIf */
 		
-		cFilter:="" 
+		cFiltro:="" 
 		cAliasSC6 := cString
 		dbSelectArea(cAliasSC6)
 		cIndexSC6  := CriaTrab(NIL,.F.) 
-		cFilter := If( Empty(dbFilter()),"","("+dbFilter()+") .AND. " )
-		cFilter += 'C6_FILIAL == "'+xFilial("SC6")+'" .AND. '
-		cFilter += '(C6_NUM >= "'+mv_par01+'" .AND. C6_NUM <= "'+mv_par02+'") .AND. '
-		cFilter += '(C6_PRODUTO >= "'+mv_par03+'" .AND. C6_PRODUTO <= "'+mv_par04+'") .AND. '
-		cFilter += 'Dtos(C6_ENTREG) >= "'+Dtos(mv_par10)+'" .AND. '
-		cFilter += 'Dtos(C6_ENTREG) <= "'+Dtos(mv_par11)+'" .AND. '
-		cFilter += 'C6_QTDVEN-C6_QTDENT > 0 .AND. ' 
-		cFilter += 'Alltrim(C6_BLQ) <> "R"'
+		cFiltro := If( Empty(dbFilter()),"","("+dbFilter()+") .AND. " )
+		cFiltro += 'C6_FILIAL == "'+xFilial("SC6")+'" .AND. '
+		cFiltro += '(C6_NUM >= "'+mv_par01+'" .AND. C6_NUM <= "'+mv_par02+'") .AND. '
+		cFiltro += '(C6_PRODUTO >= "'+mv_par03+'" .AND. C6_PRODUTO <= "'+mv_par04+'") .AND. '
+		cFiltro += 'Dtos(C6_ENTREG) >= "'+Dtos(mv_par10)+'" .AND. '
+		cFiltro += 'Dtos(C6_ENTREG) <= "'+Dtos(mv_par11)+'" .AND. '
+		cFiltro += 'C6_QTDVEN-C6_QTDENT > 0 .AND. ' 
+		cFiltro += 'Alltrim(C6_BLQ) <> "R"'
 		If nOrdem = 1
 			cDescOrdem:= STR0013	//"PEDIDO"
 			cKey :="C6_FILIAL+C6_NUM"   
@@ -1430,15 +1446,15 @@ cQueryAdd := ""
 			cDescOrdem:= STR0015	//"DATA DE ENTREGA"
 			cKey :="C6_FILIAL+DTOS(SC6->C6_ENTREG)"
 		EndIf
-		IndRegua(cAliasSC6,cIndexSC6,cKey,,cFilter,STR0006)//"Selecionando Registros..."
-		#IfNDEF TOP
+		IndRegua(cAliasSC6,cIndexSC6,cKey,,cFiltro,STR0006)//"Selecionando Registros..."
+		/*#IfNDEF TOP
 			DbSetIndex(cIndexSC6+OrdBagExt())
-		#EndIf                           
+		#EndIf         */                  
 		DbGoTop()
 		
-#IfDEF TOP
+//#IfDEF TOP
 	EndIf
-#EndIf	
+//#EndIf	
 
 If MV_PAR06 == 1
 	cTipo := STR0016		//" APTOS A FATURAR "
@@ -1858,7 +1874,7 @@ EndIf
 
 dbSelectArea("STR")
 dbCloseArea()
-fErase(cTrab+".DBF")
+//fErase(cTrab+".DBF")
 fErase(cTrab+OrdBagExt())
 
 If lQuery
