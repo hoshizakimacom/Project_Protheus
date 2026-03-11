@@ -25,11 +25,11 @@ Return
 //+----------------------------------------------------------------------------------------------------------------
 Static Function M02EMain(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 
-	BeginTran()
+	BEGIN TRANSACTION //BeginTran()
 
 		M10E05P(_cCodProd,_nQtd,_cNumSer)
 	
-	EndTran()
+	END TRANSACTION //EndTran()
 	MsUnlockAll()
 
 Return
