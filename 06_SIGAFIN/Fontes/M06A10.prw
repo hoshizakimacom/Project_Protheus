@@ -77,9 +77,11 @@ Local aRotina 	:= {}
 //----------------------------------------------------------
 // Adiciona botões do browse
 //----------------------------------------------------------
-ADD OPTION aRotina TITLE 'Visualiza'	ACTION 'U_M06V10()'	 OPERATION 2 ACCESS 0 // 'Visual'
+//ADD OPTION aRotina TITLE 'Visualiza'	ACTION 'U_M06V10()'	 OPERATION 2 ACCESS 0 // 'Visual' - Thiago Marques - 13/08/2025 - Comentado para compatibilização 2410
 //ADD OPTION aRotina TITLE 'Follow-up'	ACTION 'U_M06F10(TRB->FILIAL,TRB->CLIENTE,TRB->LOJA,TRB->PREFIXO,TRB->NUMERO,TRB->PARCELA)'  	 OPERATION 2 ACCESS 0 // 'Consulta Cli'
-ADD OPTION aRotina TITLE 'Follow-up'	ACTION 'U_M06F10(TRB->FILIAL,TRB->CLIENTE,TRB->LOJA,TRB->PREFIXO,TRB->NUMERO,TRB->PARCELA,TRB->EMISSAO,TRB->VENCTO,TRB->VALOR,TRB->SALDO)'  	 OPERATION 2 ACCESS 0 // 'Consulta Cli'
+//ADD OPTION aRotina TITLE 'Follow-up'	ACTION 'U_M06F10(TRB->FILIAL,TRB->CLIENTE,TRB->LOJA,TRB->PREFIXO,TRB->NUMERO,TRB->PARCELA,TRB->EMISSAO,TRB->VENCTO,TRB->VALOR,TRB->SALDO)'  	 OPERATION 2 ACCESS 0 // 'Consulta Cli' - Thiago Marques - 13/08/2025 - Comentado para compatibilização 2410
+aAdd(aRotina, {'Visualiza',	'U_M06V10()',0, 2})
+aAdd(aRotina, {'Follow-up',	'U_M06F10(TRB->FILIAL,TRB->CLIENTE,TRB->LOJA,TRB->PREFIXO,TRB->NUMERO,TRB->PARCELA,TRB->EMISSAO,TRB->VENCTO,TRB->VALOR,TRB->SALDO)',0, 2})
 
 Return aRotina
 
@@ -180,12 +182,20 @@ AADD( aStruct , { "RECNO" 		 , "N" , 20 , 0 } )
 AADD( aStruct , { "RECSA1" 		 , "N" , 20 , 0 } )
 
 // Crio fisicamente o arquivo.
-cArqTRB := CriaTrab( aStruct, .T. )
+//cArqTRB := CriaTrab( aStruct, .T. )
+oTempTable := FWTemporaryTable():New("TRB") //cNomArq := CriaTrab(aCampos)
+//Define as colunas usadas
+oTempTable:SetFields( aStruct )
+//Efetua a criação da tabela
+oTempTable:Create()
+//Cria índice com colunas setadas anteriormente
+
 cInd1 := Left( cArqTRB, 7 ) + "1"
 cInd2 := Left( cArqTRB, 7 ) + "2"
 
 // Acessar o arquivo e coloca-lo na lista de arquivos abertos.
-dbUseArea( .T., __LocalDriver, cArqTRB, "TRB", .F., .F. )
+dbselectarea("TRB")
+//dbUseArea( .T., __LocalDriver, cArqTRB, "TRB", .F., .F. )
 
 // Criar os índices.
 IndRegua( "TRB", cInd1, "CLIENTE+DTOS(VENCTO)+NUMERO+PARCELA"			,,,"Criando índices (CLIENTE+DTOS(VENCTO)+NUMERO+PARCELA)...",.T.)
@@ -206,22 +216,22 @@ If MV_PAR01 == 1
 	cQuery += " C5_VEND1 REPRESEN, C5_VEND1 GERENCIA, C5_XEMAILC EMAIL, C5_XCONT CONTATO, " +CRLF // C5_XNCONT NOMECONT,"  										+CRLF
 	cQuery += " E1_EMISSAO EMISSAO, E1_VENCREA VENCTO, E1_VALOR VALOR, E1_VLCRUZ VALORPED, E1_SALDO SALDO, SE1.R_E_C_N_O_ RECNO, SA1.R_E_C_N_O_ RECSA1 " 	+CRLF
 	cQuery += " FROM  "+RetSqlName('SE1')+"  SE1 
-	cQuery += "  INNER JOIN "+RetSqlName('SA1')+" SA1 ON   A1_FILIAL = '"+xFilial('SA1')+"' AND E1_CLIENTE = A1_COD     AND E1_LOJA  = A1_LOJA AND SA1.D_E_L_E_T_ <> '*' "	+CRLF
+	cQuery += "  INNER JOIN "+RetSqlName('SA1')+" SA1 ON   A1_FILIAL = '"+xFilial('SA1')+"' AND E1_CLIENTE = A1_COD     AND E1_LOJA  = A1_LOJA AND SA1.D_E_L_E_T_ = '' "	+CRLF
 	//cQuery += "  INNER JOIN "+RetSqlName('SF2')+" SF2 ON   F2_FILIAL = '"+xFilial('SF2')+"' AND E1_CLIENTE = F2_CLIENTE AND E1_LOJA  = F2_LOJA AND E1_NUM = F2_DOC AND E1_PREFIXO = F2_SERIE  AND SF2.D_E_L_E_T_ <> '*' "	+CRLF
 
 //	cQuery += "  INNER JOIN "+RetSqlName('SC5')+" SC5 ON   C5_FILIAL = '"+xFilial('SC5')+"' AND E1_CLIENTE = C5_CLIENTE AND E1_LOJA  = C5_LOJACLI AND E1_NUM = C5_NOTA AND E1_PREFIXO = C5_SERIE  AND SC5.D_E_L_E_T_ <> '*' "	+CRLF
-	cQuery += "  INNER JOIN "+RetSqlName('SC5')+" SC5 ON   C5_FILIAL = '"+xFilial('SC5')+"' AND E1_CLIENTE = C5_CLIENTE AND E1_LOJA  = C5_LOJACLI AND E1_PEDIDO = C5_NUM AND SC5.D_E_L_E_T_ <> '*' "	+CRLF
+	cQuery += "  INNER JOIN "+RetSqlName('SC5')+" SC5 ON   C5_FILIAL = '"+xFilial('SC5')+"' AND E1_CLIENTE = C5_CLIENTE AND E1_LOJA  = C5_LOJACLI AND E1_PEDIDO = C5_NUM AND SC5.D_E_L_E_T_ = '' "	+CRLF
 
 	cQuery += " WHERE E1_VENCREA BETWEEN '"+DTOS(MV_PAR02)+"' AND '"+DTOS(MV_PAR03)+"'"															+CRLF
 	cQuery += " AND E1_CLIENTE BETWEEN '"+MV_PAR04+"' AND '"+MV_PAR05+"'"	+CRLF
 	
 	If mv_par06 == 1	// Exibe Titulos Encerrados com Hist."
-		cQuery += " AND (E1_SALDO > 0 OR ( SELECT COUNT(*) FROM "+RetSqlName('ZAI')+" ZAI WHERE ZAI_FILIAL = '"+xFilial("ZAI")+"' AND ZAI_PREFIX = E1_PREFIXO AND ZAI_NUM = E1_NUM AND ZAI_PARCEL = E1_PARCELA AND ZAI_TIPO = E1_TIPO AND ZAI.D_E_L_E_T_ <> '*' ) > 0)
+		cQuery += " AND (E1_SALDO > 0 OR ( SELECT COUNT(*) FROM "+RetSqlName('ZAI')+" ZAI WHERE ZAI_FILIAL = '"+xFilial("ZAI")+"' AND ZAI_PREFIX = E1_PREFIXO AND ZAI_NUM = E1_NUM AND ZAI_PARCEL = E1_PARCELA AND ZAI_TIPO = E1_TIPO AND ZAI.D_E_L_E_T_ = '' ) > 0)
 	Else
 		cQuery += " AND E1_SALDO > 0
 	EndIf
 	cQuery += " AND E1_TIPO IN ('NF ','BOL') "
-	cQuery += " AND SE1.D_E_L_E_T_<>'*'"																										+CRLF
+	cQuery += " AND SE1.D_E_L_E_T_='' "																										+CRLF
 	
 
 Elseif MV_PAR01 == 2
@@ -231,14 +241,14 @@ Elseif MV_PAR01 == 2
 	cQuery +=" C5_VEND1 REPRESEN, C5_VEND1 GERENCIA, C5_XEMAILC EMAIL,  C5_XCONT CONTATO, " +CRLF // C5_XNCONT NOMECONT,"  											
 	cQuery +=" E1_EMISSAO EMISSAO, E1_VENCREA VENCTO, E1_VALOR VALOR, E1_VLCRUZ VALORPED, E1_SALDO SALDO, SE1.R_E_C_N_O_ RECNO, SA1.R_E_C_N_O_ RECSA1 " 		+CRLF
 	cQuery +=" FROM  "+RetSqlName('ZAI')+"  ZAI 
-	cQuery +=" 	INNER JOIN "+RetSqlName('SE1')+" SE1 ON   E1_FILIAL = ZAI_FILIAL AND E1_CLIENTE = ZAI_CLIENT AND E1_LOJA = ZAI_LOJA	AND E1_PREFIXO = ZAI_PREFIX	AND E1_NUM = ZAI_NUM AND E1_PARCELA = ZAI_PARCEL AND ZAI_TIPO = E1_TIPO AND SE1.D_E_L_E_T_ <> '*'"		+CRLF
-	cQuery +=" 	INNER JOIN "+RetSqlName('SA1')+" SA1 ON   A1_FILIAL = '"+xFilial('SA1')+"' AND E1_CLIENTE = A1_COD AND E1_LOJA  = A1_LOJA AND SA1.D_E_L_E_T_ <> '*'"																			+CRLF
+	cQuery +=" 	INNER JOIN "+RetSqlName('SE1')+" SE1 ON   E1_FILIAL = ZAI_FILIAL AND E1_CLIENTE = ZAI_CLIENT AND E1_LOJA = ZAI_LOJA	AND E1_PREFIXO = ZAI_PREFIX	AND E1_NUM = ZAI_NUM AND E1_PARCELA = ZAI_PARCEL AND ZAI_TIPO = E1_TIPO AND SE1.D_E_L_E_T_ = ''"		+CRLF
+	cQuery +=" 	INNER JOIN "+RetSqlName('SA1')+" SA1 ON   A1_FILIAL = '"+xFilial('SA1')+"' AND E1_CLIENTE = A1_COD AND E1_LOJA  = A1_LOJA AND SA1.D_E_L_E_T_ = ''"																			+CRLF
 	//cQuery +=" 	INNER JOIN "+RetSqlName('SF2')+" SF2 ON   F2_FILIAL = ZAI_FILIAL AND F2_CLIENTE = ZAI_CLIENT AND F2_LOJA = ZAI_LOJA	AND F2_SERIE = ZAI_PREFIX	AND F2_DOC = ZAI_NUM AND SF2.D_E_L_E_T_ <> '*'"									+CRLF
-	cQuery += " INNER JOIN "+RetSqlName('SC5')+" SC5 ON   C5_FILIAL = '"+xFilial('SC5')+"' AND ZAI_CLIENT = C5_CLIENTE AND ZA1_LOJA = C5_LOJACLI AND ZAI_NUM = C5_NOTA AND ZAI_PREFIX = C5_SERIE  AND SC5.D_E_L_E_T_ <> '*' "					+CRLF
+	cQuery += " INNER JOIN "+RetSqlName('SC5')+" SC5 ON   C5_FILIAL = '"+xFilial('SC5')+"' AND ZAI_CLIENT = C5_CLIENTE AND ZA1_LOJA = C5_LOJACLI AND ZAI_NUM = C5_NOTA AND ZAI_PREFIX = C5_SERIE  AND SC5.D_E_L_E_T_ = '' "					+CRLF
 	cQuery +=" WHERE ZAI_AGEN BETWEEN '"+DTOS(MV_PAR02)+"' AND '"+DTOS(MV_PAR03)+"'"																	+CRLF
 	cQuery +=" AND ZAI_CLIENT BETWEEN '"+MV_PAR04+"' AND '"+MV_PAR05+"'"																				+CRLF
 	cQuery +=" AND E1_SALDO > 0 "																														+CRLF
-	cQuery +=" AND ZAI.D_E_L_E_T_<>'*'"																													+CRLF
+	cQuery +=" AND ZAI.D_E_L_E_T_= ''"																													+CRLF
 	
 Endif
         
@@ -269,8 +279,8 @@ While ! QRY->( EOF() )
 	TRB->(MsUnLock())
 	QRY->( dbSkip() )
 End
-
-Return({cArqTRB,cInd1,cInd2})
+oTempTable:Delete()
+Return({"TRB",cInd1,cInd2})
 
 /*±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
@@ -318,7 +328,7 @@ Local i,j
 
 dbSelectArea("SX1")
 dbSetOrder(1)
-c_Perg := PADR(c_Perg,Len(SX1->X1_GRUPO))
+c_Perg := PADR(c_Perg,10)
 
 //Grupo /Ordem /Pergunta               /PERSPA  / PERENG/Variavel/Tipo   /Tamanho  /Decimal/Presel /GSC /Valid/Var01      /Def01      /DEFSPA1 /DEFENG1 /Cnt01 /Var02     /Def02           /DEFSPA2 /DEFENG2 /Cnt02 /Var03     /Def03          /DEFSPA3 /DEFENG3 /Cnt03 /Var04     /Def04          /DEFSPA4 /DEFENG4 /Cnt04 /Var05     /Def05          /DEFSPA5/DEFENG5  /Cnt05 /F3   /PYME/GRPSXG
 aAdd(aRegs,{c_Perg,"01"	,"Tipo Data?"			,''		,''			,"mv_ch1"	,"N"	,1			,0			,2			,"C"	,""		,""		,""			,""		,"mv_par01"	,"Vencimento"	,"Si"		,"Yes"		,""		,"Agendamento"	,"No"		,"No"		,""		,""			,""			,""		,""			,""			,""		,""			,""			,""		,""		,""})
