@@ -82,6 +82,8 @@ Static Function ReportDef(_oReport, _cPerg)
 	TRCell():New(_oOP,'VALOR'			, _cAlias)		// VALOR
 	TRCell():New(_oOP,'PICKINGLIST'		, _cAlias)		// PICKING LIST	#5706	
 	TRCell():New(_oOP,'DTENCER'			, _cAlias)		// DT.ENCERR
+	TRCell():New(_oOP,'REVISAO'			, _cAlias)		// REVISAO
+	TRCell():New(_oOP,'DATAREV'			, _cAlias)		// DATAREV
 
 	_oOP:oReport:cFontBody 			:= 'Calibri'
 	_oOP:oReport:nFontBody			:= 11
@@ -154,6 +156,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 			Column SUP_S 				as Date	//#5175
 			Column EXPEDICAO 			as Date
 			Column DTENCER		 		as Date
+			Column DATAREV		 		as Date
 
 			SELECT
 					CASE //0002 #3881
@@ -228,6 +231,9 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 						ELSE 'NÃO INDICADO'
 					END AS PICKINGLIST
 
+					,C2_REVISAO										AS REVISAO
+					,ISNULL(G5_DATAREV,'')       					AS DATAREV
+
 			FROM %Table:SC2% SC2
 
 			LEFT JOIN %Table:SC6% SC6
@@ -259,10 +265,16 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					AND CK_PRODUTO = C2_PRODUTO
 					AND CK_XITEMP  = C6_XITEMP
 					AND C6_ITEM    = CK_ITEM
+			LEFT JOIN %Table:SG5% SG5
+					ON SG5.%NotDel%
+					AND G5_FILIAL = %xFilial:SG5%
+					AND G5_PRODUTO = C2_PRODUTO
+					AND G5_REVISAO = C2_REVISAO
 			WHERE 	SC2.%NotDel%
 				AND C2_FILIAL    = %xFilial:SC2%
 				AND C2_NUM + C2_ITEM + C2_SEQUEN + C2_ITEMGRD 		BETWEEN %Exp:MV_PAR01% AND %Exp:MV_PAR02%
 				AND C2_EMISSAO 	BETWEEN %Exp:MV_PAR03% AND %Exp:MV_PAR04%
+				AND C2_LOCAL	BETWEEN %Exp:MV_PAR06% AND %Exp:MV_PAR07%
 				// Abertas
 //				AND C2_TPOP = 'F'
 				AND C2_DATRF = ''
@@ -304,6 +316,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 			Column SUP_S 				as Date	//#5175
 			Column EXPEDICAO 			as Date
 			Column DTENCER		 		as Date
+			Column DATAREV		 		as Date
 
 			SELECT
 					CASE 														//0002 #3881
@@ -325,6 +338,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 				
 					,B1_XITDESE										AS ITEM_DESENV 	//0002 #3881
 					,C2_NUM + C2_ITEM + C2_SEQUEN + C2_ITEMGRD 		AS 'OF'
+					,C2_LOCAL										AS 'ARMAZEM'
 					,C5_EMISSAO 									AS DATA_
 					,C5_NUM											AS PEDIDO
 					,A1_NOME										AS CLIENTE
@@ -373,12 +387,16 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,C6_VALOR										AS VALOR
 					,C2_DATRF										AS DTENCER
 					
+					
 					,CASE
 						WHEN B1_XPICLIS = '1' THEN '1 - SIM'
 						WHEN B1_XPICLIS = '2' THEN '2 - NÃO'
 						ELSE 'NÃO INDICADO'
 					END AS PICKINGLIST
-			
+
+					,C2_REVISAO										AS REVISAO
+					,ISNULL(G5_DATAREV,'')       					AS DATAREV
+
 					
 			FROM %Table:SC2% SC2
 
@@ -411,10 +429,16 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					AND CK_PRODUTO = C2_PRODUTO
 					AND CK_XITEMP  = C6_XITEMP
 					AND C6_ITEM    = CK_ITEM
+			LEFT JOIN %Table:SG5% SG5
+					ON SG5.%NotDel%
+					AND G5_FILIAL = %xFilial:SG5%
+					AND G5_PRODUTO = C2_PRODUTO
+					AND G5_REVISAO = C2_REVISAO
 			WHERE 	SC2.%NotDel%
 				AND C2_FILIAL    = %xFilial:SC2%
 				AND C2_NUM + C2_ITEM + C2_SEQUEN + C2_ITEMGRD 		BETWEEN %Exp:MV_PAR01% AND %Exp:MV_PAR02%
 				AND C2_EMISSAO 	BETWEEN %Exp:MV_PAR03% AND %Exp:MV_PAR04%
+				AND C2_LOCAL	BETWEEN %Exp:MV_PAR06% AND %Exp:MV_PAR07%
 				
 //				AND C2_TPOP = 'F'
 				AND C2_DATRF <> ''
@@ -455,6 +479,7 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 			Column SUP_S 				as Date	//#5175
 			Column EXPEDICAO 			as Date
 			Column DTENCER		 		as Date
+			Column DATAREV		 		as Date
 
 			SELECT
 					CASE //0002 #3881
@@ -524,11 +549,15 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					,C6_VALOR										AS VALOR
 					,C2_DATRF										AS DTENCER
 					
+					
 					,CASE
 						WHEN B1_XPICLIS = '1' THEN '1 - SIM'
 						WHEN B1_XPICLIS = '2' THEN '2 - NÃO'
 						ELSE 'NÃO INDICADO'
 					END AS PICKINGLIST		
+					
+					,C2_REVISAO										AS REVISAO
+					,ISNULL(G5_DATAREV,'')       					AS DATAREV
 					
 			FROM %Table:SC2% SC2
 
@@ -561,10 +590,16 @@ Static Function M10RGetSC2(_cAlias,_oReport)
 					AND CK_PRODUTO = C2_PRODUTO
 					AND CK_XITEMP  = C6_XITEMP
 					AND C6_ITEM    = CK_ITEM
+			LEFT JOIN %Table:SG5% SG5
+					ON SG5.%NotDel%
+					AND G5_FILIAL = %xFilial:SG5%
+					AND G5_PRODUTO = C2_PRODUTO
+					AND G5_REVISAO = C2_REVISAO
 			WHERE 	SC2.%NotDel%
 				AND C2_FILIAL    = %xFilial:SC2%
 				AND C2_NUM + C2_ITEM + C2_SEQUEN + C2_ITEMGRD 		BETWEEN %Exp:MV_PAR01% AND %Exp:MV_PAR02%
 				AND C2_EMISSAO 	BETWEEN %Exp:MV_PAR03% AND %Exp:MV_PAR04%
+				AND C2_LOCAL	BETWEEN %Exp:MV_PAR06% AND %Exp:MV_PAR07%
 
 				ORDER BY 'OF'
 		EndSql
@@ -604,6 +639,8 @@ Static Function AtuSX1(_cPerg)
 		PutSX1(_cPerg,'02','OP Ate ?'		,'OP Ate ?'			,'OP Ate ?'			,'mv_ch2','C',13,0, ,'G','','SC2',,,'mv_par02',,,,Replicate('Z',13))
 		PutSX1(_cPerg,'03','Data De ?'		,'Data De ?'		,'Data De ?'		,'mv_ch3','D',08,0, ,'G','','   ',,,'mv_par03',,,,)
 		PutSX1(_cPerg,'04','Data Ate ?'		,'Data Ate ?'		,'Data Ate ?'		,'mv_ch4','D',08,0, ,'G','','   ',,,'mv_par04',,,,)
+		PutSX1(_cPerg,'05','Armazem De ?'	,'Armazem De ?'		,'Armazem De ?'		,'mv_ch1','C',02,0, ,'G','','SC2',,,'mv_par06',,,,Space(02))
+		PutSX1(_cPerg,'06','Armazem Ate ?'	,'Armazem Ate ?'	,'Armazem Ate ?'	,'mv_ch2','C',02,0, ,'G','','SC2',,,'mv_par07',,,,Replicate('Z',02))
 	EndIf
 
 	RestArea(_aAreaSX1)
