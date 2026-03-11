@@ -10,7 +10,7 @@ Static _cTime       := 0
 Static _aCodZA3     := {}
 
 //+---------------------------------------------------------------------------------
-// Rotina responsavel pelo apontamento de etapa de produção
+// Rotina responsavel pelo apontamento de etapa de produï¿½ï¿½o
 //+---------------------------------------------------------------------------------
 User Function M10A01()
     Private _oDlg         := Nil
@@ -36,24 +36,24 @@ User Function M10A01()
     Private _cC6xEtapa    := ' '
    
     //+--------------------------------------------------------
-    // Inicializa variáveis static
+    // Inicializa variï¿½veis static
     //+--------------------------------------------------------
     M10ASetVa(.F.)
 
     M10AGetPa()
 
     //+--------------------------------------------------------
-    // Busca etapa e local de transferência
-    //  Caso grupo do usuário logado não possua etapa,
-    //  não permite apontamento
+    // Busca etapa e local de transferï¿½ncia
+    //  Caso grupo do usuï¿½rio logado nï¿½o possua etapa,
+    //  nï¿½o permite apontamento
     //+--------------------------------------------------------
     M10AGetEt()
 
     If Empty(_cEtapaDes)
-        M10AMsg("Usuário sem permissão para acessar essa rotina.",'Atenção',.F.)
+        M10AMsg("Usuï¿½rio sem permissï¿½o para acessar essa rotina.",'Atenï¿½ï¿½o',.F.)
     Else
 
-        DEFINE MSDIALOG _oDlg FROM 0,0 TO 350,800 TITLE "Apontamento de Etapas de Produção" PIXEL
+        DEFINE MSDIALOG _oDlg FROM 0,0 TO 350,800 TITLE "Apontamento de Etapas de Produï¿½ï¿½o" PIXEL
 
             _oPnlAll            := TPanel():New(0,0,"",_oDlg,,,,,,0,0)
             _oPnlAll:Align      := 5
@@ -61,13 +61,13 @@ User Function M10A01()
             _nClrStd            := _oPnlAll:nClrPane
             _oTimer             := TTimer():New(_nInat, _bTimer, _oDlg )
 
-            _oTSayUsr           := TSay():New(020,020,{||"Usuário:"}    ,_oPnlAll,,_oTFont,.F.,.F.,.F.,.T.,0,,200,020,.F.,.T.,.F.,.F.,.F.,.F. )
+            _oTSayUsr           := TSay():New(020,020,{||"Usuï¿½rio:"}    ,_oPnlAll,,_oTFont,.F.,.F.,.F.,.T.,0,,200,020,.F.,.T.,.F.,.F.,.F.,.F. )
             _oTSayUsrInf        := TSay():New(020,140,{||_cUsrEtapa }   ,_oPnlAll,,_oTFont,.F.,.F.,.F.,.T.,0,,400,020,.F.,.T.,.F.,.F.,.F.,.F. )
 
             _oTSayCom           := TSay():New(050,020,{||"Etapa:"}      ,_oPnlAll,,_oTFont,.F.,.F.,.F.,.T.,0,,200,020,.F.,.T.,.F.,.F.,.F.,.F. )
             _oTSayComInf        := TSay():New(050,140,{||_cEtapaDes }   ,_oPnlAll,,_oTFont,.F.,.F.,.F.,.T.,0,,400,020,.F.,.T.,.F.,.F.,.F.,.F. )
 
-            _oTSayCB            := TSay():New(105,020,{||"Cód. Barras:"},_oPnlAll,,_oTFont,.F.,.F.,.F.,.T.,0,,200,020,.F.,.T.,.F.,.F.,.F.,.F. )
+            _oTSayCB            := TSay():New(105,020,{||"Cï¿½d. Barras:"},_oPnlAll,,_oTFont,.F.,.F.,.F.,.T.,0,,200,020,.F.,.T.,.F.,.F.,.F.,.F. )
             _oTGetCB            := TGet():New(100,140,{ | u | If( PCount() == 0, _cOP, _cOP := u ) },_oPnlAll,130,020,"@!",,0,,_oTFont,.F.,,.T.,,.F.,,.F.,.F.,{|| },.F.,.F.,,'_cOP',,,, )
 
             _oTGetCB:bLostFocus := {|| IIF(!Empty(_cOP), {Eval(_bConf),_oTGetCB:SetFocus()}, )}
@@ -79,7 +79,7 @@ User Function M10A01()
     EndIf
 
     //+--------------------------------------------------------
-    // Limpa variáveis static
+    // Limpa variï¿½veis static
     //+--------------------------------------------------------
     M10ASetVa(.T.)
 Return
@@ -118,11 +118,11 @@ Static Function M10AProc( _oPnlAll,_oTimer)
     // Ambiente posicionado na OP informada (SC2)
     //+--------------------------------------------------------
     If _lValid
-        BeginTran()
+        BEGIN TRANSACTION //BeginTrans()
 
             If !Empty(ZA3->ZA3_LOCAL)
                 //+--------------------------------------------------------
-                // Cria saldo inicial se necessário
+                // Cria saldo inicial se necessï¿½rio
                 // Cria movimento interno para alimentar estoque
                 //+--------------------------------------------------------
                 SC2->(DbGoTo(_nRecnoSC2))
@@ -135,14 +135,14 @@ Static Function M10AProc( _oPnlAll,_oTimer)
                     EndIf
 
                 //+--------------------------------------------------------
-                // Cria saldo inicial se necessário
+                // Cria saldo inicial se necessï¿½rio
                 // Cria transferencia
                 //+--------------------------------------------------------
                 Else
                     _lErro  := !M10ASetSa()
 
 //                  If !_lErro
-//                      _lErro := !M10APrD3T()      // cria Transferência
+//                      _lErro := !M10APrD3T()      // cria Transferï¿½ncia
 //                  EndIf
                 EndIf
             EndIf
@@ -154,19 +154,19 @@ Static Function M10AProc( _oPnlAll,_oTimer)
                 M10ASetSt()
             EndIf
 
-        //+--------------------------------------------------------
-        //  Somente efetiva movimentação se não houver erro
-        //+--------------------------------------------------------
-        If _lErro
-            DisarmTransaction()
-        Else
-            EndTran()
-        EndIf
+            //+--------------------------------------------------------
+            //  Somente efetiva movimentaï¿½ï¿½o se nï¿½o houver erro
+            //+--------------------------------------------------------
+            If _lErro
+                DisarmTransaction()
+            //Else
+            EndIf
 
+        END TRANSACTION //EndTrans()
         MsUnLockAll()
 
         If !_lErro
-            M10AMsg(I18N('Apontamento de #1 realizado com sucesso!',{AllTrim(ZA3->ZA3_DESCRI)}),'Atenção',.T.)
+            M10AMsg(I18N('Apontamento de #1 realizado com sucesso!',{AllTrim(ZA3->ZA3_DESCRI)}),'Atenï¿½ï¿½o',.T.)
         EndIf
     EndIf
 
@@ -253,22 +253,22 @@ Static Function M10APrD3T()
         _aAux := {}
 
         AAdd(_aAux,{"D3_COD",	  _cProd,				 Nil})	//  Produto Origem
-        AAdd(_aAux,{"D3_DESCRI",  _cDesc,				 Nil})  //  Descrição
+        AAdd(_aAux,{"D3_DESCRI",  _cDesc,				 Nil})  //  Descriï¿½ï¿½o
         AAdd(_aAux,{"D3_UM",	  _cUM,					 Nil})  //  Unid. Medida
         AAdd(_aAux,{"D3_LOCAL",   SC2->C2_XLOCAL,		 Nil})	//  Armazem origem
-        AAdd(_aAux,{"D3_LOCALIZ", CriaVar('D3_LOCALIZ'), Nil})  //  Endereço Origem
+        AAdd(_aAux,{"D3_LOCALIZ", CriaVar('D3_LOCALIZ'), Nil})  //  Endereï¿½o Origem
         AAdd(_aAux,{"D3_COD", 	  _cProd,				 Nil})  //  Produto Destino
-        AAdd(_aAux,{"D3_DESCRI",  _cDesc, 				 Nil})  //  Descrição
+        AAdd(_aAux,{"D3_DESCRI",  _cDesc, 				 Nil})  //  Descriï¿½ï¿½o
         AAdd(_aAux,{"D3_UM",	  _cUM,					 Nil})  //  Unid. Medida
-        AAdd(_aAux,{"D3_LOCAL",	  ZA3->ZA3_LOCAL,		 Nil})	//  Armazém destino
-        AAdd(_aAux,{"D3_LOCALIZ", CriaVar('D3_LOCALIZ'), Nil})  //  Endereço Destino
+        AAdd(_aAux,{"D3_LOCAL",	  ZA3->ZA3_LOCAL,		 Nil})	//  Armazï¿½m destino
+        AAdd(_aAux,{"D3_LOCALIZ", CriaVar('D3_LOCALIZ'), Nil})  //  Endereï¿½o Destino
         AAdd(_aAux,{"D3_NUMSERI", CriaVar('D3_NUMSERI'), Nil})  //  Num. Serie
         AAdd(_aAux,{"D3_LOTECTL", CriaVar('D3_LOTECTL'), Nil})  //  Lote Origem
         AAdd(_aAux,{"D3_NUMLOTE", CriaVar('D3_NUMLOTE'), Nil})  //  Sub-Lote Origem
         AAdd(_aAux,{"D3_DTVALID", CriaVar('D3_DTVALID'), Nil})  //  Validade
         AAdd(_aAux,{"D3_POTENCI", CriaVar('D3_POTENCI'), Nil})  //  Potencia
         AAdd(_aAux,{"D3_QUANT",	  SC2->C2_QUANT,		 Nil})  //  Quantidade
-        AAdd(_aAux,{"D3_QTSEGUM", CriaVar('D3_QTSEGUM'), Nil})  //  Qtde 2ª UM
+        AAdd(_aAux,{"D3_QTSEGUM", CriaVar('D3_QTSEGUM'), Nil})  //  Qtde 2ï¿½ UM
         AAdd(_aAux,{"D3_ESTORNO", CriaVar('D3_ESTORNO'), Nil})  //  Estornado
         AAdd(_aAux,{"D3_NUMSEQ",  CriaVar('D3_NUMSEQ'),	 Nil})  //  Seq.
         AAdd(_aAux,{"D3_LOTECTL", CriaVar('D3_LOTECTL'), Nil})  //  Lote Dest.
@@ -278,7 +278,7 @@ Static Function M10APrD3T()
         AAdd(_aAux,{"D3_CODLAN",  CriaVar('D3_CODLAN'),	 Nil})	//  CAT83 Prod. Origem
         AAdd(_aAux,{"D3_CODLAN",  CriaVar('D3_CODLAN'),	 Nil})	//  CAT83 Prod. Destino         
         AAdd(_aAux,{"D3_IDDCF",	  CriaVar('D3_IDDCF'),	 Nil}) 	//  Id DCF
-        AAdd(_aAux,{"D3_OBSERVA", CriaVar('D3_OBSERVA'), Nil})	//	Observação
+        AAdd(_aAux,{"D3_OBSERVA", CriaVar('D3_OBSERVA'), Nil})	//	Observaï¿½ï¿½o
 
         AAdd(_aVet      ,AClone(_aAux))
 
@@ -286,7 +286,7 @@ Static Function M10APrD3T()
 
         If lMsErroAuto
             _cErro  := M10AGetEr()
-            M10AMsg('Erro ao incluir transferência:' + CRLF + _cErro,'Erro',.F.)
+            M10AMsg('Erro ao incluir transferï¿½ncia:' + CRLF + _cErro,'Erro',.F.)
         EndIf
     EndIf
 Return !lMsErroAuto
@@ -446,7 +446,7 @@ Static Function M10AGetOP()
         _nRecnoSC2      := SC2->(Recno())
         _nRecnoSC6      := Posicione('SC6',1,xFilial('SC6') + SC2->(C2_PEDIDO+C2_ITEMPV+C2_PRODUTO),'Recno()' )
     Else
-        M10AMsg(I18N('Ordem de Produção #1 não encontrada.',{AllTrim(_cOP)}),'Atenção',.F.)
+        M10AMsg(I18N('Ordem de Produï¿½ï¿½o #1 nï¿½o encontrada.',{AllTrim(_cOP)}),'Atenï¿½ï¿½o',.F.)
         M10ASetVa(.F.)
     EndIf
 Return _lOk
@@ -462,7 +462,7 @@ Static Function M10ASetSa()
     Local _lOk          := .T.
 
     //+--------------------------------------------------------
-    //  Verifica se existe saldo inicial no armazém origem
+    //  Verifica se existe saldo inicial no armazï¿½m origem
     //  Caso nao exista saldo inicial, cria
     //+--------------------------------------------------------
     _lSaldoIni      := M10AGetSI()
@@ -481,12 +481,12 @@ Static Function M10AVlEtp()
     Private _cItemSt      := ''
 
     //+--------------------------------------------------------
-    //  Verifica se etapa já foi apontada anteriormente
+    //  Verifica se etapa jï¿½ foi apontada anteriormente
     //+--------------------------------------------------------
     If _lOk
         SC2->(DbGoTo(_nRecnoSC2))
 
-        // Verifica se etapa já apontada anteriormente
+        // Verifica se etapa jï¿½ apontada anteriormente
         For _nZA3 := 1 To Len(_aCodZA3)
             ZA3->(DbSetOrder(1))
             ZA3->(DbGoTop())
@@ -499,7 +499,7 @@ Static Function M10AVlEtp()
         Next
 
         If _nRecnoZA3 == 0
-            M10AMsg('Etapa já apontada para esta Ordem de Produção.','Atenção',.F.)
+            M10AMsg('Etapa jï¿½ apontada para esta Ordem de Produï¿½ï¿½o.','Atenï¿½ï¿½o',.F.)
             _lOk := .F.
         EndIf
     EndIf
@@ -560,8 +560,8 @@ Static Function M10ASetC5()
     Local _lComplet := .T.
 
     //+--------------------------------------------------------
-    // Caso etapa seja ultima de produção, verifica se o pedido
-    // não está cancelado e atualiza seu status
+    // Caso etapa seja ultima de produï¿½ï¿½o, verifica se o pedido
+    // nï¿½o estï¿½ cancelado e atualiza seu status
     //+--------------------------------------------------------
     If ZA3->ZA3_ULTIMA == 'S'
 
@@ -575,8 +575,8 @@ Static Function M10ASetC5()
         EndIf
 
         //+--------------------------------------------------------
-        // Caso o pedido não esteja cancelado, verifica se todos os
-        //  itens estão com status 9 (em expedição)
+        // Caso o pedido nï¿½o esteja cancelado, verifica se todos os
+        //  itens estï¿½o com status 9 (em expediï¿½ï¿½o)
         //+--------------------------------------------------------
         If !_lCancel
 
