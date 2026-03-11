@@ -7,7 +7,11 @@ User Function M34R02()
     Local _oReport      := Nil
     Local _cPerg        := 'M34R02   '
 
-    MR34PutSX1(_cPerg)
+    //MR34PutSX1(_cPerg)
+    if !FWSX1Util():ExistPergunte(_CPERG)
+        MSGALERT( "Grupo de perguntas não encontrado!", _CPERG )
+        Return
+    endif
 
     If FindFunction('TRepInUse') .And. TRepInUse(.F.)    //verifica se relatorios personalizaveis esta disponivel
         If Pergunte(_cPerg, .T.)
@@ -186,7 +190,7 @@ Static Function MR34Def(_oReport, _cPerg)
 Return(_oReport)
 
 //+-----------------------------------------------------------------------------------------------------
-Static Function MR34PutSX1(_cPerg)
+/*Static Function MR34PutSX1(_cPerg)
     Local _aAreaSX1     := SX1->(GetArea())
 
     SX1->(DbGoTop())
@@ -205,6 +209,6 @@ Static Function MR34PutSX1(_cPerg)
 
     RestArea(_aAreaSX1)
 
-Return
+Return*/
 
 //+-----------------------------------------------------------------------------------------------------
