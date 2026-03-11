@@ -1,647 +1,570 @@
-#INCLUDE "PROTHEUS.CH"
-#INCLUDE "FINA980.CH"
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±ºPrograma  ³FINA980   ºAutor  ³Microsiga           º Data ³  12/05/11   º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºDesc.     ³Reclassificador de naturezas                                º±±
-±±º          ³                                                            º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºUso       ³ AP                                                         º±±
-±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-*/
-
-User Function M06A13()
-
-Local aSize 	:= {}
-Local aCampos 	:= {}
-Local cAlias 	:= ""
-Local cCpoOk 	:= ""
-Local oDlg		:= Nil
-Local oMainWnd 	:= Nil
-Local nOpcao   	:= 0
-Local lInverte 	:= .F.
-Local cPerg 	:= "FIN980"
-Local cMarca 	:= GetMark()
-
-Private oMark 	:= Nil
-
-If !Pergunte(cPerg,.T.)
-	Return nil
-EndIf
-
-If mv_par03 == 1
-	cAlias := "SE2"
-	cCpoOk := "E2_OK"
-Else
-	cAlias := "SE1"
-	cCpoOk := "E1_OK"
-Endif
-
-F980GerTmp(cAlias)
-dbSelectArea(cAlias)
-
-If (cAlias)->(Eof())
-	MsgInfo (STR0002, STR0001)
-Else
-
-	//Campos da MarkBrowse
-	aAdd(aCampos,{cCpoOk,"","  ",""})
-	dbSelectArea("SX3")
-	SX3->(dbSetOrder(1))
-	SX3->(dbSeek (cAlias))
-
-	//Adiciona o campo filial no browse somente se a tabela estiver exclusivo e em uso.
-	If !Empty(FwFilial(cAlias)) .Or. X3USO(X3_USADO) .And. cNivel >= X3_NIVEL
-		aAdd(aCampos,{X3_CAMPO,"",AllTrim(X3Titulo()),X3_PICTURE})
-		SX3->(dbSkip())
-	EndIf
-
-	While !Eof() .And. (X3_ARQUIVO == cAlias)
-		If X3USO(X3_USADO)  .And. cNivel >= X3_NIVEL .And. X3_CONTEXT != "V"
-			aAdd(aCampos,{X3_CAMPO,"",AllTrim(X3Titulo()),X3_PICTURE})
-		EndIf
-		SX3->(dbSkip())
-	Enddo
-
-	dbSelectArea(cAlias)
-	(cAlias)->(dbGoTop())
-
-	bOk1 := {|| F980Natur(cAlias,cMarca,cCpoOk),oDlg:End(),(cAlias)->(dbCloseArea())}
-	bOk2 := {|| oDlg:End(),(cAlias)->(dbCloseArea())}
-
-	aSize := MsAdvSize()
-	DEFINE MSDIALOG oDlg TITLE STR0003 From aSize[7],00 To aSize[6],aSize[5] OF oMainWnd PIXEL
-	oDlg:lMaximized := .T.
-
-	oMark := MsSelect():New(cAlias,cCpoOk,,aCampos,@lInverte,@cMarca,{50,oDlg:nLeft,oDlg:nBottom,oDlg:nRight})
-	oMark:oBrowse:Align := CONTROL_ALIGN_ALLCLIENT // Somente Interface MDI
-
-	//oMark:bMark := {||  }
-	oMark:bAval	:= {|| F980Mark(cAlias,cCpoOk,cMarca) }
-	oMark:oBrowse:lhasMark = .T.
-	oMark:oBrowse:lCanAllmark := .T.
-	oMark:oBrowse:bAllMark := { || F980Invert(cMarca,cAlias,cCpoOk) }
-	oMark:oBrowse:Align := CONTROL_ALIGN_ALLCLIENT
-
-	ACTIVATE MSDIALOG oDlg ON INIT (EnchoiceBar(oDlg,{|| Iif(F980VldMrk(cAlias,cMarca,cCpoOk),Eval(bOk1),)},{|| Eval(bOk2)},,/*aButtons*/)) CENTER
-
-EndIf
-
-Return
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±ºPrograma  ³FINA980   ºAutor  ³Microsiga           º Data ³  12/05/11   º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºDesc.     ³Filtra o alias SE1 ou SE2 pra montagem da MarkBrowse        º±±
-±±º          ³                                                            º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºUso       ³ AP                                                         º±±
-±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-*/
-
-Static Function F980GerTmp(cAlias)
-
-Local cDataIni := ""
-Local cDataFim := ""
-Local cFilter  := ""
-Local cChave   := ""
-Local nCarteira := mv_par03 //1 = Pagar; 2= Receber
-Local cNaturIni := mv_par04
-Local cNaturFim := mv_par05
-Local cIndex  	:= CriaTrab(Nil,.F.)
-
-cDataIni := Str(Year(mv_par01),4)+StrZero(Month(mv_par01),2)+StrZero(Day(mv_par01),2)
-cDataFim := Str(Year(mv_par02),4)+StrZero(Month(mv_par02),2)+StrZero(Day(mv_par02),2)
-
-If nCarteira == 1 // Pagar
-
-	cFilter := 'E2_FILIAL == "'+xFilial("SE2")+'" .And. '
-	cFilter += '(DTOS(E2_EMISSAO) >= "'+cDataIni+'" .And. DTOS(E2_EMISSAO) <= "'+cDataFim+'") .And. '
-	cFilter += '(E2_NATUREZ >= "'+cNaturIni+'" .And. E2_NATUREZ <= "'+cNaturFim+'") .And. '
-	cFilter += '!(E2_TIPO $ "'+MVABATIM+'|'+MVTAXA+'|'+MVTXA+'|'+MVINSS+'|'+'SES|CID")'
-
-	cChave := "E2_FILIAL+E2_EMISSAO"
-
-Else //Receber
-
-	cFilter := 'E1_FILIAL == "'+xFilial("SE1")+'" .And. '
-	cFilter += '(DTOS(E1_EMISSAO) >= "'+cDataIni+'" .And. DTOS(E1_EMISSAO) <= "'+cDataFim+'") .And. '
-	cFilter += '(E1_NATUREZ >= "'+cNaturIni+'" .And. E1_NATUREZ <= "'+cNaturFim+'") .And. '
-	cFilter += '!(E1_TIPO $ "'+MVABATIM+'|'+MVINABT+'|'+MVIRABT+'|'+MVCSABT+'|'+MVCFABT+'|'+MVPIABT+'")'
-
-	cChave := "E1_FILIAL+E1_EMISSAO"
-
-Endif
-
-dbSelectArea(cAlias)
-cChave  := IndexKey()
-IndRegua(cAlias,cIndex,cChave,,cFilter,STR0004)  //Aguarde
-nIndex := RetIndex(cAlias)
-(cAlias)->(dbSetOrder(nIndex+1))
-
-Return
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±ºPrograma  ³FINA980   ºAutor  ³Microsiga           º Data ³  05/18/11   º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºDesc.     ³Valida a marcação da markbrowse                             º±±
-±±º          ³                                                            º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºUso       ³ AP                                                         º±±
-±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-*/
-
-Static Function F980VldMrk(cAlias,cMarca,cCpoOk)
-
-Local lReturn    := .F.
-Local aAreaAlias := {}
+#INCLUDE "protheus.ch"
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M06A13()
+
+LOCAL ASIZE := {}
+LOCAL ACAMPOS := {}
+LOCAL CALIAS := ""
+LOCAL CCPOOK := ""
+LOCAL ODLG := NIL
+LOCAL OMAINWND := NIL
+LOCAL NOPCAO := 0
+LOCAL LINVERTE :=  .F. 
+LOCAL CPERG := "FIN980"
+LOCAL CMARCA := GETMARK()
+Local cAliasX3 := GetNextAlias()
+Local _cQry := ""
+
+PRIVATE OMARK := NIL
+
+IF !(PERGUNTE(CPERG, .T. ))
+    RETURN NIL
+ENDIF
+
+IF MV_PAR03==1
+    CALIAS := "SE2"
+    CCPOOK := "E2_OK"
+ELSE 
+    CALIAS := "SE1"
+    CCPOOK := "E1_OK"
+ENDIF
+
+F980GERTMP(CALIAS)
+DBSELECTAREA(CALIAS)
+
+IF (CALIAS)->(EOF())
+    MSGINFO("NÃO EXISTEM DADOS A SEREM EXIBIDOS. VERIFIQUE AS INFORMAÇÕES NECESSÁRIAS PARA CONFIGURAÇÃO DOS PARÂMETROS.","ATENÇÃO")
+ELSE 
+    cMvCampo := IIF(MV_PAR03==1,"E2_FILIAL","E1_FILIAL")
+    AADD(ACAMPOS,{CCPOOK,"","  ",""})
+    IF (!(EMPTY(FWFILIAL(CALIAS)))) .OR. (X3USO(GetSX3Cache(cMvCampo, "X3_USADO")) .AND. CNIVEL>=GetSX3Cache(cMvCampo, "X3_NIVEL"))
+        AADD(ACAMPOS,{cMvCampo,"", ALLTRIM(GetSX3Cache(cMvCampo, "X3_TITULO")),GetSX3Cache(cMvCampo, "X3_PICTURE")})
+        SX3->(DBSKIP())
+    ENDIF
+
+    _cQry += " SELECT X3_CAMPO X7CAMPO,X3_USADO X3_USADO, X3_NIVEL X3NIVEL, X3_TITULO X3TITULO, X3_PICTURE X3PICTURE, X3_CONTEXT X3CONTEXT "
+    _cQry += " FROM " + RetSQLName("SX3") + " SX3 "
+    _cQry += " WHERE    SX3.D_E_L_E_T = ' ' AND X3_ARQUIVO = '"+CALIAS+"' "
+
+    If Select(cAliasX3) > 0
+        DBSelectArea(cAliasX3)
+        (cAliasX3)->(DbCloseArea())
+    EndIf
+
+    DBUseArea(.T., "TOPCONN", TCGenQry(,, _cQry), cAliasX3, .T., .T.)
+
+    DBSelectArea(cAliasX3)
+    While !(cAliasX3)->(EOF())
+
+        IF X3USO(cAliasX3->X3USADO) .AND. CNIVEL>=cAliasX3->X3NIVEL .AND. cAliasX3->X3CONTEXT<>"V"
+            AADD(ACAMPOS,{cAliasX3->X3CAMPO,"", ALLTRIM(cAliasX3->X3TITULO),cAliasX3->X3PICTURE})
+        ENDIF
+
+        (cAliasX3)->(dbSkip())
+    EndDo
+    /*DBSELECTAREA("SX3")
+    SX3->(DBSETORDER(1))
+    SX3->(DBSEEK(CALIAS))
+
+    IF (!(EMPTY(FWFILIAL(CALIAS)))) .OR. (X3USO(X3_USADO) .AND. CNIVEL>=X3_NIVEL)
+        AADD(ACAMPOS,{X3_CAMPO,"", ALLTRIM(X3TITULO()),X3_PICTURE})
+        SX3->(DBSKIP())
+    ENDIF
+
+    WHILE !(EOF()) .AND. X3_ARQUIVO==CALIAS
+    
+        IF X3USO(X3_USADO) .AND. CNIVEL>=X3_NIVEL .AND. X3_CONTEXT<>"V"
+            AADD(ACAMPOS,{X3_CAMPO,"", ALLTRIM(X3TITULO()),X3_PICTURE})
+        ENDIF
+        SX3->(DBSKIP())
+    ENDDO*/
+
+    DBSELECTAREA(CALIAS)
+    (CALIAS)->(DBGOTOP())
+
+    BOK1 := {||F980NATUR(CALIAS,CMARCA,CCPOOK),ODLG:END(),(CALIAS)->(DBCLOSEAREA())}
+    BOK2 := {||ODLG:END,(CALIAS)->(DBCLOSEAREA)}
+
+    ASIZE := MSADVSIZE()
+    ODLG := MSDIALOG():NEW(ASIZE[7],0,ASIZE[6],ASIZE[5],"RECLASSIFICAÇÃO DE NATUREZA FINANCEIRA",,, .F. ,,,,,OMAINWND, .T. ,,, .F. )
+    ODLG:LMAXIMIZED :=  .T. 
+
+    OMARK := MSSELECT():NEW(CALIAS,CCPOOK,,ACAMPOS,@LINVERTE,@CMARCA,{50,ODLG:NLEFT,ODLG:NBOTTOM,ODLG:NRIGHT})
+    OMARK:OBROWSE:ALIGN := 5
+
+    OMARK:BAVAL := {||F980MARK(CALIAS,CCPOOK,CMARCA)}
+    OMARK:OBROWSE:LHASMARK :=  .T. 
+    OMARK:OBROWSE:LCANALLMARK :=  .T. 
+    OMARK:OBROWSE:BALLMARK := {||F980INVERT(CMARCA,CALIAS,CCPOOK)}
+    OMARK:OBROWSE:ALIGN := 5
 
-dbSelectArea(cAlias)
-aAreaAlias := (cAlias)->(GetArea())
+    ODLG:ACTIVATE(ODLG:BLCLICKED,ODLG:BMOVED,ODLG:BPAINTED, .T. ,,,{|SELF|ENCHOICEBAR(ODLG,{||IIF(F980VLDMRK(CALIAS,CMARCA,CCPOOK),EVAL(BOK1),)},{||EVAL(BOK2)},,)},ODLG:BRCLICKED,)
+ENDIF
 
-(cAlias)->(dbGoTop())
-
-While !(cAlias)->(Eof())
+RETURN 
 
-	If (cAlias)->(&cCpoOk) == cMarca
-		lReturn := .T.
-		Exit
-	EndIf
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION F980GERTMP(CALIAS)
 
-   	(cAlias)->(dbSkip())
+LOCAL CDATAINI := ""
+LOCAL CDATAFIM := ""
+LOCAL CFILTRO := ""
+LOCAL CCHAVE := ""
+LOCAL NCARTEIRA := MV_PAR03
+LOCAL CNATURINI := MV_PAR04
+LOCAL CNATURFIM := MV_PAR05
+LOCAL CINDEX := CRIATRAB(NIL, .F. )
 
-EndDo
+CDATAINI := STR(YEAR(MV_PAR01),4)+ STRZERO(MONTH(MV_PAR01),2)+ STRZERO(DAY(MV_PAR01),2)
+CDATAFIM := STR(YEAR(MV_PAR02),4)+ STRZERO(MONTH(MV_PAR02),2)+ STRZERO(DAY(MV_PAR02),2)
 
-If !lReturn
-	MsgAlert(STR0005, STR0001) //Selecione ao menos um título para o processamento da reclassificação.
-EndIf
+IF NCARTEIRA==1
 
-RestArea(aAreaAlias)
+    CFILTRO := 'E2_FILIAL == "'+XFILIAL("SE2")+'" .AND. '
+    CFILTRO += '(DTOS(E2_EMISSAO) >= "'+CDATAINI+'" .AND. DTOS(E2_EMISSAO) <= "'+CDATAFIM+'") .AND. '
+    CFILTRO += '(E2_NATUREZ >= "'+CNATURINI+'" .AND. E2_NATUREZ <= "'+CNATURFIM+'") .AND. '
+    CFILTRO += '!(E2_TIPO $ "'+MVABATIM+"|"+MVTAXA+"|"+MVTXA+"|"+MVINSS+"|"+'SES|CID")'
 
-Return lReturn
+    CCHAVE := "E2_FILIAL+E2_EMISSAO"
+ELSE 
 
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±ºPrograma  ³FINA980   ºAutor  ³Microsiga           º Data ³  05/16/11   º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºDesc.     ³Gera a tela pra informar a natureza e exibe o resultado da  º±±
-±±º          ³substituição de naturezas                                   º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºUso       ³ AP                                                         º±±
-±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-*/
+    CFILTRO := 'E1_FILIAL == "'+XFILIAL("SE1")+'" .AND. '
+    CFILTRO += '(DTOS(E1_EMISSAO) >= "'+CDATAINI+'" .AND. DTOS(E1_EMISSAO) <= "'+CDATAFIM+'") .AND. '
+    CFILTRO += '(E1_NATUREZ >= "'+CNATURINI+'" .AND. E1_NATUREZ <= "'+CNATURFIM+'") .AND. '
+    CFILTRO += '!(E1_TIPO $ "'+MVABATIM+"|"+MVINABT+"|"+MVIRABT+"|"+MVCSABT+"|"+MVCFABT+"|"+MVPIABT+'")'
 
-Static Function F980Natur(cAlias, cMarca, cCpoOk)
+    CCHAVE := "E1_FILIAL+E1_EMISSAO"
+ENDIF
 
-Local oDlg2 	:= Nil
-Local oMemo 	:= Nil
-Local bProces 	:= Nil
-Local lProc 	:= .F.
-Local aProces 	:= {}
-Local cNatureza := CriaVar("ED_CODIGO",.F.)
-Local cTexto 	:= ""
-Local nX 		:= 0
-
-DEFINE MSDIALOG oDlg2 FROM  15,6 TO 100,350 TITLE STR0006 PIXEL
-
-bProces := {|| F980Proc(cNatureza, @lProc, @aProces, cAlias, cMarca, cCpoOk),oDlg2:End()}
-oDlg2:lMaximized := .F.
+DBSELECTAREA(CALIAS)
+CCHAVE := INDEXKEY()
+INDREGUA(CALIAS,CINDEX,CCHAVE,,CFILTRO,"AGUARDE...")
+NINDEX := RETINDEX(CALIAS)
+(CALIAS)->(DBSETORDER(NINDEX+1))
 
-@ 10,15 SAY STR0007 SIZE 23, 7 OF oDlg2 PIXEL COLOR CLR_HBLUE
-@ 10,50 MSGET cNatureza F3 "SED" SIZE 60, 10 OF oDlg2 PIXEL Picture "@!"  Valid F980VldNat(cNatureza) HASBUTTON
+RETURN 
 
-DEFINE SBUTTON FROM 10,120 TYPE 1 ACTION Eval(bProces) ENABLE OF oDlg2
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION F980VLDMRK(CALIAS,CMARCA,CCPOOK)
 
-ACTIVATE MSDIALOG oDlg2 CENTERED
+LOCAL LRETURN :=  .F. 
+LOCAL AAREAALIAS := {}
 
-//Informe do processamento
-If Len(aProces) > 0
+DBSELECTAREA(CALIAS)
+AAREAALIAS := (CALIAS)->(GETAREA())
 
-	If mv_par03 == 1 //Pagar
+(CALIAS)->(DBGOTOP())
 
-		cTexto := STR0008+CRLF // Titulos a Pagar
-		cTexto += "---------------------------------------------------------------"+CRLF
+WHILE !((CALIAS)->(EOF()))
+ 
+    IF (CALIAS)->(&CCPOOK)==CMARCA
+        LRETURN :=  .T. 
+        EXIT 
+    ENDIF
 
-		cTexto += PadR(STR0010,TamSx3("E2_PREFIXO")[1]+1," ") 		//Prefixo
-		cTexto += PadR(STR0011,TamSx3("E2_NUM")[1]+2," ")      	//Numero
-		cTexto += PadR(STR0012,TamSx3("E2_PARCELA")[1]+2," ")   	//Parcela
-		cTexto += PadR(STR0013,TamSx3("E2_TIPO")[1]+4," ") 	  	//Tipo
-		cTexto += PadR(STR0014,TamSx3("E2_FORNECE")[1]+1," ")	 	//Fornecedor
-		cTexto += PadR(STR0016,TamSx3("E2_LOJA")[1]+3," ")      	//Loja
-		cTexto += STR0017+CRLF                               		//Status
+    (CALIAS)->(DBSKIP())
+    ENDDO
 
-	ElseIf mv_par03 = 2 //Receber
-
-		cTexto := STR0009+CRLF // Titulos a Receber
-		cTexto += "---------------------------------------------------------------"+CRLF
-
-		cTexto += PadR(STR0010,TamSx3("E1_PREFIXO")[1]+1," ")  	//Prefixo
-		cTexto += PadR(STR0011,TamSx3("E1_NUM")[1]+2," ")      	//Numero
-		cTexto += PadR(STR0012,TamSx3("E1_PARCELA")[1]+2," ")   	//Parcela
-		cTexto += PadR(STR0013,TamSx3("E1_TIPO")[1]+4," ") 	  	//Tipo
-		cTexto += PadR(STR0015,TamSx3("E1_CLIENTE")[1]+1," ") 		//Cliente
-		cTexto += PadR(STR0016,TamSx3("E1_LOJA")[1]+3," ")     	//Loja
-		cTexto += STR0017+CRLF                              		//Status
+IF !(LRETURN)
+    MSGALERT(IIF((CPAISLOC) $ ("ANG|PTG"),"SELECCIONE AO MENOS UM TÍTULO PARA O PROCESSAMENTO DA RECLASSIFICAÇÃO.","SELECIONE AO MENOS UM TÍTULO PARA O PROCESSAMENTO DA RECLASSIFICAÇÃO."),"ATENÇÃO")
+ENDIF
 
-	EndIf
-
-	cTexto += "---------------------------------------------------------------"+CRLF
+RESTAREA(AAREAALIAS)
 
-	For nX := 1 to Len(aProces)
-
-		cTexto += aProces[nX][1]+"-"+aProces[nX][2]+"  "+aProces[nX][3]+"  "+aProces[nX][4]+"    "+aProces[nX][5]+" "+aProces[nX][6]
-
-		If aProces[nX][7] == "0"
-			cTexto += " - "+STR0018+CRLF
-		Else
-			cTexto += " - "+STR0019+CRLF
-		EndIf
-
-
-	Next nX
-
-	//Dados complementares
-	cTexto += CRLF+"---------------------------------------------------------------"+CRLF
-	cTexto += " "
-	cTexto += STR0020 //ATENÇÃO: Os registros NÃO PROCESSADOS possuem naturezas que não condizem com a informada.
-	cTexto += " "
-	cTexto += STR0021 //Verifique uma natureza compatível antes da seleção.
+RETURN LRETURN
 
-
-	DEFINE FONT oFont NAME "Mono AS" SIZE 6,15
-	DEFINE MSDIALOG oDlg2 TITLE STR0022 From 3,0 to 340,417 PIXEL //Registros processados
-	@ 5,5 GET oMemo  VAR cTexto MEMO SIZE 200,145 OF oDlg2 PIXEL
-	oMemo:bRClicked := {||AllwaysTrue()}
-	oMemo:oFont:=oFont
-
-	DEFINE SBUTTON  FROM 153,175 TYPE 1 ACTION oDlg2:End() ENABLE OF oDlg2 PIXEL
-
-	ACTIVATE MSDIALOG oDlg2 CENTER
-
-Else
-	cTexto := STR0023+CRLF //Nenhum registro foi processado.
-	cTexto += STR0024+CRLF //A natureza e/ou títulos selecionados não são equivalentes
-	cTexto += STR0025+CRLF //ou o processo foi interrompido pelo usuário.
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION F980NATUR(CALIAS,CMARCA,CCPOOK)
 
-	MsgInfo(cTexto, STR0001)
-EndIf
+LOCAL ODLG2 := NIL
+LOCAL OMEMO := NIL
+LOCAL BPROCES := NIL
+LOCAL LPROC :=  .F. 
+LOCAL APROCES := {}
+LOCAL CNATUREZA := CRIAVAR("ED_CODIGO", .F. )
+LOCAL CTEXTO := ""
+LOCAL NX := 0
 
-Return
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±ºPrograma  ³FINA980   ºAutor  ³Microsiga           º Data ³  05/16/11   º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºDesc.     ³Processa as subtituções de naturezas                        º±±
-±±º          ³                                                            º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºUso       ³ AP                                                         º±±
-±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-*/
-
-Static Function F980Proc(cNatureza, lProc, aProces, cAlias, cMarca, cCpoOk)
-
-Local aConfNat	:= {}
-Local aRegistro	:= {}
-
-Local nX 		:= 0
-Local nCarteira := mv_par03 //1=Pagar; 2=Receber
-
-Local cCpoNat 	:= ""
-Local cCposOut 	:= "APURPIS|APURCOF|PCAPPIS|PCAPCOF|IRRFCAR|INSSCAR" //Outros campos --> Carreteiro e Apuração
-Local cCampo	:= ""
-
-Local lNatVld 	:= .T.
-
-Local cNatOrig 	:= ""
-Local cPrefOrig := ""
-Local cNumOrig 	:= ""
-Local cParcOrig := ""
-Local cTipOrig 	:= ""
-Local cCFOrig 	:= ""
-Local cLojOrig 	:= ""
-
-Local cFiltro 	:= ""
-Local nRecno	:= ""
-Local aArea		:= {}
-
-DEFAULT cNatureza 	:= ""
-DEFAULT cAlias	 	:= ""
-DEFAULT cMarca	 	:= ""
-DEFAULT cCpoOk	 	:= ""
-DEFAULT aProces 	:= {}
-DEFAULT lProc	 	:= .F.
-
-
-//Campos a serem validados na atualização da natureza
-dbSelectArea("SX3")
-SX3->(dbSetOrder(1))
-SX3->(dbSeek ("SED"))
-
-//Inclui a natureza no array
-aAdd(aConfNat,{"ED_FILIAL",CriaVar("ED_FILIAL",.F.)})
-
-While !Eof() .And. (X3_ARQUIVO == "SED")
-	If X3Uso(X3_USADO)  .And. cNivel >= X3_NIVEL .And. X3_CONTEXT != "V" .And.;
-	   (SubStr(X3_CAMPO,4,4) $ "CALC|PERC|BASE" .Or. SubStr(X3_CAMPO,4,3) == "DED" .Or. SubStr(X3_CAMPO,4,7) $ cCposOut )
-		aAdd(aConfNat,{X3_CAMPO,CriaVar(X3_CAMPO,.F.)})
-	EndIf
-	SX3->(dbSkip())
-Enddo
-
-//Posiciona na natureza selecionada
-dbSelectArea("SED")
-SED->(dbSetOrder(1))
-
-If SED->(dbSeek(xFilial("SED")+cNatureza))
-
-	For nX := 1 to Len(aConfNat)
-		cCampo := aConfNat[nX][1]
-		aConfNat[nX][2] := SED->(&cCampo)
-	Next nX
-
-Endif
-
-//Campos que serao atualizados
-If nCarteira == 1 // Pagar
-	cCpoNat := "E2_NATUREZ"
-ElseIf nCarteira == 2 //Receber
-	cCpoNat := "E1_NATUREZ"
-EndIf
-
-dbSelectArea(cAlias)
-(cAlias)->(dbGoTop())
-
-While !(cAlias)->(Eof())
-
-	IncProc("Processando...")
-
-	If (cAlias)->(&cCpoOk) == cMarca
-
-		If nCarteira == 1 // Pagar
-			cNatOrig	:= (cAlias)->E2_NATUREZ
-			cPrefOrig	:= (cAlias)->E2_PREFIXO
-			cNumOrig	:= (cAlias)->E2_NUM
-			cParcOrig 	:= (cAlias)->E2_PARCELA
-			cTipOrig 	:= (cAlias)->E2_TIPO
-			cCFOrig 	:= (cAlias)->E2_FORNECE
-			cLojOrig 	:= (cAlias)->E2_LOJA
-
-		ElseIf nCarteira == 2 //Receber
-			cNatOrig	:= (cAlias)->E1_NATUREZ
-			cPrefOrig	:= (cAlias)->E1_PREFIXO
-			cNumOrig	:= (cAlias)->E1_NUM
-			cParcOrig 	:= (cAlias)->E1_PARCELA
-			cTipOrig 	:= (cAlias)->E1_TIPO
-			cCFOrig 	:= (cAlias)->E1_CLIENTE
-			cLojOrig 	:= (cAlias)->E1_LOJA
-		EndIf
-
-	   	If SED->(dbSeek(xFilial("SED")+cNatOrig))
-	   		//Compara as características da natureza
-	   		For nX := 1 to Len(aConfNat)
-				cCampo := aConfNat[nX][1]
-				If SED->(&cCampo) <> aConfNat[nX][2]
-					lNatVld := .F.
-					Exit
-				EndIf
-			Next nX
-	   	EndIf
-
-		//Array que ira conter os detalhes do registro processado
-		//-- [1] Prefixo
-		//-- [2] Numero
-		//-- [3] Parcela
-		//-- [4] Tipo
-		//-- [5] Cliente/Fornecedor
-		//-- [6] Loja
-		//-- [7] Processado? 0=Nao;1=Sim
-		aRegistro := Array(7)
-
-		aRegistro[1] := cPrefOrig
-		aRegistro[2] := cNumOrig
-		aRegistro[3] := cParcOrig
-		aRegistro[4] := cTipOrig
-		aRegistro[5] := cCFOrig
-		aRegistro[6] := cLojOrig
-
-		If lNatVld
-
-			//Atualiza a natureza do títilo
-			RecLock(cAlias, .F.)
-			(cAlias)->(&cCpoNat) := cNatureza
-			(cAlias)->(MsUnlock())
-
-			//Procura por baixas realizadas para fazer a alteração.
-			dbSelectArea("SE5")
-			SE5->(dbSetOrder(7))
-
-			If SE5->(dbSeek(xFilial("SE5")+cPrefOrig+cNumOrig+cParcOrig+cTipOrig+cCFOrig+cLojOrig))
-
-				While !SE5->(Eof()) .And. SE5->(E5_FILIAL+E5_PREFIXO+E5_NUMERO+E5_PARCELA+E5_TIPO+E5_CLIFOR+E5_LOJA) == xFilial("SE5")+cPrefOrig+cNumOrig+cParcOrig+cTipOrig+cCFOrig+cLojOrig
-
-					If SE5->E5_NATUREZ <> cNatureza
-						RecLock("SE5", .F.)
-						SE5->E5_NATUREZ := cNatureza
-						SE5->(MsUnlock())
-					EndIf
-
-					SE5->(dbSkip())
-				EndDo
-
-			EndIf
-
-			//Procura por abatimento AB-
-			dbSelectArea(cAlias)
-			aArea   := (cAlias)->(GetArea())
-			nRecno  := (cAlias)->(Recno())
-			cFiltro := (cAlias)->(dbFilter())
-
-			If nCarteira == 1 // Pagar
-				(cAlias)->(dbSetOrder(6))
-			ElseIf nCarteira == 2
-				(cAlias)->(dbSetOrder(2))
-			EndIf
-
-			(cAlias)->(dbClearFilter())
-
-			If (cAlias)->(dbSeek(xFilial(cAlias)+cCFOrig+cLojOrig+cPrefOrig+cNumOrig+cParcOrig+"AB-"))
-				If (cAlias)->(&cCpoNat) == cNatOrig
-					//Atualiza o abatimento
-					RecLock(cAlias, .F.)
-					(cAlias)->(&cCpoNat) := cNatureza
-					(cAlias)->(MsUnlock())
-				EndIf
-			EndIf
-
-			Set Filter to &cFiltro
-			RestArea(aArea)
-
-			aRegistro[7] := "1" //Registro processado
-
-		Else
-			aRegistro[7] := "0" //Registro nao processado
-		EndIf
-
-		aAdd(aProces,aRegistro)
-		lNatVld := .T.
-	EndIf
-
-	(cAlias)->(dbSkip())
-
-EndDo
-
-Return
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±ºPrograma  ³FINA980   ºAutor  ³Microsiga           º Data ³  12/05/11   º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºDesc.     ³Inverte a seleção da markbrowse                             º±±
-±±º          ³                                                            º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºUso       ³ AP                                                         º±±
-±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-*/
-
-Static Function F980Invert(cMarca,cAlias,cCampo)
-
-Local nReg := (cAlias)->(Recno())
-
-dbSelectArea(cAlias)
-(cAlias)->(dbGoTop())
-
-While !Eof()
-	RecLock(cAlias,.F.)
-	IF (cAlias)->&cCampo == cMarca
-		(cAlias)->&cCampo := "  "
-	Else
-		(cAlias)->&cCampo := cMarca
-	Endif
-	(cAlias)->(MsUnlock())
-	(cAlias)->(dbSkip())
-Enddo
-
-(cAlias)->(dbGoto(nReg))
-
-oMark:oBrowse:Refresh(.T.)
-
-Return
-
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±ºPrograma  ³FINA980   ºAutor  ³Microsiga           º Data ³  12/05/11   º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºDesc.     ³Atualiza a marca do título selecionado                      º±±
-±±º          ³                                                            º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºUso       ³ AP                                                         º±±
-±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-*/
-
-Static Function F980Mark(cAlias,cCampo,cMarca)
-
-Local nReg := (cAlias)->(Recno())
-
-dbSelectArea(cAlias)
-
-
-RecLock(cAlias,.F.)
-	If (cAlias)->&cCampo <> cMarca
-		(cAlias)->&cCampo := cMarca
-	Else
-		(cAlias)->&cCampo := ""
-	EndIf
-(cAlias)->(MsUnlock())
-
-oMark:oBrowse:Refresh(.T.)
-
-Return
-
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±ºPrograma  ³FINA980   ºAutor  ³Microsiga           º Data ³  05/18/11   º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºDesc.     ³Valida a natureza selecionada para a substituição           º±±
-±±º          ³                                                            º±±
-±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±ºUso       ³ AP                                                         º±±
-±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-*/
-
-Static Function F980VldNat(cNatureza)
-
-Local lReturn := .T.
-Local aReserv := {}
-
-Local nX := 0
-
-If Empty(cNatureza)
-	MsgStop(STR0026, STR0001) //Informe uma natureza antes de confirmar o processamento
-	lReturn := .F.
-ElseIf !ExistCpo("SED",cNatureza)
-	lReturn := .F.
-Else
-	dbSelectArea("SED")
-	SED->(dbSetOrder(1))
-
-	//Naturezas reservadas
-	aAdd(aReserv,StrTran(GetMv("MV_CIDE"),'"')) 	//-- CIDE
-	aAdd(aReserv,StrTran(GetMv("MV_COFINS"),'"')) 	//-- COFINS
-	aAdd(aReserv,StrTran(GetMv("MV_PISNAT"),'"')) 	//-- PIS
-	aAdd(aReserv,StrTran(GetMv("MV_CSLL"),'"')) 	//-- CSLL
-	aAdd(aReserv,StrTran(GetMv("MV_INSS"),'"')) 	//-- INSS
-	aAdd(aReserv,StrTran(GetMv("MV_IRF"),'"')) 	//-- IRRF
-	aAdd(aReserv,StrTran(GetMv("MV_ISS"),'"')) 	//-- ISS
-	aAdd(aReserv,StrTran(GetMv("MV_SEST"),'"')) 	//-- SEST
-
-	If SED->(dbSeek(xFilial("SED")+cNatureza))
-		For nX := 1 to Len(aReserv)
-			If AllTrim(SED->ED_CODIGO) == AllTrim(aReserv[nX])
-				MsgInfo(STR0027, STR0001) //A natureza informada é de uso exclusivo do sistema ou não pode ser utilizada por esta rotina.
-				lReturn := .F.
-				Exit
-			EndIf
-		Next nX
-	EndIf
-Endif
-
-Return lReturn
+ODLG2 := MSDIALOG():NEW(15,6,100,350,IIF((CPAISLOC) $ ("ANG|PTG"),"SELECCIONE A NATUREZA","SELECIONE A NATUREZA"),,, .F. ,,,,,, .T. ,,, .F. )
+
+BPROCES := {||F980PROC(CNATUREZA,@LPROC,@APROCES,CALIAS,CMARCA,CCPOOK),ODLG2:END()}
+ODLG2:LMAXIMIZED :=  .F. 
+
+TSAY():NEW(10,15,{||"NATUREZA:"},ODLG2,,, .F. , .F. , .F. , .T. ,16711680,,23,7, .F. , .F. , .F. , .F. , .F. , .F. )
+TGET():NEW(10,50,{ | U |IIF(PCOUNT()==0,CNATUREZA,CNATUREZA := U)},ODLG2,60,10,"@!",{||F980VLDNAT(CNATUREZA)},,,, .F. ,, .T. ,, .F. ,, .F. , .F. ,, .F. , .F. ,"SED","CNATUREZA",,,, .T. )
+
+SBUTTON():NEW(10,120,1,{||EVAL(BPROCES)},ODLG2, .T. ,,)
+
+ODLG2:ACTIVATE(ODLG2:BLCLICKED,ODLG2:BMOVED,ODLG2:BPAINTED, .T. ,,,,ODLG2:BRCLICKED,)
+
+IF  LEN(APROCES)>0
+
+    IF MV_PAR03==1
+
+        CTEXTO := "TITULOS A PAGAR" + CRLF
+        CTEXTO += "---------------------------------------------------------------" + CRLF
+
+        CTEXTO += PADR("PRF",TAMSX3("E2_PREFIXO")[1]+1," ")
+        CTEXTO += PADR(IIF((CPAISLOC) $ ("ANG|PTG"),"NR.","NUM"),TAMSX3("E2_NUM")[1]+2," ")
+        CTEXTO += PADR("PC",TAMSX3("E2_PARCELA")[1]+2," ")
+        CTEXTO += PADR("TP",TAMSX3("E2_TIPO")[1]+4," ")
+        CTEXTO += PADR(IIF((CPAISLOC) $ ("ANG|PTG"),"FORN.","FORN"),TAMSX3("E2_FORNECE")[1]+1," ")
+        CTEXTO += PADR(IIF((CPAISLOC) $ ("ANG|PTG"),"LJ.","LJ"),TAMSX3("E2_LOJA")[1]+3," ")
+        CTEXTO += IIF((CPAISLOC) $ ("ANG|PTG"),"ESTADO","STATUS") + CRLF
+
+    ELSEIF MV_PAR03=2
+
+        CTEXTO := "TITULOS A RECEBER" + CRLF
+        CTEXTO += "---------------------------------------------------------------" + CRLF
+
+        CTEXTO += PADR("PRF",TAMSX3("E1_PREFIXO")[1]+1," ")
+        CTEXTO += PADR(IIF((CPAISLOC) $ ("ANG|PTG"),"NR.","NUM"),TAMSX3("E1_NUM")[1]+2," ")
+        CTEXTO += PADR("PC",TAMSX3("E1_PARCELA")[1]+2," ")
+        CTEXTO += PADR("TP",TAMSX3("E1_TIPO")[1]+4," ")
+        CTEXTO += PADR("CLT",TAMSX3("E1_CLIENTE")[1]+1," ")
+        CTEXTO += PADR(IIF((CPAISLOC) $ ("ANG|PTG"),"LJ.","LJ"),TAMSX3("E1_LOJA")[1]+3," ")
+        CTEXTO += IIF((CPAISLOC) $ ("ANG|PTG"),"ESTADO","STATUS") + CRLF
+    ENDIF
+
+    CTEXTO += "---------------------------------------------------------------" + CRLF
+
+    FOR NX := 1 TO  LEN(APROCES)
+
+        CTEXTO += APROCES[NX][1]+"-"+APROCES[NX][2]+"  "+APROCES[NX][3]+"  "+APROCES[NX][4]+"    "+APROCES[NX][5]+" "+APROCES[NX][6]
+
+        IF APROCES[NX][7]=="0"
+            CTEXTO += " - "+"NÃO PROCESSADO" + CRLF
+        ELSE 
+            CTEXTO += " - "+"PROCESSADO" + CRLF
+        ENDIF
+    NEXT
+
+    CTEXTO += CHR(13)+CHR(10)+"---------------------------------------------------------------" + CRLF
+    CTEXTO += " "
+    CTEXTO += IIF((CPAISLOC) $ ("ANG|PTG"),"ATENÇÃO: OS REGISTOS NÃO PROCESSADOS POSSUEM NATUREZAS QUE NÃO CONDIZEM COM A INFORMADA.","ATENÇÃO: OS REGISTROS NÃO PROCESSADOS POSSUEM NATUREZAS QUE NÃO CONDIZEM COM A INFORMADA.")
+    CTEXTO += " "
+    CTEXTO += IIF((CPAISLOC) $ ("ANG|PTG"),"VERIFIQUE UMA NATUREZA COMPATÍVEL ANTES DA SELECÇÃO.","VERIFIQUE UMA NATUREZA COMPATÍVEL ANTES DA SELEÇÃO.")
+
+    OFONT := TFONT():NEW("MONO AS",6,15, .F. ,,,,,,,,,,,,)
+    ODLG2 := MSDIALOG():NEW(3,0,340,417,IIF((CPAISLOC) $ ("ANG|PTG"),"REGISTOS PROCESSADOS","REGISTROS PROCESSADOS"),,, .F. ,,,,,, .T. ,,, .F. )
+    OMEMO := TMULTIGET():NEW(5,5,{ | U |IIF(PCOUNT()==0,CTEXTO,CTEXTO := U)},ODLG2,200,145,, .F. ,,,, .T. ,, .F. ,, .F. , .F. , .F. ,,, .F. ,,)
+    OMEMO:BRCLICKED := {||ALLWAYSTRUE()}
+    OMEMO:OFONT := OFONT
+
+    PIXEL := SBUTTON():NEW(153,175,1,{||ODLG2:END()},ODLG2, .T. ,,)
+
+    ODLG2:ACTIVATE(ODLG2:BLCLICKED,ODLG2:BMOVED,ODLG2:BPAINTED, .T. ,,,,ODLG2:BRCLICKED,)
+ELSE 
+
+    CTEXTO := IIF((CPAISLOC) $ ("ANG|PTG"),"NENHUM REGISTO FOI PROCESSADO","NENHUM REGISTRO FOI PROCESSADO.") + CRLF
+    CTEXTO += IIF((CPAISLOC) $ ("ANG|PTG"),"A NATUREZA E/OU TÍTULOS SELECCIONADOS NÃO SÃO EQUIVALENTES","A NATUREZA E/OU TÍTULOS SELECIONADOS NÃO SÃO EQUIVALENTES") + CRLF
+    CTEXTO += IIF((CPAISLOC) $ ("ANG|PTG"),"OU O PROCESSO FOI INTERROMPIDO PELO UTILIZADOR.","OU O PROCESSO FOI INTERROMPIDO PELO USUÁRIO.") + CRLF
+
+    MSGINFO(CTEXTO,"ATENÇÃO")
+ENDIF
+
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION F980PROC(CNATUREZA,LPROC,APROCES,CALIAS,CMARCA,CCPOOK)
+
+LOCAL ACONFNAT := {}
+LOCAL AREGISTRO := {}
+
+LOCAL NX := 0
+LOCAL NCARTEIRA := MV_PAR03
+
+LOCAL CCPONAT := ""
+LOCAL CCPOSOUT := "APURPIS|APURCOF|PCAPPIS|PCAPCOF|IRRFCAR|INSSCAR"
+LOCAL CCAMPO := ""
+
+LOCAL LNATVLD :=  .T. 
+
+LOCAL CNATORIG := ""
+LOCAL CPREFORIG := ""
+LOCAL CNUMORIG := ""
+LOCAL CPARCORIG := ""
+LOCAL CTIPORIG := ""
+LOCAL CCFORIG := ""
+LOCAL CLOJORIG := ""
+
+LOCAL CFILTRO := ""
+LOCAL NRECNO := ""
+LOCAL AAREA := {}
+Local cAliasX3 := GetNextAlias()
+Local _cQry := ""
+
+CNATUREZA := IIF(VALTYPE(CNATUREZA)=="U","",CNATUREZA)
+CALIAS := IIF(VALTYPE(CALIAS)=="U","",CALIAS)
+CMARCA := IIF(VALTYPE(CMARCA)=="U","",CMARCA)
+CCPOOK := IIF(VALTYPE(CCPOOK)=="U","",CCPOOK)
+APROCES := IIF(VALTYPE(APROCES)=="U",{},APROCES)
+LPROC := IIF(VALTYPE(LPROC)=="U", .F. ,LPROC)
+
+    _cQry += " SELECT X3_CAMPO X3CAMPO,X3_USADO X3_USADO, X3_NIVEL X3NIVEL, X3_TITULO X3TITULO, X3_PICTURE X3PICTURE, X3_CONTEXT X3CONTEXT "
+    _cQry += " FROM " + RetSQLName("SX3") + " SX3 "
+    _cQry += " WHERE    SX3.D_E_L_E_T = ' ' AND X3_ARQUIVO = 'SED' "
+
+    If Select(cAliasX3) > 0
+        DBSelectArea(cAliasX3)
+        (cAliasX3)->(DbCloseArea())
+    EndIf
+
+    DBUseArea(.T., "TOPCONN", TCGenQry(,, _cQry), cAliasX3, .T., .T.)
+
+    DBSelectArea(cAliasX3)
+    While !(cAliasX3)->(EOF())
+        IF X3USO(cAliasX3->X3USADO) .AND. CNIVEL>=cAliasX3->X3NIVEL .AND. cAliasX3->X3CONTEXT<>"V" .AND. ((( SUBSTR(cAliasX3->X3CAMPO,4,4)) $ ("CALC|PERC|BASE")) .OR. (( SUBSTR(cAliasX3->X3CAMPO,4,3)=="DED") .OR. (( SUBSTR(cAliasX3->X3CAMPO,4,7)) $ (CCPOSOUT))))
+            AADD(ACONFNAT,{cAliasX3->X3CAMPO,CRIAVAR(cAliasX3->X3CAMPO, .F. )})
+        ENDIF
+    End
+/*DBSELECTAREA("SX3")
+SX3->(DBSETORDER(1))
+SX3->(DBSEEK("SED"))
+
+AADD(ACONFNAT,{"ED_FILIAL",CRIAVAR("ED_FILIAL", .F. )})
+
+WHILE !(EOF()) .AND. X3_ARQUIVO=="SED"
+ 
+    IF X3USO(X3_USADO) .AND. CNIVEL>=X3_NIVEL .AND. X3_CONTEXT<>"V" .AND. ((( SUBSTR(X3_CAMPO,4,4)) $ ("CALC|PERC|BASE")) .OR. (( SUBSTR(X3_CAMPO,4,3)=="DED") .OR. (( SUBSTR(X3_CAMPO,4,7)) $ (CCPOSOUT))))
+        AADD(ACONFNAT,{X3_CAMPO,CRIAVAR(X3_CAMPO, .F. )})
+    ENDIF
+    SX3->(DBSKIP())
+ENDDO**/
+
+DBSELECTAREA("SED")
+SED->(DBSETORDER(1))
+
+IF SED->(DBSEEK(XFILIAL("SED")+CNATUREZA))
+
+    FOR NX := 1 TO  LEN(ACONFNAT)
+        CCAMPO := ACONFNAT[NX][1]
+        ACONFNAT[NX][2] := SED->(&CCAMPO)
+    NEXT
+ENDIF
+
+IF NCARTEIRA==1
+    CCPONAT := "E2_NATUREZ"
+ELSEIF NCARTEIRA==2
+    CCPONAT := "E1_NATUREZ"
+ENDIF
+
+DBSELECTAREA(CALIAS)
+(CALIAS)->(DBGOTOP())
+
+WHILE !((CALIAS)->(EOF()))
+ 
+    INCPROC("PROCESSANDO...")
+
+    IF (CALIAS)->(&CCPOOK)==CMARCA
+
+        IF NCARTEIRA==1
+  CNATORIG := CALIAS->E2_NATUREZ
+            CPREFORIG := CALIAS->E2_PREFIXO
+            CNUMORIG := CALIAS->E2_NUM
+            CPARCORIG := CALIAS->E2_PARCELA
+            CTIPORIG := CALIAS->E2_TIPO
+            CCFORIG := CALIAS->E2_FORNECE
+            CLOJORIG := CALIAS->E2_LOJA
+
+        ELSEIF NCARTEIRA==2
+            CNATORIG := CALIAS->E1_NATUREZ
+            CPREFORIG := CALIAS->E1_PREFIXO
+            CNUMORIG := CALIAS->E1_NUM
+            CPARCORIG := CALIAS->E1_PARCELA
+            CTIPORIG := CALIAS->E1_TIPO
+            CCFORIG := CALIAS->E1_CLIENTE
+            CLOJORIG := CALIAS->E1_LOJA
+        ENDIF
+
+        IF SED->(DBSEEK(XFILIAL("SED")+CNATORIG))
+
+            FOR NX := 1 TO  LEN(ACONFNAT)
+                CCAMPO := ACONFNAT[NX][1]
+                
+                IF SED->(&CCAMPO)<>ACONFNAT[NX][2]
+                    LNATVLD :=  .F. 
+                    EXIT 
+                ENDIF
+            NEXT
+        ENDIF
+
+        AREGISTRO := ARRAY(7)
+
+AREGISTRO[1] := CPREFORIG
+        AREGISTRO[2] := CNUMORIG
+        AREGISTRO[3] := CPARCORIG
+        AREGISTRO[4] := CTIPORIG
+        AREGISTRO[5] := CCFORIG
+        AREGISTRO[6] := CLOJORIG
+
+        IF LNATVLD
+
+            RECLOCK(CALIAS, .F. )
+            (CALIAS)->(&CCPONAT) := CNATUREZA
+            (CALIAS)->(MSUNLOCK())
+
+            DBSELECTAREA("SE5")
+            SE5->(DBSETORDER(7))
+
+            IF SE5->(DBSEEK(XFILIAL("SE5")+CPREFORIG+CNUMORIG+CPARCORIG+CTIPORIG+CCFORIG+CLOJORIG))
+
+                WHILE !(SE5->(EOF())) .AND. SE5->(E5_FILIAL+E5_PREFIXO+E5_NUMERO+E5_PARCELA+E5_TIPO+E5_CLIFOR+E5_LOJA)==XFILIAL("SE5")+CPREFORIG+CNUMORIG+CPARCORIG+CTIPORIG+CCFORIG+CLOJORIG
+                
+                    IF SE5->E5_NATUREZ<>CNATUREZA
+                        RECLOCK("SE5", .F. )
+                        SE5->E5_NATUREZ := CNATUREZA
+                        SE5->(MSUNLOCK())
+                    ENDIF
+
+                    SE5->(DBSKIP())
+                    ENDDO
+            ENDIF
+
+            DBSELECTAREA(CALIAS)
+            AAREA := (CALIAS)->(GETAREA())
+            NRECNO := (CALIAS)->(RECNO())
+            CFILTRO := (CALIAS)->(DBFILTER())
+
+            IF NCARTEIRA==1
+                (CALIAS)->(DBSETORDER(6))
+            ELSEIF NCARTEIRA==2
+                (CALIAS)->(DBSETORDER(2))
+            ENDIF
+
+            (CALIAS)->(DBCLEARFILTER())
+
+            IF (CALIAS)->(DBSEEK(XFILIAL(CALIAS)+CCFORIG+CLOJORIG+CPREFORIG+CNUMORIG+CPARCORIG+"AB-"))
+                
+                IF (CALIAS)->(&CCPONAT)==CNATORIG
+
+                    RECLOCK(CALIAS, .F. )
+                    (CALIAS)->(&CCPONAT) := CNATUREZA
+                    (CALIAS)->(MSUNLOCK())
+                ENDIF
+            ENDIF
+
+            IF (EMPTY(CFILTRO)) 
+            DBCLEARFILTER()
+            ELSE
+            DBSETFILTER({||&CFILTRO},CFILTRO)
+            ENDIF
+            RESTAREA(AAREA)
+
+            AREGISTRO[7] := "1"
+        ELSE 
+
+            AREGISTRO[7] := "0"
+        ENDIF
+
+        AADD(APROCES,AREGISTRO)
+        LNATVLD :=  .T. 
+    ENDIF
+
+    (CALIAS)->(DBSKIP())
+    ENDDO
+
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION F980INVERT(CMARCA,CALIAS,CCAMPO)
+
+LOCAL NREG := (CALIAS)->(RECNO())
+
+DBSELECTAREA(CALIAS)
+(CALIAS)->(DBGOTOP())
+
+WHILE !(EOF())
+ 
+    RECLOCK(CALIAS, .F. )
+    
+    IF (CALIAS)->(&CCAMPO)==CMARCA
+        (CALIAS)->(&CCAMPO) := "  "
+    ELSE 
+        (CALIAS)->(&CCAMPO) := CMARCA
+    ENDIF
+    (CALIAS)->(MSUNLOCK())
+    (CALIAS)->(DBSKIP())
+    ENDDO
+
+(CALIAS)->(DBGOTO(NREG))
+
+OMARK:OBROWSE:REFRESH( .T. )
+
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION F980MARK(CALIAS,CCAMPO,CMARCA)
+
+LOCAL NREG := (CALIAS)->(RECNO())
+
+DBSELECTAREA(CALIAS)
+
+RECLOCK(CALIAS, .F. )
+IF (CALIAS)->(&CCAMPO)<>CMARCA
+    (CALIAS)->(&CCAMPO) := CMARCA
+ELSE 
+    (CALIAS)->(&CCAMPO) := ""
+ENDIF
+(CALIAS)->(MSUNLOCK())
+
+OMARK:OBROWSE:REFRESH( .T. )
+
+RETURN 
+
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION F980VLDNAT(CNATUREZA)
+
+LOCAL LRETURN :=  .T. 
+LOCAL ARESERV := {}
+
+LOCAL NX := 0
+
+IF EMPTY(CNATUREZA)
+    MSGSTOP("INFORME UMA NATUREZA ANTES DE CONFIRMAR O PROCESSAMENTO.","ATENÇÃO")
+    LRETURN :=  .F. 
+ELSEIF !(EXISTCPO("SED",CNATUREZA))
+    LRETURN :=  .F. 
+ELSE 
+    DBSELECTAREA("SED")
+    SED->(DBSETORDER(1))
+    
+    AADD(ARESERV,STRTRAN(GETMV("MV_CIDE"),'"'))
+    AADD(ARESERV,STRTRAN(GETMV("MV_COFINS"),'"'))
+    AADD(ARESERV,STRTRAN(GETMV("MV_PISNAT"),'"'))
+    AADD(ARESERV,STRTRAN(GETMV("MV_CSLL"),'"'))
+    AADD(ARESERV,STRTRAN(GETMV("MV_INSS"),'"'))
+    AADD(ARESERV,STRTRAN(GETMV("MV_IRF"),'"'))
+    AADD(ARESERV,STRTRAN(GETMV("MV_ISS"),'"'))
+    AADD(ARESERV,STRTRAN(GETMV("MV_SEST"),'"'))
+    
+    IF SED->(DBSEEK(XFILIAL("SED")+CNATUREZA))
+        FOR NX := 1 TO  LEN(ARESERV)
+            
+            IF  ALLTRIM(SED->ED_CODIGO)== ALLTRIM(ARESERV[NX])
+                MSGINFO(IIF((CPAISLOC) $ ("ANG|PTG"),"A NATUREZA INFORMADA É DE USO EXCLUSIVO DO SISTEMA OU NÃO PODE SER UTILIZADA POR ESTE PROCEDIMENTO.","A NATUREZA INFORMADA É DE USO EXCLUSIVO DO SISTEMA OU NÃO PODE SER UTILIZADA POR ESTA ROTINA."),"ATENÇÃO")
+                LRETURN :=  .F. 
+                EXIT 
+            ENDIF
+        NEXT
+    ENDIF
+ENDIF
+
+RETURN LRETURN
