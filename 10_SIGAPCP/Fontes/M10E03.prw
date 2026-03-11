@@ -55,11 +55,11 @@ Return
 //+----------------------------------------------------------------------------------------------------------------
 Static Function M02EMain(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 
-	BeginTran()
+	BEGIN TRANSACTION //BeginTran()
 
-			M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
+		M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 	
-	EndTran()
+	END TRANSACTION  //EndTran()
 	MsUnlockAll()
 
 Return
@@ -232,7 +232,7 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 		_oPrinter:QrCode(625,810,_cQRCode, 070) // #7976
 
 		_oPrinter:Say(_nRow + 505 , 270, Alltrim(_cNumSer),_OFontGG) //525
-		_oPrinter:Say(_nRow + 685 , 1025, "FGQ-FB-008 Rev.00", _OFontP)
+		_oPrinter:Say(_nRow + 685 , 1030, "FGQ-FB-008 Rev.00", _OFontP)
 		
 		If _cINMETRO =="1"
 			_oPrinter:SayBitMap( _nRow + 260, 1080 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 60 * 2.5 , 60 * 2.5)
@@ -240,7 +240,7 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 		
 		_oPrinter:Say(_nRow + 530 , 450, "ESPECIFICAÇÕES TÉCNICAS: " ,_OFontP) //560
 	
-		If _cFamilia == "000001" .and. _cTpGas <> "4"
+		If _cFamilia == "000001"
             If _cTpFluido == "1"
              		_cTxFluido := "R134a"
             ElseIf _cTpFluido == "2"
@@ -254,16 +254,17 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 
             Endif        
                     
-			_oPrinter:Say(_nRow + 580, 70, "Carga de Fluído: "     + _cVlrFluido + "g", _OFontP)
+			_oPrinter:Say(_nRow + 575 , 70, "Fluído Refrigerante: " + _cTxFluido ,_OFontP)
+			_oPrinter:Say(_nRow + 615 , 70, "Carga de Fluído: "     + _cVlrFluido + "g", _OFontP)
 			_oPrinter:Say(_nRow + 655 , 70, "Potência: " 			+ _cPotencia, _OFontP)
 			
-			_oPrinter:Say(_nRow + 580 , 450, "Potência degelo: " 	+ _cPdeGelo , _OFontP)			//#6033
-			_oPrinter:Say(_nRow + 620 , 450, "Grau de Proteção: IP" + _cGrProtecao, _OFontP)
-			_oPrinter:Say(_nRow + 660 , 450, "Classe Climática: " 	+ _cClClima , _OFontP)
+			_oPrinter:Say(_nRow + 575 , 450, "Potência degelo: " 	+ _cPdeGelo , _OFontP)			//#6033
+			_oPrinter:Say(_nRow + 615 , 450, "Grau de Proteção: IP" + _cGrProtecao, _OFontP)
+			_oPrinter:Say(_nRow + 655 , 450, "Classe Climática: " 	+ _cClClima , _OFontP)
 
 			_oPrinter:Say(_nRow + 575 , 800, "Corrente: " 			+ _cCorrente + " A", _OFontP)
-			_oPrinter:Say(_nRow + 620 , 800, "Tensão: " 			+ _cTensao, _OFontP)
-			_oPrinter:Say(_nRow + 660 , 800, "Frequência: " 		+ _cFreq, _OFontP)
+			_oPrinter:Say(_nRow + 615 , 800, "Tensão: " 			+ _cTensao, _OFontP)
+			_oPrinter:Say(_nRow + 655 , 800, "Frequência: " 		+ _cFreq, _OFontP)
 
 		EndIf
 
@@ -285,44 +286,11 @@ Static Function M02EPrint(_cCodProd,_nQtd,_cNota,_nQtdImp,_cNumSer)
 			_oPrinter:Say(_nRow + 685 , 70, "Potência: " + _cPotencia, _OFontP)
 			
 			_oPrinter:Say(_nRow + 605 , 550, "Grau de Proteção: IP" + _cGrProtecao, _OFontP)
-			_oPrinter:Say(_nRow + 660 , 550, "Classe Climática: " + _cClClima , _OFontP)
+			_oPrinter:Say(_nRow + 645 , 550, "Classe Climática: " + _cClClima , _OFontP)
 			_oPrinter:Say(_nRow + 685 , 550, "Corrente: " + _cCorrente + " A", _OFontP)
 			
 			_oPrinter:Say(_nRow + 605 , 950, "Tensão: " + _cTensao, _OFontP)
 			_oPrinter:Say(_nRow + 645 , 950, "Frequência: " + _cFreq, _OFontP)
-		EndIf
-		
-		If _cFamilia == "000001"
-			
-			If _cTpFluido == "1"
-             		_cTxFluido := "R134a"
-            ElseIf _cTpFluido == "2"
-              		_cTxFluido := "R404A"
-            ElseIf _cTpFluido == "3"
-                    _cTxFluido := "R404A/R134a"
-            ElseIf _cTpFluido == "4"			//#5495
-                    _cTxFluido := "R290"		//#5495
-			ElseIf _cTpFluido == "5"			//#5917
-                    _cTxFluido := "R452A"		//#5917		
-
-            Endif  
-
-			If _cTpGas == "4"
-
-				_oPrinter:Say(_nRow + 580 , 800, "Gás: " 				+ IIF(_cTpGas == "4", "Ciclopentano", "GLP"), _OFontP)
-				_oPrinter:Say(_nRow + 580 , 70, "Fluído Refrigerante: " + _cTxFluido ,_OFontP)
-				_oPrinter:Say(_nRow + 620 , 70, "Carga de Fluído: "     + _cVlrFluido + "g", _OFontP)
-				_oPrinter:Say(_nRow + 660 , 70, "Potência: " 			+ _cPotencia, _OFontP)
-
-				//_oPrinter:Say(_nRow + 580 , 450, "Potência degelo: " 	+ _cPdeGelo , _OFontP)
-				_oPrinter:Say(_nRow + 620 , 450, "Grau de Proteção: IP" + _cGrProtecao, _OFontP)
-				_oPrinter:Say(_nRow + 660 , 450, "Classe Climática: " 	+ _cClClima , _OFontP)
-				_oPrinter:Say(_nRow + 580 , 450, "Corrente: " 			+ _cCorrente + " A", _OFontP)
-				
-				_oPrinter:Say(_nRow + 620 , 800, "Tensão: " 			+ _cTensao, _OFontP)
-				_oPrinter:Say(_nRow + 660 , 800, "Frequência: " 		+ _cFreq, _OFontP)
-			EndIf
-			
 		EndIf
 		
 		If _cFamilia == "000002"
