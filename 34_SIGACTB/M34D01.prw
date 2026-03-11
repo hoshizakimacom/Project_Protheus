@@ -1,217 +1,223 @@
-#Include 'Protheus.ch'
-#Include 'TBICONN.ch'
+#INCLUDE "protheus.ch"
+STATIC _CARQORI := "", _CARQLOG := ""
 
-Static _cArqOri     := ''
-Static _cArqLog     := ''
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+USER FUNCTION M34D01()
+LOCAL _ASAYS := {}
+LOCAL _ABUTTON := {}
+LOCAL _CTITULO := FUNNAME()
 
-//+-------------------------------------------------------------------------------------------------
-//  Rotina de importação de clientes a partir de arquivo CSV
-//+-------------------------------------------------------------------------------------------------
-User Function M34D01()
-    Local   _aSays          := {}
-    Local   _aButton        := {}
-    Local   _cTitulo        := FunName()
+AADD(_ASAYS,OEMTOANSI("ESTA ROTINA TEM COMO OBJETIVO CRIAR ITEM CONTÁBIL PARA OS CLIENTES QUE AINDA NÃO POSSUEM."))
+AADD(_ASAYS,OEMTOANSI(" "))
 
-    AADD(_aSays,OemToAnsi("Esta rotina tem como objetivo criar item contábil para os clientes que ainda não possuem."))
-    AADD(_aSays,OemToAnsi(" "))
+AADD(_ABUTTON,{1, .T. ,{||PROCESSA({||MD34PROC()}),FECHABATCH()}})
+AADD(_ABUTTON,{2, .T. ,{||FECHABATCH()}})
 
-    aAdd( _aButton, { 1, .T., {|| Processa({||MD34Proc()}),FechaBatch()}}   )
-    aAdd( _aButton, { 2, .T., {|| FechaBatch()                  }}  )
+FORMBATCH(_CTITULO,_ASAYS,_ABUTTON)
 
-    FormBatch( _cTitulo, _aSays, _aButton )
+_CARQORI := ""
+_CARQLOG := ""
+RETURN 
 
-    _cArqOri        := ''
-    _cArqLog        := ''
-Return
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD34PROC()
+LOCAL _ODLG := NIL
+LOCAL _CTITLE := "IMPORTAÇÃO CLIENTES + ITEM CONTABIL"
+LOCAL _OARQLOG := NIL
+PRIVATE _OARQORI := NIL
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD34Proc()
-    Local _oDlg         := Nil
-    Local _cTitle       := 'Importação Clientes + Item Contabil'
-    Local _oArqLog      := Nil
-    Private _oArqOri      := Nil
+_ODLG := MSDIALOG():NEW(0,0,300,900,_CTITLE,,, .F. ,128,,,,, .T. ,,, .F. )
 
-    Define MsDialog _oDlg Title _cTitle Style DS_MODALFRAME From 000,000 To 300,900 Pixel
+TSAY():NEW(40,20,{||"ARQUIVO LOG:"},_ODLG,,, .F. , .F. , .F. , .T. ,,,,, .F. , .F. , .F. , .F. , .F. , .F. )
+_OARQLOG := TGET():NEW(37,80,{ | U |IIF(PCOUNT()==0,_CARQLOG,_CARQLOG := U)},_ODLG,300,10,,,,,, .F. ,, .T. ,, .F. ,{|| .F. }, .F. , .F. ,, .F. , .F. ,,"_CARQLOG",,,)
 
-//    @020,020 Say  'Arquivo Origem *.CSV:' Of _oDlg Pixel
-//    @017,080 Get _oArqOri Var _cArqOri Size 300,010 Of _oDlg Pixel WHEN .F.
+TBUTTON():NEW(37,400,"SELEC. ARQUIVO",_ODLG,{||MD34ARQLOG()},40,15,,, .F. , .T. , .F. ,, .F. ,,, .F. )
 
-//    @017,400 BUTTON "Selec. Arquivo"    SIZE 040, 015 PIXEL OF _oDlg ACTION ( MD05ArqOri() )
+TBUTTON():NEW(120,170,"CONFIRMAR",_ODLG,{||MD34OK()},40,12,,, .F. , .T. , .F. ,, .F. ,,, .F. )
+TBUTTON():NEW(120,220,"CANCELAR",_ODLG,{||_ODLG:END()},40,12,,, .F. , .T. , .F. ,, .F. ,,, .F. )
 
-    @040,020 Say  'Arquivo Log:' Of _oDlg Pixel
-    @037,080 Get _oArqLog Var _cArqLog Size 300,010 Of _oDlg Pixel WHEN .F.
+_ODLG:ACTIVATE(_ODLG:BLCLICKED,_ODLG:BMOVED,_ODLG:BPAINTED, .T. ,,,,_ODLG:BRCLICKED,)
 
-    @037,400 BUTTON "Selec. Arquivo"    SIZE 040, 015 PIXEL OF _oDlg ACTION ( MD34ArqLog() )
+_CARQORI := ""
+_CARQLOG := ""
+RETURN 
 
-    @120,170 BUTTON "Confirmar"     SIZE 040, 012 PIXEL OF _oDlg ACTION ( MD34Ok() )
-    @120,220 BUTTON "Cancelar"      SIZE 040, 012 PIXEL OF _oDlg ACTION (_oDlg:End())
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD34ARQLOG()
+LOCAL _CARQ := CGETFILE("*.TXT","INFORME DIRETORIO PARA ARQUIVO DE LOG",0,"", .F. ,NOR(48,8,128), .F. , .T. )
 
-    Activate MsDialog _oDlg Centered
+_CARQLOG := _CARQ+DTOS(DATE())+"_"+STRTRAN(TIME(),":","")+".TXT"
+RETURN 
 
-    _cArqOri        := ''
-    _cArqLog        := ''
-Return
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD34OK()
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD34ArqLog()
-    Local _cArq     :=  cGetFile('*.TXT'    ,'Informe diretorio para arquivo de log'    ,0,'',.F.           ,nOR( GETF_LOCALHARD, GETF_LOCALFLOPPY, GETF_RETDIRECTORY ),.F., .T. )
+LOCAL _NREG := 0
+LOCAL _CLOG := "INICIO "+DTOC(DATE())+" "+TIME() + CRLF + CRLF
+LOCAL _CMSG := ""
+LOCAL _NERR := 0
+LOCAL _NINC := 0
+LOCAL _CALIAS := GETNEXTALIAS()
+PRIVATE _LVALID :=  .T. 
+PRIVATE _AITENS := {}
+PRIVATE _AFIELD := {}
+PRIVATE _NTOTAL := 0
+PRIVATE _NITEM := 0
 
-    _cArqLog := _cArq + DToS(Date()) + '_' + (StrTran(Time(),':','')) + '.TXT'
-Return
+MD34SELECT(_CALIAS,@_NTOTAL)
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD34Ok()
-  
-    Local _nReg     := 0
-    Local _cLog     := 'Inicio ' + DToC(Date()) + ' ' + Time() + CRLF + CRLF
-    Local _cMsg     := ''
-    Local _nErr     := 0
-    Local _nInc     := 0
-    Local _cAlias   := GetNextAlias()
-    Private _lValid   := .T.
-    Private _aItens   := {}
-    Private _aField   := {}
-    Private _nTotal   := 0
-    Private _nItem    := 0
+WHILE !(_CALIAS)->(EOF())
+ 
+    FWMSGRUN(,{||MD34EXEC(_CALIAS,@_CLOG,@_NERR,@_NINC)},,I18N("IMPORTANTO ITEM CONTÁBIL #1 DE #2 ...",{++_NREG,_NTOTAL}))
 
-   MD34Select(_cAlias,@_nTotal)
+    (_CALIAS)->(DBSKIP())
+    ENDDO
 
-    // Percorre itens do array
-    While (_cAlias)->(!EOF())
-        FWMsgRun(, {||MD34Exec(_cAlias,@_cLog,@_nErr,@_nInc) },,I18N('Importanto Item Contábil #1 de #2 ...',{++_nReg,_nTotal}))
+_CMSG := MD34LOG(_CARQLOG,_CMSG,@_CLOG,_NERR,_NINC)
 
-        (_cAlias)->(DbSkip())
-    EndDo
+AVISO("ATENÇÃO",I18N(_CMSG,{_NTOTAL,_CARQLOG}),{"OK"},3)
 
-    _cMsg := MD34Log(_cArqLog,_cMsg,@_cLog,_nErr,_nInc)
+_CARQORI := ""
+_CARQLOG := ""
+RETURN 
 
-    Aviso('Atenção',I18N( _cMsg,{_nTotal,_cArqLog}),{'OK'},3)
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD34SELECT(_CALIAS,_NTOTAL)
 
-    _cArqOri        := ''
-    _cArqLog        := ''
-Return
+_cQry := " SELECT A1_COD, "
+_cQry += "        A1_LOJA, "
+_cQry += "        A1_XITEMC, "
+_cQry += "        A1_NOME, "
+_cQry += "        R_E_C_N_O_ AS SA1_RECNO "
+_cQry += " FROM "+RETSQLNAME("SA1")+" SA1 "
+_cQry += " WHERE SA1.D_E_L_E_T_= ' ' "
+_cQry += "   AND A1_XITEMC = ' ' "
+__EXECSQL(_CALIAS,_cQry,{}, .F. )
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD34Select(_cAlias,_nTotal)
+(_CALIAS)->(DBEVAL({||_NTOTAL++}))
+(_CALIAS)->(DBGOTOP())
+RETURN 
 
-    BeginSql Alias _cAlias
-        SELECT   A1_COD
-                ,A1_LOJA
-                ,A1_XITEMC
-                ,A1_NOME
-                ,R_E_C_N_O_ AS SA1_RECNO
-        FROM %Table:SA1% SA1
-        WHERE SA1.%NotDel% AND A1_XITEMC = ' '
-    EndSql
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD34LOG(_CARQLOG,_CMSG,_CLOG,_NERR,_NINC)
+LOCAL _NHANDLE := 0
 
-    (_cAlias)->( dbEval( {|| _nTotal++ } ) )
-    (_cAlias)->( dbGoTop() )
-Return
+_NHANDLE := FCREATE(_CARQLOG)
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD34Log(_cArqLog,_cMsg,_cLog,_nErr,_nInc)
-    Local _nHandle      := 0
+_CLOG := CHR(13)+CHR(10) + CRLF+I18N("CLIENTES INCLUÍDOS: #1",{_NINC}) + CRLF+I18N("CLIENTES NÃO INCLUÍDOS (ERRO): #1",{_NERR}) + CRLF + CRLF+_CLOG
+_CLOG += CHR(13)+CHR(10) + CRLF+"FIM "+DTOC(DATE())+" "+TIME() + CRLF + CRLF
 
-    _nHandle    := FCREATE(_cArqLog)
+IF _NHANDLE=- (1)
+    _CMSG += " ERRO AO CRIAR ARQUIVO - FERROR "+STR(FERROR())
+ELSE 
+    _CMSG += " VERIFIQUE ARQUIVO DE LOG GERADO: " + CRLF + CRLF+"#2 " + CRLF
+    FWRITE(_NHANDLE,_CLOG)
+    FCLOSE(_NHANDLE)
+ENDIF
+RETURN _CMSG
 
-    _cLog := CRLF + CRLF + I18N('Clientes Incluídos: #1',{_nInc})  +  CRLF + I18N('Clientes não incluídos (erro): #1',{_nErr}) + CRLF + CRLF + _cLog
-    _cLog += CRLF + CRLF + 'Fim ' + DToC(Date()) + ' ' + Time() + CRLF + CRLF
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD34EXEC(_CALIAS,_CLOG,_NERR,_NINC)
+LOCAL CITEMC := "1"+ ALLTRIM(_CALIAS->A1_COD)+ ALLTRIM(_CALIAS->A1_LOJA)
+LOCAL _CMSGLOG := ""
+LOCAL _ADADOS := {}
+LOCAL CNOME :=  ALLTRIM(_CALIAS->A1_NOME)
 
-    If _nHandle = -1
-        _cMsg   += " Erro ao criar arquivo - ferror " + Str(Ferror())
-    Else
-        _cMsg += ' Verifique arquivo de log gerado: ' + CRLF + CRLF + '#2 ' + CRLF
-        FWrite(_nHandle, _cLog)
-        FClose(_nHandle)
-    EndIf
-Return _cMsg
+LMSERROAUTO :=  .F. 
 
-//+-------------------------------------------------------------------------------------------------
-Static Function MD34Exec(_cAlias,_cLog,_nErr,_nInc)
-    Local cItemC        := '1' + AllTrim((_cAlias)->A1_COD )+ AllTrim((_cAlias)->A1_LOJA)
-    Local _cMsgLog      := ''
-    Local _aDados       := {}
-    Local cNome         := AllTrim((_cAlias)->A1_NOME)
+CTD->(DBSETORDER(1))
+CTD->(DBGOTOP())
 
-    lMsErroAuto     := .F.
+IF !(CTD->(DBSEEK(XFILIAL("CTD")+CITEMC)))
+    
+    AADD(_ADADOS,{"CTD_ITEM",CITEMC,NIL})
+    AADD(_ADADOS,{"CTD_CLASSE","2",NIL})
+    AADD(_ADADOS,{"CTD_DESC01",CNOME,NIL})
+    AADD(_ADADOS,{"CTD_BLOQ","2",NIL})
+    AADD(_ADADOS,{"CTD_DTEXIS",STOD("19800101"),NIL})
+    AADD(_ADADOS,{"CTD_DTEXSF",STOD("20401231"),NIL})
+    AADD(_ADADOS,{"CTD_CLOBRG","2",NIL})
+    AADD(_ADADOS,{"CTD_ACCLVL","1",NIL})
+    
+    MSEXECAUTO({|X,Y|CTBA040(X,Y)},_ADADOS,3)
+ENDIF
 
+IF !(LMSERROAUTO)
+    
+    SA1->(DBGOTO(_CALIAS->SA1_RECNO))
+    
+    IF !SA1->(EOF())
+        RECLOCK("SA1", .F. )
+        SA1->A1_XITEMC := CITEMC
+        SA1->(MSUNLOCK())
+    ENDIF
+    
+    _CMSGLOG := "INCLUÍDO"
+ELSE 
+    
+    ++_NERR
+    _CMSGLOG := MD34GETERR()
+ENDIF
 
-    CTD->(DbSetOrder(1))    // CTD_FILIAL+CTD_ITEM
-    CTD->(DbGoTop())
+MD34GETLOG(_CALIAS->A1_COD,_CALIAS->A1_LOJA,CITEMC,_CMSGLOG,@_CLOG)
+RETURN 
 
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD34GETLOG(CCOD,CLOJA,CITEMC,_CMSGLOG,_CLOG)
+_CLOG += CHR(13)+CHR(10)
+_CLOG += " | CÓDIGO: "+CCOD
+_CLOG += " | LOJA: "+CLOJA
+_CLOG += " | ITEM CONTABIL: "+CITEMC
+_CLOG += " | STATUS: "+ ALLTRIM(_CMSGLOG)+" |"
+RETURN 
 
-    // Verifica se item contabil já existe. Se não, inclui
-    If !CTD->(DbSeek( xFilial('CTD') + cItemC ))
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD34GETERR()
+LOCAL _CRET := ""
+LOCAL _CFILEERROR := NOMEAUTOLOG()
+LOCAL _CMEMO := MEMOREAD(_CFILEERROR)
+LOCAL _NY := 0
+LOCAL _CAUX := ""
+LOCAL _LTITULO :=  .T. 
 
-        AAdd(_aDados,   {'CTD_ITEM'     ,cItemC                     ,Nil})
-        AAdd(_aDados,   {'CTD_CLASSE'   ,'2'                        ,Nil})  // 1=Sintetica;2=Analitica
-        AAdd(_aDados,   {'CTD_DESC01'   ,cNome                      ,Nil})  // Descrição da moeda 1
-        AAdd(_aDados,   {'CTD_BLOQ'     ,'2'                        ,Nil})  // Bloqueado? 1=Sim;2=Nao
-        AAdd(_aDados,   {'CTD_DTEXIS'   ,SToD('19800101')           ,Nil})  // Data inicio de existencia
-        AAdd(_aDados,   {'CTD_DTEXSF'   ,SToD('20401231')           ,Nil})  // Data fim de existencia
-        AAdd(_aDados,   {'CTD_CLOBRG'   ,'2'                        ,Nil})  // Nao - Classe Valor Obrigatório
-        AAdd(_aDados,   {'CTD_ACCLVL'   ,'1'                        ,Nil})  // Sim - Aceita Classe de Valor
+FOR _NY := 1 TO MLCOUNT(_CMEMO)
+    _CAUX :=  ALLTRIM(MEMOLINE(_CMEMO,,_NY))
+    
+    IF  LEN(_CAUX)>0 .AND. _LTITULO
+        _CRET += _CAUX+" "
+    ELSE 
+        
+        IF AT("< --",_CAUX)>0
+            _CRET += " | "+_CAUX
+        ENDIF
+        _LTITULO :=  .F. 
+    ENDIF
+NEXT
 
-        MSExecAuto({|x,y| CTBA040(x,y)},_aDados,3)
-    EndIf
+FERASE(_CFILEERROR)
+RETURN _CRET
 
-    If !lMsErroAuto
-        // Atualiza cadastro do cliente
-        SA1->(DbGoto( (_cAlias)->SA1_RECNO ))
+/////////////////////////////////////////////////////////////
+// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
+/////////////////////////////////////////////////////////////
+STATIC FUNCTION MD34ITEMC(CCOD,CLOJA,CITEMC,_CMSGLOG)
 
-        If SA1->(!EOF())
-            RecLock('SA1',.F.)
-                SA1->A1_XITEMC  := cItemC
-            SA1->(MsUnLock())
-        EndIf
-
-        _cMsgLog    := 'Incluído'
-    Else
-
-        ++_nErr
-        _cMsgLog    := MD34GetErr()
-    EndIf
-
-    MD34GetLog((_cAlias)->A1_COD,(_cAlias)->A1_LOJA,cItemC,_cMsgLog,@_cLog)
-Return
-
-//+-------------------------------------------------------------------------------------------------
-Static Function MD34GetLog(cCod,cLoja,cItemC,_cMsgLog,_cLog)
-    _cLog += CRLF
-    _cLog += ' | Código: '      + cCod
-    _cLog += ' | Loja: '        + cLoja
-    _cLog += ' | Item Contabil: '        + cItemC
-    _cLog += ' | STATUS: '      + AllTrim(_cMsgLog) + ' |'
-Return
-
-//+-------------------------------------------------------------------------------------------------
-Static Function MD34GetErr()
-    Local _cRet         := ''
-    Local _cFileError   := NomeAutoLog()
-    Local _cMemo            := MemoRead( _cFileError )
-    Local _nY               := 0
-    Local _cAux         := ''
-    Local _lTitulo      := .T.
-
-    For _nY := 1 To MLCount(_cMemo)
-        _cAux := AllTrim(MemoLine(_cMemo,,_nY))
-
-        If Len(_cAux) > 0 .And. _lTitulo
-            _cRet += _cAux + " "
-        Else
-            If At("< --", _cAux) > 0
-                _cRet += " | " + _cAux
-            EndIf
-            _lTitulo    := .F.
-        EndIf
-    Next _nY
-
-    Ferase(_cFileError)
-Return _cRet
-
-//+-------------------------------------------------------------------------------------------------------------------
-//| Cadastro de item contabil por cliente no momento da aprovação do orçamento de vendas
-//+-------------------------------------------------------------------------------------------------------------------
-Static Function MD34ItemC(cCod,cLoja,cItemC,_cMsgLog)
-
-Return
+RETURN 
