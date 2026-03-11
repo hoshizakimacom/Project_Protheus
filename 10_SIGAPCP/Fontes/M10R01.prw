@@ -93,6 +93,7 @@ User Function M10RGetC2(_cAlias,_cOP)
                 ,C2_PRODUTO
                 ,C2_QUANT
                 ,C2_PEDIDO
+                ,C2_REVISAO
                 ,C2_ITEMPV
                 ,C2_EMISSAO
                 ,C2_DATPRF
@@ -293,6 +294,14 @@ User Function M10RPrPro(_cAlias,_oPrinter,_oBrush,_oFont1,_oFont2,_nRow,_nColIni
     _oPrinter:Say(_nRow     ,_nColIni   ,'Código'               ,_oFont1)
     _oPrinter:Say(_nRow         ,_nCol2 ,(_cAlias)->C2_PRODUTO      ,_oFont2)
     _nRow += _nNext + 10
+
+    _oPrinter:Say(_nRow     ,_nColIni   ,'Revisão'               ,_oFont1)
+    _oPrinter:Say(_nRow         ,_nCol2 ,(_cAlias)->C2_REVISAO      ,_oFont2)
+    _nRow += _nNext + 20
+
+    _oPrinter:Say(_nRow     ,_nColIni   ,'Data Revisão'            ,_oFont1)
+    _oPrinter:Say(_nRow         ,_nCol2 ,DTOC(POSICIONE("SG5",1,XFILIAL("SG5")+SC2->(C2_PRODUTO + C2_REVISAO),"G5_DATAREV"))     ,_oFont2)
+    _nRow += _nNext + 30
     
     If Len(_aCliente) > 1
 	    _oPrinter:FWMSBAR('CODE128', 18.5/*nRow*/ , 33 ,(_cAlias)->C2_PRODUTO,_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, /*0.025 nWidth*/,0.75/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,0.7,0.7,/*lCmtr2Pix*/)
