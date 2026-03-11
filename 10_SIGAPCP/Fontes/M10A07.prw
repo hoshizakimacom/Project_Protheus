@@ -276,7 +276,9 @@ Static Function fSalvar()
                 
             If lMsErroAuto 
         
-                Mostraerro() 
+                If !IsBlind()
+                    Mostraerro() 
+                Endif
                 DisarmTransaction() 
                 break
         
