@@ -38,9 +38,12 @@ User Function MA410MNU()
 	   AAdd( aRotina,{ "Crédito - Desbloquear"         ,"U_M05A09_B(2)"     ,0 ,2 ,0 ,Nil})
 	EndIf
 
-	aSubRotina := { { OemtoAnsi('Parametros')   ,'Pergunte("M06A11",.T.)'  , 0 ,2 },;
-					{ OemtoAnsi('Envio e-mail') ,'U_M06A11()'              , 0 ,2 }}
+	aSubRotina := { { OemtoAnsi('Parametros')       ,'Pergunte("M06A11",.T.)'  , 0 ,2 },;
+					{ OemtoAnsi('Envio e-mail Fin.'),'U_M06A11()'              , 0 ,2 },;
+					{ OemtoAnsi('Envio e-mail CX')  ,'U_M05A42()'              , 0 ,2 }}
 	Aadd( aRotina,{ 'Env.Confirm.Pedido'               ,aSubRotina         ,0 ,2 ,0 ,Nil})
+
+	Aadd( aRotina,{ 'Exportar Pedido Itens'     ,'U_M05R22'         ,0 ,2 ,0 ,Nil})
 
 
 	RestArea(_aArea)
