@@ -207,11 +207,11 @@ Local cEstoq 	:= If( (mv_par13 == 1),"S",If( (mv_par13 == 2),"N","SN" ) )
 Local cDupli 	:= If( (mv_par14 == 1),"S",If( (mv_par14 == 2),"N","SN" ) )
 
 Local cFilSA3 := ""
-#IFNDEF TOP
+/*#IFNDEF TOP
 	Local cFilSA1 := ""
 	Local cFilSC5 := ""
 	Local cFilSC6 := ""
-#ENDIF	
+#ENDIF*/	
 Local aPedido	:= {}
 Local nCont		:= 0
 Local nPos		:= 0
@@ -283,20 +283,28 @@ TRFunction():New(oPedVC:Cell("NTOTPED1"),/* cID */,"SUM",/*oBreak*/,/*cTitle*/,T
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Cria arquivo de Trabalho                                     ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-cNomArq := CriaTrab(aCampos)
-Use &cNomArq	Alias TRB   NEW
-IndRegua("TRB",cNomArq,"VENDEDOR+CLIENTE+NUMPED",,,STR0018)		// "Selecionando Registros..."
+oTempTable := FWTemporaryTable():New("TRB") //cNomArq := CriaTrab(aCampos)
+//Define as colunas usadas
+oTempTable:SetFields( aCampos )
+//Efetua a criação da tabela
+oTempTable:Create()
+//Cria índice com colunas setadas anteriormente
+oTempTable:AddIndex("1", {"VENDEDOR", "CLIENTE","NUMPED"} )
+dbselectarea("TRB")
+/*cNomArq := CriaTrab(aCampos)
+Use &cNomArq	Alias TRB   NEW*/
+IndRegua("TRB",""/*cNomArq*/,"VENDEDOR+CLIENTE+NUMPED",,,STR0018)		// "Selecionando Registros..."
           
 If len(oReport:Section(1):GetAdvplExp("SA3")) > 0
 	cFilSA3 := oReport:Section(1):GetAdvplExp("SA3")
 EndIf
 
 
-#IFDEF TOP
+//#IFDEF TOP
 	If ( TcSrvType()<>"AS/400" )
 		GTrabTopR4(oReport)
 	Else
-#ENDIF
+//#ENDIF
 
 	If len(oReport:Section(2):GetAdvplExp("SA1")) > 0
 		cFilSA1 := oReport:Section(2):GetAdvplExp("SA1")
@@ -390,9 +398,9 @@ EndIf
 		dbSelectArea("SC5")
 		dbSkip()
 	EndDO
-#IFDEF TOP
+//#IFDEF TOP
 	EndIf	
-#ENDIF
+//#ENDIF
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Impressao do Relatorio                                       ³
@@ -414,7 +422,7 @@ While !Eof()
 		Loop
 	EndIf
 
-	#IFNDEF TOP
+	/*#IFNDEF TOP
 		dbSelectArea("SA1")
 		SA1->(dbSetOrder(1))
 		SA1->(dbSeek( xFilial("SA1") + TRB->CLIENTE+TRB->LOJA ))
@@ -423,7 +431,7 @@ While !Eof()
 			dbSkip()
 			Loop
 		EndIf
-	#ENDIF		
+	#ENDIF*/	
 	
 	dbSelectArea("TRB")
 	cVend := TRB->VENDEDOR
@@ -432,17 +440,17 @@ While !Eof()
 	dbSelectArea("TRB")   
 	While !Eof() .And.  TRB->VENDEDOR == cVend
 		
-		#IFDEF TOP
+		//#IFDEF TOP
 			If ( TcSrvType()<>"AS/400" )
 			Else
-		#ENDIF
+		//#ENDIF
 			IF TRB->CLIENTE < mv_par05 .Or. TRB->CLIENTE > mv_par06 .Or. TRB->LOJA < mv_par10 .Or. TRB->LOJA > mv_par11
 				dbSkip()
 				Loop
 			EndIF
-		#IFDEF TOP
+		//#IFDEF TOP
 			EndIf
-		#ENDIF		
+		//#ENDIF		
 		
 		cCli 		:= TRB->CLIENTE
 		cLoja		:= TRB->LOJA   
@@ -450,11 +458,11 @@ While !Eof()
 		While !Eof() .And. TRB->VENDEDOR == cVend .And. TRB->CLIENTE == cCli .And. TRB->LOJA == cLoja
 			
 			oReport:IncMeter()
-			#IFDEF TOP
+			//#IFDEF TOP
 				If ( TcSrvType()<>"AS/400" )
 					nTotPed1:=xMoeda( TRB->TOTPED, TRB->MOEDA, mv_par08, TRB->EMISSAO )
 				Else
-			#ENDIF
+			//#ENDIF
 				dbSelectArea("SC6")
 				dbSeek( xFilial()+TRB->NUMPED )
 				nTotPed1 := 0
@@ -477,12 +485,12 @@ While !Eof()
 						dbSkip()
 					EndIf
 				Enddo			
-			#IFDEF TOP
+			//#IFDEF TOP
 				EndIf
-			#ENDIF            
+			//#ENDIF            
 
          	DbSelectArea("TRB")
-			#IFDEF TOP
+			//#IFDEF TOP
 				If ( TcSrvType()<>"AS/400" )
 					cNome 	:= TRB->CLINOME
 					cMun 	:= TRB->CLIMUN
@@ -491,7 +499,7 @@ While !Eof()
 					cStatus := TRB->STATUSP
 					dEmissao:= TRB->EMISSAO					
 				Else
-			#ENDIF
+			//#ENDIF
 				SA1->(dbSetOrder(1))
 				SA1->(dbSeek( xFilial("SA1") + TRB->CLIENTE+TRB->LOJA ))
 				cNome 		:= SA1->A1_NOME
@@ -499,9 +507,9 @@ While !Eof()
 				cUF	  		:= SA1->A1_UF
 				dEmissao	:= SC5->C5_EMISSAO
 				cReg  := cReg  := Posicione("SX5",1,xFilial("SX5")+ "A2" +(cSCJTmp)->A1_REGIAO,"X5DESCRI()")
-			#IFDEF TOP
+			//#IFDEF TOP
 				EndIf
-			#ENDIF  
+			//#ENDIF  
 			
 			oReport:Section(1):Section(1):PrintLine()			
 			
@@ -992,15 +1000,23 @@ cabec2 := ""
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Cria arquivo de Trabalho                                     ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-cNomArq := CriaTrab(aCampos)
-Use &cNomArq	Alias TRB   NEW
-IndRegua("TRB",cNomArq,"VENDEDOR+CLIENTE+NUMPED",,,STR0008)		//"Selecionando Registros..."
+oTempTable := FWTemporaryTable():New("TRB") //cNomArq := CriaTrab(aCampos)
+//Define as colunas usadas
+oTempTable:SetFields( aCampos )
+//Efetua a criação da tabela
+oTempTable:Create()
+//Cria índice com colunas setadas anteriormente
+oTempTable:AddIndex("1", {"VENDEDOR", "CLIENTE","NUMPED"} )
+dbselectarea("TRB")
+/*cNomArq := CriaTrab(aCampos)
+Use &cNomArq	Alias TRB   NEW*/
+IndRegua("TRB",""/*cNomArq*/,"VENDEDOR+CLIENTE+NUMPED",,,STR0008)		//"Selecionando Registros..."
 
-#IFDEF TOP
+//#IFDEF TOP
 	If ( TcSrvType()<>"AS/400" )
 		GerTrabTop()
 	Else
-#ENDIF
+//#ENDIF
 	dbSelectArea("SC5")
 	dbSetOrder(2)
 	dbSeek(xFilial()+DTOS(mv_par01),.T.)
@@ -1076,9 +1092,9 @@ IndRegua("TRB",cNomArq,"VENDEDOR+CLIENTE+NUMPED",,,STR0008)		//"Selecionando Reg
 		dbSelectArea("SC5")
 		dbSkip()
 	EndDO
-#IFDEF TOP
+//#IFDEF TOP
 	EndIf	
-#ENDIF
+//#ENDIF
 
 dbSelectArea("TRB")
 dbGoTop()
@@ -1086,7 +1102,7 @@ nTotGer1 := 0
 nTotGerAux := 0
 
 SetRegua(RecCount())		// Total de Elementos da regua
-
+cMvNorm := GetMv("MV_NORM")
 While !Eof() .And. lContinua
 	
 	IF lEnd
@@ -1101,7 +1117,7 @@ While !Eof() .And. lContinua
 	dbSeek( xFilial() + cVend )
 	
 	IF li > 55
-		cabec(titulo,cabec1,cabec2,nomeprog,tamanho,GetMv("MV_NORM"))
+		cabec(titulo,cabec1,cabec2,nomeprog,tamanho,cMvNorm)
 	EndIF
 	@li,  0 Psay STR0010+ cVend + "  " + SA3->A3_NOME		//"VENDEDOR : "
 	li++
@@ -1115,17 +1131,17 @@ While !Eof() .And. lContinua
 			lContinua := .F.
 			Exit
 		Endif
-		#IFDEF TOP
+		//#IFDEF TOP
 			If ( TcSrvType()<>"AS/400" )
 			Else
-		#ENDIF
+		//#ENDIF
 			IF CLIENTE < mv_par05 .Or. CLIENTE > mv_par06 .Or. LOJA < mv_par10 .Or. LOJA > mv_par11
 				dbSkip()
 				Loop
 			EndIF
-		#IFDEF TOP
+		//#IFDEF TOP
 			EndIf
-		#ENDIF		
+		//#ENDIF		
 		nTotCli1 := 0
 		cCli := CLIENTE
 		cLoja:= LOJA
@@ -1141,14 +1157,14 @@ While !Eof() .And. lContinua
 			IncRegua()
 			
 			IF li > 55
-				cabec(titulo,cabec1,cabec2,nomeprog,tamanho,GetMv("MV_NORM"))				   				
+				cabec(titulo,cabec1,cabec2,nomeprog,tamanho,cMvNorm)				   				
 			EndIF
 			
-			#IFDEF TOP
+			//#IFDEF TOP
 				If ( TcSrvType()<>"AS/400" )
 					nTotPed1:=xMoeda( TRB->TOTPED, TRB->MOEDA, mv_par08, TRB->EMISSAO )
 				Else
-			#ENDIF
+			//#ENDIF
 				dbSelectArea("SC6")
 				dbSeek( xFilial()+TRB->NUMPED )
 				nTotPed1 := 0
@@ -1171,25 +1187,25 @@ While !Eof() .And. lContinua
 						dbSkip()
 					EndIf
 				Enddo			
-			#IFDEF TOP
+			//#IFDEF TOP
 				EndIf
-			#ENDIF            
+			//#ENDIF            
 
          	DbSelectArea("TRB")
 			@li, 0 Psay TRB->CLIENTE + " "
-			#IFDEF TOP
+			//#IFDEF TOP
 				If ( TcSrvType()<>"AS/400" )
 					@li, aCoord[1] Psay SubStr(CLINOME, 1, aTam2[1])
 					@li, aCoord[2] Psay SubStr(CLIMUN,  1, aTam2[2])
 				Else
-			#ENDIF
+			//#ENDIF
 				SA1->(dbSetOrder(1))
 				SA1->(dbSeek( xFilial("SA1") + TRB->CLIENTE+TRB->LOJA ))
 				@li, aCoord[1] Psay SubStr(SA1->A1_NOME, 1, aTam2[1])
 				@li, aCoord[2] Psay SubStr(SA1->A1_MUN,  1, aTam2[2])
-			#IFDEF TOP
+			//#IFDEF TOP
 				EndIf
-			#ENDIF
+			//#ENDIF
 			@li, aCoord[3] Psay NUMPED
 			@li, aCoord[4] Psay nTotPed1	Picture tm(nTotPed1,16)
 			li++
@@ -1208,7 +1224,7 @@ While !Eof() .And. lContinua
 			
 		EndDO
 		IF li > 55
-			cabec(titulo,cabec1,cabec2,nomeprog,tamanho,GetMv("MV_NORM"))
+			cabec(titulo,cabec1,cabec2,nomeprog,tamanho,cMvNorm)
 		EndIF
 
 		//-- Total por Cliente
@@ -1306,7 +1322,7 @@ Replace MOEDA    With SC5->C5_MOEDA
 MsUnlock()
 dbSelectArea("SC5")
 Return .T.
-#IFDEF TOP
+//#IFDEF TOP
 Static Function GerTrabTop()
 Local aArea:=GetArea()
 Local aStruSC5:= {}
@@ -1452,5 +1468,5 @@ DbSelectArea(cSC5Tmp)
 DbCloseArea()
 RestArea(aArea)
 Return
-#ENDIF
+//#ENDIF
 
