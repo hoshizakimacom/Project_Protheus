@@ -80,11 +80,11 @@ User Function M06R02()
 Local oReport
 Private cAliasQry := GetNextAlias()
 
-#IFDEF TOP
+//#IFDEF TOP
    Private cAlias    := cAliasQry
-#ELSE
-   Private cAlias    := "SE3"
-#ENDIF
+//#ELSE
+//   Private cAlias    := "SE3"
+//#ENDIF
 
 If FindFunction("TRepInUse") .And. TRepInUse()
 	//-- Interface de impressao
@@ -349,9 +349,9 @@ Local nTotPorc	:= 0
 Local nTotPerVen	:= 0
 Local nTotPerGer	:= 0
 
-#IFNDEF TOP
-	Local cCondicao := ""
-#ENDIF
+//#IFNDEF TOP
+//	Local cCondicao := ""
+//#ENDIF
 
 Local cDocLiq   := ""
 Local cTitulo   := ""                                     
@@ -368,6 +368,7 @@ Local cFilSA1   := ""
 Local lVend	    := .F.
 Local lFirst    := .F.
 Local lRndIrrf	:= GetMV("MV_RNDIRF")
+Local cVarMV_VLRETIR:=GetMV("MV_VLRETIR")
 
 If oReport:Section(1):GetOrder() == 1		// Ordem: por Titulo
 	nOrdem := 1
@@ -469,7 +470,7 @@ EndIf
 //³Filtragem do relatório                                                  ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 
-#IFDEF TOP
+//#IFDEF TOP
 
 	// Indexa de acordo com ordem escolhida oelo cliente
 	dbSelectArea("SE3")
@@ -544,52 +545,52 @@ EndIf
 	oReport:Section(nSection):EndQuery()
 
 
-#ELSE
-   
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³Utilizar a funcao MakeAdvlExpr, somente quando for utilizar o range de parametros para ambiente CDX ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	MakeAdvplExpr("MTR540") 
-
-	// Indexa de acordo com ordem escolhida oelo cliente
-	dbSelectArea("SE3")
-	If nOrdem == 1		// Ordem: por Titulo
-		dbSetOrder(2)   
-		cOrder := "E3_FILIAL+E3_VEND+E3_PREFIXO+E3_NUM+E3_PARCELA"
-	Else										// Ordem: por Cliente
-		dbSetOrder(3)
-		cOrder := "E3_FILIAL+E3_VEND+E3_CODCLI+E3_LOJA+E3_PREFIXO+E3_NUM+E3_PARCELA"
-	EndIf	
-	
-	DbSelectArea("SE3")	// Posiciona no arquivo de comissoes
-	DbSetOrder(3)			// Por Vendedor, Cliente, Loja, Prefixo, Numero
-	cFilialSE3 := xFilial()
-	cNomArq    := CriaTrab("",.F.)
-	
-	cCondicao := "SE3->E3_FILIAL=='" + cFilialSE3 + "'"
-	
-	If !Empty(mv_par04)
-		cCondicao +=  " .AND. "+MV_PAR04
-	EndIf
-	
-	cCondicao += " .AND. DtoS(SE3->E3_EMISSAO)>='" + DtoS(mv_par02) + "'"
-	cCondicao += " .AND. DtoS(SE3->E3_EMISSAO)<='" + DtoS(mv_par03) + "'"	
-	                                 
-	If mv_par01 == 1
-		cCondicao += " .AND. SE3->E3_BAIEMI!='B'"  // Baseado pela emissao da NF
-	Elseif mv_par01 == 2
-		cCondicao += " .AND. SE3->E3_BAIEMI=='B'"  // Baseado pela baixa do titulo
-	Endif	
-		
-	If mv_par06 == 1 		// Comissoes a pagar
-		cCondicao += " .AND. Dtos(SE3->E3_DATA)== '"+Dtos(Ctod(""))+"'"
-	ElseIf mv_par06 == 2 // Comissoes pagas
-		cCondicao += " .AND. Dtos(SE3->E3_DATA)!= '"+Dtos(Ctod(""))+"'"
-	Endif
-	
-	oReport:Section(nSection):SetFilter(cCondicao,cOrder)      // abre tela de imprimindo...
-	
-#ENDIF
+//#ELSE
+//   
+//	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//	//³Utilizar a funcao MakeAdvlExpr, somente quando for utilizar o range de parametros para ambiente CDX ³
+//	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+//	MakeAdvplExpr("MTR540") 
+//
+//	// Indexa de acordo com ordem escolhida oelo cliente
+//	dbSelectArea("SE3")
+//	If nOrdem == 1		// Ordem: por Titulo
+//		dbSetOrder(2)   
+//		cOrder := "E3_FILIAL+E3_VEND+E3_PREFIXO+E3_NUM+E3_PARCELA"
+//	Else										// Ordem: por Cliente
+//		dbSetOrder(3)
+//		cOrder := "E3_FILIAL+E3_VEND+E3_CODCLI+E3_LOJA+E3_PREFIXO+E3_NUM+E3_PARCELA"
+//	EndIf	
+//	
+//	DbSelectArea("SE3")	// Posiciona no arquivo de comissoes
+//	DbSetOrder(3)			// Por Vendedor, Cliente, Loja, Prefixo, Numero
+//	cFilialSE3 := xFilial()
+//	cNomArq    := CriaTrab("",.F.)
+//	
+//	cCondicao := "SE3->E3_FILIAL=='" + cFilialSE3 + "'"
+//	
+//	If !Empty(mv_par04)
+//		cCondicao +=  " .AND. "+MV_PAR04
+//	EndIf
+//	
+//	cCondicao += " .AND. DtoS(SE3->E3_EMISSAO)>='" + DtoS(mv_par02) + "'"
+//	cCondicao += " .AND. DtoS(SE3->E3_EMISSAO)<='" + DtoS(mv_par03) + "'"	
+//	                                 
+//	If mv_par01 == 1
+//		cCondicao += " .AND. SE3->E3_BAIEMI!='B'"  // Baseado pela emissao da NF
+//	Elseif mv_par01 == 2
+//		cCondicao += " .AND. SE3->E3_BAIEMI=='B'"  // Baseado pela baixa do titulo
+//	Endif	
+//		
+//	If mv_par06 == 1 		// Comissoes a pagar
+//		cCondicao += " .AND. Dtos(SE3->E3_DATA)== '"+Dtos(Ctod(""))+"'"
+//	ElseIf mv_par06 == 2 // Comissoes pagas
+//		cCondicao += " .AND. Dtos(SE3->E3_DATA)!= '"+Dtos(Ctod(""))+"'"
+//	Endif
+//	
+//	oReport:Section(nSection):SetFilter(cCondicao,cOrder)      // abre tela de imprimindo...
+//	
+//#ENDIF
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Metodo TrPosition()                                                     ³
@@ -629,7 +630,7 @@ oReport:SetMeter(SE3->(LastRec()))
 dbSelectArea(cAlias)
 
 cPeriodo	:= "De: "+DTOC(MV_PAR02) + " Até: "+DTOC(MV_PAR03)
-
+cMvRetIR := GetMV("MV_VLRETIR") 
 While !oReport:Cancel() .And. !&(cAlias)->(Eof())
 	
 	cVend := &(cAlias)->(E3_VEND)
@@ -847,7 +848,7 @@ While !oReport:Cancel() .And. !&(cAlias)->(Eof())
 	
 	nValIR    := 0
 	nTotSemIR := 0
-	If mv_par10 > 0 .And. (nAc2 * mv_par10 / 100) > GetMV("MV_VLRETIR") //IR
+	If mv_par10 > 0 .And. (nAc2 * mv_par10 / 100) > cMvRetIR //IR
 		nValIR    := nAc2 * (MV_PAR10/100)
 		nTotSemIR := nAc2 - (nAc2 * (MV_PAR10/100))
 	Else
@@ -897,9 +898,9 @@ If mv_par11 == 1
 	oGeral:SetPageBreak(.T.)
 EndIf 
 
-#IFNDEF TOP
-   RetIndex("SE3")
-#ENDIF
+//#IFNDEF TOP
+//   RetIndex("SE3")
+//#ENDIF
    
 
 
@@ -1042,6 +1043,7 @@ Local aLiquid  := {}
 Local aValLiq  := {}
 Local aLiqProp := {}
 Local ny
+Local cVarMV_VLRETIR:= GetMV("MV_VLRETIR") 
 Local aColuna := IIF(cPaisLoc <> "MEX",{15,19,42,46,83,95,107,119,130,137,153,169,176,195,203},{28,35,58,62,99,111,123,135,146,153,169,185,192,211,219})
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Variaveis utilizadas para Impressao do Cabecalho e Rodape    ³
@@ -1132,7 +1134,7 @@ Endif
 
 nAg1 := nAg2 := nAg3 := nAg4 := 0
 
-#IFDEF TOP
+//#IFDEF TOP#IF
 	If TcSrvType() != "AS/400"
 		cOrder := SqlOrder(SE3->(IndexKey()))
 		
@@ -1158,7 +1160,7 @@ nAg1 := nAg2 := nAg3 := nAg4 := 0
    		cQuery+= "E3_COMIS <> 0 AND "
 		EndIf  
 		
-		cQuery += "D_E_L_E_T_ <> '*' "   
+		cQuery += "D_E_L_E_T_ =' ' "   
 
 		cQuery += " ORDER BY "+ cOrder
 
@@ -1175,7 +1177,7 @@ nAg1 := nAg2 := nAg3 := nAg4 := 0
 		Next 
 	Else
 	
-#ENDIF	
+//#ENDIF	
 		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 		//³ Cria arquivo de trabalho                                     ³
 		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
@@ -1184,14 +1186,14 @@ nAg1 := nAg2 := nAg3 := nAg4 := 0
 		IndRegua("SE3",cNomArq,cChave,,cCondicao, OemToAnsi(STR0016)) //"Selecionando Registros..."
 		nIndex := RetIndex("SE3")
 		DbSelectArea("SE3") 
-		#IFNDEF TOP
-			DbSetIndex(cNomArq+OrdBagExT())
-		#ENDIF
+//		#IFNDEF TOP
+//			DbSetIndex(cNomArq+OrdBagExT())
+//		#ENDIF
 		DbSetOrder(nIndex+1)
 
-#IFDEF TOP
+//#IFDEF TOP
 	EndIf
-#ENDIF	
+//#ENDIF	
 
 SetRegua(RecCount())		// Total de Elementos da regua 
 DbGotop()
@@ -1464,7 +1466,7 @@ While !Eof()
 		@ li, aColuna[13]  PSAY nAc2 PicTure PesqPict('SE3','E3_COMIS')
 		li++
 	
-		If mv_par10 > 0 .And. (nAc2 * mv_par10 / 100) > GetMV("MV_VLRETIR") //IR
+		If mv_par10 > 0 .And. (nAc2 * mv_par10 / 100) > cVarMV_VLRETIR //IR
 			@ li, 00  PSAY OemToAnsi(STR0015)  //"TOTAL DO IR       --> "
 			nAc4 += If(lRndIrrf,Round((nAc2 * mv_par10 / 100),TamSx3("E2_IRRF")[2]),NoRound((nAc2 * mv_par10 / 100),TamSx3("E2_IRRF")[2]))
 			@ li, aColuna[13]  PSAY nAc4 PicTure tm(nAc2 * mv_par10 / 100,15,nDecs)
@@ -1495,7 +1497,7 @@ While !Eof()
 			Endif
 		Endif
 		@ li, 089  PSAY nAc2 PicTure PesqPict('SE3','E3_COMIS')
-		If mv_par10 > 0 .And. (nAc2 * mv_par10 / 100) > GetMV("MV_VLRETIR") //IR
+		If mv_par10 > 0 .And. (nAc2 * mv_par10 / 100) > cVarMV_VLRETIR //IR
 			nAc4 += If(lRndIrrf,Round((nAc2 * mv_par10 / 100),TamSx3("E2_IRRF")[2]),NoRound((nAc2 * mv_par10 / 100),TamSx3("E2_IRRF")[2]))
 			@ li, 105  PSAY nAc4 PicTure tm(nAc2 * mv_par10 / 100,15,nDecs)
 			@ li, 121 PSAY nAc2 - nAc4 PicTure tm(nAc2,15,nDecs)
@@ -1527,7 +1529,7 @@ If (nAg1+nAg2+nAg3+nAg4) != 0
 			@li, aColuna[12] PSAY NoRound((nAg2/nAg1)*100) Picture PesqPict('SE3','E3_PORC')
 		Endif
 		@li, aColuna[13] PSAY nAg2 PicTure PesqPict('SE3','E3_COMIS')
-		If mv_par10 > 0 .And. (nAg2 * mv_par10 / 100) > GetMV("MV_VLRETIR")//IR
+		If mv_par10 > 0 .And. (nAg2 * mv_par10 / 100) > cVarMV_VLRETIR//IR
 			li ++
 			@ li, 00  PSAY OemToAnsi(STR0015)  //"TOTAL DO IR       --> "
 			@ li, 175  PSAY nAg4 PicTure tm((nAg2 * mv_par10 / 100),15,nDecs)
@@ -1547,7 +1549,7 @@ If (nAg1+nAg2+nAg3+nAg4) != 0
 			@li,081 PSAY NoRound((nAg2/nAg1)*100) Picture PesqPict('SE3','E3_PORC')
 		Endif
 		@li,089 PSAY nAg2 Picture PesqPict('SE3','E3_COMIS')
-		If mv_par10 > 0 .And. (nAg2 * mv_par10 / 100) > GetMV("MV_VLRETIR")//IR
+		If mv_par10 > 0 .And. (nAg2 * mv_par10 / 100) > cVarMV_VLRETIR//IR
 			@ li,105  PSAY nAg4 PicTure tm((nAg2 * mv_par10 / 100),15,nDecs)
 			@ li,121  PSAY nAg2 - nAg4 Picture tm(nAg2,15,nDecs)
 		EndIf
@@ -1555,17 +1557,17 @@ If (nAg1+nAg2+nAg3+nAg4) != 0
 	roda(cbcont,cbtxt,"G")
 EndIF
     
-#IFDEF TOP
+//#IFDEF TOP
 	If TcSrvType() != "AS/400"
   		dbSelectArea("SE3")
 		DbCloseArea()
 		chkfile("SE3")
 	Else	
-#ENDIF
+//#ENDIF
 		fErase(cNomArq+OrdBagExt())
-#IFDEF TOP
+//#IFDEF TOP
 	Endif
-#ENDIF
+//#ENDIF
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Restaura a integridade dos dados                             ³
