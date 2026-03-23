@@ -38,11 +38,11 @@ ElseIf _cItDese == "N"
     MsgAlert("Produto com pendências da Engenharia. Item não está desenvolvido. Produto: "+SC6->C6_PRODUTO, "Aviso")
 EndIf
 
-IF _cLibEng == "2"
-	lRet := .F.
-	MsgAlert("Produto não está liberado pela engenharia. Produto: "+SC6->C6_PRODUTO, "Aviso")
+//IF _cLibEng == "2"
+//	lRet := .F.
+//	MsgAlert("Produto não está liberado pela engenharia. Produto: "+SC6->C6_PRODUTO, "Aviso")
 
-EndIf
+//EndIf
 
 RestArea(aAreaSB1)
 RestArea(aArea)
