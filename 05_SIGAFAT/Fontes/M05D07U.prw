@@ -238,10 +238,10 @@ Local cCodigo    := ""
 // Informe o código do produto, a qual já deve estar registrado na tabela SB1
 cCodigo := Alltrim(aProd[1,2])
 cDescri	:= Alltrim(aProd[2,2])
-//nCompr	:= aProd[3,2] 
-//nLarg	:= aProd[4,2]
-//nAltur	:= aProd[5,2]
-cPdgelo	:= Alltrim(aProd[3,2]) //Adicionado 19/12/25 devido a alteração do campo de combobox para Caractere (Ticket 9689)
+nCompr	:= aProd[3,2] 
+nLarg	:= aProd[4,2]
+nAltur	:= aProd[5,2]
+//cPdgelo	:= Alltrim(aProd[3,2]) //Adicionado 19/12/25 devido a alteração do campo de combobox para Caractere (Ticket 9689)
 
 
 BeginTran()
@@ -256,10 +256,10 @@ BeginTran()
     	
    	    oModel:SetValue("SB5MASTER","B5_COD",cCodigo)
 	    oModel:SetValue("SB5MASTER","B5_CEME",cDescri)
-	    //oModel:SetValue("SB5MASTER","B5_COMPRLC",nCompr)
-   	    //oModel:SetValue("SB5MASTER","B5_LARGLC",nLarg)
-   	    //oModel:SetValue("SB5MASTER","B5_ALTURLC",nAltur)
-        oModel:SetValue("SB5MASTER","B5_XPDGELO",cPdgelo)
+	    oModel:SetValue("SB5MASTER","B5_COMPRLC",nCompr)
+   	    oModel:SetValue("SB5MASTER","B5_LARGLC",nLarg)
+   	    oModel:SetValue("SB5MASTER","B5_ALTURLC",nAltur)
+        //oModel:SetValue("SB5MASTER","B5_XPDGELO",cPdgelo)
    	    	    
     	If oModel:VldData()
         	oModel:CommitData()
