@@ -18,7 +18,6 @@ Local _cItDese  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XITDESE")
 Local _cPdf     := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPDF")
 Local _cDxf     := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XDFX")
 Local _cEstru   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESTR")
-Local _cMaoOb   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XMDOBRA")
 Local _cLibEng  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESPLIB")
 //Local _cPadrao   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPADRAO")		//1=Sim 2=Não
 Local cAviso    := ""
@@ -50,11 +49,6 @@ EndIf
 
 If _cEstru <> "1" //Diferente de Sim
     cAviso += "Não é permitida a inclusão de ordem de produção, Não há estrutura liberada"+CRLF
-	 _lRet     := .F.
-EndIf
-
-If _cMaoOb <> "1" //Diferente de Sim
-    cAviso += "Não é permitida a inclusão de ordem de produção, Não há Mão de Obra liberada"+CRLF
 	 _lRet     := .F.
 EndIf
 
@@ -116,10 +110,10 @@ Else
 	If ! SB1->B1_XFAMILI $ cAM_FAMSER
 		cAviso += "Só é posível gerar Número(s) de Série para as Famílias Cocção, Mobiliário, Refrigeração e Máquinas de Gelo Exportação "+CRLF
 	Else
-		If ZAB->(MSSeek(xFILIAL("ZAB")+cOP))
+		/*If ZAB->(MSSeek(xFILIAL("ZAB")+cOP))
 			cAviso += "Número(s) de Série já gerados para esta Ordem de Produção - Número de Serie : "+ZAB->ZAB_NUMSER+CRLF 
 			_lRet := .F.
-		Else
+		Else*/
 
 			If RIGHT(Alltrim(cProduto),2) <> "-A" //Nao for produto de Avaria
 
@@ -309,7 +303,7 @@ Else
 					EndIf
 				EndIf
 
-			EndIf	
+		//	EndIf	
 		EndIf
 	EndIf
 EndIf
@@ -421,12 +415,12 @@ User Function M10EPrin(_cCodProd,_nQtd,_cNumSer,lCtrlImp,_nQtdImp)
 	_oPrinter:SetDevice(IMP_SPOOL)
 	_oPrinter:StartPage()
 
-	_oPrinter:SayBitMap( _nRow -40 , 50 ,GetSrvProfString("Startpath","") + "M10E001.bmp", 100 * 4.0 , 30 * 4.0)
+	_oPrinter:SayBitMap( _nRow -40 , 50 ,GetSrvProfString("Startpath","") + "M10E006.bmp", 100 * 4.0 , 30 * 4.0)
 	//_oPrinter:Say(_nRow + 100 , 70 , "Grupo HOSHIZAKI",_oFontMI)
 	_oPrinter:Say(_nRow ,800 , "HOSHIZAKI MACOM Ltda",_oFontP) /**#7666**/
 	_oPrinter:Say(_nRow += _nNextLin ,800 , "CNPJ: 43.553.668/0001-79",_oFontP)
 	_oPrinter:Say(_nRow + _nNextLin ,800 , "Telefone: (011) 2085-7000",_oFontP)
-	_oPrinter:Say(_nRow + 77 ,650 , "Acesse o site: www.hoshizakimacom.com.br",_oFontP)
+	_oPrinter:Say(_nRow + 77 ,800 , "www.hoshizakimacom.com.br",_oFontP)
 	_oPrinter:Say(_nRow + 140 ,70, "Modelo: ",_OFontP)
 	_oPrinter:Say(_nRow + 140 , 200, Alltrim(_cCodProd),_OFontGG)
 	_oPrinter:Say(_nRow + 190 , 70, "Desc.: ",_OFontP)
@@ -612,7 +606,7 @@ User Function M10EPri1(_cCodProd,_nQtd,_cNumSer,lCtrlImp)
 	_oPrinter:Say(_nRow ,650 , "HOSHIZAKI MACOM Ltda",_oFontP)
 	_oPrinter:Say(_nRow += 38 ,650 , "CNPJ: 43.553.668/0001-79",_oFontP)
 	_oPrinter:Say(_nRow + 40 ,650 , "Telefone: (011) 2085-7000",_oFontP)
-	_oPrinter:Say(_nRow + 82 ,650 , "Acesse o site: www.hoshizakimacom.com.br",_oFontP)
+	_oPrinter:Say(_nRow + 82 ,650 , "www.hoshizakimacom.com.br",_oFontP)
 	_oPrinter:Say(_nRow + 140 ,70, "Modelo: ",_OFontP)
 	_oPrinter:Say(_nRow + 140 , 250, Alltrim(_cCodProd),_OFontGG)
 	_oPrinter:Say(_nRow + 515 , 70, "OP.: ",_OFontP)
