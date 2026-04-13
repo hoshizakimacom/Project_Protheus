@@ -7,56 +7,57 @@ User Function M05G02(_cField)
     Local _aArea        := GetArea()
     Local _xRet         := Nil
 
+    Private lMVCSA1     := GETMV("MV_MVCSA1")
+
     Do Case
         Case _cField == 'A1_XGEN'
-            _xRet   := M->A1_XGEN
+            _xRet   := &('M->'+_cField)
 
             MG02GetIns()    // Preenche inscrição estadual para clientes genéricos
 
         Case _cField == 'A1_TPESSOA'
-            _xRet   := M->A1_TPESSOA
+            _xRet   := &('M->'+_cField)
 
             MG02GetCnt()    // Retorna de cliente é contribuinte ou não contribuinte
             MG02GetGrp()    // Retorna grupo de tributação
 
         Case _cField == 'A1_END'
-            _xRet   := M->A1_END
+            _xRet   := &('M->'+_cField)
 
             MG02SetE()
 
         Case _cField == 'A1_BAIRRO'
-            _xRet   := M->A1_BAIRRO
+            _xRet   := &('M->'+_cField)
 
             MG02SetB()
 
         Case _cField == 'A1_EST'
-            _xRet   := M->A1_EST
+            _xRet   := &('M->'+_cField)
 
             MG02SetEs()
 
         Case _cField == 'A1_CEP'
-            _xRet   := M->A1_CEP
+            _xRet   := &('M->'+_cField)
 
             MG02SetCep()
 
         Case _cField == 'A1_COD_MUN'
-            _xRet   := M->A1_COD_MUN
+            _xRet   := &('M->'+_cField)
 
             MG02SetNat()
 
         Case _cField == 'A1_NATUREZ'
-            _xRet   := M->A1_NATUREZ
-
+            _xRet   := &('M->'+_cField)
 
             MG02SetMun()
 
         Case _cField == 'A1_XGRPEC'
-            _xRet   := M->A1_XGRPEC
+            _xRet   := &('M->'+_cField)
 
             MG02SetRed()
 
         Case _cField == 'A1_TIPO'
-            _xRet   := M->A1_TIPO
+            _xRet   := &('M->'+_cField)
 
             MG02SetCon()
 
@@ -98,45 +99,86 @@ Static Function MG02SetLj(cCod)
         EndIf
     EndIf
 
-    M->A1_LOJA  := cLoja
+    If lMVCSA1
+        FWFLDPUT("A1_LOJA", cLoja ) 
+    Else   
+        M->A1_LOJA  := cLoja
+    EndIf
 Return
 
 //+------------------------------------------------------------------------------------------------
 Static Function MG02SetCon()
     Local cTipo     := AllTrim(M->A1_TIPO)
     Local cConta    := ''
-
+   
     If cTipo == 'X'
         cConta  := '1120100002'
     Else
         cConta  := '1120100001'
     EndIf
 
-    M->A1_CONTA := cConta
+    If lMVCSA1
+        FWFLDPUT("A1_CONTA", cConta ) 
+    Else 
+        M->A1_CONTA := cConta
+    EndIf
 Return
 
 //+------------------------------------------------------------------------------------------------
 Static Function MG02SetRed()
-    M->A1_XREDE := Space(TamSX3('A1_XREDE')[1])
+    If lMVCSA1
+        FWFLDPUT("A1_XREDE", Space(TamSX3('A1_XREDE')[1]) ) 
+    Else
+        M->A1_XREDE := Space(TamSX3('A1_XREDE')[1])
+    EndIf
 Return
 
 //+------------------------------------------------------------------------------------------------
 Static Function MG02SetMun()
 
-    M->A1_MUNC      := Posicione('CC2',1, xFilial('CC2') + M->A1_EST + M->A1_COD_MUN,'CC2_MUN' )
-    M->A1_CODMUNE   := AllTrim(M->A1_COD_MUN)
+    If lMVCSA1
+        FWFLDPUT("A1_MUNC", Posicione('CC2',1, xFilial('CC2') + M->A1_EST + M->A1_COD_MUN,'CC2_MUN' ) ) 
+        FWFLDPUT("A1_CODMUNE", AllTrim(M->A1_COD_MUN) ) 
+    Else
+        M->A1_MUNC := Posicione('CC2',1, xFilial('CC2') + M->A1_EST + M->A1_COD_MUN,'CC2_MUN' )
+        M->A1_CODMUNE := AllTrim(M->A1_COD_MUN)
+    EndIf
 Return
 
 //+------------------------------------------------------------------------------------------------
 Static Function MG02SetCep()
-    M->A1_CEPC    := AllTrim(M->A1_CEP)
+    If lMVCSA1
+        FWFLDPUT("A1_CEPC", AllTrim(M->A1_CEP) ) 
+    Else
+        M->A1_CEPC := AllTrim(M->A1_CEP)
+    EndIf   
 Return
 
 //+------------------------------------------------------------------------------------------------
 
 //+------------------------------------------------------------------------------------------------
-Static Function MG02SetNat()
-    M->A1_NATUREZ    := AllTrim(M->A1_NATUREZ)
+User Function MG02SetNat()
+    
+    //Local cTipo2    := AllTrim(M->A1_TIPO)
+    //Local cNatur    := ""
+        
+    If lMVCSA1
+        FWFLDPUT("A1_NATUREZ", AllTrim(M->A1_NATUREZ) ) 
+    Else
+        M->A1_NATUREZ := AllTrim(M->A1_NATUREZ)
+    EndIf
+
+
+    /*Do Case        
+            Case M->cTipo2 == "F"
+                cNatur:= "4110102"
+            
+            Case M->cTipo2 == "R"
+                cNatur:= "4110102"
+            
+            Case M->cTipo2 == "X"
+                cNatuz:= "4110103"
+    EndCase*/
 Return
 
 //+------------------------------------------------------------------------------------------------
@@ -146,25 +188,45 @@ Static Function MG02SetEs()
     Local cReg      := ''
     Local cRegDes   := ''
 
-    M->A1_ESTC    := AllTrim(M->A1_EST)
-    M->A1_ESTE    := AllTrim(M->A1_EST)
+    If lMVCSA1
+        FWFLDPUT("A1_ESTC", AllTrim(M->A1_EST) )
+        FWFLDPUT("A1_ESTE", AllTrim(M->A1_EST) )
+    Else
+        M->A1_ESTC    := AllTrim(M->A1_EST)
+        M->A1_ESTE    := AllTrim(M->A1_EST)
+    EndIf
 
-    U_M05A30(M->A1_EST,@cReg,@cRegDes)
+    U_M05A30(M->A1_EST,@cReg,@cRegDes) 
 
-    M->A1_REGIAO  := cReg
-    M->A1_DSCREG  := cRegDes
+    If lMVCSA1
+        FWFLDPUT("A1_REGIAO", cReg)
+        FWFLDPUT("A1_DSCREG", cRegDes)
+    Else
+        M->A1_REGIAO := cReg
+        M->A1_DSCREG := cRegDes
+    EndIf
 Return
 
 //+------------------------------------------------------------------------------------------------
 Static Function MG02SetB()
-    M->A1_BAIRROC    := AllTrim(M->A1_BAIRRO)
-    M->A1_BAIRROE    := AllTrim(M->A1_BAIRRO)
+    If lMVCSA1
+        FWFLDPUT("A1_BAIRROC", AllTrim(M->A1_BAIRRO) ) 
+        FWFLDPUT("A1_BAIRROE", AllTrim(M->A1_BAIRRO) ) 
+    Else
+        M->A1_BAIRROC := AllTrim(M->A1_BAIRRO)
+        M->A1_BAIRROE := AllTrim(M->A1_BAIRRO)
+    EndIf
 Return
 
 //+------------------------------------------------------------------------------------------------
 Static Function MG02SetE()
-    M->A1_ENDCOB    := AllTrim(M->A1_END)
-    M->A1_ENDENT    := AllTrim(M->A1_END)
+    If lMVCSA1
+        FWFLDPUT("A1_ENDCOB", AllTrim(M->A1_END) ) 
+        FWFLDPUT("A1_ENDENT", AllTrim(M->A1_END) ) 
+    Else
+        M->A1_ENDCOB := AllTrim(M->A1_END)
+        M->A1_ENDENT := AllTrim(M->A1_END)
+    EndIf
 Return
 
 //+------------------------------------------------------------------------------------------------
@@ -180,7 +242,11 @@ Static Function MG02GetCnt()
         _cRet   := '2'
     EndIf
 
-    M->A1_CONTRIB   := _cRet
+    If lMVCSA1
+        FWFLDPUT("A1_CONTRIB", _cRet ) 
+    Else
+        M->A1_CONTRIB := _cRet
+    EndIf   
 Return
 
 //+------------------------------------------------------------------------------------------------
@@ -281,7 +347,11 @@ Static Function MG02GetIns()
     
 
     _cRet           := PadR(AllTrim(_cRet),TamSx3('A1_INSCR')[1])
-    M->A1_INSCR     := _cRet
+    If lMVCSA1
+        FWFLDPUT("A1_INSCR", _cRet ) 
+    Else
+        M->A1_INSCR := _cRet
+    EndIf
 Return
 
 //+------------------------------------------------------------------------------------------------
@@ -298,7 +368,11 @@ Static Function MG02GetGrp()
             _cRet := 'NCB'
     End Case
 
-     M->A1_GRPTRIB    := _cRet
+    If lMVCSA1
+        FWFLDPUT("A1_GRPTRIB", _cRet ) 
+    Else
+        M->A1_GRPTRIB := _cRet
+    EndIf
 Return
 
 //+------------------------------------------------------------------------------------------------
