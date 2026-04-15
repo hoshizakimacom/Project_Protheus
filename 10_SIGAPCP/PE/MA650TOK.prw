@@ -18,7 +18,7 @@ Local _cItDese  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XITDESE")
 Local _cPdf     := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPDF")
 Local _cDxf     := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XDFX")
 Local _cEstru   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESTR")
-Local _cMaoOb   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XMDOBRA")
+//Local _cMaoOb   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XMDOBRA")
 Local _cLibEng  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESPLIB")
 //Local _cPadrao   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPADRAO")		//1=Sim 2=Não
 Local cAviso    := ""
@@ -53,10 +53,12 @@ If _cEstru <> "1" //Diferente de Sim
 	 _lRet     := .F.
 EndIf
 
+/*
 If _cMaoOb <> "1" //Diferente de Sim
     cAviso += "Não é permitida a inclusão de ordem de produção, Não há Mão de Obra liberada"+CRLF
 	 _lRet     := .F.
 EndIf
+*/
 
 If _lRet
 	aRet   := U_M10AETQ(M->C2_PRODUTO,M->C2_QUANT,M->C2_QUJE,M->C2_NUM,M->C2_ITEM,M->C2_SEQUEN,.T. /*lImprime*/,.T. /*lCtrlImp*/)
@@ -116,11 +118,12 @@ Else
 	If ! SB1->B1_XFAMILI $ cAM_FAMSER
 		cAviso += "Só é posível gerar Número(s) de Série para as Famílias Cocção, Mobiliário, Refrigeração e Máquinas de Gelo Exportação "+CRLF
 	Else
+	/*
 		If ZAB->(MSSeek(xFILIAL("ZAB")+cOP))
 			cAviso += "Número(s) de Série já gerados para esta Ordem de Produção - Número de Serie : "+ZAB->ZAB_NUMSER+CRLF 
 			_lRet := .F.
 		Else
-
+	*/
 			If RIGHT(Alltrim(cProduto),2) <> "-A" //Nao for produto de Avaria
 
 				Do Case
@@ -310,7 +313,7 @@ Else
 				EndIf
 
 			EndIf	
-		EndIf
+		//EndIf
 	EndIf
 EndIf
 
