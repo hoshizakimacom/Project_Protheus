@@ -96,6 +96,8 @@ While .T.
 			oBrwOP:AddColumn(TCColumn():New(PADR('Sentido Pré',20) ,{|| aOrdProd[oBrwOP:nAt, 26]},,,,'LEFT'	, TAMSX3("B1_XSPRE")[1]+20    ,.f.,.f.,,,,.f.,))
 			oBrwOP:AddColumn(TCColumn():New('Prod.PAI'     ,{|| aOrdProd[oBrwOP:nAt,16]},,,,'LEFT'	, TAMSX3("C2_PRODUTO")[1]+15   ,.f.,.f.,,,,.f.,))
 			oBrwOP:AddColumn(TCColumn():New('Descr.PAI'    ,{|| aOrdProd[oBrwOP:nAt,17]},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(PADR('Roteiro',30),{|| aOrdProd[oBrwOP:nAt, 27]},,,,'LEFT'	, TAMSX3("B1_XROTEIR")[1]+15,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(PADR('Roteiro/Corte',30),{|| aOrdProd[oBrwOP:nAt, 28]},,,,'LEFT'	, TAMSX3("B1_XROTCT")[1]+15,.f.,.f.,,,,.f.,))
 			oBrwOP:AddColumn(TCColumn():New(''   		   ,{|| ''},,,,'CENTER', 1,.f.,.f.,,,,.f.,)) //Melhorar distribuição dos campos na tela
 
 			oBrwOP:SetHeaderImage(03,"COLDOWN")  //Numero da OP
@@ -120,7 +122,9 @@ While .T.
 			oBrwEmp:AddColumn(TCColumn():New(PADR('Qtd.Prv.Entrada',30),{|| aEmpenhos[oBrwEmp:nAt, 8]},PesqPict("SD4","D4_QUANT"),,,'RIGHT'	, TAMSX3("D4_QUANT")[1]+20 ,.f.,.f.,,,,.f.,))
 			oBrwEmp:AddColumn(TCColumn():New(PADR('Data Prev.Entrega',30),{|| aEmpenhos[oBrwEmp:nAt, 13]},,,,'LEFT'	, TAMSX3("C7_DATPRF")[1]+15,.f.,.f.,,,,.f.,))
 			oBrwEmp:AddColumn(TCColumn():New(PADR('Espessura',30),{|| aEmpenhos[oBrwEmp:nAt, 15]},,,,'LEFT'	, TAMSX3("B1_XESPES")[1]+15,.f.,.f.,,,,.f.,))
-			oBrwEmp:AddColumn(TCColumn():New(PADR('Material',30),{|| aEmpenhos[oBrwEmp:nAt, 16]},,,,'LEFT'	, TAMSX3("B1_XMAT")[1]+15,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New(PADR('Material',30),{|| aEmpenhos[oBrwEmp:nAt, 16]},,,,'LEFT'	, TAMSX3("B1_XMAT2")[1]+15,.f.,.f.,,,,.f.,))
+			//oBrwEmp:AddColumn(TCColumn():New(PADR('Roteiro',30),{|| aEmpenhos[oBrwEmp:nAt, 17]},,,,'LEFT'	, TAMSX3("B1_XROTEIR")[1]+15,.f.,.f.,,,,.f.,))
+			//oBrwEmp:AddColumn(TCColumn():New(PADR('Roteiro/Corte',30),{|| aEmpenhos[oBrwEmp:nAt, 18]},,,,'LEFT'	, TAMSX3("B1_XROTCT")[1]+15,.f.,.f.,,,,.f.,))
 			oBrwEmp:AddColumn(TCColumn():New('  '   		    ,{|| ''},,,,'CENTER', 10,.t.,.f.,,,,.f.,)) //Melhorar distribuição dos campos na tela
 		EndIf
 		oBrwEmp:CallRefresh()
@@ -300,7 +304,9 @@ User Function M04M11D()
                             "",;                                        //23-
                             SC2->C2_DATPRI,;                            //24-Prv.Inicio
                             "",;                                        //25-
-                            X3Combo("B1_XSPRE",SB1->B1_XSPRE)})         //26-Sentido Pré
+                            X3Combo("B1_XSPRE",SB1->B1_XSPRE),;         //26-Sentido Pré
+							SB1->B1_XROTEIR,;							//27-Roteiro
+							SB1->B1_XROTCT})						    //28-Roteiro/Corte
 
 		dbSelectArea(cAliasTrb)
 		dbSkip()
@@ -389,7 +395,7 @@ Static Function CarregaOP()
 
 			nSldLib := 0
 
-			AADD(aEmpenhos, {SD4->D4_OP,SD4->D4_COD,SB1->B1_DESC,SD4->D4_LOCAL,SD4->D4_QUANT,nSldEst,nSldCQ,nPrvEnt,"BR_VERMELHO","Sim",SB1->B1_UM,nSldProc,dDatPRF,nSldLib,X3Combo("B1_XESPES",SB1->B1_XESPES),X3Combo("B1_XMAT",SB1->B1_XMAT)} )
+			AADD(aEmpenhos, {SD4->D4_OP,SD4->D4_COD,SB1->B1_DESC,SD4->D4_LOCAL,SD4->D4_QUANT,nSldEst,nSldCQ,nPrvEnt,"BR_VERMELHO","Sim",SB1->B1_UM,nSldProc,dDatPRF,nSldLib,X3Combo("B1_XESPES",SB1->B1_XESPES),SB1->B1_XMAT2})
 
 			//Verifica se tem saldo para o componente em estoque no Armazem (Ex.01), caso Produto PI considera o saldo em Processo tambem (Ex.Arm.01 + Arm.03)
 			If ( SD4->D4_QUANT ) > 0 .And. ( SD4->D4_QUANT ) > IIF(SB1->B1_TIPO="PI",nSldEst+nSldCQ,nSldEst)
@@ -493,7 +499,7 @@ OBS: A coluna COMPRIMENTO CORTE deverá ter a possibilidade de se inserir um fato
 // Escreve o texto mais a quebra de linha CRLF
 If aRetPar[1] == "1" //Chapa
 	//fWrite(nH,"Codigo;Tipo_Cod;Componente;Tipo_Comp;Quant;OP" + chr(13)+chr(10) )        
-	fWrite(nH,"CAMINHO;PROGRAMA;QUANTIDADE;ESPESSURA;MATERIAL;CLIENTE / OP;PROJ.;SEN.PRÉ" + chr(13)+chr(10) )        
+	fWrite(nH,"CAMINHO;PROGRAMA;QUANTIDADE;ESPESSURA;MATERIAL;CLIENTE / OP;PROJ.;SEN.PRÉ;ROTEIRO;ROTEIRO / CORTE" + chr(13)+chr(10) )        
 ElseIf aRetPar[1] == "2" //Tubo
 	fWrite(nH,"Codigo;Descricao;Quantidade;Material;Comprimento_Corte;OP" + chr(13)+chr(10) )        
 EndIf
@@ -516,6 +522,9 @@ For nX := 1 To Len(aOrdProd)
 				cTipo_Cod := SB1->B1_TIPO
 				cDesc_PI  := SB1->B1_DESC
 				cSentidoPre:= X3Combo("B1_XSPRE",SB1->B1_XSPRE)
+				cRoteiro  := SB1->B1_XROTEIR
+				cRot_Cort := SB1->B1_XROTCT
+				
 
 				SB1->(dbSeek(xFilial("SB1")+SD4->D4_COD))
 				cTipo_Comp := SB1->B1_TIPO
@@ -523,7 +532,9 @@ For nX := 1 To Len(aOrdProd)
 				cUM_MP     := SB1->B1_UM
 				cSEGUM_MP  := SB1->B1_SEGUM
 				cEspessura := X3Combo("B1_XESPES",SB1->B1_XESPES)
-				cMaterial  := X3Combo("B1_XMAT",SB1->B1_XMAT)
+				cMaterial  := SB1->B1_XMAT2
+				//cRoteiro  := SB1->B1_XROTEIR
+				//cRot_Cort := SB1->B1_XROTCT
 
 				//Dados do componente pra corte
 				If  aRetPar[1] == "1" // Chapa
@@ -544,7 +555,10 @@ For nX := 1 To Len(aOrdProd)
 								cMaterial+";"+;
 								Alltrim(SD4->D4_OP)+";"+;
 								Alltrim(aOrdProd[nX][16]/*SC2->C2_PRODUTO*/)+";"+;
-								cSentidoPre + chr(13)+chr(10) )
+								cSentidoPre+";"+;
+								cRoteiro+";"+;
+								cRot_Cort+chr(13)+chr(10))
+								
 
 				ElseIf aRetPar[1] == "2" //Tubo
 
