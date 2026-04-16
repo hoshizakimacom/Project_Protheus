@@ -813,9 +813,9 @@ User Function M04M12M()
 					aPecasAux[nP] := LEFT(aPecasAux[nP],LEN(aPecasAux[nP])-5) //RETIRAR SUFIXO DFX99
 					nPeca := ASCAN(aPecas,{|x|x[1]==ALLTRIM(aPecasAux[nP])})
 					If nPeca = 0
-						AADD(aPecas,{ALLTRIM(aPecasAux[nP]),VAL(cQtd),0/*Empenhada*/})
+						AADD(aPecas,{ALLTRIM(aPecasAux[nP]),( VAL(cQtd) * VAL(aDados[7]) ),0/*Empenhada*/})
 					Else
-						aPecas[nPeca][2] += VAL(cQtd)
+						aPecas[nPeca][2] += ( VAL(cQtd) * VAL(aDados[7]) )
 					EndIf
 				Next
 
@@ -854,7 +854,7 @@ User Function M04M12M()
 				nQtdRef   := 0
 
 				If nQtPeca > 0 // Só considera itens com quantidade alocada
-					VerOP(cOp,@cProdPI,cMP,@cCodMPEst,@nQtEstr,@nQtEmp,@nPerda,@cCodMPUsa,@cObserv,nQtPeca,@cCodRef,@nQtdRef,nPesoPC) //Posiciona na OP, Estrutura e Empenho
+					VerOP(cOp,@cProdPI,cMP,@cCodMPEst,@nQtEstr,@nQtEmp,@nPerda,@cCodMPUsa,@cObserv,nQtPeca,@cCodRef,@nQtdRef,nPesoPC,nQtReq) //Posiciona na OP, Estrutura e Empenho
 				EndIf
 			EndIf
 
@@ -918,10 +918,12 @@ Return
 
 Static Function RetXMAT(cMP)
 
+Local aArea := GETAREA()
 Local aOpcoes    := {} 
-Local nPosMat    := 0
+//Local nPosMat    := 0
 Local cOPMat     := " "
 
+/*
 dbSelectArea('SX3')
 SX3->( dbSetOrder(2) )
 SX3->( dbSeek( "B1_XMAT" ) )
@@ -930,6 +932,20 @@ nPosMat := aScan(aOpcoes,{|x|UPPER(RTRIM(x[3]))==UPPER(RTRIM(cMP))})
 If nPosMat > 0
    cOPMat := aOpcoes[nPosMat][2]
 EndIf
+*/
+dbSelectArea("ZAK")
+dbSetOrder(1)
+dbGoTop()
+While !EOF()
+	AADD(aOpcoes,{ZAK->ZAK_COD,ZAK->ZAK_DESC})
+	dbSkip()
+EndDo
+nPosMat := aScan(aOpcoes,{|x|UPPER(RTRIM(x[2]))==UPPER(RTRIM(cMP))})
+If nPosMat > 0
+   cOPMat := aOpcoes[nPosMat][1]
+EndIf
+
+RestArea(aArea)
 
 Return cOPMAT
 
@@ -989,7 +1005,7 @@ Return
 Posiciona na OP, Estrutura e Empenho
 
 */
-Static Function VerOP(cOP,cProd,cMP,cCompEst,nQtEstr,nQtEmp,nPerda,cCompUsa,cObserv,nQtPeca,cCodRef,nQtdRef,nPesoPC)
+Static Function VerOP(cOP,cProd,cMP,cCompEst,nQtEstr,nQtEmp,nPerda,cCompUsa,cObserv,nQtPeca,cCodRef,nQtdRef,nPesoPC,nQtReq)
 
 Local aArea := GETAREA()
 Local cRev  := ""
@@ -997,6 +1013,8 @@ Local cTRT  := ""
 Local lOk   := .T.
 Local cAMFAMIL2C := RTRIM(GetNewPar("AM_FAMIL2C",.F.,"000011;"))
 Local lPlanilha := .F. //.T.=Considera Perda Planilha, .F.=Considera Perda Estrutura Engenharia
+Local nQtdReq := 0
+Local nRecSD4 := 0
 
 Default cCompEst := SPACE(TAMSX3("D4_COD")[1])
 Default cCompUsa := SPACE(TAMSX3("D3_COD")[1])
@@ -1028,11 +1046,12 @@ If lOk
 
 		SB1->(dbSeek(xFilial("SB1")+SD4->D4_COD))
 
-		If UPPER(RTRIM(X3Combo("B1_XMAT",SB1->B1_XMAT))) == UPPER(RTRIM(cMP)) .And.;
+		If /*UPPER(RTRIM(X3Combo("B1_XMAT",SB1->B1_XMAT)))*/UPPER(TRIM(SB1->B1_XMAT2)) == UPPER(RTRIM(cMP)) .And.;
 			SB1->B1_XFAMIL2 $ cAMFAMIL2C
 			cCompEst := SD4->D4_COD
 			cTRT     := SD4->D4_TRT
 			nQtEmp   := SD4->D4_QUANT
+			nRecSD4  := SD4->(RECNO())
 			Exit
 		EndIf
 
@@ -1056,6 +1075,7 @@ If lOk
 	While nQtPecaAux > 0
 
 		nQtApon := nQtPecaAux
+		cCompUsa := SPACE(TAMSX3("D3_COD")[1])
 
 		nPosPc  := 0
 		//nPosMP  := ASCAN(aRefs,{|x| (nPosPc:=ASCAN(x[5],{|w| w[1]==ALLTRIM(cProd) .And. (w[2]-w[3])>=nQtPeca })) > 0})
@@ -1080,23 +1100,24 @@ If lOk
 				aRefs[nPosMP,5][nPosPc][3] += nQtApon
 			EndIf
 
+			If EMPTY(cCompUsa)	
+				cObserv += IIF(!EMPTY(cObserv),"|","")+"Comp.Usado não encontrado!"
+			EndIf
 			cCodRef := aRefs[nPosMP,1]
-			nQtdRef := (nQtEmp*nPerda)/100
+			nQtdRef := (nQtReq*nPerda)/100
 		Else
+			cObserv += IIF(!EMPTY(cObserv),"|","")+"Prod.Sem saldo ou não encontrado no Subnests do Pedido!"
 		    cCodRef := ""
 			nQtdRef := 0
 		EndIf
 
-		If EMPTY(cCompUsa)	
-			cObserv += IIF(!EMPTY(cObserv),"|","")+"Comp.Usado não especificado!"
-		EndIf
-
+		nQtdReq := nQtReq
 		If !lApontaRef //Se não aponta Refugo, considera o custo para o produto final, requisitando mais material
-			nQtReq += nQtdRef
-			nQtReq := ROUND(nQtReq,TAMSX3("D3_QUANT")[2])
+			nQtdReq += nQtdRef
+			nQtdReq := ROUND(nQtdReq,TAMSX3("D3_QUANT")[2])
 		EndIf
 
-		AADD(aOPs,{cOP,cProdPI,cMP,cCodMPEst,nQtApon/*nQtPeca*/,nPerda,nQtEmp,nQtNext,nQtReq,cCodMPUsa,cObserv,cCodRef,nQtdRef})
+		AADD(aOPs,{cOP,cProdPI,cMP,cCodMPEst,nQtApon/*nQtPeca*/,nPerda,nQtEmp,nQtNext,nQtdReq,cCodMPUsa,cObserv,cCodRef,nQtdRef,nRecSD4})
 	
 		nQtPecaAux -= nQtApon
 	EndDo
@@ -1118,6 +1139,7 @@ Local aAlterREF:= {}
 Local lOk := .F.
 Local nX
 Local lDiverg := .F.
+Local nRecSD4 := 0
 
     //Objetos da Janela
     Private oDlgMet
@@ -1218,9 +1240,12 @@ EndIf
 DEFINE MSDIALOG oDlgMet TITLE "Apontamento de produção - Metalix" FROM 000, 000  TO nJanAltu, nJanLarg COLORS 0, 16777215 PIXEL
         
         //Labels gerais
-        @ 004, 033 SAY "Apontamento de Produção - Metalix"  SIZE 250, 030 FONT oFontSubN  OF oDlgMet COLORS RGB(031,073,125) PIXEL
-        @ 004, 263 SAY "Lote: "+cLote  SIZE 250, 030 FONT oFontSubN  OF oDlgMet COLORS RGB(031,073,125) PIXEL
-                  
+        @ 004, 033 SAY "Apontamento de Produção - Metalix"  SIZE 250, 030 FONT oFontSubN  OF oDlgMet /*COLORS RGB(031,073,125)*/ PIXEL
+        @ 004, 263 SAY "Lote: "+cLote  SIZE 250, 030 FONT oFontSubN  OF oDlgMet /*COLORS RGB(031,073,125)*/ PIXEL
+
+		@ 006, 465 BUTTON oBtnFech   PROMPT "Anterior"   SIZE 065, 018 OF oDlgMet ACTION PesqErro("<",oMsGetAPO) FONT oFontBtn PIXEL
+		@ 006, 555 BUTTON oBtnFech   PROMPT "Proximo"    SIZE 065, 018 OF oDlgMet ACTION PesqErro(">",oMsGetAPO) FONT oFontBtn PIXEL
+
         //Botões
 		If !lDiverg
         	@ 006, 665 BUTTON oBtnFech                          PROMPT "Salvar"        SIZE 065, 018 OF oDlgMet ACTION (lOk:=.T.,oDlgMet:End())  FONT oFontBtn PIXEL 
@@ -1291,8 +1316,9 @@ If lOk
 		nQtdEstr  := aOPs[nX,7]
 		nQtdMP    := aOPs[nX,9]
 		cxMat     := RetXMAT(aOPs[nX, 3])
+		nRecSD4   := aOPs[nX,14]
 
-		MsgRun("Processando.....", "Apontamento produção Metalix",{|| Aponta(cLote,cNumOP,nQuant,cCodMP,cCodEstru,nQtdMp,nQtdEstr,cxMat,cCodRef,nQtdRef,lApontaRef) })
+		MsgRun("Processando.....", "Apontamento produção Metalix",{|| Aponta(cLote,cNumOP,nQuant,cCodMP,cCodEstru,nQtdMp,nQtdEstr,cxMat,cCodRef,nQtdRef,lApontaRef,nRecSD4) })
 
 	Next
 
@@ -1304,6 +1330,40 @@ RestArea(aArea)
 
 Return Nil
  
+Static Function PesqErro(cOper,oMsBrowse)
+
+Local nCont := 0
+
+If cOper == "<"
+
+	For nCont := oMsBrowse:nAt-1 To 1 Step -1
+
+          If oMsBrowse:aCols[nCont][1] == "BR_PRETO"
+			 oMsBrowse:nAt := nCont
+		     Exit
+          EndIf
+
+	Next nCont
+
+Else
+
+	For nCont := oMsBrowse:nAt+1 To LEN(oMsBrowse:aCols) Step 1
+
+          If oMsBrowse:aCols[nCont][1] == "BR_PRETO"
+			 oMsBrowse:nAt := nCont
+		     Exit
+          EndIf
+
+	Next nCont
+
+EndIf
+
+//oMsBrowse:SetBlkBackColor({|oMsBrowse| IIf(oMsBrowse:nAt, CLR_HMAGENTA , Nil )})
+oMsBrowse:Refresh()
+oMsBrowse:SetFocus()
+
+Return 
+
 /*/
 	±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 	±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
@@ -1837,7 +1897,7 @@ Return .T.
 Função para gravação do apontamento via SigaAuto do Mata250
 
 */
-Static Function Aponta(cLote,cNumOP,nQuant,cCodMP,cCodEstru,nQtdMp,nQtdEstr,cxMat,cCodRef,nQtdRef,lApontaRef)
+Static Function Aponta(cLote,cNumOP,nQuant,cCodMP,cCodEstru,nQtdMp,nQtdEstr,cxMat,cCodRef,nQtdRef,lApontaRef,nRecSD4)
 
 Local nX
 
@@ -1858,6 +1918,10 @@ Private aSavMvPar   := { MV_PAR01 }
 
 Default lApontaRef  := .F.
 
+dbSelectArea("SC2")
+dbSetOrder(1) //C2_FILIAL+C2_NUM
+dbSeek(xFilial("SC2")+cNumOP)
+
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Ajuste os empenhos da Ordem de Producao                      ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
@@ -1872,7 +1936,11 @@ If cCodMP <> cCodEstru .Or. nQtdMP <> nQtdEstr
 	nQtdOriAnt 	:= 0
 	cLoteAnt   	:= ""
 	cLotCtlAnt 	:= ""
-	cLocal	   	:= ""
+	cLocal	   	:= cLocProc
+	dDataSD4    := dDataBase
+	cTRT        := "" 
+	cRoteiro    := ""
+	cxAnsul     := ""
 	mv_par01    := 2 //Não digita lote
 
 	lNovoSD4    := .F.
@@ -1892,8 +1960,10 @@ If cCodMP <> cCodEstru .Or. nQtdMP <> nQtdEstr
 	//³foi alterado na rotina.          ³
 	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 	dbSelectArea("SD4")
-	SD4->( dbSetOrder(2) )//D4_FILIAL+D4_OP+D4_COD+D4_LOCAL
-	If dbSeek(xFilial("SD4")+cNumOP+cCodEstru+cLocProc,.F.)
+	SD4->( dbSetOrder(1) )//D4_FILIAL+D4_OP
+	SD4->( dbGoTo(nRECSD4) )
+	If SD4->(!EOF())
+
 		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 		//³Alteração: armazena as informações    ³
 		//³anteriores dos campos para a gravação.³
@@ -1905,53 +1975,16 @@ If cCodMP <> cCodEstru .Or. nQtdMP <> nQtdEstr
 		cLoteAnt   := SD4->D4_NUMLOTE
 		cLotCtlAnt := SD4->D4_LOTECTL
 		cLocal	   := SD4->D4_LOCAL
+		dDataSD4   := SD4->D4_DATA
+		cTRT       := SD4->D4_TRT 
+		cRoteiro   := SD4->D4_ROTEIRO
+		cxAnsul    := SD4->D4_XANSUL
 
 		RecLock("SD4",.F.)
 	Else
-		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-		//³Caso não tenha encontrado na base,    ³
-		//³verifica se não alterou apenas o local³
-		//³de empenho;                           ³
-		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-		DbSelectArea("SD4")
-		SD4->( dbSetOrder(2) )//D4_FILIAL+D4_OP+D4_COD+D4_LOCAL
-		If dbSeek(xFilial("SD4")+cNumOP+cCodEstru+cLocProc,.F.)
-
-			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-			//³Se encontrar alguém na base com o    ³
-			//³mesmo código de produto, verifica se ³
-			//³existe no aCols alguém para aquele   ³
-			//³local específico.                    ³
-			//³                                     ³
-			//³Se encontrar, o item atual é uma     ³
-			//³inclusão. Se não encontrar, significa³
-			//³que o usuário apenas alterou qual o  ³
-			//³armazém de onde os itens serão       ³
-			//³usados.                              ³
-			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-			nPos	:= 	aScan(aCols,{|aDados| aDados[nPCod]==SD4->D4_COD .and. aDados[nPLocal]==SD4->D4_LOCAL .and. !aDados[Len(aHeader)+1]})
-			If nPos > 0  .and. nPos <> i
-				RecLock("SD4",.T.)
-			Else
-				//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-				//³Alteração: armazena as informações    ³
-				//³anteriores dos campos para a gravação.³
-				//³(a380grava())                         ³
-				//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-				nQtdAnt	   := SD4->D4_QUANT
-				nQtdAnt2UM := SD4->D4_QTSEGUM
-				nQtdOriAnt := SD4->D4_QTDEORI
-				cLoteAnt   := SD4->D4_NUMLOTE
-				cLotCtlAnt := SD4->D4_LOTECTL
-				cLocal	   := SD4->D4_LOCAL
-
-				RecLock("SD4",.F.)
-			EndIf
-		Else
-			lNovoSD4 := .T.
-			RecLock("SD4",.T.)
-		Endif
-	Endif
+		lNovoSD4 := .T.
+		RecLock("SD4",.T.)
+	EndIf
 
 	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 	//³Grava SD4		  ³
@@ -1960,8 +1993,14 @@ If cCodMP <> cCodEstru .Or. nQtdMP <> nQtdEstr
 	SD4->D4_OP		:=  cNumOP
 	SD4->D4_COD     :=  cCodMP
 	SD4->D4_PRODUTO :=  SC2->C2_PRODUTO
-	SD4->D4_QTDEORI :=  nQtdMp
-	SD4->D4_QUANT   :=  nQtdMp
+	SD4->D4_QTDEORI :=  nQtdMp //Quantidade Original do Empenho
+	SD4->D4_QUANT   :=  ( ( nQtdMp / SC2->C2_QUANT ) * ( SC2->C2_QUANT - SC2->C2_QUJE) ) //Saldo do Empenho
+    SD4->D4_QTSEGUM := ConvUM(SC2->C2_PRODUTO,SD4->D4_QUANT,0,2) // 2UM
+	SD4->D4_LOCAL   :=  cLocal
+	SD4->D4_DATA    :=  dDataSD4
+	SD4->D4_TRT     :=	cTRT  
+	SD4->D4_ROTEIRO :=  cRoteiro 
+	SD4->D4_XANSUL  :=  cxAnsul
 
 	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 	//³ Apaga o D4_NUMLOTE caso o controle de Rastro seja "L". ³
@@ -1985,6 +2024,7 @@ aAdd(aMata250[1], {'D3_USUARIO',cUserName                        ,Nil})
 aAdd(aMata250[1], {'D3_QUANT'  ,nQuant                           ,Nil})
 //aAdd(aMata250[1], {'D3_PARCTOT','T'                              ,Nil})
 aAdd(aMata250[1], {'D3_PERDA'  ,0                                ,Nil})
+aAdd(aMata250[1], {'D3_OBSERVA','METALIX - LOTE:' + cLote        ,Nil})
 
 MSExecAuto({|x,y| mata250(x,y)},aMata250[1],3)
 			
