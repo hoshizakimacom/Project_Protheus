@@ -19,7 +19,7 @@ Local _cPdf     := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPDF")
 Local _cDxf     := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XDFX")
 Local _cEstru   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESTR")
 //Local _cMaoOb   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XMDOBRA")
-Local _cLibEng  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESPLIB")
+//Local _cLibEng  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESPLIB")
 //Local _cPadrao   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPADRAO")		//1=Sim 2=Não
 Local cAviso    := ""
 
@@ -28,11 +28,11 @@ if _cTipoPrd == "ME"
 	_lRet := .F.
 Endif
 
-If _cLibEng == "2"
+/*If _cLibEng == "2"
     cAviso += "Produto não está liberado pela engenharia"+CRLF
 	_lRet := .F.
 EndIf
-
+*/
 IF _cItDese <> "S" //Diferente de Sim
 	_lRet := .F.
     cAviso += "Não é permitida a inclusão de ordem de produção, Item não está desenvolvido"+CRLF
@@ -530,6 +530,19 @@ User Function M10EPrin(_cCodProd,_nQtd,_cNumSer,lCtrlImp,_nQtdImp)
 				_oPrinter:Say(_nRow + 645 , 550, "Potência: " + _cPotencia, _OFontP)
 				
 				_oPrinter:Say(_nRow + 685 , 70, "Consumo: " + _cConsumo, _OFontP)
+		EndIf
+
+	ElseIf _cFamilia == "000003"
+
+		If _cCategoria == "2"
+
+				_oPrinter:Say(_nRow + 685 , 70, "Corrente: " + _cCorrente + " A",_OFontP)
+				
+				_oPrinter:Say(_nRow + 645 , 550, "Potência: " + _cPotencia, _OFontP)
+				
+				_oPrinter:Say(_nRow + 645 , 920, "Grau de Proteção: IP " + _cGrProtecao, _OFontP)
+
+				_oPrinter:Say(_nRow + 685 , 550,"Tensao/Freq: " + UPPER(_cTensao) + " " + _cFreq, _OFontP)
 		EndIf
 
 	ElseIf _cFamilia == "000004"
