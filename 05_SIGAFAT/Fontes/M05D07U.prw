@@ -238,11 +238,19 @@ Local cCodigo    := ""
 // Informe o código do produto, a qual já deve estar registrado na tabela SB1
 cCodigo := Alltrim(aProd[1,2])
 cDescri	:= Alltrim(aProd[2,2])
-nCompr	:= aProd[3,2] 
-nLarg	:= aProd[4,2]
-nAltur	:= aProd[5,2]
-//cPdgelo	:= Alltrim(aProd[3,2]) //Adicionado 19/12/25 devido a alteração do campo de combobox para Caractere (Ticket 9689)
-
+cCateg  := AllTrim(aProd[3,2])
+cPoten  := Alltrim(aProd[4,2])
+cFreq   := Alltrim(aProd[5,2])
+cTens   := Alltrim(aProd[6,2])
+cClasC  := Alltrim(aProd[7,2])
+cFluid  := Alltrim(aProd[8,2])
+cGrauP  := Alltrim(aProd[9,2])
+cCorret := Alltrim(aProd[10,2])
+cCrgFlu := Alltrim(aProd[11,2])
+cPdgelo	:= Alltrim(aProd[12,2]) //Adicionado 19/12/25 devido a alteração do campo de combobox para Caractere (Ticket 9689)
+nCompr	:= aProd[13,2] 
+nLarg	:= aProd[14,2]
+nAltur	:= aProd[15,2]
 
 BeginTran()
 	
@@ -256,10 +264,19 @@ BeginTran()
     	
    	    oModel:SetValue("SB5MASTER","B5_COD",cCodigo)
 	    oModel:SetValue("SB5MASTER","B5_CEME",cDescri)
-	    oModel:SetValue("SB5MASTER","B5_COMPRLC",nCompr)
-   	    oModel:SetValue("SB5MASTER","B5_LARGLC",nLarg)
-   	    oModel:SetValue("SB5MASTER","B5_ALTURLC",nAltur)
-        //oModel:SetValue("SB5MASTER","B5_XPDGELO",cPdgelo)
+	    oModel:SetValue("SB5MASTER","B5_XCATEGO",cCateg)
+        oModel:SetValue("SB5MASTER","B5_XPOTENC",cPoten)
+        oModel:SetValue("SB5MASTER","B5_XFREQNT",cFreq)
+        oModel:SetValue("SB5MASTER","B5_XTENSAO",cTens)
+        oModel:SetValue("SB5MASTER","B5_XCLASCL",cClasC)
+        oModel:SetValue("SB5MASTER","B5_XFLUIDO",cFluid)
+        oModel:SetValue("SB5MASTER","B5_XGPROT",cGrauP)
+        oModel:SetValue("SB5MASTER","B5_XCORNT",cCorret)
+        oModel:SetValue("SB5MASTER","B5_XFLUID",cCrgFlu)
+        oModel:SetValue("SB5MASTER","B5_XPDGELO",cPdgelo)
+        oModel:SetValue("SB5MASTER","B5_COMPRLC",nCompr)
+        oModel:SetValue("SB5MASTER","B5_LARGLC",nLarg)
+        oModel:SetValue("SB5MASTER","B5_ALTURLC",nAltur)
    	    	    
     	If oModel:VldData()
         	oModel:CommitData()
