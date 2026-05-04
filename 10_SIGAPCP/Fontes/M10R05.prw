@@ -63,7 +63,7 @@ Local cAliasQry := GetNextAlias()
 //³ExpC5 : Descricao                                                       ³
 //³                                                                        ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-oReport := TReport():New("M10R05","Diario","M10R05", {|oReport| ReportPrint(oReport,cAliasQry,oVenProd)},"Este relatorio emite a relacao diaria de itens do pedido de venda" + " " + " para pedidos de venda com status Ativo da Filial 01.")
+oReport := TReport():New("M10R05","Diario Projetos","M10R05", {|oReport| ReportPrint(oReport,cAliasQry,oVenProd)},"Este relatorio emite a relacao diaria de itens do pedido de venda" + " " + " para pedidos de venda com status Ativo da Filial 01.")
 oReport:SetTotalInLine(.F.)
 
 Pergunte(oReport:uParam,.F.)
@@ -102,7 +102,7 @@ Pergunte(oReport:uParam,.F.)
 //³        Default : ExpC2                                                 ³
 //³                                                                        ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-oVenProd := TRSection():New(oReport,"Diario",{"SC6","SB1"},/*{Array com as ordens do relatï¿½rio}*/,/*Campos do SX3*/,/*Campos do SIX*/)		// "Relacao de Pedidos por Produto"
+oVenProd := TRSection():New(oReport,"Diario Projetos",{"SC6","SB1"},/*{Array com as ordens do relatï¿½rio}*/,/*Campos do SX3*/,/*Campos do SIX*/)		// "Relacao de Pedidos por Produto"
 oVenProd:SetTotalInLine(.F.)
 oVenProd:oReport:cFontBody := "Verdana"
 oVenProd:oReport:nFontBody := 10
@@ -120,7 +120,6 @@ TRCell():New(oVenProd,"CLIENT"		,/*Tabela*/	,"Cliente"			 ,PesqPict("SA1","A1_NO
 TRCell():New(oVenProd,"ITEM"		,/*Tabela*/ ,"Item"				 ,PesqPict("SC6","C6_ITEM")		,TamSx3("C6_ITEM")[1]		,/*lPixel*/,{|| cItem	})				// Item do Pedido
 TRCell():New(oVenProd,"PLANTA"		,/*Tabela*/ ,"Planta"			 ,PesqPict("SC6","C6_XITEMP")	,TamSx3("C6_XITEMP")[1]		,/*lPixel*/,{|| cPlanta	},,,"CENTER")	// Item Planta
 TRCell():New(oVenProd,"LIBTEC"		,/*Tabela*/	,"Lib.Tec.Com."		 ,PesqPict("SC6","C6_XGOPDT")	,TamSx3("C6_XGOPDT")[1]		,/*lPixel*/,{|| dDtLib	})				// Data Liberacao Tec.Comerc.
-
 TRCell():New(oVenProd,"Prod. Padrao",/*Tabela*/ ,"Prod. Padrao?"	 ,PesqPict("SB1","B1_XPADRAO")	,TamSx3("B1_XPADRAO")[1]	,/*lPixel*/,{|| cXPadra})				// Produto Padr�o?
 TRCell():New(oVenProd,"PDF"			,/*Tabela*/ ,"PDF?"		 		 ,PesqPict("SB1","B1_XPDF")		,TamSx3("B1_XPDF")[1]		,/*lPixel*/,{|| cXPdf})					// PDF DEsenvolvido?
 TRCell():New(oVenProd,"DXF"			,/*Tabela*/ ,"DXF?"		 		 ,PesqPict("SB1","B1_XDFX")		,TamSx3("B1_XDFX")[1]		,/*lPixel*/,{|| cXDxf})					// DXF Desenvolvido?
@@ -129,7 +128,7 @@ TRCell():New(oVenProd,"MDOBRA"		,/*Tabela*/ ,"Mao de Obra?"		 ,PesqPict("SB1","B
 TRCell():New(oVenProd,"Dev. Eng"	,/*Tabela*/ ,"Dev. Eng?"		 ,PesqPict("SB1","B1_XITDESE")	,TamSx3("B1_XITDESE")[1]	,/*lPixel*/,{|| cXItDese})				// Item em Desenvolvimento
 TRCell():New(oVenProd,"Dt.Dev.Eng"	,/*Tabela*/ ,"Dt.Dev.Eng"	 	 ,PesqPict("SB1","B1_XDTITDS")	,TamSx3("B1_XDTITDS")[1]	,/*lPixel*/,{|| dXDtItDs})				// Data que o item foi colocado em desenvolvimento
 TRCell():New(oVenProd,"Prod.Lib.Eng",/*Tabela*/ ,"Prod.Lib.Eng"		 ,PesqPict("SB1","B1_XESPLIB")	,TamSx3("B1_XESPLIB")[1]	,/*lPixel*/,{|| cXEspLib})				// produto Especial Liberado?
-TRCell():New(oVenProd,"Dt.Prod.Lib" ,/*Tabela*/ ,"Dt. Prod.Lib"		 ,PesqPict("SB1","B1_XDTLIB")	,TamSx3("B1_XDTLIB")[1]		,/*lPixel*/,{|| cXDtLib})				// Data Libera��o Engenharia
+TRCell():New(oVenProd,"Dt.Prod.Lib.Eng"  ,/*Tabela*/ ,"Dt.Prod.Lib.Eng"		 ,PesqPict("SB1","B1_XDTLIB")	,TamSx3("B1_XDTLIB")[1]		,/*lPixel*/,{|| cXDtLib})				// Data Libera��o Engenharia
 TRCell():New(oVenProd,"Obs Teccom"	,/*Tabela*/ ,"Obs Teccom?"	 	 ,PesqPict("SC6","C6_XOBSENG")	,TamSx3("C6_XOBSENG")[1]	,/*lPixel*/,{|| cXObsEng})				// Observa��o TECCOM
 
 TRCell():New(oVenProd,"ETAPA"		,/*Tabela*/ ,"Etapa"			 ,PesqPict("SC6","C6_XETAPA")	,TamSx3("C6_XETAPA")[1]		,/*lPixel*/,{|| cXEtapa })				// Etapa
@@ -205,6 +204,20 @@ TRCell():New(oVenProd,"RESP. ENG"	,/*Tabela*/	,"Resp. Eng"		 ,PesqPict("SB1","B1
 TRCell():New(oVenProd,"SUB FAM.SUG.",/*Tabela*/ ,"Familia Sugerida"  ,PesqPict("SB1","B1_XFAMSGD")	,TamSx3("B1_XFAMSGD")[1]	,/*lPixel*/,{|| cXFamSgd })				// Familia Sugerida
 TRCell():New(oVenProd,"FAMILIA.SUG.",/*Tabela*/ ,"Sub.Fam. Sugerida" ,PesqPict("SB1","B1_XSUBFAM")	,TamSx3("B1_XSUBFAM")[1]	,/*lPixel*/,{|| cXSubFam })
 TRCell():New(oVenProd,"VLUIPI"		,/*Tabela*/	,"Vl.Tot+IPI"		 ,PesqPict("SC6","C6_XVLTBRU")	,TamSx3("C6_XVLTBRU")[1]	,/*lPixel*/,{||	nVlUnIPI})				// Sub Fam.Sugerida
+
+TRCell():New(oVenProd,"AG_PROJETO"  ,/*Tabela*/ ,"AGING.PROJ"		 ,PesqPict("SC5","C5_EMISSAO")	,TamSx3("C5_EMISSAO")[1]	,/*lPixel*/,{|| dAgProj	})
+TRCell():New(oVenProd,"AG_TEC"      ,/*Tabela*/	,"AGING.TEC"		 ,PesqPict("SC5","C5_EMISSAO")	,TamSx3("C5_EMISSAO")[1]    ,/*lPixel*/,{|| dAgTec	})
+TRCell():New(oVenProd,"DIAS_MANUF"  ,/*Tabela*/ ,"DIAS.MANUF"		 ,PesqPict("SC6","C6_XGOPDT")	,TamSx3("C6_XGOPDT")[1]		,/*lPixel*/,{|| dDManuf	})	
+TRCell():New(oVenProd,"AG_ENG"      ,/*Tabela*/	,"AGING.ENG"		 ,PesqPict("SB1","B1_XDTLIB")	,TamSx3("B1_XDTLIB")[1]		,/*lPixel*/,{|| dAgEng	})			
+
+//TRCell():New(oVenProd,"AG_TEC"      ,/*Tabela*/	,"AGING.TEC"		 ,PesqPict("SC5","C5_EMISSAO")	,TamSx3("C5_EMISSAO")[1]    ,/*lPixel*/,{|| dAgTec	})				
+//TRCell():New(oVenProd,"DIAS_MANUF"  ,/*Tabela*/ ,"DIAS.MANUF"		 ,PesqPict("SC6","C6_XGOPDT")	,TamSx3("C6_XGOPDT")[1]		,/*lPixel*/,{|| dDManuf	})				
+//TRCell():New(oVenProd,"AG_PROJETO"  ,/*Tabela*/ ,"AGING.PROJ"		 ,PesqPict("SC5","C5_EMISSAO")	,TamSx3("C5_EMISSAO")[1]	,/*lPixel*/,{|| dAgProj	})				
+//TRCell():New(oVenProd,"AG_ENG"      ,/*Tabela*/	,"AGING.ENG"		 ,PesqPict("SB1","B1_XDTLIB")	,TamSx3("B1_XDTLIB")[1]		,/*lPixel*/,{|| dAgEng	})		
+TRCell():New(oVenProd,"LIB_ENG"     ,/*Tabela*/ ,"LIB.ENG"			 ,PesqPict("SB1","B1_XDTLIB")	,TamSx3("B1_XDTLIB")[1]		,/*lPixel*/,{|| dLibEng	})	
+TRCell():New(oVenProd,"DIAS_PCP"     ,/*Tabela*/,"DIAS.PCP"			 ,PesqPict("SB1","B1_XDTLIB")	,TamSx3("B1_XDTLIB")[1]		,/*lPixel*/,{|| dDiasPcp})	
+
+
 //	nPvLib   := 0
 //  nSldLib  := 0
 //	nSldDisp := 0
@@ -259,47 +272,207 @@ dbSetOrder(2)			// Produto,Numero
 		COLUMN C6_XGOPDT AS DATE
 		COLUMN C6_ENTREG AS DATE
 	
+			
 		SELECT DISTINCT
-			C6_FILIAL,C6_NUM,C6_ITEM,C6_PRODUTO,C6_QTDVEN,C6_QTDENT,C6_LOCAL,C6_BLQ, C6_TES,
-			C6_XITEMP,C6_XOPER,C6_XETAPA,C6_XGOPDT,C6_OP,C6_ENTREG,C6_XVLUBRU,C6_XVLTBRU,
-			C6_XVLTIPI,C6_XVLTICM,C6_XVLTCF2,C6_XVLTPS2,C6_XVLTSOL,
-			C5_EMISSAO,C5_XTPVEN,C5_VEND1,C5_XSTSFIN,C5_XDTAPRV,C5_TPFRETE,C5_TRANSP,
-			C5_XLIBREV,C5_XMOTLIB,C5_XDTPCP1,C5_XOBS1,C5_XDTPCP2,C5_XOBS2,
-			C5_XDTPCP3,C5_XOBS3,C5_XDTPCP4,C5_XOBS4,C5_XDTPCP5,C5_XOBS5,
-			C5_XDTPCP6,C5_XOBS6,C5_XDTPCP7,C5_XOBS7,C5_XDTPCP8,C5_XOBS8, C5_XFRETE,B5_COMPRLC, B5_LARGLC,B5_ALTURLC, 
-			C5_XLIBPRO,C5_XDLIBPR,C5_CLIENTE, C5_LOJACLI, C5_FRETE,
-			A1_NOME, A1_NREDUZ, A1_EST, 
-			B1_XFABRIC,B1_TIPO,B1_LOCPAD,B1_XFAMILI, B1_FAMILIA, B1_XITDESE, B1_XDTITDS,B1_DESC,B1_XPROD, B1_XPDF, B1_XDFX, B1_XESTR, B1_XMDOBRA,B1_XESPLIB, B1_XREPENG,
-			B5_CEME, B1_XDTLIB,B1_XPADRAO, SC6.R_E_C_N_O_ RECSC6,
-			A3_GEREN,A3_NOME,A3_EMAIL,
-			B2_QATU,
-			(SELECT SUM(C2_QUANT - C2_QUJE) FROM %Table:SC2% SC2 WHERE C2_FILIAL = SC6.C6_FILIAL AND C2_PRODUTO = C6_PRODUTO AND C2_DATRF = ' ' AND SC2.%NotDel%) AS QTD_PRV_PROD,
-			(SELECT SUM(C6_VALOR) FROM %Table:SC6% SC62 WHERE SC62.C6_FILIAL = SC6.C6_FILIAL AND SC62.C6_NUM = SC6.C6_NUM AND SC62.%NotDel%) AS TOT_SC6,
-			(SELECT SUM(C9_QTDLIB) FROM %Table:SC9% SC9 WHERE SC9.C9_FILIAL = SC6.C6_FILIAL AND SC9.C9_PEDIDO = SC6.C6_NUM AND SC9.C9_PRODUTO = SC6.C6_PRODUTO AND C9_BLEST = '  ' AND SC9.%NotDel%) AS PV_QT_LIB,
-			(SELECT SUM(C9_QTDLIB) FROM %Table:SC9% SC9 WHERE SC9.C9_FILIAL = SC6.C6_FILIAL AND SC9.C9_PRODUTO = SC6.C6_PRODUTO AND C9_BLEST = '  ' AND SC9.%NotDel%) AS QTD_EMP
 
-		FROM 
-			%Table:SC6% SC6
+    SC5.C5_XTPVEN,
+    SB1.B1_TIPO,
+    SC6.C6_XGOPDT,
+    SB1.B1_XDTLIB,SB1.B1_XITDESE,SB1.B1_XFABRIC,SB1.B1_XDTITDS,SB1.B1_XPROD,SB1.B1_XPDF,SB1.B1_XDFX,SB1.B1_XESTR,SB1.B1_XMDOBRA,SB1.B1_XESPLIB,
+	SB1.B1_XPADRAO,SB1.B1_XDTLIB,SB1.B1_XREPENG,SB1.B1_XFAMILI,
+	SB5.B5_COMPRLC,SB5.B5_LARGLC,SB5.B5_ALTURLC,SB1.B1_DESC,
 
-		INNER JOIN %Table:SC5% SC5 ON C5_FILIAL = C6_FILIAL AND C5_NUM = C6_NUM     AND C5_MSBLQL <> '1'     AND SC5.%NotDel%
+    SC6.C6_FILIAL,
+    SC6.C6_NUM,
+    SC6.C6_ITEM,
+    SC6.C6_PRODUTO,
+    SC6.C6_QTDVEN,
+    SC6.C6_QTDENT,
+    SC6.C6_LOCAL,
+    SC6.C6_BLQ,
+    SC6.C6_TES, SC6.C6_XVLTIPI,SC6.C6_XVLTICM,SC6.C6_XVLTCF2,SC6.C6_XVLTPS2,SC6.C6_XVLTSOL,
 
-		INNER JOIN %Table:SB1% SB1 ON B1_FILIAL = %xFilial:SB1% AND B1_COD = C6_PRODUTO AND SB1.%NotDel%
-		LEFT  JOIN %Table:SB5% SB5 ON B5_FILIAL = C6_FILIAL AND B5_COD = C6_PRODUTO AND SB5.%NotDel%
-		INNER JOIN %Table:SA3% SA3 ON A3_FILIAL = %xFilial:SA3% AND A3_COD = C5_VEND1   AND SA3.%NotDel%
-		INNER JOIN %Table:SB2% SB2 ON B2_FILIAL = C6_FILIAL AND B2_COD = C6_PRODUTO AND B2_LOCAL = C6_LOCAL AND SB2.%NotDel%
-		INNER JOIN %Table:SA1% SA1 ON A1_FILIAL = %xFilial:SA1% AND C5_CLIENTE = A1_COD AND C5_LOJACLI = A1_LOJA AND SA1.%NotDel%
+    SC6.C6_XITEMP,
+    SC6.C6_XOPER,
+    SC6.C6_XETAPA,
+    SC6.C6_OP,
+    SC6.C6_ENTREG,
+	SC6.C6_XOBSENG,
+	SC6.C6_XVLTBRU,
 
-		WHERE 
-			//SC6.C6_FILIAL = %xFilial:SC6% AND
-			SC6.C6_FILIAL BETWEEN %Exp:MV_PAR10% AND %Exp:MV_PAR11% AND  //GMUD 0006
-			SC6.C6_BLQ <> 'R' AND
-			SC6.C6_QTDVEN > SC6.C6_QTDENT AND
-			SC5.C5_TIPO NOT IN ('D','B') AND
-			SC5.C5_EMISSAO >= %Exp:Dtos(MV_PAR04)% AND SC5.C5_EMISSAO <= %Exp:Dtos(MV_PAR05)% AND
-			SC6.C6_NUM >= %Exp:MV_PAR06% AND SC6.C6_NUM <= %Exp:MV_PAR07% AND
-			SC6.C6_PRODUTO >= %Exp:MV_PAR08% AND SC6.C6_PRODUTO <= %Exp:MV_PAR09% AND
-			SC6.%NotDel%
-		ORDER BY SC6.C6_FILIAL,SC6.C6_NUM
+    SC5.C5_EMISSAO,SC5.C5_TPFRETE,SC5.C5_EMISSAO,SC5.C5_TRANSP,
+    SC5.C5_VEND1,
+    SC5.C5_XSTSFIN,SC5.C5_XMOTLIB,SC5.C5_XDTPCP1,SC5.C5_XOBS1,SC5.C5_XDTPCP2,SC5.C5_XOBS2,SC5.C5_XDTPCP3,SC5.C5_XOBS3,  SC5.C5_XDTPCP4,SC5.C5_XOBS4,
+	SC5.C5_XDTPCP5,SC5.C5_XOBS5,
+	SC5.C5_XDTPCP6,SC5.C5_XOBS6,
+	SC5.C5_XDTPCP7,SC5.C5_XOBS7,
+	SC5.C5_XDTPCP8,SC5.C5_XOBS8,SC5.C5_XDTAPRV,SC5.C5_XDLIBPR,SC5.C5_FRETE,SC5.C5_XLIBREV,SC5.C5_XFRETE,SC5.C5_XTPVEN,
+
+    SB2.B2_QATU,
+	SA1.A1_NOME,SA1.A1_EST,SA1.A1_NREDUZ,
+	SA3.A3_NOME,SA3.A3_EMAIL,SA3.A3_COD,SA3.A3_GEREN,
+
+    /* AGING TEC */
+    CASE
+        WHEN SC6.C6_XGOPDT IS NULL
+          OR SC6.C6_XGOPDT = ''
+          OR SC6.C6_XGOPDT < SC5.C5_EMISSAO
+        THEN 0
+        ELSE DATEDIFF(
+            DAY,
+            CONVERT(DATE, SC5.C5_EMISSAO, 112),
+            CONVERT(DATE, SC6.C6_XGOPDT, 112)
+        )
+    END AS AG_TEC,
+
+    /* AGING PROJETO */
+    CASE
+        WHEN SC6.C6_ENTREG IS NULL
+        THEN 0
+        ELSE DATEDIFF(
+            DAY,
+            CONVERT(DATE, SC5.C5_EMISSAO, 112),
+            CONVERT(DATE, SC6.C6_ENTREG, 112)
+        )
+    END AS AG_PROJETO,
+
+    /* LIB ENG */
+    CASE
+        WHEN SB1.B1_XDTLIB = ''
+          OR SB1.B1_XDTLIB < SC5.C5_EMISSAO
+        THEN 0
+        ELSE DATEDIFF(
+            DAY,
+            CONVERT(DATE, SC5.C5_EMISSAO, 112),
+            CONVERT(DATE, SB1.B1_XDTLIB, 112)
+        )
+    END AS LIB_ENG,
+
+    /* AGING ENG */
+    CASE
+        WHEN SC5.C5_XTPVEN <> '1'
+             AND SB1.B1_TIPO = 'PA'
+        THEN
+            CASE
+                WHEN SB1.B1_XDTLIB = ''
+                  OR SB1.B1_XDTLIB < SC5.C5_EMISSAO
+                THEN 0
+                ELSE DATEDIFF(
+                    DAY,
+                    CONVERT(DATE, SC5.C5_EMISSAO, 112),
+                    CONVERT(DATE, SB1.B1_XDTLIB, 112)
+                )
+            END
+        WHEN SB1.B1_XDTLIB = ''
+          OR SB1.B1_XDTLIB < SC6.C6_XGOPDT
+          OR SC6.C6_XGOPDT = ''
+        THEN 0
+        ELSE DATEDIFF(
+            DAY,
+            CONVERT(DATE, SC6.C6_XGOPDT, 112),
+            CONVERT(DATE, SB1.B1_XDTLIB, 112)
+        )
+    END AS AG_ENG,
+
+    /* DIAS MANUFATURA */
+    CASE
+        WHEN SC5.C5_XTPVEN <> '1'
+             AND SB1.B1_TIPO = 'PA'
+        THEN
+            DATEDIFF(
+                DAY,
+                CONVERT(DATE, SC5.C5_EMISSAO, 112),
+                CONVERT(DATE, SC6.C6_ENTREG, 112)
+            )
+        WHEN SC6.C6_XGOPDT = ''
+          OR SC6.C6_ENTREG < SC6.C6_XGOPDT
+        THEN 0
+        ELSE DATEDIFF(
+            DAY,
+            CONVERT(DATE, SC6.C6_XGOPDT, 112),
+            CONVERT(DATE, SC6.C6_ENTREG, 112)
+        )
+    END AS DIAS_MANUF,
+
+    /* SUBQUERIES */
+    (SELECT SUM(C2_QUANT - C2_QUJE)
+       FROM SC2010 SC2
+      WHERE SC2.C2_FILIAL  = SC6.C6_FILIAL
+        AND SC2.C2_PRODUTO = SC6.C6_PRODUTO
+        AND SC2.C2_DATRF   = ' '
+        AND SC2.D_E_L_E_T_ = ''
+    ) AS QTD_PRV_PROD,
+
+    (SELECT SUM(C6_VALOR)
+       FROM SC6010 SC62
+      WHERE SC62.C6_FILIAL = SC6.C6_FILIAL
+        AND SC62.C6_NUM    = SC6.C6_NUM
+        AND SC62.D_E_L_E_T_ = ''
+    ) AS TOT_SC6,
+
+    (SELECT SUM(C9_QTDLIB)
+       FROM SC9010 SC9
+      WHERE SC9.C9_FILIAL  = SC6.C6_FILIAL
+        AND SC9.C9_PEDIDO  = SC6.C6_NUM
+        AND SC9.C9_PRODUTO = SC6.C6_PRODUTO
+        AND SC9.C9_BLEST   = '  '
+        AND SC9.D_E_L_E_T_ = ''
+    ) AS PV_QT_LIB,
+
+    (SELECT SUM(C9_QTDLIB)
+       FROM SC9010 SC9
+      WHERE SC9.C9_FILIAL  = SC6.C6_FILIAL
+        AND SC9.C9_PRODUTO = SC6.C6_PRODUTO
+        AND SC9.C9_BLEST   = '  '
+        AND SC9.D_E_L_E_T_ = ''
+    ) AS QTD_EMP
+
+FROM SC6010 SC6
+
+INNER JOIN SC5010 SC5
+    ON SC5.C5_FILIAL = SC6.C6_FILIAL
+   AND SC5.C5_NUM    = SC6.C6_NUM
+   AND SC5.C5_MSBLQL <> '1'
+   AND SC5.D_E_L_E_T_ = ''
+
+INNER JOIN SB1010 SB1
+    ON SB1.B1_COD = SC6.C6_PRODUTO
+   AND SB1.D_E_L_E_T_ = ''
+
+INNER JOIN SB2010 SB2
+    ON SB2.B2_FILIAL = SC6.C6_FILIAL
+   AND SB2.B2_COD    = SC6.C6_PRODUTO
+   AND SB2.B2_LOCAL  = SC6.C6_LOCAL
+   AND SB2.D_E_L_E_T_ = ''
+
+INNER JOIN SA1010 SA1
+    ON SA1.A1_COD  = SC5.C5_CLIENTE
+   AND SA1.A1_LOJA = SC5.C5_LOJACLI
+   AND SA1.D_E_L_E_T_ = ''
+
+LEFT JOIN SB5010 SB5
+    ON SB5.B5_FILIAL = SC5.C5_FILIAL
+   AND SB5.B5_COD    = SC6.C6_PRODUTO
+   AND SB5.D_E_L_E_T_ = ''
+
+INNER JOIN SA3010 SA3
+    ON SA3.A3_COD = SC5.C5_VEND1
+   AND SA3.D_E_L_E_T_ = ''
+
+WHERE
+    SC6.C6_FILIAL = %xFilial:SC6%
+AND SC6.C6_BLQ <> 'R'
+AND SC6.C6_QTDVEN > SC6.C6_QTDENT
+AND SC5.C5_TIPO NOT IN ('D','B')
+AND SC5.C5_EMISSAO >= %Exp:Dtos(MV_PAR04)%
+AND SC5.C5_EMISSAO <= %Exp:Dtos(MV_PAR05)%
+AND SC6.C6_NUM >= %Exp:MV_PAR06%
+AND SC6.C6_NUM <= %Exp:MV_PAR07%
+AND SC6.C6_PRODUTO >= %Exp:MV_PAR08%
+AND SC6.C6_PRODUTO <= %Exp:MV_PAR09%
+AND SC6.D_E_L_E_T_ = ''
+
+ORDER BY SC6.C6_FILIAL, SC6.C6_NUM
 	EndSql
 
 	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -356,7 +529,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cAltura := (cAliasQry)->B5_ALTURLC		//#6839
 	cXRespE := (cAliasQry)->B1_XREPENG		//#6839
 
-	SC6->(dbGoto((cAliasQry)->RECSC6))
+	//SC6->(dbGoto((cAliasQry)->RECSC6))
 	cXObsEng := SC6->C6_XOBSENG 	//#6839
 	//cXObsEng := (cAliasQry)->C2_XOBSENG	//#6839
 
@@ -534,6 +707,15 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	nSldDisp := nSldEst - (cAliasQry)->QTD_EMP
   	nRatFre  := (cAliasQry)->C5_XFRETE
 
+	dAgTec   := (cAliasQry)->AG_TEC
+	dDManuf  := (cAliasQry)->DIAS_MANUF
+	dAgProj  := (cAliasQry)->AG_PROJETO
+	dAgEng   := (cAliasQry)->AG_ENG
+	dLibEng	 := (cAliasQry)->LIB_ENG
+	dDiasPcp := dDManuf - dAgEng
+
+
+
 /* Sub Fam�lia e Fam�lia Sugerida do Produtos
 */
 	cXSubFam	:= Posicione("SB1",1,xFilial("SB1")+SC6->C6_PRODUTO,"B1_XSUBFAM")
@@ -615,7 +797,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	
 	Do Case
 		Case Alltrim((cAliasQry)->C5_XTPVEN) == "1" 
-			cXTpVen		:= "1 - Projeto"
+			cXTpVen		:= "1 - Projeto"		
 		Case Alltrim((cAliasQry)->C5_XTPVEN) == "2"
 			cXTpVen		:= "2 - Venda Unitaria"
 		Case Alltrim((cAliasQry)->C5_XTPVEN) == "3"
@@ -641,6 +823,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		Case Alltrim((cAliasQry)->C5_XTPVEN) == ""
 			cXTpVen		:= ""
 	EndCase
+	
 
 	IIF(lAtraso,cAtraso	:= "Sim",cAtraso := "Nao")
 	IIF(lPronta,cPronta := "Sim",cPronta := "Nao")
@@ -684,7 +867,7 @@ DEFAULT lPos 	:= .F.
 DEFAULT cNumPed := ""
 
 If nTotPed > 0
-/*/
+/*
 	BeginSql Alias cAliasTot
 	
 		SELECT 
@@ -696,7 +879,7 @@ If nTotPed > 0
 			SC6.C6_NUM = %Exp:cNumPed% AND
 			SC6.%NotDel%
 	EndSql
-/*/
+*/
 	
 	If nTotPed > 20000.00 .And. nTotPed < 200000.00
 		cRet	:= "Gastronomia"
