@@ -695,11 +695,12 @@ User Function M04M12M()
 	Local aArea     := GETAREA()
 	Local aPergs    := {}
 	Local aRetPar   := {}
-	Local nHandle   := 0
+	//Local nHandle   := 0
 	Local nP        := 0
 	Local nPos      := 0
 	Local aPecasAUX := {}
 	Local aPecas    := {}
+	Local nRecno
 
 	PRIVATE aOps  := {}
 	PRIVATE aEmp  := {}
@@ -716,6 +717,7 @@ User Function M04M12M()
 
 	CursorWait()
 
+	/*
 	nHandle := FT_FUse(aRetPar[1])
   
 	If nHandle = -1 // Se houver erro de abertura abandona processamento
@@ -726,6 +728,19 @@ User Function M04M12M()
   	FT_FGoTop() // Posiciona na primeria linha
   	
   	nLast := FT_FLastRec() // Retorna o número de linhas do arquivo
+	*/
+	oFile := FwFileReader():New(aRetPar[1])
+	If !(oFile:Open())
+		Aviso("Erro","Erro na abertura do arquivo:"+aRetPar[1],{"Fechar"})
+    	return
+	EndIf
+
+	aLinhas := oFile:GetAllLines() // ACESSA TODAS AS LINHAS
+
+	oFile:Close() // Fecha o Arquivo
+
+	nLast := LEN(aLinhas)
+
 	lCabec := .T.
 
 	/*
@@ -766,10 +781,15 @@ User Function M04M12M()
 	lOps         := .F.
 	lEmps        := .F.
 
- 	While !FT_FEOF()
+ 	/*
+	While !FT_FEOF()
 
     	cLine  := FT_FReadLn() // Retorna a linha corrente
     	nRecno := FT_FRecno() // Retorna o recno da Linha
+	*/	
+	For nRecno := 1 To nLast
+
+		cLine := aLinhas[nRecno]
 
 		aDados := StrTokArr2(cLine,";",.T.)	
 
@@ -860,10 +880,14 @@ User Function M04M12M()
 
 		EndIf
 
+	/*
     	FT_FSKIP()
   	EndDo
   	
   	FT_FUSE() // Fecha o Arquivo
+	*/
+
+	Next
 
 	CursorArrow()
 
