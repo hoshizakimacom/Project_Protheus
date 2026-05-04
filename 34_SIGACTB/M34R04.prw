@@ -204,8 +204,8 @@ TRCell():New(oVenProd,"FRETE %"     ,/*Tabela*/ ,"Frete %" 	         ,PesqPict("
 TRCell():New(oVenProd,"CUSTOSD2"    ,/*Tabela*/ ,"Custo Médio Linha" ,PesqPict("SD2","D2_CUSTO1")	,TamSx3("D2_CUSTO1")[1]		,/*lPixel*/,{|| cCustD2 })		// Custo em Linha #9371
 TRCell():New(oVenProd,"TPPROD"      ,/*Tabela*/ ,"Tipo do Produto"   ,PesqPict("SD2","D2_TP")		,TamSx3("D2_TP")[1]			,/*lPixel*/,{|| cTpTipo })		// Tipo de Produto #9371
 TRCell():New(oVenProd,"TPCLI"       ,/*Tabela*/ ,"Tipo Cliente"   	 ,PesqPict("SA1","A1_TIPO")		,TamSx3("A1_TIPO")[1]		,/*lPixel*/,{|| cTpCli })		// Tipo de Cliente #9371
+TRCell():New(oVenProd,"CANAL"       ,/*Tabela*/ ,"Canal do Cliente"	 ,PesqPict("SA1","A1_XCANAL")	,TamSx3("A1_XCANAL")[1]		,/*lPixel*/,{|| cCanal })		// Canal do Cliente #10542
 TRCell():New(oVenProd,"LINHA"		,/*Tabela*/	,"Linha Produto"	 ,PesqPict("SB5","B5_XDSCLIN")	,TamSx3("B5_XDSCLIN")[1]    ,/*lPixel*/,{|| cLinha})		// Linha do Produto #10542
-TRCell():New(oVenProd,"TPCLI"       ,/*Tabela*/ ,"Canal do Cliente"	 ,PesqPict("SA1","A1_XCANAL")	,TamSx3("A1_XCANAL")[1]		,/*lPixel*/,{|| cCanal })		// Canal do Cliente #10542
 
 Return(oReport)
 
@@ -416,25 +416,15 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		cXrede	    := SA1->A1_XREDE
 		cXsegm      := SA1->A1_XSEGM
 		cTpCli		:= SA1->A1_TIPO
-		cCanal		:= SA1->A1_XCANAL
+		//cCanal		:= SA1->A1_XCANAL
 	Else
         cNomeCli    := ""
         cRegiao     := ""
 		cXrede	    := SA1->A1_XREDE
 		cXsegm      := SA1->A1_XSEGM
 		cTpCli		:= SA1->A1_TIPO
-		cCanal		:= SA1->A1_XCANAL
+		//cCanal		:= SA1->A1_XCANAL
 	Endif
-
-	If Alltrim(SA1->A1_XCANAL) == "1" 
-		cCanal := "1 - Gastronomia"
-	ElseIf Alltrim(SA1->A1_XCANAL) == "2"
-		cCanal := "2 - Contas Corporativas"
-	ElseIf Alltrim(SA1->A1_XCANAL) == "3"
-		cCanal:= "3 - Dealer"
-	ElseIf Alltrim(SA1->A1_XCANAL) == "4"
-		cCanal := "4 - Exportacao"
-	EndIf
 
 	If lPosC5
     	cCodVend    := SC5->C5_VEND1
@@ -487,6 +477,19 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
         ElseIf cTpCli == 'X'
              cTpCli  	:= 'Exportação'                     
         Endif
+
+
+		cCanal := Posicione("SA1",1,xFilial("SA1")+(cAliasQry)->(D2_CLIENTE+D2_LOJA),"A1_XCANAL")
+		
+		If cCanal $ '1' 
+			cCanal := 'Gastronomia'
+		ElseIf cCanal $ '2'
+			cCanal := 'Contas Corporativas'
+		ElseIf cCanal $ '3'
+			cCanal:= 'Dealer'
+		ElseIf cCanal $ '4'
+			cCanal := 'Exportacao'
+		EndIf
         
 
 //		U_BusTpVen(SC5->C5_XTPVEN,"C5_XTPVEN") //Função para utilizar os tipo de vendas cadastrados no campo C5_XTPVEN
