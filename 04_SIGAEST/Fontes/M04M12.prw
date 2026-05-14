@@ -701,6 +701,9 @@ User Function M04M12M()
 	Local aPecasAUX := {}
 	Local aPecas    := {}
 	Local nRecno
+	Local nOp
+	Local nPeca
+	Local cAviso    := ""
 
 	PRIVATE aOps  := {}
 	PRIVATE aEmp  := {}
@@ -807,35 +810,52 @@ User Function M04M12M()
 
 		ElseIf lSubNests .And. lEmps
 
-			If LEN(aDados) >= 12 .And. !EMPTY(aDados[5])
+			If LEN(aDados) >= 27 .And. !EMPTY(aDados[5]) .And. !EMPTY(aDados[15]) 
 				
 				cMP       := aDados[5] //PADR(aDados[5],TAMSX3("B1_XMAT")[1])
-				nEspess   := VAL(STRTRAN(STRTRAN(aDados[6],".",""),",",".") ) 
+				nEspess   := VAL(STRTRAN(STRTRAN(aDados[6],".",""),",","."))
 				nTamX     := VAL(aDados[3])
 				nTamY     := VAL(aDados[4])
-				nPercSuc  := VAL(aDados[11])
-				
-				// (Qtd. * Peso Chapa) * Perc.Sucata
-				nQtdScrap := ( VAL(aDados[7]) * VAL(STRTRAN(STRTRAN(aDados[8],".",""),",",".") ) ) * ( VAL(STRTRAN(STRTRAN(aDados[11],".",""),",",".") ) / 100 )
+				nQtdChapa := VAL(aDados[7])
+				nPesoCHAP := VAL(STRTRAN(STRTRAN(aDados[8],".",""),",","."))
+				nAreaChap := VAL(STRTRAN(STRTRAN(aDados[11],".",""),",","."))
+				nAreaEff  := VAL(STRTRAN(STRTRAN(aDados[12],".",""),",","."))
+				nPercEff  := VAL(STRTRAN(STRTRAN(aDados[13],".",""),",","."))
+				nPercSuc  := VAL(STRTRAN(STRTRAN(aDados[14],".",""),",","."))
+				nSobra    := VAL(STRTRAN(STRTRAN(aDados[27],".",""),",","."))
 
-				aPecasAux  := StrTokArr2(aDados[12],",")	
+				// Peso Effetivo
+				nPesoEff := ( nQtdChapa * nPesoCHAP ) * ( nAreaEff / nAreaChap )
+
+				// (Qtd. * Peso Chapa) * Perc.Sucata
+				nQtdScrap := nPesoEff * ( nPercSuc / 100 )
+
+				aPecasAux  := StrTokArr2(aDados[15],",")
 				aPecas     := {}
 				For nP := 1 To LEN(aPecasAux)
+					
+					aPecasAux[nP] := ALLTRIM(aPecasAux[nP])
+
 					nPos := AT("(",aPecasAux[nP])
 					If nPos > 0
 						cQtd          := SUBSTR(aPecasAux[nP],nPos+1,(AT(")",aPecasAux[nP])-nPos)-1)
 						cQtd          := STRTRAN(cQtd,"x","")
 						cQtd          := STRTRAN(cQtd,"X","")
 						aPecasAux[nP] := LEFT(aPecasAux[nP],nPos-1)
+						aPecasAux[nP] := ALLTRIM(aPecasAux[nP])
 					Else
 					    cQtd       := "1"
 					EndIf
-					aPecasAux[nP] := LEFT(aPecasAux[nP],LEN(aPecasAux[nP])-5) //RETIRAR SUFIXO DFX99
+					
+					If LEFT(RIGHT(aPecasAux[nP],5),3) == "DXF"
+						aPecasAux[nP] := LEFT(aPecasAux[nP],LEN(aPecasAux[nP])-5) //RETIRAR SUFIXO DFX99
+					EndIf
+
 					nPeca := ASCAN(aPecas,{|x|x[1]==ALLTRIM(aPecasAux[nP])})
 					If nPeca = 0
-						AADD(aPecas,{ALLTRIM(aPecasAux[nP]),( VAL(cQtd) * VAL(aDados[7]) ),0/*Empenhada*/})
+						AADD(aPecas,{ALLTRIM(aPecasAux[nP]),( VAL(cQtd) * nQtdChapa ),0/*Empenhada*/,0/*Peso Peça*/})
 					Else
-						aPecas[nPeca][2] += ( VAL(cQtd) * VAL(aDados[7]) )
+						aPecas[nPeca][2] += ( VAL(cQtd) * nQtdChapa )
 					EndIf
 				Next
 
@@ -847,15 +867,24 @@ User Function M04M12M()
 				//If nPosRef > 0
 				//	aRefs[nPosRef][3] += nQtdScrap
 				//Else
-					AADD(aRefs,{cScrap,cComp,nQtdScrap,0,aPecas,nPercSuc})
+					AADD(aRefs,{cScrap,cComp,nQtdScrap,0,aPecas,nPercSuc,nPesoEff,0 /*Calculo Peso total das Peças*/}) //Adicionar Referencia de Scrap para controle de perdas e apontamento de refugo
 				//EndIf
+			Else
+
+				cMsgErro := "Estrutura do arquivo inválida ! Revise."
+				If !(cMsgErro $ cAviso)
+					cAviso += cMsgErro+CHR(13)+CHR(10) 
+				EndIf
+				aOps := {} //Limpa array de OP's para não processar dados inconsistentes
+			    Exit
+
 			EndIf
 
 		ElseIf lPecSubNests .And. "No." $ cLine
 			lOps := .T.
 		ElseIf lPecSubNests .And. lOps
 
-			If LEN(aDados) >= 10 //.And. !EMPTY(aDados[10])
+			If LEN(aDados) >= 12 .And. !EMPTY(aDados[12])
 
 				cOP       := PADR(aDados[12],TAMSX3("D4_OP")[1])
 				cMP       := aDados[5] //PADR(aDados[5],TAMSX3("B1_XMAT")[1])
@@ -872,20 +901,56 @@ User Function M04M12M()
 				cObserv   := ""
 				cCodRef   := SPACE(TAMSX3("D4_COD")[1])
 				nQtdRef   := 0
+				cLinha    := aDados[1]
 
 				If nQtPeca > 0 // Só considera itens com quantidade alocada
-					VerOP(cOp,@cProdPI,cMP,@cCodMPEst,@nQtEstr,@nQtEmp,@nPerda,@cCodMPUsa,@cObserv,nQtPeca,@cCodRef,@nQtdRef,nPesoPC,nQtReq) //Posiciona na OP, Estrutura e Empenho
+					VerOP(cOp,@cProdPI,cMP,@cCodMPEst,@nQtEstr,@nQtEmp,@nPerda,@cCodMPUsa,@cObserv,nQtPeca,@cCodRef,@nQtdRef,nPesoPC,nQtReq,cLinha) //Posiciona na OP, Estrutura e Empenho
 				EndIf
+			
+			Else
+
+				cMsgErro := "Estrutura do arquivo inválida ! Revise."
+				If !(cMsgErro $ cAviso)
+					cAviso += cMsgErro+CHR(13)+CHR(10)
+				EndIf
+				aOps := {} //Limpa array de OP's para não processar dados inconsistentes
+				Exit
 			EndIf
 
 		EndIf
 
+	Next
+
 	/*
-    	FT_FSKIP()
-  	EndDo
-  	
-  	FT_FUSE() // Fecha o Arquivo
+
+	Recalculo da Quantidade da Requisição da Chapa com base no Peso Efetivo x Peso total da peca no corte
+
 	*/
+	For nOp := 1 To Len(aOPs)
+
+		nPesoTotalPecas := 0
+		nQtReqChapa := 0
+		If aOPS[nOp][15] > 0
+			For nPeca := 1 To Len(aRefs[aOPS[nOp][15]][5])
+				If EMPTY(aRefs[aOPS[nOp][15]][5][nPeca][4]) //Se tiver sem peso na peça    
+					nPesoTotalPecas := 0
+					aOPS[nOp][11] += IIF(EMPTY(aOPS[nOp][11]),"","|") + "SubNests No."+cValToChar(aOPS[nOp][15])+" com produtos sem peso, verifique pois compromete rateio para requisição do KG de CHAPA !!! "
+					Exit
+				EndIf
+				nPesoTotalPecas += ( aRefs[aOPS[nOp][15]][5][nPeca][2] * aRefs[aOPS[nOp][15]][5][nPeca][4] ) //Quantidade x Peso Peça
+			Next
+
+			If nPesoTotalPecas > 0
+				nQtReqChapa := ( (aOPs[nOp][5] * aOPs[nOp][16]) / nPesoTotalPecas ) * aRefs[aOPS[nOp][15]][7] //Proporção do Peso Efetivo da Chapa com o Peso Total das Peças vezes a Quantidade Requerida da Chapa
+				aOPs[nOp][9] := nQtReqChapa
+				If aOPS[nOp][15] > 0
+					aOPs[nOp][6] := aRefs[aOPS[nOp][15]][6]
+					aOPs[nOp][13] := ( nQtReqChapa * aRefs[aOPS[nOp][15]][6] ) / 100    //Qtd.Refugo
+				Else
+					aOPs[nOp][13] := 0
+				EndIf
+			EndIf
+		EndIf
 
 	Next
 
@@ -896,7 +961,7 @@ User Function M04M12M()
 
 	Simulação Tela Importação de Arquivo Metalix, Ajustes e Apontamento OP de Corte							
 							
-	OP	PI(CORTE)	COMP	QTD ESTRUT.	PERDA	QTD.EMP.	QTD.NEXT.	QTD. REQ.
+	OP	PI(CORTE)	COMP	QTD ESTRUT.	PERDA	QTD.EMP.	PESO PC	QTD. REQ.
 	0000101001	PC_001_PORTA	CHAPA LIGA 304	20	10%	22	20	20
 	0000201001	PC_002_LATERAL	CHAPA LIGA 304	10	10%	11	10	10
 	0000301001	PC_003_LATERAL	CHAPA LIGA 306	30	10%	33	31	31
@@ -924,7 +989,11 @@ User Function M04M12M()
 
 		Else
 
-			Aviso("Aviso","Não encontrado nenhuma OP para importação!! Revise o arquivo gerado.",{"Fechar"})
+			If !EMPTY(cAviso)
+				Aviso("Aviso",cAviso,{"Fechar"})
+			Else
+				Aviso("Aviso","Não encontrado nenhuma OP para importação!! Revise o arquivo gerado.",{"Fechar"})
+			EndIf
 
 		EndIf
 
@@ -1029,14 +1098,14 @@ Return
 Posiciona na OP, Estrutura e Empenho
 
 */
-Static Function VerOP(cOP,cProd,cMP,cCompEst,nQtEstr,nQtEmp,nPerda,cCompUsa,cObserv,nQtPeca,cCodRef,nQtdRef,nPesoPC,nQtReq)
+Static Function VerOP(cOP,cProd,cMP,cCompEst,nQtEstr,nQtEmp,nPerda,cCompUsa,cObserv,nQtPeca,cCodRef,nQtdRef,nPesoPC,nQtReq,cLinha)
 
 Local aArea := GETAREA()
 Local cRev  := ""
 Local cTRT  := ""
 Local lOk   := .T.
 Local cAMFAMIL2C := RTRIM(GetNewPar("AM_FAMIL2C",.F.,"000011;"))
-Local lPlanilha := .F. //.T.=Considera Perda Planilha, .F.=Considera Perda Estrutura Engenharia
+Local lPlanilha := .T. //.T.=Considera Perda Planilha, .F.=Considera Perda Estrutura Engenharia
 Local nQtdReq := 0
 Local nRecSD4 := 0
 
@@ -1047,11 +1116,11 @@ dbSelectArea("SC2")
 dbSetOrder(1)
 If !dbSeek(xFilial("SC2")+cOP)
 	cObserv += IIF(!EMPTY(cObserv),"|","")+"OP não encontrada!"
-	lOk  := .F.
+	//lOk  := .F.
 Else
 	If !EMPTY(SC2->C2_DATRF)
 		cObserv += IIF(!EMPTY(cObserv),"|","")+"OP encerrada anteriormente!"
-		lOk  := .F.
+		//lOk  := .F.
 	EndIf
 EndIf
 
@@ -1124,13 +1193,15 @@ If lOk
 				aRefs[nPosMP,5][nPosPc][3] += nQtApon
 			EndIf
 
+			aRefs[nPosMP,5][nPosPc][4] := nPesoPC //Peso da Peça
+
 			If EMPTY(cCompUsa)	
 				cObserv += IIF(!EMPTY(cObserv),"|","")+"Comp.Usado não encontrado!"
 			EndIf
 			cCodRef := aRefs[nPosMP,1]
 			nQtdRef := (nQtReq*nPerda)/100
 		Else
-			cObserv += IIF(!EMPTY(cObserv),"|","")+"Prod.Sem saldo ou não encontrado no Subnests do Pedido!"
+			cObserv += IIF(!EMPTY(cObserv),"|","")+"Prod.Sem saldo ou não encontrado no Subnests do Pedido! ("+ALLTRIM(cProd)+")"
 		    cCodRef := ""
 			nQtdRef := 0
 		EndIf
@@ -1141,7 +1212,8 @@ If lOk
 			nQtdReq := ROUND(nQtdReq,TAMSX3("D3_QUANT")[2])
 		EndIf
 
-		AADD(aOPs,{cOP,cProdPI,cMP,cCodMPEst,nQtApon/*nQtPeca*/,nPerda,nQtEmp,nQtNext,nQtdReq,cCodMPUsa,cObserv,cCodRef,nQtdRef,nRecSD4})
+        //          1	 2       3       4           5            6       7       8       9       10       11      12      13      14      15    16      17     
+		AADD(aOPs,{cOP,cProdPI,cMP,cCodMPEst,nQtApon/*nQtPeca*/,nPerda,nQtEmp,nQtNext,nQtdReq,cCodMPUsa,cObserv,cCodRef,nQtdRef,nRecSD4,nPosMP,nPesoPC,cLinha})
 	
 		nQtPecaAux -= nQtApon
 	EndDo
@@ -1189,6 +1261,7 @@ Local nRecSD4 := 0
 	For nX := 1 To LEN(aOPs)
 
 		Aadd(aColsAPO, {IIF(!EMPTY(aOPs[nX, 11]),"BR_PRETO","BR_VERDE") /*BR_VERMELO,BR_VERDE*/,;
+						aOPs[nX, 17],;
 						aOPs[nX, 1],;
 						aOPs[nX, 2],;
 						aOPs[nX, 5],;
@@ -1237,6 +1310,7 @@ Local nRecSD4 := 0
     //              Título               Campo        Máscara                        Tamanho                   Decimal                   Valid      Usado  Tipo F3     Combo
     aAdd(aHeadAPO, {"",                  "XX_COR"    , "@BMP",                        002,                       0,                        ".F.",     "   ", "C", "",    "V",     "",      "",        "", "V"})
     //aAdd(aHeadAPO, {"Filial",            "D4_FILIAL" , "",                            TamSX3("D4_FILIAL")[01],   0,                        "",        ".T.", "C", "",    ""} )    
+    aAdd(aHeadAPO, {"Linha",             "LINHA"     , "",                            3,   0,                        "",        ".T.", "C", "",    ""} )    
     aAdd(aHeadAPO, {"O.P",               "D4_OP"     , "",                            TamSX3("D4_OP")[01],       0,                        "",        ".T.", "C", "",    ""} )
     aAdd(aHeadAPO, {"PI Corte",          "XPICORTE"  , "",                            TamSX3("C2_PRODUTO")[01],  0,                        "",        ".T.", "C", "",    ""} )
     aAdd(aHeadAPO, {"Qtd.Pecas",         "C2_QUANT"  , PesqPict("SC2","C2_QUANT"),    TamSX3("C2_QUANT")[01],    0,                        "",        ".T.", "N", "",    ""} )
@@ -1248,9 +1322,9 @@ Local nRecSD4 := 0
     aAdd(aHeadAPO, {"Qtd.Estrut.",       "G1_QUANT"  , PesqPict("SG1","G1_QUANT"),    TamSX3("G1_QUANT")[01],    0,                        "",        ".T.", "N", "",    ""} )
     aAdd(aHeadAPO, {"% Perda",           "G1_PERDA"  , PesqPict("SG1","G1_PERDA"),    TamSX3("G1_PERDA")[01],    0,                        "",        ".T.", "N", "",    ""} )
     aAdd(aHeadAPO, {"Qtd.Emp.",          "D4_QTDEORI", PesqPict("SD4","D4_QTDEORI"),  TamSX3("D4_QTDEORI")[01],    0,                        "",        ".T.", "N", "",   ""} )
-    aAdd(aHeadAPO, {"Qtd.Next.",         "D4_QUANT"  , PesqPict("SD4","D4_QUANT"),    TamSX3("D4_QUANT")[01],    0,                        "",        ".T.", "N", "",    ""} )
+    aAdd(aHeadAPO, {"Peso PC",           "D4_QUANT"  , PesqPict("SD4","D4_QUANT"),    TamSX3("D4_QUANT")[01],    0,                        "",        ".T.", "N", "",    ""} )
     aAdd(aHeadAPO, {"Qtd.Req.",          "QTDREF"    , PesqPict("SD3","D3_QUANT"),    TamSX3("D3_QUANT")[01],    0,                        "",        ".T.", "N", "",    ""} )
-    aAdd(aHeadAPO, {"Observação",        "OBSERV"    , "@X",                            50,    0,                        "",        ".T.", "C", "",    ""} )
+    aAdd(aHeadAPO, {"Observação",        "OBSERV"    , "@X",                            80,    0,                        "",        ".T.", "C", "",    ""} )
 
 If lApontaRef
     //Criando o cabeçalho da Grid do refugo
@@ -1264,8 +1338,8 @@ EndIf
 DEFINE MSDIALOG oDlgMet TITLE "Apontamento de produção - Metalix" FROM 000, 000  TO nJanAltu, nJanLarg COLORS 0, 16777215 PIXEL
         
         //Labels gerais
-        @ 004, 033 SAY "Apontamento de Produção - Metalix"  SIZE 250, 030 FONT oFontSubN  OF oDlgMet /*COLORS RGB(031,073,125)*/ PIXEL
-        @ 004, 263 SAY "Lote: "+cLote  SIZE 250, 030 FONT oFontSubN  OF oDlgMet /*COLORS RGB(031,073,125)*/ PIXEL
+        //@ 004, 033 SAY "Apontamento de Produção - Metalix"  SIZE 250, 030 FONT oFontSubN  OF oDlgMet /*COLORS RGB(031,073,125)*/ PIXEL
+        @ 004, 033 /*263*/ SAY "Lote: "+cLote  SIZE 250, 030 FONT oFontBtn /*oFontSubN*/  OF oDlgMet /*COLORS RGB(031,073,125)*/ PIXEL
 
 		@ 006, 465 BUTTON oBtnFech   PROMPT "Anterior"   SIZE 065, 018 OF oDlgMet ACTION PesqErro("<",oMsGetAPO) FONT oFontBtn PIXEL
 		@ 006, 555 BUTTON oBtnFech   PROMPT "Proximo"    SIZE 065, 018 OF oDlgMet ACTION PesqErro(">",oMsGetAPO) FONT oFontBtn PIXEL
