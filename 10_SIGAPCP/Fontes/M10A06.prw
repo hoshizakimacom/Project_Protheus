@@ -76,6 +76,7 @@ _nRegZAB := 0
 		(cAlias)->(DbGoTop())
 
 		While ! (cAlias)->(Eof())
+			
 			cProduto 	:= (cAlias)->C2_PRODUTO
 			_nQtdOP		:= (cAlias)->C2_QUANT
 			_nQtdJE		:= (cAlias)->C2_QUJE
@@ -84,20 +85,28 @@ _nRegZAB := 0
 			_cSequen	:= (cAlias)->C2_SEQUEN
 
 			DbSelectArea("ZAB")
-			DbSetOrder(2)
-			//ZAB_FILIAL, ZAB_NUMOP, ZAB_ITEMOP, ZAB_SEQOP, R_E_C_N_O_, D_E_L_E_T_
+			DbSetOrder(2) //ZAB_FILIAL, ZAB_NUMOP, ZAB_ITEMOP, ZAB_SEQOP, R_E_C_N_O_, D_E_L_E_T_
 			If !(ZAB->(MSSeek(xFILIAL("ZAB")+_cOp+_cItem+_cSequen)))
-				FWMsgRun(, {|| _lRet := U_M10AETQ(cProduto,_nQtdOP,_nQtdJE, _cOp, _cItem, _cSequen,.T./*lImprime*/,.F. /*lCtrlImp*/)},,'Gerando Números de série ...')
+
+				FWMsgRun(, {|| aRet := U_M10AETQ(cProduto,_nQtdOP,_nQtdJE, _cOp, _cItem, _cSequen,.T./*lImprime*/,.F. /*lCtrlImp*/)},,'Gerando Números de série ...')
+
+				_lRet  := aRet[1]
+				cAviso += aRet[2]
 			Else
-				Aviso("Geração de Número de Série","Números de Série já gerados para a O.P. em questão " +  _cOp+_cItem+_cSequen +  ". ",{"Ok"},3)
+				//Aviso("Geração de Número de Série","Números de Série já gerados para a O.P. em questão " +  _cOp+_cItem+_cSequen +  ". ",{"Ok"},3)
+				cAviso += "Números de Série já gerados para a O.P. em questão " +  _cOp+_cItem+_cSequen +  ". "+CHR(13)+CHR(10)
 			Endif
 		    (cAlias)->(DbSkip())
 		Enddo
 		(cAlias)->(DbCloseArea())
 
+		If !EMPTY(cAviso)
+			Aviso("ATENÇÃO",cAviso,{"Ok"},3)
+		EndIf
+
     Else // imprime somente as etiquetas
 
-		_cQuery:= " SELECT * "
+		_cQuery:= " SELECT ZAB.R_E_C_N_O_ RECZAB, ZAB.* "
 		_cQuery+= "FROM "+RetSqlName("ZAB")+" ZAB "
 		_cQuery+= "WHERE ZAB_FILIAL = '"+xFILIAL("ZAB")+"' "
 		_cQuery+= "  AND ZAB_NUMOP+ZAB_ITEMOP+ZAB_SEQOP >= '"+_cDeOP +"' " 
@@ -105,7 +114,7 @@ _nRegZAB := 0
 		_cQuery+= "  AND D_E_L_E_T_ = '' "
 
 		TcQuery _cQuery New Alias (cAlias := GetNextAlias())
-		(cAlias)->(DbEval({|| _nRegZAB ++ }))
+		//(cAlias)->(DbEval({|| _nRegZAB ++ }))
 		(cAlias)->(DbGoTop())
 
 		While ! (cAlias)->(Eof())
@@ -117,18 +126,21 @@ _nRegZAB := 0
 			_cItem		:= (cAlias)->(ZAB_ITEMOP)
 			_cSequen	:= (cAlias)->(ZAB_SEQOP)
 
-			For _nRegZAB := 1 to _nQtdOP
-				_cNumSer	:= (cAlias)->ZAB_NUMSER
+			//For _nRegZAB := 1 to _nQtdOP
 
-				U_M10EPrin(cProduto,_nQtdOP,_cNumSer,.F./*lCtrlImp*/) //MA650TOK.PRW
-				U_M10EPri1(cProduto,_nQtdOP,_cNumSer,.F./*lCtrlImp*/) //MA650TOK.PRW
-				U_M10EPri1(cProduto,_nQtdOP,_cNumSer,.F./*lCtrlImp*/) //MA650TOK.PRW
+			dbSelectArea("ZAB")
+			dbGoTo((cAlias)->RECZAB)
 
-				(cAlias)->(DbSkip())
-			Next
-		 	
+			_cNumSer	:= (cAlias)->ZAB_NUMSER
+
+			U_M10EPrin(cProduto,_nQtdOP,_cNumSer,.F./*lCtrlImp*/) //MA650TOK.PRW
+			U_M10EPri1(cProduto,_nQtdOP,_cNumSer,.F./*lCtrlImp*/) //MA650TOK.PRW
+			U_M10EPri1(cProduto,_nQtdOP,_cNumSer,.F./*lCtrlImp*/) //MA650TOK.PRW
+
+			(cAlias)->(DbSkip())
+			//Next
 		Enddo	
+
 		(cAlias)->(DbCloseArea())
     Endif
 Return
-
