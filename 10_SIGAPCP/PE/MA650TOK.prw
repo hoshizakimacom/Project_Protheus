@@ -18,7 +18,7 @@ Local _cItDese  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XITDESE")
 Local _cPdf     := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPDF")
 Local _cDxf     := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XDFX")
 Local _cEstru   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESTR")
-Local _cMaoOb   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XMDOBRA")
+//Local _cMaoOb   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XMDOBRA")
 Local _cLibEng  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESPLIB")
 //Local _cPadrao   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPADRAO")		//1=Sim 2=Não
 Local cAviso    := ""
@@ -236,6 +236,7 @@ Else
 				dbCloseArea()
 				DBSelectArea("ZAB")
 
+
 				For _nX :=1 to _nQtdOP
 					Sleep(500)		
 					_nSerial ++ 
@@ -284,34 +285,34 @@ Else
 				Aadd(aPergs, {1, "Numero de Série Origem:",SPACE(TAMSX3("ZAB_NUMSER")[1]),"@X","","ZAB","",60,.F.})
 				Aadd(aPergs, {1, "Nro.Relatório Avaria:"  ,"A   -"+RIGHT(STR(YEAR(dDataBase),4),2),"@R A999-99","","   ","",60,.T.})
 
-				If !ParamBox(aPergs, "Produto Avariado - Informe o seguinte dados", @aRetPar,/*bOk*/,/*aButtons*/,/*lCentered*/,/*nPOSX*/,/*nPOSY*/,/*oDlgWIzard*/,/*cLoad*/,.F./*lCanSave*/,.F./*lUserSave*/)
-					cAviso += "Produto Avariado e não informado o numero de serie origem para geração da serie de avaria"+CRLF
-					_lRet := .F.
-				Else
+				//If !ParamBox(aPergs, "Produto Avariado - Informe o seguinte dados", @aRetPar,/*bOk*/,/*aButtons*/,/*lCentered*/,/*nPOSX*/,/*nPOSY*/,/*oDlgWIzard*/,/*cLoad*/,.F./*lCanSave*/,.F./*lUserSave*/)
+				//	cAviso += "Produto Avariado e não informado o numero de serie origem para geração da serie de avaria"+CRLF
+				//	_lRet := .F.
+				//Else
 
-					_cNumSer := PADR(ALLTRIM(aRetPar[1])+"-"+aRetPar[2],TAMSX3("ZAB_NUMSER")[1])
+					//_cNumSer := PADR(ALLTRIM(aRetPar[1])+"-"+aRetPar[2],TAMSX3("ZAB_NUMSER")[1])
 
-					If ZAB->(MSSeek(xFILIAL("ZAB")+ _cNumSer))
-						cAviso += "Problemas na geração do Número de Série, entre em contato com o TI - "+ _cNumSer
-						_lRet := .F.
-					Else
+					//If ZAB->(MSSeek(xFILIAL("ZAB")+ _cNumSer))
+					//	cAviso += "Problemas na geração do Número de Série, entre em contato com o TI - "+ _cNumSer
+					//	_lRet := .F.
+					//Else
 
-						Reclock("ZAB",.T.)
-						ZAB->ZAB_FILIAL := xFilial("ZAB")
-						ZAB->ZAB_NUMSER	:= _cNumSer
-						ZAB->ZAB_CODPRO	:= cProduto
-						ZAB->ZAB_NUMOP	:= cOP
-						ZAB->ZAB_ITEMOP	:= cItem
-						ZAB->ZAB_SEQOP	:= cSequen
-						ZAB->(MsUnlock())
+					//	Reclock("ZAB",.T.)
+					//	ZAB->ZAB_FILIAL := xFilial("ZAB")
+					//	ZAB->ZAB_NUMSER	:= _cNumSer
+					//	ZAB->ZAB_CODPRO	:= cProduto
+					//	ZAB->ZAB_NUMOP	:= cOP
+					//	ZAB->ZAB_ITEMOP	:= cItem
+					//	ZAB->ZAB_SEQOP	:= cSequen
+					//	ZAB->(MsUnlock())
 
-						If lImprime
-							U_M10EPrin(cProduto , _nQtdOP, _cNumSer, lCtrlImp) //MA650TOK.PRW
-							U_M10EPri1(cProduto , _nQtdOP, _cNumSer, lCtrlImp) //MA650TOK.PRW
-							U_M10EPri1(cProduto , _nQtdOP, _cNumSer, lCtrlImp) //MA650TOK.PRW //Adicionado mais uma impressão etq. Checklist
-						EndIf
-					EndIf
-				EndIf
+					//	If lImprime
+					//		U_M10EPrin(cProduto , _nQtdOP, _cNumSer, lCtrlImp) //MA650TOK.PRW
+					//		U_M10EPri1(cProduto , _nQtdOP, _cNumSer, lCtrlImp) //MA650TOK.PRW
+					//		U_M10EPri1(cProduto , _nQtdOP, _cNumSer, lCtrlImp) //MA650TOK.PRW //Adicionado mais uma impressão etq. Checklist
+					//	EndIf
+					//EndIf
+				//EndIf
 
 			EndIf	
 		EndIf
