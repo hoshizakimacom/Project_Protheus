@@ -55,6 +55,8 @@ Local _cNumSer  := ""
 Private _cOp	 := ""
 Private _cItem	 := ""
 Private _cSequen := ""
+Private aRet     := {}
+Private cAviso   := ""
 
 _cDeOP   := Alltrim(cGet1)
 _cAteOP  := Alltrim(cGet2)
