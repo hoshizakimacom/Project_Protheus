@@ -444,7 +444,7 @@ User Function M10EPrin(_cCodProd,_nQtd,_cNumSer,lCtrlImp,_nQtdImp)
 	_oPrinter:Say(_nRow + 420 , 470, "Manual do Produto: " ,_OFontP)
 	//_oPrinter:FWMSBAR('CODE128',12.4/*nRow*/,6/*nCol*/,AllTrim(_cNumSer),_oPrinter,.F./*lCheck*/,/*Color*/,/*lHorz*/, 0.018/* nWidth*/,0.5/* 1.5 nHeigth*/,/*lBanner*/,/*cFont*/,/*cMode*/,.F.,/*0.5*/,/*0.5*/,/*lCmtr2Pix*/)
 	_oPrinter:Say(_nRow + 420 , 70, Alltrim(_cNumSer),_OFontGG)
-	_oPrinter:Say(_nRow + 675 , 990, "FGQ-FB-008 Rev.00", _OFontP) /**#7666**/
+	_oPrinter:Say(_nRow + 685 , 980, "FGQ-FB-008 Rev.00", _OFontP) /**#7666**/
 		
 	If _cINMETRO =="1"
 		//_oPrinter:SayBitMap( 500, 900 ,GetSrvProfString("Startpath","") + "M10E005.BMP", 30 * 4.0 , 30 * 4.0) // *** Valdemir - 03/03/2023 *** // #7976 de 800 para 900 
@@ -472,8 +472,9 @@ User Function M10EPrin(_cCodProd,_nQtd,_cNumSer,lCtrlImp,_nQtdImp)
 	
 		If _cTpGas <> "4"
 						
-				_oPrinter:Say(_nRow + 600, 70, "Carga de Fluído: "     + _cVlrFluido + "g", _OFontP)
+				_oPrinter:Say(_nRow + 600, 70, "Carga de Fluído: "      + _cVlrFluido + "g", _OFontP)
 				_oPrinter:Say(_nRow + 655 , 70, "Potência: " 			+ _cPotencia, _OFontP)
+				_oPrinter:Say(_nRow + 630 , 70, "Fluído Refrigerante: " + _cTxFluido ,_OFontP) //#10726
 				
 				_oPrinter:Say(_nRow + 600 , 450, "Potência degelo: " 	+ _cPdeGelo , _OFontP)			//#6033
 				_oPrinter:Say(_nRow + 630 , 450, "Grau de Proteção: IP" + _cGrProtecao, _OFontP)
