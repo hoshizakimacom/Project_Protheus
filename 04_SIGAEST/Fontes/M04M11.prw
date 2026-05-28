@@ -81,11 +81,11 @@ While .T.
 						(Iif(aOrdProd[oBrwOP:nAt,11] > 0 .And. EMPTY(aOrdProd[oBrwOP:nAt,12]), 'BR_AZUL',;
 						(Iif(!EMPTY(aOrdProd[oBrwOP:nAt,12]), 'BR_VERMELHO',;
 						)))))},,,,'CENTER', 25,.t.,.f.,,,,.f.,))
-			oBrwOP:AddColumn(TCColumn():New(PADR('Numero da OP',25),{|| aOrdProd[oBrwOP:nAt, 2]},,,,'LEFT'	, TAMSX3("C2_NUM")[1]+30       ,.f.,.f.,,,,.f.,))
-			oBrwOP:AddColumn(TCColumn():New('Item'   	   ,{|| aOrdProd[oBrwOP:nAt, 3]},,,,'LEFT'	, TAMSX3("C2_ITEM")[1]+10      ,.f.,.f.,,,,.f.,))
-			oBrwOP:AddColumn(TCColumn():New(PADR('Sequencia',15),{|| aOrdProd[oBrwOP:nAt, 4]},,,,'LEFT'	, TAMSX3("C2_SEQUEN")[1]+15    ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(PADR('Numero da OP',25),{|| Upper(aOrdProd[oBrwOP:nAt, 2])},,,,'LEFT'	, TAMSX3("C2_NUM")[1]+30       ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Item'   	   ,{|| Upper(aOrdProd[oBrwOP:nAt, 3])},,,,'LEFT'	, TAMSX3("C2_ITEM")[1]+10      ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(PADR('Sequencia',15),{|| Upper(aOrdProd[oBrwOP:nAt, 4])},,,,'LEFT'	, TAMSX3("C2_SEQUEN")[1]+15    ,.f.,.f.,,,,.f.,))
 			oBrwOP:AddColumn(TCColumn():New('Item Grd.'    ,{|| aOrdProd[oBrwOP:nAt, 5]},,,,'LEFT'	, TAMSX3("C2_ITEMGRD")[1]+15   ,.f.,.f.,,,,.f.,))
-			oBrwOP:AddColumn(TCColumn():New('Produto'      ,{|| aOrdProd[oBrwOP:nAt, 6]},,,,'LEFT'	, TAMSX3("C2_PRODUTO")[1]+15   ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Produto'      ,{|| Upper(aOrdProd[oBrwOP:nAt, 6])},,,,'LEFT'	, TAMSX3("C2_PRODUTO")[1]+15   ,.f.,.f.,,,,.f.,))
 			oBrwOP:AddColumn(TCColumn():New('Descrição'    ,{|| aOrdProd[oBrwOP:nAt, 7]},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
 			oBrwOP:AddColumn(TCColumn():New('Emissão'      ,{|| aOrdProd[oBrwOP:nAt, 8]},,,,'LEFT'	, TAMSX3("C2_EMISSAO")[1]+10   ,.f.,.f.,,,,.f.,))
 			oBrwOP:AddColumn(TCColumn():New('Prv.Inicio'  ,{|| aOrdProd[oBrwOP:nAt, 24]},,,,'LEFT'	, TAMSX3("C2_DATPRI")[1]+10    ,.f.,.f.,,,,.f.,))
@@ -110,9 +110,9 @@ While .T.
 
 		If Len(oBrwEmp:aColumns) == 0
 			oBrwEmp:AddColumn(TCColumn():New('  '   		    ,{|| aEmpenhos[oBrwEmp:nAt,9]},,,,'CENTER', 10,.t.,.f.,,,,.f.,))
-			oBrwEmp:AddColumn(TCColumn():New(PADR('Ordem de Produção',30),{|| aEmpenhos[oBrwEmp:nAt, 1]},,,,'LEFT'	, TAMSX3("D4_OP")[1]+15  ,.f.,.f.,,,,.f.,))
-			oBrwEmp:AddColumn(TCColumn():New('Componente'       ,{|| aEmpenhos[oBrwEmp:nAt, 2]},,,,'LEFT'	, TAMSX3("D4_COD")[1]+15  ,.f.,.f.,,,,.f.,))
-			oBrwEmp:AddColumn(TCColumn():New('Descrição'  	    ,{|| aEmpenhos[oBrwEmp:nAt, 3]},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New(PADR('Ordem de Produção',30),{|| Upper(aEmpenhos[oBrwEmp:nAt, 1])},,,,'LEFT'	, TAMSX3("D4_OP")[1]+15  ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New('Componente'       ,{|| Upper(aEmpenhos[oBrwEmp:nAt, 2])},,,,'LEFT'	, TAMSX3("D4_COD")[1]+15  ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New('Descrição'  	    ,{|| Upper(aEmpenhos[oBrwEmp:nAt, 3])},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
 			oBrwEmp:AddColumn(TCColumn():New('Local'            ,{|| aEmpenhos[oBrwEmp:nAt, 4]},,,,'LEFT'	, TAMSX3("D4_LOCAL")[1]+15,.f.,.f.,,,,.f.,))
 			oBrwEmp:AddColumn(TCColumn():New('UM'               ,{|| aEmpenhos[oBrwEmp:nAt, 11]},,,,'LEFT'	, TAMSX3("B1_UM")[1]+15,.f.,.f.,,,,.f.,))
 			oBrwEmp:AddColumn(TCColumn():New('Quantidade'       ,{|| aEmpenhos[oBrwEmp:nAt, 5]},PesqPict("SD4","D4_QUANT"),,,'RIGHT'	, TAMSX3("D4_QUANT")[1]+20 ,.f.,.f.,,,,.f.,))
@@ -499,7 +499,7 @@ OBS: A coluna COMPRIMENTO CORTE deverá ter a possibilidade de se inserir um fato
 // Escreve o texto mais a quebra de linha CRLF
 If aRetPar[1] == "1" //Chapa
 	//fWrite(nH,"Codigo;Tipo_Cod;Componente;Tipo_Comp;Quant;OP" + chr(13)+chr(10) )        
-	fWrite(nH,"CAMINHO;PROGRAMA;QUANTIDADE;ESPESSURA;MATERIAL;CLIENTE / OP;PROJ.;SEN.PRÉ;ROTEIRO;ROTEIRO / CORTE" + chr(13)+chr(10) )        
+	fWrite(nH,"CAMINHO;PROGRAMA;QUANTIDADE;ESPESSURA;MATERIAL;CLIENTE / OP;PROJ.;SEN.PRÉ;ROTEIRO;DESENHO PEÇA;ROTEIRO / CORTE" + chr(13)+chr(10) )        
 ElseIf aRetPar[1] == "2" //Tubo
 	fWrite(nH,"Codigo;Descricao;Quantidade;Material;Comprimento_Corte;OP" + chr(13)+chr(10) )        
 EndIf
@@ -526,7 +526,7 @@ For nX := 1 To Len(aOrdProd)
 				cRot_Cort := SB1->B1_XROTCT
 				
 
-				SB1->(dbSeek(xFilial("SB1")+SD4->D4_COD))
+				SB1->(dbSeek(xFilial("SB1")+(SD4->D4_COD)))
 				cTipo_Comp := SB1->B1_TIPO
 				cDesc_MP   := SB1->B1_DESC
 				cUM_MP     := SB1->B1_UM
@@ -547,16 +547,18 @@ For nX := 1 To Len(aOrdProd)
 						cLocalDXF := "\\srvapl07\produtos_anexos"
 						cFileDXF  := FileDXF(SC2->C2_PRODUTO)
 					EndIf
+					cFilePDF := FilePDF(SD4->D4_OP,SD4->D4_PRODUTO)
 
 					fWrite(nH,  cLocalDXF+";"+;
 								cFileDXF+";"+;
 								Alltrim(Transform(SC2->C2_QUANT/*SD4->D4_QUANT*/,"999999999.9"/*"999999999.999999"*/))+";"+;
 								cEspessura+";"+;
 								cMaterial+";"+;
-								Alltrim(SD4->D4_OP)+";"+;
-								Alltrim(aOrdProd[nX][16]/*SC2->C2_PRODUTO*/)+";"+;
+								"'"+Alltrim(Upper(SD4->D4_OP))+";"+;
+								Alltrim(Upper(aOrdProd[nX][16])/*SC2->C2_PRODUTO*/)+";"+;
 								cSentidoPre+";"+;
 								cRoteiro+";"+;
+								cFilePDF+";"+;
 								cRot_Cort+chr(13)+chr(10))
 								
 
@@ -761,7 +763,7 @@ Retorna o Nome do Arquivo DXF na pasta do Servidor
 @version   12.1
 @since     06.03.2025
 
-@return NIL
+@return cFile - Nome do arquivo DXF encontrado
 
 /*/
 //------------------------------------------------------------------------------------------
@@ -785,3 +787,51 @@ Else
 EndIf
 
 Return cFile
+
+//------------------------------------------------------------------------------------------
+/*/{Protheus.doc} FilePDF
+Retorna o Nome do Arquivo PDF PAI na pasta do Servidor 
+@author    Montes
+@version   12.1
+@since     23.04.2025
+
+@return cFilePDF - Nome do arquivo PDF encontrado
+
+/*/
+//------------------------------------------------------------------------------------------
+Static Function FilePDF(cOP,cProduto)
+
+Local aArea      := GetArea()
+Local aAreaSD4   := SD4->(GetArea())
+Local cDirServer := "\produtos_anexos\"
+Local aSufixo    := { "PDF", "COM" } //Sufixos para diferenciar o PDF do produto filho e do produto pai, caso não encontre o PDF do produto filho ele busca o do produto pai
+Local cExtensao  := ".PDF"
+Local cFilePDF   := ""
+Local aFiles     := {}
+Local nI         := 0
+Local nF         := 0
+
+dbSelectArea("SD4")
+dbSetOrder(4) //D4_FILIAL+D4_OPORIG+D4_LOTECTL+D4_NUMLOTE
+If dbSeek(xFilial("SD4")+cOP) .And. SD4->D4_COD == cProduto
+
+	For nI := 1 To Len(aSufixo)
+		If LEN(aFiles := Directory(cDirServer+Alltrim(SD4->D4_PRODUTO)+aSufixo[nI]+"*"+cExtensao, "F")) > 0
+			For nF := 1 To LEN(aFiles)
+				If cFilePDF < aFiles[nF,1]
+					cFilePDF := aFiles[nF,1]
+				EndIf
+			Next
+		EndIf
+	Next
+
+	If EMPTY(cFilePDF) //Busca o PDF do produto pai caso não encontre o do produto filho
+		cFilePDF := FilePDF(SD4->D4_OP,SD4->D4_PRODUTO) //Busca o PDF do produto pai caso não encontre o do produto filho
+	EndIf
+
+EndIf
+
+RestArea(aAreaSD4)
+RestArea(aArea)
+
+Return cFilePDF

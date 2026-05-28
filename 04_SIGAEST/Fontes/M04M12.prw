@@ -794,7 +794,7 @@ User Function M04M12M()
 
 		cLine := aLinhas[nRecno]
 
-		aDados := StrTokArr2(cLine,";",.T.)	
+		aDados := StrTokArr2(Upper(cLine),";",.T.)	
 
 		If "Pedido:" $ cLine
 			cLote := UPPER(aDados[2])
@@ -892,7 +892,26 @@ User Function M04M12M()
 				cCodMPEst := SPACE(TAMSX3("D4_COD")[1])
 				nQtPeca   := VAL(STRTRAN(STRTRAN(aDados[7],".",""),",","."))
 				nPesoPC   := VAL(STRTRAN(STRTRAN(aDados[10],".",""),",","."))
-				nQtNext   := nPesoPC * VAL(STRTRAN(STRTRAN(aDados[7],".",""),",",".")) //( VAL(STRTRAN(STRTRAN(aDados[9],".",""),",",".")) * VAL(STRTRAN(STRTRAN(aDados[10],".",""),",",".")) ) //Tam.X * Tam.Y
+
+				If EMPTY(nPesoPC)
+
+					nComprimento := (VAL(STRTRAN(STRTRAN(aDados[8],".",""),",","."))/1000)
+					nLargura     := (VAL(STRTRAN(STRTRAN(aDados[9],".",""),",","."))/1000)
+					nEspessura   := (VAL(STRTRAN(STRTRAN(aDados[4],".",""),",",".")))
+
+					/*
+					Verificar densidade conforme chapa
+
+					Ex.: INOX304PEL = 7.80
+					     ALUMINIUM-5052 = 2.70
+					*/
+					nDensidade := VerDensid(cMP,nEspessura)
+
+					nPesoPC := ROUND(nComprimento * nLargura * nEspessura * nDensidade,3) //Peso em KG da peça no corte considerando as medidas e densidade do material, multiplicado por 1000 para converter de toneladas para kg
+
+				EndIf
+
+				nQtNest   := nPesoPC * VAL(STRTRAN(STRTRAN(aDados[7],".",""),",",".")) //( VAL(STRTRAN(STRTRAN(aDados[9],".",""),",",".")) * VAL(STRTRAN(STRTRAN(aDados[10],".",""),",",".")) ) //Tam.X * Tam.Y
 				nQtReq    := nPesoPC * VAL(STRTRAN(STRTRAN(aDados[7],".",""),",",".")) //( VAL(STRTRAN(STRTRAN(aDados[9],".",""),",",".")) * VAL(STRTRAN(STRTRAN(aDados[10],".",""),",",".")) ) //Tam.X * Tam.Y
 				nQtEstr   := 0
 				nQtEmp    := 0
@@ -1093,6 +1112,42 @@ RESTAREA(aArea)
 Return 
 
 
+Static Function VerDensid(cMP,nEspess)
+
+Local aArea      := GETAREA()
+Local cQuery     := ""
+Local cAliasComp := GETNEXTALIAS()
+Local cOPMat     := " "
+Local cAMFAMIL2C := RTRIM(GetNewPar("AM_FAMIL2C",.F.,"000011;"))
+Local nDensidade := 0
+
+cOPMAT := RetXMAT(cMP)
+
+cQuery := " SELECT TOP 1 B5_DENSID "
+cQuery += " FROM " + RetSQLName('SB1') + " SB1 "
+cQuery += " INNER JOIN " + RetSQLName('SB5') + " SB5 ON B5_FILIAL = '" + xFilial("SB5") + "' AND B5_COD = B1_COD AND SB5.D_E_L_E_T_ = ' ' "
+cQuery += " WHERE B1_FILIAL = '" + xFilial("SB1") + "' "
+cQuery += " AND B1_XMAT = '"+cOPMAT+"' "
+cQuery += " AND B1_XFAMIL2 IN "+FormatIn(cAMFAMIL2C,";")
+cQuery += " AND B5_ESPESS = "+STR(nEspess,TAMSX3("B5_ESPESS")[1],TAMSX3("B5_ESPESS")[2])
+cQuery += " AND B5_DENSID > 0"
+cQuery += " AND SB1.D_E_L_E_T_ = ' ' "
+
+TCQUERY cQuery NEW ALIAS (cAliasComp)
+
+(cAliasComp)->(dbGoTop())
+
+If (cAliasComp)->(!EOF())
+	nDensidade  := (cAliasComp)->B5_DENSID
+EndIf
+
+(cAliasComp)->(dbCloseArea())
+
+RESTAREA(aArea)
+
+Return nDensidade
+
+
 /*
 
 Posiciona na OP, Estrutura e Empenho
@@ -1171,7 +1226,6 @@ If lOk
 		cCompUsa := SPACE(TAMSX3("D3_COD")[1])
 
 		nPosPc  := 0
-		//nPosMP  := ASCAN(aRefs,{|x| (nPosPc:=ASCAN(x[5],{|w| w[1]==ALLTRIM(cProd) .And. (w[2]-w[3])>=nQtPeca })) > 0})
 		nPosMP  := ASCAN(aRefs,{|x| (nPosPc:=ASCAN(x[5],{|w| w[1]==ALLTRIM(cProd) .And. (w[2]-w[3])>0 })) > 0})
 		If nPosMP > 0
 			cCompUsa := aRefs[nPosMP,2]
@@ -1179,13 +1233,6 @@ If lOk
 				nPerda := aRefs[nPosMP,6] //Percentual de Sucata da Chapa
 			EndIf
 
-			/*
-			If aRefs[nPosMP,5][nPosPc][3] > aRefs[nPosMP,5][nPosPc][2]
-				aRefs[nPosMP,5][nPosPc][3] := aRefs[nPosMP,5][nPosPc][2] //Marca que já foi empenhado a quantidade para esta PC/OP
-			Else
-				aRefs[nPosMP,5][nPosPc][3] := 0
-			EndIf
-			*/
 			If (aRefs[nPosMP,5][nPosPc][2]-aRefs[nPosMP,5][nPosPc][3]) >= nQtApon
 				aRefs[nPosMP,5][nPosPc][3] += nQtApon //Marca que já foi empenhado a quantidade para esta PC/OP
 			Else
@@ -1213,7 +1260,7 @@ If lOk
 		EndIf
 
         //          1	 2       3       4           5            6       7       8       9       10       11      12      13      14      15    16      17     
-		AADD(aOPs,{cOP,cProdPI,cMP,cCodMPEst,nQtApon/*nQtPeca*/,nPerda,nQtEmp,nQtNext,nQtdReq,cCodMPUsa,cObserv,cCodRef,nQtdRef,nRecSD4,nPosMP,nPesoPC,cLinha})
+		AADD(aOPs,{cOP,cProdPI,cMP,cCodMPEst,nQtApon/*nQtPeca*/,nPerda,nQtEmp,nQtNest,nQtdReq,cCodMPUsa,cObserv,cCodRef,nQtdRef,nRecSD4,nPosMP,nPesoPC,cLinha})
 	
 		nQtPecaAux -= nQtApon
 	EndDo
@@ -1341,8 +1388,9 @@ DEFINE MSDIALOG oDlgMet TITLE "Apontamento de produção - Metalix" FROM 000, 000 
         //@ 004, 033 SAY "Apontamento de Produção - Metalix"  SIZE 250, 030 FONT oFontSubN  OF oDlgMet /*COLORS RGB(031,073,125)*/ PIXEL
         @ 004, 033 /*263*/ SAY "Lote: "+cLote  SIZE 250, 030 FONT oFontBtn /*oFontSubN*/  OF oDlgMet /*COLORS RGB(031,073,125)*/ PIXEL
 
-		@ 006, 465 BUTTON oBtnFech   PROMPT "Anterior"   SIZE 065, 018 OF oDlgMet ACTION PesqErro("<",oMsGetAPO) FONT oFontBtn PIXEL
-		@ 006, 555 BUTTON oBtnFech   PROMPT "Proximo"    SIZE 065, 018 OF oDlgMet ACTION PesqErro(">",oMsGetAPO) FONT oFontBtn PIXEL
+		@ 006, 415 BUTTON oBtnFech   PROMPT "Anterior"   SIZE 065, 018 OF oDlgMet ACTION PesqErro("<",oMsGetAPO) FONT oFontBtn PIXEL
+		@ 006, 505 BUTTON oBtnFech   PROMPT "Proximo"    SIZE 065, 018 OF oDlgMet ACTION PesqErro(">",oMsGetAPO) FONT oFontBtn PIXEL
+		@ 006, 595 BUTTON oBtnFech   PROMPT "Excel"      SIZE 065, 018 OF oDlgMet ACTION U_M04M12X(3,aColsAPO,cLote) FONT oFontBtn PIXEL
 
         //Botões
 		If !lDiverg
@@ -1434,31 +1482,35 @@ Local nCont := 0
 
 If cOper == "<"
 
-	For nCont := oMsBrowse:nAt-1 To 1 Step -1
+	If oMsBrowse:nAt > 0
+		For nCont := oMsBrowse:nAt-1 To 1 Step -1
 
-          If oMsBrowse:aCols[nCont][1] == "BR_PRETO"
-			 oMsBrowse:nAt := nCont
-		     Exit
-          EndIf
+			If oMsBrowse:aCols[nCont][1] == "BR_PRETO"
+				oMsBrowse:nAt := nCont
+				Exit
+			EndIf
 
-	Next nCont
+		Next nCont
+	EndIf
 
 Else
 
-	For nCont := oMsBrowse:nAt+1 To LEN(oMsBrowse:aCols) Step 1
+	If oMsBrowse:nAt < LEN(oMsBrowse:aCols)
+		For nCont := oMsBrowse:nAt+1 To LEN(oMsBrowse:aCols) Step 1
 
-          If oMsBrowse:aCols[nCont][1] == "BR_PRETO"
-			 oMsBrowse:nAt := nCont
-		     Exit
-          EndIf
+			If oMsBrowse:aCols[nCont][1] == "BR_PRETO"
+				oMsBrowse:nAt := nCont
+				Exit
+			EndIf
 
-	Next nCont
+		Next nCont
+	EndIf
 
 EndIf
 
 //oMsBrowse:SetBlkBackColor({|oMsBrowse| IIf(oMsBrowse:nAt, CLR_HMAGENTA , Nil )})
-oMsBrowse:Refresh()
-oMsBrowse:SetFocus()
+oMsBrowse:Refresh(.T.)
+//oMsBrowse:SetFocus()
 
 Return 
 
@@ -1487,6 +1539,7 @@ User Function M04M12X(nTela,aCols,cLote)
 	Local aItenXcel     := {}
 	Local aArea			:= GetArea()
 	Local nX			:= 0
+	Local nY            := 0
 	Local cTexto		:= ""
 	Local cDescPA       := ""
 	Local cLib
@@ -1638,6 +1691,55 @@ User Function M04M12X(nTela,aCols,cLote)
 				Next nX
 
 				cTexto := OemToAnsi("LOG Importação Metalix - Lote "+cLote)
+
+				MsgRun("Favor Aguardar.....", "Exportando os Registros para o Excel",{||DlgToExcel({{"GETDADOS",cTexto,aCabXcel,aItenXcel}})})
+
+			EndIf
+
+		EndIf
+
+
+	ElseIf nTela == 3 // Tela de Importação Metalix
+
+		If Len(aColsAPO) > 0
+
+			If GetRemoteType(@cLib) == 5
+
+				MsgInfo("Rotina não pode ser executada em Smartclient Web.","Atenção")
+
+				Return
+
+			Else
+	
+				For nY := 1 To Len(aHeadAPO)
+
+					AADD(aCabXcel,{aHeadAPO[ny][1],aHeadAPO[ny][8],aHeadAPO[ny][4],aHeadAPO[ny][5]})
+
+				Next
+
+
+				AADD(aItenXcel,{})
+				For nY := 1 To Len(aHeadAPO)
+
+					AADD(aItenXcel[LEN(aItenXcel)],"")
+
+				Next
+				AADD(aItenXcel[LEN(aItenXcel)],"")
+	
+
+				For nX := 1 to Len(aColsAPO)
+
+					AADD(aItenXcel,{})
+					For nY := 1 To Len(aHeadAPO)
+	
+						AADD(aItenXcel[LEN(aItenXcel)],aColsAPO[nX][nY])
+
+					Next
+					AADD(aItenXcel[LEN(aItenXcel)],"")
+	
+				Next nX
+
+				cTexto := OemToAnsi("Importação Metalix - Lote "+cLote)
 
 				MsgRun("Favor Aguardar.....", "Exportando os Registros para o Excel",{||DlgToExcel({{"GETDADOS",cTexto,aCabXcel,aItenXcel}})})
 
