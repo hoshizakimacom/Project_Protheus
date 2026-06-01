@@ -19,7 +19,7 @@ Local _cPdf     := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPDF")
 Local _cDxf     := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XDFX")
 Local _cEstru   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESTR")
 //Local _cMaoOb   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XMDOBRA")
-Local _cLibEng  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESPLIB")
+//Local _cLibEng  := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XESPLIB")
 //Local _cPadrao   := Posicione("SB1",1,xFilial("SB1")+M->C2_PRODUTO,"B1_XPADRAO")		//1=Sim 2=Não
 Local cAviso    := ""
 
@@ -28,10 +28,10 @@ if _cTipoPrd == "ME"
 	_lRet := .F.
 Endif
 
-If _cLibEng == "2"
+/*If _cLibEng == "2"
     cAviso += "Produto não está liberado pela engenharia"+CRLF
 	_lRet := .F.
-EndIf
+EndIf*/
 
 IF _cItDese <> "S" //Diferente de Sim
 	_lRet := .F.
