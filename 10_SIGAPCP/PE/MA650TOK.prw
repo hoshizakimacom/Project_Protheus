@@ -426,7 +426,8 @@ User Function M10EPrin(_cCodProd,_nQtd,_cNumSer,lCtrlImp,_nQtdImp)
 	_oPrinter:SetDevice(IMP_SPOOL)
 	_oPrinter:StartPage()
 
-	_oPrinter:SayBitMap( _nRow -40 , 50 ,GetSrvProfString("Startpath","") + "M10E006.bmp", 100 * 4.0 , 30 * 4.0)
+	//_oPrinter:SayBitMap( _nRow -40 , 50 ,GetSrvProfString("Startpath","") + "M10E006.bmp", 100 * 4.0 , 30 * 4.0)
+	_oPrinter:SayBitMap( _nRow -40 , 50 , "\system\M10E006.bmp", 100 * 4.0 , 30 * 4.0)
 	//_oPrinter:Say(_nRow + 100 , 70 , "Grupo HOSHIZAKI",_oFontMI)
 	_oPrinter:Say(_nRow ,650 , "HOSHIZAKI MACOM Ltda",_oFontP) /**#7666**/
 	_oPrinter:Say(_nRow += _nNextLin ,650 , "CNPJ: 43.553.668/0001-79",_oFontP)
