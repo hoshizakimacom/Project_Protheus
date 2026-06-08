@@ -544,7 +544,7 @@ For nX := 1 To Len(aOrdProd)
 						cLocalDXF := "W:\Work\maquinas\dxf-prg" //"W:\Work\maquinas\dxf-prg\DXF-PDM"
 						cFileDXF  := Alltrim(SC2->C2_PRODUTO)+".DXF"
 					Else
-						cLocalDXF := "\\srvapl07\produtos_anexos"
+						cLocalDXF := "\\srvapl08\produtos_anexos"
 						cFileDXF  := FileDXF(SC2->C2_PRODUTO)
 					EndIf
 					cFilePDF := FilePDF(SD4->D4_OP,SD4->D4_PRODUTO)
