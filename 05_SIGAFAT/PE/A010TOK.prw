@@ -1,8 +1,3 @@
-#Include 'Protheus.ch'
-
-//+--------------------------------------------------------------------------------------------------------
-//  PE no OK da tela de cadastro de produtos
-//+--------------------------------------------------------------------------------------------------------
 User Function A010TOK()
     Local aArea     := GetArea()
     Local lRet      := .T.
@@ -22,12 +17,12 @@ User Function A010TOK()
         EndIf
 
         // Valida NCM se o tipo do produto for diferente de PI
-        If lRet
+        /*If lRet
             If (M->B1_TIPO <> 'PI' .And. Empty(M->B1_POSIPI)) //#9728 - Chamado Vinicius Capeli
                 lRet := .F.
                 MsgInfo('É obrigatório informar o campo NCM diferentes do tipo PI.','Atenção')
             EndIf
-        EndIf
+        EndIf*/
 
         // Valida URL
         If lRet .And. !Empty(M->B1_XURL)
