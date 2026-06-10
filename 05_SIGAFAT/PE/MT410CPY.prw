@@ -15,6 +15,7 @@ M->C5_DESC3 	:= 0
 M->C5_DESC4 	:= 0
 M->C5_XSTSFIN	:= "1"
 M->C5_XPCONPG	:= 70
+M->C5_TABELA    := ""
 
 //M->C5_XSTSFIN  := IIF(SC5->C5_CLIENTE == '002953' .Or. SC5->C5_CLIENTE == '000001','2','1')
 M->C5_XSTSFIN  := IIF(SC5->C5_CLIENTE == AllTrim(GetMv("AM_CLIMCD") ),'2','1')
