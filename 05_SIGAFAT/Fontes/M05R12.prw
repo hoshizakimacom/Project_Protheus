@@ -167,6 +167,7 @@ TRCell():New(oVenProd,"EMAIL CONTAT",/*Tabela*/ ,"Email Contato"	 ,PesqPict("SCJ
 TRCell():New(oVenProd,"CONSULTOR"	,/*Tabela*/ ,"Consultor"		 ,PesqPict("SCJ","CJ_XCONSUL")	,TamSx3("CJ_XCONSUL")[1]	,/*lPixel*/,{|| cXconsu })		// Consultor 		//#6227
 TRCell():New(oVenProd,"SUB FAM.SUG.",/*Tabela*/ ,"Familia Sugerida"  ,PesqPict("SB1","B1_XFAMSGD")	,TamSx3("B1_XFAMSGD")[1]	,/*lPixel*/,{|| cXFamSgd })		// Familia Sugerida
 TRCell():New(oVenProd,"FAMILIA.SUG.",/*Tabela*/ ,"Sub.Fam. Sugerida" ,PesqPict("SB1","B1_XSUBFAM")	,TamSx3("B1_XSUBFAM")[1]	,/*lPixel*/,{|| cXSubFam })		// Sub Fam.Sugerida
+TRCell():New(oVenProd,"PROBABILID."	,/*Tabela*/	,"Probabilidade"	 ,"@X",TamSx3("ZA9_XPROBA")[1]+10	,/*lPixel*/,{|| cXProbCod})		// Probabilidade
 
 Return(oReport)
 
@@ -198,6 +199,7 @@ Local cXTpVenCod
 Local cXStatus 		//#5035
 Local cXFamSgdCod
 Local cXSubFamCod
+Private cXProbCod
 Private cXStFup		//#5035
 Private cStFup		//#5035
 Private cXcont		//#6227
@@ -296,7 +298,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cXObras		:= (cAliasQry)->CJ_XOBRAS
 	cXSubFam	:= Posicione("SB1",1,xFilial("SB1")+(cAliasQry)->CK_PRODUTO,"B1_XSUBFAM")
 	cXFamSgd	:= Posicione("SB1",1,xFilial("SB1")+(cAliasQry)->CK_PRODUTO,"B1_XFAMSGD")
-	
+		
 	
 	cXTpVenCod := AllTrim((cAliasQry)->CJ_XTPVEN)
 	If cXTpVenCod == "1"
@@ -390,7 +392,9 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		dXFuFec := substring(dtos(ZA9->ZA9_XFUFEC),7,2)+"/"+SUBSTRING(dtos(ZA9->ZA9_XFUFEC),5,2)+"/"+SUBSTRING(dtos(ZA9->ZA9_XFUFEC),3,2)//ZA9->ZA9_XFUFEC
 		dXFuprx	:= substring(dtos(ZA9->ZA9_XFUPRX),7,2)+"/"+SUBSTRING(dtos(ZA9->ZA9_XFUPRX),5,2)+"/"+SUBSTRING(dtos(ZA9->ZA9_XFUPRX),3,2)//ZA9->ZA9_XFUPRX
 		dXFuUlt := substring(dtos(ZA9->ZA9_XFUULT),7,2)+"/"+SUBSTRING(dtos(ZA9->ZA9_XFUULT),5,2)+"/"+SUBSTRING(dtos(ZA9->ZA9_XFUULT),3,2)//ZA9->ZA9_XFUULT
-  		cXStFup  := ZA9->ZA9_XFUST 	
+  		cXStFup := ZA9->ZA9_XFUST
+		cXProb	:= Alltrim(ZA9->ZA9_XPROBA)
+		
 
            
 	Else
@@ -398,6 +402,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
         dXFuprx	:= CTOD("  /  /  ")
 		dXFuUlt	:= CTOD("  /  /  ")
 		cXStFup	:= ""
+		cXProb	:= ""
 	
 	Endif
 
@@ -451,7 +456,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	
 	cStFup:= ""
 
-    If 	 cXStatus  == "B"						//#7359
+    If 	cXStatus  == "B"						//#7359
 		cStFup		:= "5 - Aprovado"			//#7359
 	ElseIf cXStFup 	    == "1"
 		cStFup		:= "1 - Projeto Cancelado"
@@ -462,6 +467,18 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	ElseIf cXStFup  == "4"
 		cStFup		:= "4 - Substituido"
 
+	Endif
+
+	// ZA9_XPROBA - Probabilidade
+
+	cXProbCod := ""
+	
+	If cXProb  == "1"						
+		cXProbCod		:= "1 - Baixa"			
+	ElseIf cXProb == "2"
+		cXProbCod		:= "2 - Média"
+	ElseIf cXProb == "3"
+		cXProbCod		:= "3 - Alta"
 	Endif
 
 	oReport:IncMeter()
