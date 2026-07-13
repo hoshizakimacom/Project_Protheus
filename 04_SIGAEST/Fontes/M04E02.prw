@@ -287,7 +287,7 @@ Static Function M10EGetInf(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_
 	_cCliente 		:= Posicione('SA1',1,xFilial('SA1') + SC5->(C5_CLIENTE + C5_LOJACLI),'A1_NOME')
 	_cFantasia 		:= Posicione('SA1',1,xFilial('SA1') + SC5->(C5_CLIENTE + C5_LOJACLI),'A1_NREDUZ')
 
-	//_cXItemP		:= cValtoChar(SC6->C6_QTDVEN)
+	_cXItemP		:= cValtoChar(SC6->C6_QTDVEN)
 	_cNum			:= AllTrim(SC6->C6_FILIAL + SC6->C6_NUM + SC6->C6_ITEM + _cSerie)
 	_cProd			:= AllTrim(SC6->C6_PRODUTO)
 	_cDescr			:= Posicione('SB1',1,xFilial('SB1') + SC6->C6_PRODUTO,'B1_DESC')
@@ -352,10 +352,10 @@ Static Function M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_c
 	Local _oFontP1 		:= TFont():New('Arial',,12)
 	Local _nColIni		:= 040
 	Local _nCol02			:= _nColIni + 120
-	Local _nCol03			:= _nCol02 + 600
+	Local _nCol03			:= _nCol02 + 650
 	Local _nCol04			:= _nCol03 + 120
 	Local _nNextLin		:= 60
-	//Private _nAlin			:= 10 - Len(_cXItemP)
+	Private _nAlin			:= 10 - Len(_cXItemP)
 	Private _oFontG2 		:= TFont():New('Arial',,28,.T.,.T.)
 	
 		_oPrinter := FWMSPrinter():New('M10E001' + StrTran(Time(),':',''), IMP_SPOOL, .T./*_lAdjustToLegacy*/, /*cPathInServer*/, .T.,/*[ lTReport]*/, /*[ @oPrintSetup]*/, /*[ cPrinter]*/, /*[ lServer]*/, /*[ lPDFAsPNG]*/, /*[ lRaw]*/, /*[ lViewPDF]*/,2)
@@ -398,8 +398,8 @@ Static Function M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_c
 
 		_nRow += _nNextLin * 2.5
 
-		//_oPrinter:Say(_nRow,_nCol03,'Item:',_oFontP2)
-		//_oPrinter:Say(_nRow,_nCol04,AllTrim(_cXItemP),_oFontM1)
+		_oPrinter:Say(_nRow + 18,_nCol03,'Item:',_oFontP2)
+		_oPrinter:Say(_nRow + 18,_nCol04,AllTrim(_cXItemP),_oFontM1)
 
 		_oPrinter:Say(_nRow - 17,_nCol03,'Seq:',_oFontP2)
 		_oPrinter:Say(_nRow - 17,_nCol04,_cItem,_oFontM1)
@@ -409,8 +409,8 @@ Static Function M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_c
 		_oPrinter:Say(_nRow,_nColIni,'Pedido:',_oFontP2)
 		_oPrinter:Say(_nRow,_nCol02,_cPedido,_oFontG1)
 
-		_oPrinter:Say(_nRow,_nCol03,'Quant.:',_oFontP2)
-		_oPrinter:Say(_nRow,_nCol04, cValtochar(_nQtdVen),_oFontG2)
+		_oPrinter:Say(_nRow + 30,_nCol03,'Quant.:',_oFontP2)
+		_oPrinter:Say(_nRow + 30,_nCol04, cValtochar(_nQtdVen),_oFontG2)
 		
 		//+-------------------------------------------------------------------------
 		// Area 3
@@ -429,7 +429,7 @@ Static Function M10EPrint(_cPedido,_cItem,_cProd,_aDescr,_cCliente,_cFantasia,_c
 
 		_nRow += _nNextLin * 0.5
 
-		//_oPrinter:Say(_nRow + _nNextLin	,630, _cXItemP, _oFontG2)
+		//_oPrinter:Say(_nRow + _nNextLin	,650, _cXItemP, _oFontG2)
 
 		_nRow += _nNextLin * 0.3
 
