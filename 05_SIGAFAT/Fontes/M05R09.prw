@@ -173,6 +173,7 @@ TRCell():New(oVenProd,"FAMILIA.SUG.",/*Tabela*/ ,"Sub.Fam. Sugerida" ,PesqPict("
 TRCell():New(oVenProd,"VLRBRTIPI"	,/*Tabela*/	,"Vlr. Bruto + IPI"	 ,PesqPict("SC6","C6_XVLTBRU")	,TamSx3("C6_XVLTBRU")[1]    ,/*lPixel*/,{|| nVlrBrIPI })		    // Valor Bruto + IPI
 TRCell():New(oVenProd,"VLBIPIFRET"	,/*Tabela*/	,"Vl.Br.+IPI+Frete"	 ,PesqPict("SC6","C6_XVLTBRU")	,TamSx3("C6_XVLTBRU")[1]    ,/*lPixel*/,{|| nVlrBFret})		   		// Valor Bruto + IPI + Frete
 TRCell():New(oVenProd,"TPFRETE"		,/*Tabela*/	,"Tipo Frete"		 ,PesqPict("SC5","C5_TPFRETE")	,TamSx3("C5_TPFRETE")[1]    ,/*lPixel*/,{|| cTpFrete})		   		// Tipo de Frete
+TRCell():New(oVenProd,"VLRLIQ"		,/*Tabela*/	,"Vlr. Liquido"		 ,PesqPict("SC6","C6_VALOR")	,TamSx3("C6_VALOR")[1]	    ,/*lPixel*/,{|| cVlrLiq})		   		// Valor Liquido
 
 Return(oReport)
 
@@ -226,7 +227,8 @@ dbSetOrder(2)			// Produto,Numero
 	
 		SELECT 
 			C6_FILIAL,C6_NUM,C6_ITEM, C6_NOTA,C6_DATFAT,C6_ENTREG,C6_CLI,C6_LOJA,C6_ITEM,C6_PRODUTO,C6_DESCRI,
-			C6_CF,C6_QTDVEN,C6_PRCVEN,C6_XVLTIPI,C6_XVLTSOL,C6_XVLTBRU,C6_XFRETE,C6_OPER, 
+			C6_CF,C6_QTDVEN,C6_PRCVEN,C6_XVLTIPI,C6_XVLTSOL,C6_XVLTBRU,C6_XFRETE,C6_OPER,C6_XVLTICM,C6_PICMRET,
+			C6_XVLTPS2,C6_XVLTCF2 
 			B1_DESC, B1_TIPO, B1_POSIPI, B1_UM, B1_XFAMILI, C6_DESCONT, SC6.R_E_C_N_O_ RECSC6
 		FROM 
 			%Table:SC6% SC6, %Table:SC5% SC5, %Table:SB1% SB1 
@@ -371,6 +373,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cCfop		:= (cAliasQry)->C6_CF
 	nDescitem	:= (cAliasQry)->C6_DESCONT
 	nVlrBrIPI	:= (cAliasQry)->C6_XVLTBRU
+	cVlrLiq		:= SC6->C6_XVLTBRU - SC6->(C6_XVLTICM + C6_XVLTIPI + C6_PICMRET + C6_XVLTPS2 + C6_XVLTCF2)
 	
 	If lPosC5
 		dEmiss		:= SC5->C5_EMISSAO

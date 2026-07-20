@@ -168,6 +168,7 @@ TRCell():New(oVenProd,"CONSULTOR"	,/*Tabela*/ ,"Consultor"		 ,PesqPict("SCJ","CJ
 TRCell():New(oVenProd,"SUB FAM.SUG.",/*Tabela*/ ,"Familia Sugerida"  ,PesqPict("SB1","B1_XFAMSGD")	,TamSx3("B1_XFAMSGD")[1]	,/*lPixel*/,{|| cXFamSgd })		// Familia Sugerida
 TRCell():New(oVenProd,"FAMILIA.SUG.",/*Tabela*/ ,"Sub.Fam. Sugerida" ,PesqPict("SB1","B1_XSUBFAM")	,TamSx3("B1_XSUBFAM")[1]	,/*lPixel*/,{|| cXSubFam })		// Sub Fam.Sugerida
 TRCell():New(oVenProd,"PROBABILID."	,/*Tabela*/	,"Probabilidade"	 ,"@X",TamSx3("ZA9_XPROBA")[1]+10	,/*lPixel*/,{|| cXProbCod})		// Probabilidade
+TRCell():New(oVenProd,"VLR. LIQ"	,/*Tabela*/	,"Vlr. Liquido"		 ,PesqPict("SCK","CK_VALOR")	,TamSx3("CK_VALOR")[1]		,/*lPixel*/,{|| nVlrLiq})		// Valor Liquido
 
 Return(oReport)
 
@@ -226,7 +227,7 @@ dbSetOrder(1)			// Produto,Numero
 		SELECT 
 			CK_FILIAL,CK_ITEM,CK_PRODUTO,CK_UM,CK_QTDVEN,CK_PRCVEN,CK_VALOR,CK_TES,CK_CLIENTE,CK_LOJA,
 			CK_DESCONT,CK_NUM,CK_DESCRI,CK_PRUNIT,CK_CLASFIS,CK_DT1VEN,CK_XITEMP,CK_XVLUTAB,CK_XVLTBRU,CK_XACRESC,
-			CK_XVLTIPI,CK_XALQPS2,CK_XVLTPS2,CK_XALQCF2,CK_XVLTCF2,CK_XALQICM,CK_XVLTICM,CK_XALQSOL,CK_XVLTSOL,
+			CK_XVLTIPI,CK_XALQPS2,CK_XVLTPS2,CK_XALQCF2,CK_XVLTCF2,CK_XALQICM,CK_XVLTICM,CK_XALQSOL,CK_XVLTSOL,CK_XVLTIMP,
 			CJ_EMISSAO,CJ_XFECENT,CJ_XTPVEN, CJ_XVEND1, CJ_XOBRAS, CJ_XTPVEN, CJ_XCONTAT, CJ_XTELCON, CJ_XEMCON, CJ_XCONSUL,
 			(SELECT SA3.A3_NOME  FROM %Table:SA3% SA3 WHERE SA3.A3_FILIAL = %xFilial:SA3% AND SA3.A3_COD = SCJ.CJ_XVEND1 AND SA3.D_E_L_E_T_ = '') AS NOMEVEN,
 			(SELECT SA3.A3_GEREN FROM %Table:SA3% SA3 WHERE SA3.A3_FILIAL = %xFilial:SA3% AND SA3.A3_COD = SCJ.CJ_XVEND1 AND SA3.D_E_L_E_T_ = '') AS CODGEN,
@@ -434,6 +435,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	nVltICM		:= (cAliasQry)->CK_XVLTICM
 	nAlqSol		:= (cAliasQry)->CK_XALQSOL
 	nVltSol		:= (cAliasQry)->CK_XVLTSOL
+	
 	//cStatus     := (cAliasQry)->CJ_STATUS
     
 	cXStatus := AllTrim((cAliasQry)->CJ_STATUS) //#5035
@@ -451,6 +453,9 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cXtelco := AllTrim((cAliasQry)->CJ_XTELCON)
 	cXemcon := AllTrim((cAliasQry)->CJ_XEMCON)
 	cXconsu := AllTrim((cAliasQry)->CJ_XCONSUL)
+	//nVlrLiq := SCK->CK_XVLTBRU - SCK->(CK_XVLTICM + CK_XVLTIPI + CK_XVLTSOL + CK_XVLTPS2 + CK_XVLTCF2)
+	nVlrLiq	:= nVltBru - (nVltICM + nVltIpi + nVltSol + nVltPis + nVltCof)
+	
 
     //ZA9_XFUST - Status Follow Up
 	
