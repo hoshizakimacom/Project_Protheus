@@ -282,7 +282,7 @@ dbSetOrder(2)			// Produto,Numero
     SB1.B1_TIPO,
     SC6.C6_XGOPDT,
     SB1.B1_XDTLIB,SB1.B1_XITDESE,SB1.B1_XFABRIC,SB1.B1_XDTITDS,SB1.B1_XPROD,SB1.B1_XPDF,SB1.B1_XDFX,SB1.B1_XESTR,SB1.B1_XMDOBRA,SB1.B1_XESPLIB,
-	SB1.B1_XPADRAO,SB1.B1_XDTLIB,SB1.B1_XREPENG,SB1.B1_XFAMILI,
+	SB1.B1_XPADRAO,SB1.B1_XDTLIB,SB1.B1_XREPENG,SB1.B1_XFAMILI,SB1.B1_XSUBFAM,SB1.B1_XFAMSGD,
 	SB5.B5_COMPRLC,SB5.B5_LARGLC,SB5.B5_ALTURLC,SB5.B5_CEME,SB1.B1_DESC,
 
     SC6.C6_FILIAL,
@@ -532,6 +532,51 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cAltura := (cAliasQry)->B5_ALTURLC		//#6839
 	cXRespE := (cAliasQry)->B1_XREPENG		//#6839
 
+	/* Sub Família e Família Sugerida do Produtos*/
+
+	cXSubFam	:= (cAliasQry)->B1_XSUBFAM
+	cXFamSgd	:= (cAliasQry)->B1_XFAMSGD
+
+	cXFamSgdCod := AllTrim(cXFamSgd)
+	If cXFamSgdCod 		== "1"
+		cXFamSgd		:= "1 - Cocção"
+	ElseIf cXFamSgdCod 	== "2"
+		cXFamSgd		:= "2 - Componentes"
+	ElseIf cXFamSgdCod  == "3"
+		cXFamSgd		:= "3 - Máquina de Gelo"
+	ElseIf cXFamSgdCod	== "4"
+		cXFamSgd		:= "4 - Mobiliários"
+	ElseIf cXFamSgdCod 	== "5"
+		cXFamSgd		:= "5 - Não Vendáveis"
+	ElseIf cXFamSgdCod 	== "6"
+		cXFamSgd		:= "6 - Refrigeração"
+	ElseIf cXFamSgdCod 	== "7"
+		cXFamSgd		:= "7 - Diversos"
+	ElseIf cXFamSgdCod 	== "8"
+		cXFamSgd		:= "8 - Lavadoras"	
+	Endif
+
+	cXSubFamCod := AllTrim(cXSubFam)
+	If cXSubFamCod		== "1"
+		cXSubFam		:= "1 - Fabricação"
+	ElseIf cXSubFamCod 	== "2"
+		cXSubFam		:= "2 - Revenda - Nacional"
+	ElseIf cXSubFamCod  == "3"
+		cXSubFam		:= "3 - Revenda - Importada"
+	ElseIf cXSubFamCod	== "4"
+		cXSubFam		:= "4 - Revenda - Grupo Hoshizaki"
+	ElseIf cXSubFamCod 	== "5"
+		cXSubFam		:= "5 - Serviços"
+	ElseIf cXSubFamCod 	== "6"
+		cXSubFam		:= "6 - Matéria Prima"
+	ElseIf cXSubFamCod 	== "7"
+		cXSubFam		:= "7 - Embalagem"
+	ElseIf cXSubFamCod 	== "8"
+		cXSubFam		:= "8 - Ativo"
+	ElseIf cXSubFamCod 	== "9"
+		cXSubFam		:= "9 - Material de Consumo"
+	Endif
+
 	//SC6->(dbGoto((cAliasQry)->RECSC6))
 	cXObsEng := SC6->C6_XOBSENG 	//#6839
 	//cXObsEng := (cAliasQry)->C2_XOBSENG	//#6839
@@ -718,53 +763,9 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	dAgEng   := (cAliasQry)->AG_ENG
 	dLibEng	 := (cAliasQry)->LIB_ENG
 	dDiasPcp := dDManuf - dAgEng
+	
 
 
-
-/* Sub Família e Família Sugerida do Produtos
-*/
-	cXSubFam	:= Posicione("SB1",1,xFilial("SB1")+SC6->C6_PRODUTO,"B1_XSUBFAM")
-	cXFamSgd	:= Posicione("SB1",1,xFilial("SB1")+SC6->C6_PRODUTO,"B1_XFAMSGD")
-
-	cXFamSgdCod := AllTrim(cXFamSgd)
-	If cXFamSgdCod 		== "1"
-		cXFamSgd		:= "1 - Cocção"
-	ElseIf cXFamSgdCod 	== "2"
-		cXFamSgd		:= "2 - Componentes"
-	ElseIf cXFamSgdCod  == "3"
-		cXFamSgd		:= "3 - Máquina de Gelo"
-	ElseIf cXFamSgdCod	== "4"
-		cXFamSgd		:= "4 - Mobiliários"
-	ElseIf cXFamSgdCod 	== "5"
-		cXFamSgd		:= "5 - Não Vendáveis"
-	ElseIf cXFamSgdCod 	== "6"
-		cXFamSgd		:= "6 - Refrigeração"
-	ElseIf cXFamSgdCod 	== "7"
-		cXFamSgd		:= "7 - Diversos"
-	ElseIf cXFamSgdCod 	== "8"
-		cXFamSgd		:= "8 - Lavadoras"	
-	Endif
-
-	cXSubFamCod := AllTrim(cXSubFam)
-	If cXSubFamCod		== "1"
-		cXSubFam		:= "1 - Fabricação"
-	ElseIf cXSubFamCod 	== "2"
-		cXSubFam		:= "2 - Revenda - Nacional"
-	ElseIf cXSubFamCod  == "3"
-		cXSubFam		:= "3 - Revenda - Importada"
-	ElseIf cXSubFamCod	== "4"
-		cXSubFam		:= "4 - Revenda - Grupo Hoshizaki"
-	ElseIf cXSubFamCod 	== "5"
-		cXSubFam		:= "5 - Serviços"
-	ElseIf cXSubFamCod 	== "6"
-		cXSubFam		:= "6 - Matéria Prima"
-	ElseIf cXSubFamCod 	== "7"
-		cXSubFam		:= "7 - Embalagem"
-	ElseIf cXSubFamCod 	== "8"
-		cXSubFam		:= "8 - Ativo"
-	ElseIf cXSubFamCod 	== "9"
-		cXSubFam		:= "9 - Material de Consumo"
-	Endif
 
 
 //Pedido
