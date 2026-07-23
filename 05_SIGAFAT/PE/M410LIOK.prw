@@ -18,7 +18,7 @@ Local cItDesv  	            := Posicione("SB1",1,xFilial("SB1")+SC6->C6_PRODUTO,
             MsgStop('As operações 07, 08, 09, 10, E0 e E1 é de uso exclusivo para transferências entre filiais. Obrigatório o uso da rotina de Solicit. Transf.','Atenção')
         lRet := .F.
     
-    Case AllTrim(cCodOper) $ "03|04|36" .and. !RetCodUsr() $ "000000|000131|000241|000010|000773|000080|000116|000012|000670|000774|000728|000181|000175|000695|000019|000379|000513|000075|000328|000351|000278|000174|000113|000330|000090|000287|000028"
+    Case AllTrim(cCodOper) $ "03|04|36" .and. !RetCodUsr() $ "000000|000131|000241|000010|000773|000080|000116|000012|000670|000774|000728|000181|000175|000695|000019|000379|000513|000075|000328|000351|000278|000174|000113|000330|000090|000287|000028|000203|000150"
            MsgStop('As operações 03, 04 e 36 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
         lRet := .F.
     
