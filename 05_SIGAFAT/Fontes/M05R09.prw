@@ -145,7 +145,7 @@ TRCell():New(oVenProd,"CIDADE"		,/*Tabela*/	,"Cidade"			 ,PesqPict("SA1","A1_MUN
 TRCell():New(oVenProd,"REGIAO"		,/*Tabela*/	,"Regiao"			 ,PesqPict("SA1","A1_DSCREG")	,TamSx3("A1_DSCREG")[1]		,/*lPixel*/,{|| cDscReg })				// Região
 TRCell():New(oVenProd,"ITEM"		,/*Tabela*/ ,"Item"				 ,PesqPict("SC6","C6_ITEM")		,TamSx3("C6_ITEM")[1]		,/*lPixel*/,{|| cItem	})				// Item do Pedido
 TRCell():New(oVenProd,"CODIGO"		,/*Tabela*/	,"Código"			 ,PesqPict("SC6","C6_PRODUTO")	,TamSx3("C6_PRODUTO")[1]	,/*lPixel*/,{|| cCodigo	})				// Código do Produto
-TRCell():New(oVenProd,"DESC"		,/*Tabela*/	,"Descriçao"		 ,PesqPict("SC6","C6_DESCRI")	,TamSx3("C6_DESCRI")[1]		,/*lPixel*/,{|| cDesc	})				// Descrição do Produto
+TRCell():New(oVenProd,"DESC"		,/*Tabela*/	,"Descricao"		 ,PesqPict("SC6","C6_DESCRI")	,TamSx3("C6_DESCRI")[1]		,/*lPixel*/,{|| cDesc	})				// Descrição do Produto
 TRCell():New(oVenProd,"NCM"			,/*Tabela*/ ,"NCM"				 ,PesqPict("SB1","B1_POSIPI")	,TamSx3("B1_POSIPI")[1]		,/*lPixel*/,{|| cNCM	})				// Código NCM do Produto
 TRCell():New(oVenProd,"FAMILIA"		,/*Tabela*/	,"Familia"			 ,PesqPict("SB1","B1_XFAMILI")	,TamSx3("B1_XFAMILI")[1]	,/*lPixel*/,{|| cXFamil	})				// Familia
 TRCell():New(oVenProd,"TIPO"		,/*Tabela*/	,"Tipo"				 ,PesqPict("SB1","B1_TIPO")		,TamSx3("B1_TIPO")[1]		,/*lPixel*/,{|| cTipo	})				// Tipo de Produto
@@ -228,7 +228,7 @@ dbSetOrder(2)			// Produto,Numero
 		SELECT 
 			C6_FILIAL,C6_NUM,C6_ITEM, C6_NOTA,C6_DATFAT,C6_ENTREG,C6_CLI,C6_LOJA,C6_ITEM,C6_PRODUTO,C6_DESCRI,
 			C6_CF,C6_QTDVEN,C6_PRCVEN,C6_XVLTIPI,C6_XVLTSOL,C6_XVLTBRU,C6_XFRETE,C6_OPER,C6_XVLTICM,C6_PICMRET,
-			C6_XVLTPS2,C6_XVLTCF2 
+			C6_XVLTPS2,C6_XVLTCF2, 
 			B1_DESC, B1_TIPO, B1_POSIPI, B1_UM, B1_XFAMILI, C6_DESCONT, SC6.R_E_C_N_O_ RECSC6
 		FROM 
 			%Table:SC6% SC6, %Table:SC5% SC5, %Table:SB1% SB1 
@@ -362,8 +362,6 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cLojCLi		:= (cAliasQry)->C6_LOJA
 	cItem		:= (cAliasQry)->C6_ITEM
 	cCodigo		:= (cAliasQry)->C6_PRODUTO
-	cDesc		:= (cAliasQry)->B1_DESC
-	cTipo		:= (cAliasQry)->B1_TIPO
 	nQuant		:= (cAliasQry)->C6_QTDVEN
 	nPrcVen		:= (cAliasQry)->C6_PRCVEN
 	nVlrTot		:= (nQuant * nPrcVen)
@@ -374,6 +372,8 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	nDescitem	:= (cAliasQry)->C6_DESCONT
 	nVlrBrIPI	:= (cAliasQry)->C6_XVLTBRU
 	cVlrLiq		:= SC6->C6_XVLTBRU - SC6->(C6_XVLTICM + C6_XVLTIPI + C6_PICMRET + C6_XVLTPS2 + C6_XVLTCF2)
+	cDesc		:= (cAliasQry)->B1_DESC
+	cTipo		:= (cAliasQry)->B1_TIPO
 	
 	If lPosC5
 		dEmiss		:= SC5->C5_EMISSAO
