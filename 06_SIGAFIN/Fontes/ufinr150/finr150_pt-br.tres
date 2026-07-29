@@ -1,0 +1,79 @@
+0001#STR0001#ALL#Imprime a posicao dos titulos a pagar relativo a data base
+0002#STR0002#ALL#do sistema.
+0003#STR0003#ALL#Zebrado
+0004#STR0004#ALL#Administracao
+0005#STR0005#ALL#Posicao dos Titulos a Pagar
+0006#STR0006#ALL#Codigo-Nome do Fornecedor      PRF-Numero       Tp     Natureza   Data de    Vencto     Vencto      Valor Original|        Titulos vencidos         |Titulos a vencer | Porta-| Vlr.juros ou |Dias  |   Historico          
+0007#STR0007#ALL#                               Parcela                            Emissao    Titulo     Real                      |  Valor nominal  Valor corrigido |  Valor nominal  | dor   |  permanencia |Atraso|(Vencidos+Vencer)     
+0008#STR0008#ALL#Por Numero
+0009#STR0009#ALL#Por Natureza
+0010#STR0010#ALL#Por Vencimento
+0011#STR0011#ALL#Por Banco
+0012#STR0012#ALL#Fornecedor
+0013#STR0013#ALL#Por Emissao
+0014#STR0014#ALL#Por Cod.Fornec.
+0015#STR0015#ALL#* indica titulo provisorio, P indica Saldo Parcial
+0016#STR0016#ALL# - Por Numero
+0017#STR0017#ALL# - Por Natureza
+0018#STR0018#ALL# - Por Vencimento
+0019#STR0019#ALL# - Por Emissao
+0020#STR0020#ALL# - Por Cod.Fornecedor
+0021#STR0021#ALL#Selecionando Registros...
+0022#STR0022#ALL# - Por Fornecedor
+0023#STR0023#ALL# - Analitico
+0024#STR0024#ALL# - Sintetico
+0025#STR0025#ALL#CANCELADO PELO OPERADOR
+0026#STR0026#ALL#S U B - T O T A L ----> 
+0027#STR0027#ALL#T O T A L   G E R A L -----> 
+0028#STR0028#ALL#MOVIMENTACOES
+0029#STR0029#ALL#TITULO
+0030#STR0030#ALL#T O T A L   D O  M E S ---> 
+0031#STR0031#ALL# - Por Banco
+0032#STR0032#ALL#T O T A L   F I L I A L --->
+0033#STR0033#ALL#                                                                                                                          |        Titulos vencidos         | Titulos a vencer |         Vlr.juros ou       (Vencidos+Vencer)
+0034#STR0034#ALL#                                                                                                                          |  Valor nominal  Valor corrigido |   Valor nominal  |         permanencia             
+0035#STR0035#ALL# em 
+0036#STR0036#ALL#Imprimir os tipos
+0037#STR0037#ALL#Nao imprimir tipos
+0038#STR0038#ALL#Codigo-Nome do Fornecedor
+0039#STR0039#ALL#Prf-Numero
+0040#STR0040#ALL#Parcela
+0041#STR0041#ALL#Tp
+0042#STR0042#ALL#Natureza
+0043#STR0043#ALL#Data de
+0044#STR0044#ALL#Emissao
+0045#STR0045#ALL#Vencto
+0046#STR0046#ALL#Titulo
+0047#STR0047#ALL#Real
+0048#STR0048#ALL#Valor Original
+0049#STR0049#ALL#Tit Vencidos
+0050#STR0050#ALL#Valor nominal
+0051#STR0051#ALL#Valor corrigido
+0052#STR0052#ALL#Titulos a vencer
+0053#STR0053#ALL#Porta-
+0054#STR0054#ALL#dor
+0055#STR0055#ALL#Vlr.juros ou
+0056#STR0056#ALL#permanencia
+0057#STR0057#ALL#Dias
+0058#STR0058#ALL#Atraso
+0059#STR0059#ALL#Historico(Vencidos+Vencer)
+0060#STR0060#ALL#(Vencidos+Vencer)
+0061#STR0061#ALL#Titulos a pagar
+0062#STR0062#ALL#Totais
+0063#STR0063#ALL#Hist.(Vdos + p/Venc.)
+0064#STR0064#ALL#Codigo-Nome do Fornecedor PRF-Numero           Tp  Natureza   Data de    Vencto     Vencto      Valor Original|        Titulos vencidos         | Titulos a vencer | Porta-| Vlr.juros ou  Dias   Hist.(Vds+Venc.)
+0065#STR0065#ALL#Total por Filial:
+0066#STR0066#ALL#Data Base não informada na parametrizacao do relatorio.
+0067#STR0067#ALL#Por favor, informe a data base nos parâmetros do relatório (pergunte).
+0068#STR0068#ALL#Ocorreu um problema na execução do comando SQL no seu banco de dados, avalie os detalhes:
+0069#STR0069#ALL#Log de incosistências de execução dos comandos SQL do FINR150 em 
+0070#STR0070#ALL#Ocorreram inconsistências na utilização de comandos no banco de dados! Banco de dados não homologado!
+0071#STR0071#ALL#Avalie o log de incosistências gerado na pasta system.
+0072#STR0072#ALL#Processando Filial: 
+0073#STR0073#ALL#Filial inicial e filial final não informadas
+0074#STR0074#ALL#Informe ao menos a filial final para emitir o relatório
+0075#STR0075#ALL#Filial final não pode ser maior que a filial inicial
+0076#STR0076#ALL#Informe uma filial final maior que a filial inicial para emitir o relatório
+0077#STR0077#ALL#Execute o UPDDISTR de acordo com a última expedição contínua para criação dos dicionários necessários para a execução integral de todos os recursos do relatório.
+0078#STR0078#ALL#Atenção
+0079#STR0079#ALL#Erro ao tentar realizar limpeza da tabela temporária.

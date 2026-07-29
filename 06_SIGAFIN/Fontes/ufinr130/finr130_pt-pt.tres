@@ -1,0 +1,46 @@
+0001#STR0001#ALL#Imprime a posição dos títulos a receber relativo a data ba-
+0002#STR0002#ALL#Se do sistema.
+0003#STR0003#ALL#Código de barras
+0004#STR0004#ALL#Administração
+0005#STR0005#ALL#Posição Dos Títulos A Receber
+0009#STR0009#ALL#Por Prefixo/número
+0011#STR0011#ALL#Por Venc/cli
+0013#STR0013#ALL#Por Emissão
+0014#STR0014#ALL#Por Ven/bco
+0015#STR0015#ALL#Por Cód.cli.
+0016#STR0016#ALL#Banco/situação
+0018#STR0018#ALL# - Por Prefixo/número
+0020#STR0020#ALL# - Por Data De Vencimento
+0022#STR0022#ALL#A Seleccionar Registos...
+0023#STR0023#ALL# - Por Vencto/banco
+0024#STR0024#ALL# - Por Cód.cliente
+0025#STR0025#ALL# - Por Banco E Situação
+0026#STR0026#ALL# - Analítico
+0027#STR0027#ALL# - Sintético
+0028#STR0028#ALL#Cancelado Pelo Operador
+0037#STR0037#ALL#S u b - total ----> 
+0038#STR0038#ALL#Total crial ----> 
+0039#STR0039#ALL#Movimentos
+0040#STR0040#ALL#Título
+0041#STR0041#ALL#T o t a l   d o  m ê s ---> 
+0042#STR0042#ALL# - Por Emissão
+0043#STR0043#ALL#Total   f i l i a l --->
+0046#STR0046#ALL#* Indica Título Provisório, P Indica Saldo Parcial
+0047#STR0047#ALL#Por Número/prefixo
+0048#STR0048#ALL# - Número/prefixo
+0050#STR0050#ALL#Não imprimir tipos
+0053#STR0053#ALL#Não
+0055#STR0055#ALL# filial - 
+0056#STR0056#ALL#Código-lj-nome Do Cliente
+0057#STR0057#ALL#Prf-número
+0059#STR0059#ALL#Tp.
+0061#STR0061#ALL#Da data
+0062#STR0062#ALL#Emissão
+0064#STR0064#ALL#Título
+0065#STR0065#ALL#Euro
+0069#STR0069#ALL#Valor Actual
+0071#STR0071#ALL#Títulos A Vencer
+0074#STR0074#ALL#Permanência
+0077#STR0077#ALL#Histórico
+0078#STR0078#ALL#(vencidos+vencer)
+0079#STR0079#ALL#Títulos a receber

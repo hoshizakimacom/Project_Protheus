@@ -1,0 +1,93 @@
+0001#STR0001#ALL#Imprime a posicao dos titulos a receber relativo a data ba-
+0002#STR0002#ALL#se do sistema.
+0003#STR0003#ALL#Zebrado
+0004#STR0004#ALL#Administracao
+0005#STR0005#ALL#Posicao dos Titulos a Receber
+0006#STR0006#ALL#Codigo-Lj-Nome do Cliente      Prf-Numero        Tipo           Data de  Vencto   Vencto   Bco St  Valor Original|        Titulos  Vencidos          |Titulos a Vencer|    Num     |   Vlr.juros ou|Dias  |     Historico   |      
+0007#STR0007#ALL#                               Parcela           Natureza       Emissao  Titulo   Real                           |    Valor Atual    Valor Corrigido |   Valor Atual  |   Banco    |   Permanencia |Atraso|  Vencidos+Vencer|    
+0008#STR0008#ALL#Por Cliente
+0009#STR0009#ALL#Por Prefixo/Numero
+0010#STR0010#ALL#Por Banco
+0011#STR0011#ALL#Por Venc/Cli
+0012#STR0012#ALL#Por Natureza
+0013#STR0013#ALL#Por Emissao
+0014#STR0014#ALL#Por Ven/Bco
+0015#STR0015#ALL#Por Cod.Cli.
+0016#STR0016#ALL#Banco/Situacao
+0017#STR0017#ALL# - Por Cliente
+0018#STR0018#ALL# - Por Prefixo/Numero
+0019#STR0019#ALL# - Por Banco
+0020#STR0020#ALL# - Por Data de Vencimento
+0021#STR0021#ALL# - Por Natureza
+0022#STR0022#ALL#Selecionando Registros...
+0023#STR0023#ALL# - Por Vencto/Banco
+0024#STR0024#ALL# - Por Cod.Cliente
+0025#STR0025#ALL# - Por Banco e Situacao
+0026#STR0026#ALL# - Analitico
+0027#STR0027#ALL# - Sintetico
+0028#STR0028#ALL#CANCELADO PELO OPERADOR
+0029#STR0029#ALL#Carteira
+0030#STR0030#ALL#Simples
+0031#STR0031#ALL#Descontada
+0032#STR0032#ALL#Caucionada
+0033#STR0033#ALL#Vinculada
+0034#STR0034#ALL#Advogado
+0035#STR0035#ALL#Judicial
+0036#STR0036#ALL#Cauc Desc
+0037#STR0037#ALL#S U B - T O T A L ----> 
+0038#STR0038#ALL#T O T A L   G E R A L ----> 
+0039#STR0039#ALL#MOVIMENTACOES
+0040#STR0040#ALL#TITULO
+0041#STR0041#ALL#T O T A L   D O  M E S ---> 
+0042#STR0042#ALL# - Por Emissao
+0043#STR0043#ALL#T O T A L   F I L I A L --->
+0044#STR0044#ALL#                                                                                                                     |       Titulos Vencidos        |Titulos a Vencer|                 Vlr.juros ou       (Vencidos+Vencer)
+0045#STR0045#ALL#                                                                                                                     | Valor Nominal  Valor Corrigido|  Valor Nominal |                  permanencia                        
+0046#STR0046#ALL#* indica titulo provisorio, P Indica Saldo Parcial
+0047#STR0047#ALL#Por Numero/Prefixo
+0048#STR0048#ALL# - Numero/Prefixo
+0049#STR0049#ALL#Imprimir os tipos
+0050#STR0050#ALL#Nao imprimir tipos
+0051#STR0051#ALL#Listar Abatimentos?
+0052#STR0052#ALL#Sim
+0053#STR0053#ALL#Nao
+0054#STR0054#ALL#Loja - 
+0055#STR0055#ALL# Filial - 
+0056#STR0056#ALL#Codigo-Lj-Nome do Cliente
+0057#STR0057#ALL#Prf-Numero
+0058#STR0058#ALL#Parcela
+0059#STR0059#ALL#TP
+0060#STR0060#ALL#Natureza
+0061#STR0061#ALL#Data de
+0062#STR0062#ALL#Emissao
+0063#STR0063#ALL#Vencto
+0064#STR0064#ALL#Titulo
+0065#STR0065#ALL#Real
+0066#STR0066#ALL#Banco
+0067#STR0067#ALL#Valor Original
+0068#STR0068#ALL#Tit Vencidos
+0069#STR0069#ALL#Valor Atual 
+0070#STR0070#ALL#Valor Corrigido
+0071#STR0071#ALL#Titulos a Vencer
+0072#STR0072#ALL#Num
+0073#STR0073#ALL#Vlr.juros ou
+0074#STR0074#ALL#permanencia
+0075#STR0075#ALL#Dias
+0076#STR0076#ALL#Atraso
+0077#STR0077#ALL#Historico
+0078#STR0078#ALL#(Vencidos+Vencer)
+0079#STR0079#ALL#Titulos a receber
+0080#STR0080#ALL# em
+0081#STR0081#ALL#Totais
+0082#STR0082#ALL#T O T A L  E M P R E S A -->
+0083#STR0083#ALL#Bco St
+0084#STR0084#ALL#QUERY DE PESQUISA DE COMPENSAÇÃO
+0085#STR0085#ALL#PESQUISA de COMPENSAÇÃO
+0086#STR0086#ALL#Formato de impressão tabela não suportado neste relatório
+0087#STR0087#ALL#  ****** SALDO INCORRETO, POIS EXISTEM TÍTULOS EM MOEDAS ESTRANGEIRAS CONVERTIDAS COM TAXA DE MOEDA ZERO. VERIFIQUE QUAIS OS TÍTULOS COM A DESCRIÇÃO 'SEM TAXA' NA COLUNA HISTÓRICO
+0088#STR0088#ALL#SEM TAXA
+0089#STR0089#ALL#Ocorreu um problema na execução do comando SQL no seu banco de dados, avalie os detalhes:
+0090#STR0090#ALL#Log de incosistências de execução dos comandos SQL do FINR130 em 
+0091#STR0091#ALL#Ocorreram inconsistências na utilização de comandos no banco de dados! Banco de dados não homologado!
+0092#STR0092#ALL#Avalie o log de incosistências gerado na pasta system.
+0093#STR0093#ALL#Doc.Original

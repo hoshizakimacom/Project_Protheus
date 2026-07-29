@@ -1,0 +1,36 @@
+0001#STR0001#ALL#Imprime a posição dos títulos a pagar relativo a data base
+0002#STR0002#ALL#Do sistema.
+0003#STR0003#ALL#Código de barras
+0004#STR0004#ALL#Administração
+0005#STR0005#ALL#Posição Dos Títulos A Pagar
+0008#STR0008#ALL#Por Número
+0013#STR0013#ALL#Por Emissão
+0014#STR0014#ALL#Por Cód.fornec.
+0015#STR0015#ALL#* Indica Título Provisório, P Indica Saldo Parcial
+0016#STR0016#ALL# - Por Número
+0019#STR0019#ALL# - Por Emissão
+0020#STR0020#ALL# - Por Cód. De Fornecedor
+0021#STR0021#ALL#A Seleccionar Registos...
+0023#STR0023#ALL# - Analítico
+0024#STR0024#ALL# - Sintético
+0025#STR0025#ALL#Cancelado Pelo Operador
+0026#STR0026#ALL#S u b - total ----> 
+0028#STR0028#ALL#Movimentos
+0029#STR0029#ALL#Título
+0030#STR0030#ALL#T o t a l   d o  m ê s ---> 
+0032#STR0032#ALL#Total   f i l i a l --->
+0037#STR0037#ALL#Não imprimir tipos
+0038#STR0038#ALL#Código-nome Do Fornecedor
+0039#STR0039#ALL#Prf-número
+0041#STR0041#ALL#Tp.
+0043#STR0043#ALL#Da data
+0044#STR0044#ALL#Emissão
+0046#STR0046#ALL#Título
+0047#STR0047#ALL#Euro
+0052#STR0052#ALL#Títulos a vencer
+0054#STR0054#ALL#Dor
+0056#STR0056#ALL#Permanência
+0059#STR0059#ALL#Histórico(vencidos+vencer)
+0060#STR0060#ALL#(vencidos+vencer)
+0061#STR0061#ALL#Títulos a pagar
+0064#STR0064#ALL#Código-Nome do Fornecedor PRF-Número           Tp  Natureza   Data de    Vencto     Vencto      Valor Original|        Títulos vencidos         | Títulos a vencer | Porta-| Vlr.juros ou  Dias   Hist.(Vds+Venc.)

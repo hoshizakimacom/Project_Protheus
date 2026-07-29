@@ -1,0 +1,79 @@
+0001#STR0001#ALL#Print the Payable Bills Status, refering to  base date
+0002#STR0002#ALL#of the System.
+0003#STR0003#ALL#Z.Form
+0004#STR0004#ALL#Management
+0005#STR0005#ALL#Bills Payable Situation  
+0006#STR0006#ALL#Code-Supplier Name PRF-Number       Tp  Nature   Due    Date     Due Date     Original Value|        Overdue Bills         |Bills due| Port- | Inter.Vl. or  |Days  |   History          
+0007#STR0007#ALL#                               Installment                            Issue    Bill     Real                      |  Nominal Value  Restated Value|  Nominal Value  | dor   |  permanence |Delay|(Overdue+Due)     
+0008#STR0008#ALL#By Number
+0009#STR0009#ALL#By Nature
+0010#STR0010#ALL#By Due Date
+0011#STR0011#ALL#By Bank
+0012#STR0012#ALL#Supplier
+0013#STR0013#ALL#By Issue
+0014#STR0014#ALL#By Cod.Supplier
+0015#STR0015#ALL#* show temporary bill, P shows Partial Bal. 
+0016#STR0016#ALL# - By Number
+0017#STR0017#ALL# - By Nature
+0018#STR0018#ALL# - By Due Date
+0019#STR0019#ALL# - By Issue
+0020#STR0020#ALL# - By Cod.Supplier
+0021#STR0021#ALL#Selecting Records...
+0022#STR0022#ALL# - By Supplier
+0023#STR0023#ALL# - Detailed
+0024#STR0024#ALL# - Summarized.
+0025#STR0025#ALL#CANCELLED BY THE OPERATOR
+0026#STR0026#ALL#S U B - T O T A L ---->
+0027#STR0027#ALL#G R A N D   T O T A L ----> 
+0028#STR0028#ALL#BILLS
+0029#STR0029#ALL#BILL
+0030#STR0030#ALL#M O N T H  T O T A L  ---> 
+0031#STR0031#ALL# - Per Bank
+0032#STR0032#ALL#T O T A L   B R A N C H --->
+0033#STR0033#ALL#                                                                                                                          |        Overdue Bills         | Outstanding Bills|         Interest Vl. or     (Overdue+Outstanding)
+0034#STR0034#ALL#                                                                                                                          |  Nominal value Adjusted Value |   Nominal value |         Permanence             
+0035#STR0035#ALL# in 
+0036#STR0036#ALL#Print types
+0037#STR0037#ALL#Do not print types
+0038#STR0038#ALL#Code-Name of supplier    
+0039#STR0039#ALL#Prf-Number
+0040#STR0040#ALL#Inst.  
+0041#STR0041#ALL#Tp
+0042#STR0042#ALL#Class   
+0043#STR0043#ALL#FromDate
+0044#STR0044#ALL#Issue  
+0045#STR0045#ALL#Due Dt
+0046#STR0046#ALL#Bill  
+0047#STR0047#ALL#Act.
+0048#STR0048#ALL#Original amnt.
+0049#STR0049#ALL#OverdueBills
+0050#STR0050#ALL#NominalAmount
+0051#STR0051#ALL#Indexed amount 
+0052#STR0052#ALL#Bills to fall due
+0053#STR0053#ALL#Hold- 
+0054#STR0054#ALL#er 
+0055#STR0055#ALL#Interest or 
+0056#STR0056#ALL#stay       
+0057#STR0057#ALL#Days
+0058#STR0058#ALL#Arrear
+0059#STR0059#ALL#History (due+to fall due) 
+0060#STR0060#ALL#(due+to fall due)
+0061#STR0061#ALL#Bills payable  
+0062#STR0062#ALL#Totals
+0063#STR0063#ALL#Hist.(Due + Maturing)
+0064#STR0064#ALL#Code-Supplier Name PRF-Number         Tp  Nature   Due    Date     Due Date     Original Value|       Overdue Bills        |Bills to be Due| Port- | Inter.Vl. or  Days   History (Due + Matured)
+0065#STR0065#ALL#Total per Branch:
+0066#STR0066#ALL#Base date not entered in the report parameterization.
+0067#STR0067#ALL#Please, enter the base date in report parameters (question).
+0068#STR0068#ALL#There was a problem running the SQL command in your database, evaluate the details:
+0069#STR0069#ALL#Log of inconsistencies in the execution of FINR150 SQL commands in
+0070#STR0070#ALL#There were inconsistencies in the use of commands in the database. Database not approved.
+0071#STR0071#ALL#Evaluate the inconsistency log generated in the system folder.
+0072#STR0072#ALL#Processing Branch:
+0073#STR0073#ALL#Initial or final branch not entered.
+0074#STR0074#ALL#Enter at least one final branch to issue the report
+0075#STR0075#ALL#Final branch cannot be greater than the initial branch
+0076#STR0076#ALL#Enter a final branch greater than the initial branch to issue the report
+0077#STR0077#ALL#Run the UPDDISTR according to the last continuous dispatch for the creation of dictionary necessary for the full execution of all report resources.
+0078#STR0078#ALL#Attention
+0079#STR0079#ALL#Error in attempt to clean up temporary table.

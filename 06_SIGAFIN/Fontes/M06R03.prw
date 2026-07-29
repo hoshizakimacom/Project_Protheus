@@ -119,7 +119,7 @@ TRCell():New(oVenProd,"VALOR"		,/*Tabela*/	,"Valor a Pagar"	 ,PesqPict("SE1","E1
 TRCell():New(oVenProd,"DTPGTO"		,/*Tabela*/	,"Dt.Pagamento"		 ,PesqPict("SE1","E1_BAIXA")	,TamSx3("E1_BAIXA")[1]		,/*lPixel*/,{|| dDtBaixa })		// Data da Baixa
 TRCell():New(oVenProd,"VALPGTO"		,/*Tabela*/ ,"Vlr.Pago"			 ,PesqPict("SE1","E1_VALOR")	,TamSx3("E1_VALOR")[1]		,/*lPixel*/,{|| nVlrPgto })		// Valor Pago
 TRCell():New(oVenProd,"SALDO"		,/*Tabela*/ ,"Saldo"			 ,PesqPict("SE1","E1_SALDO")	,TamSx3("E1_SALDO")[1]		,/*lPixel*/,{|| nSaldo	 })		// Saldo
-TRCell():New(oVenProd,"SIGLA"		,/*Tabela*/ ,"Sigla/Ped.Cliente" ,PesqPict("SC5","C5_XCOTCLI")	,TamSx3("C5_XCOTCLI")[1]	,/*lPixel*/,{|| cOrdCom  })		// Ordem de Compra
+TRCell():New(oVenProd,"SIGLA"		,/*Tabela*/ ,"Sigla/Ped.Cliente" ,PesqPict("SC5","C5_XPEDCEN")	,TamSx3("C5_XPEDCEN")[1]	,/*lPixel*/,{|| cOrdCom  })		// Pedido Central
 TRCell():New(oVenProd,"CNPJ"		,/*Tabela*/	,"CNPJ"		 		 ,PesqPict("SA1","A1_CGC")		,TamSx3("A1_CGC")[1]		,/*lPixel*/,{|| cCnpj	 })		// CNPJ do Cliente
 TRCell():New(oVenProd,"CHAVNFE"		,/*Tabela*/	,"Chave NFE"		 ,PesqPict("SE1","E1_CHAVENF")	,TamSx3("E1_CHAVENF")[1]	,/*lPixel*/,{|| cChavNF	 })		// Chave da NFE
 TRCell():New(oVenProd,"STATUS"		,/*Tabela*/ ,"Status"			 ,PesqPict("SE1","E1_NATUREZ")	,TamSx3("E1_NATUREZ")[1]	,/*lPixel*/,{|| cStatus	 })		// Status do Título
@@ -250,7 +250,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cDescPag	:= Posicione("SC5",1,xFilial("SC5")+(cAliasQry)->E1_PEDIDO,"C5_XDESPAG")
 
 	If lPosC5
-		cOrdCom		:= Alltrim(SC5->C5_XCOTCLI)
+		cOrdCom		:= Alltrim(SC5->C5_XPEDCEN)
 		cContat	    := Posicione("SU5",1,xFilial("SU5")+SC5->C5_XCONT,"U5_CONTAT")
 		cEmail   	:= Posicione("SU5",1,xFilial("SU5")+SC5->C5_XCONT,"U5_EMAIL")
 		cCodFun		:= Posicione("SU5",1,xFilial("SU5")+SC5->C5_XCONT,"U5_FUNCAO")
