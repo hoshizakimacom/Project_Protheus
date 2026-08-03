@@ -1,0 +1,74 @@
+0001#STR0001#ALL#Report of Purchase Orders list
+0002#STR0002#ALL#The Sort type and the Interval must be entered
+0003#STR0003#ALL#in order to issue the Purchase Orders.
+0004#STR0004#ALL# By Number         
+0005#STR0005#ALL# By Product        
+0006#STR0006#ALL# By Supplier      
+0007#STR0007#ALL#List of Purchase Orders
+0008#STR0008#ALL#Z.Form 
+0009#STR0009#ALL#Management
+0010#STR0010#ALL#LIST OF PURCHASE ORDERS
+0011#STR0011#ALL#LIST OF PURCHASE ORDERS
+0012#STR0012#ALL#AUTHOR.NR.: 
+0013#STR0013#ALL#ORDER  NR.: 
+0014#STR0014#ALL# - BY NUMBER
+0015#STR0015#ALL#ITEM CODE            DESCRIPTION                  GRP  CODE   COMPANY MANE  DATE OF   DELIVERY   QUANTITYDE  UM          VALUE      DISCOUNT          VALUE      TOTAL VALUE   QUANT.           QUANT.A        BALAN   RES.
+0016#STR0016#ALL#     PRODUCT         OF PRODUCT                         SUPPL.              GENERAT.  ESTIMAT.       ORDERED             UNIT.                          IPI      (C/IMPOSTOS)  ENTREGUE         RECEBER        RECEBER ELIM.
+0017#STR0017#ALL#PRODUCT : 
+0018#STR0018#ALL# - BY PRODUCT
+0019#STR0019#ALL#ORDER  ITEM  ISSUE     SUPPL. CORPORATE NAME                      SUPPLIER        EXPECTED          QUANTITY            UNIT    DISCOUNT           VALUE     TOTAL VALUE        QUANTITY   QUANT.TO          BALANCE CLEAR.
+0020#STR0020#ALL#             DATE      CODE                                       PHONE           DELIVERY           ORDERED           VALUE                         IPI       (W/IPI)         DELIVERED    RECEIVE        RECEIVABLE RESIDUE
+0021#STR0021#ALL#SUPPLIER   : 
+0022#STR0022#ALL# - BY SUPPLIER  
+0023#STR0023#ALL#ORDER  ITEM  ISSUE   PRODUCT         PRODUCT DESCRIPTION            GROUP EXPECTED      QUANTITY              UNIT     DISCOUNT           VALUE    TOTAL PRICE       QUANTITY    QUANTITY        BALANCE   CLEARED
+0024#STR0024#ALL#NUMBER       DATE      CODE                                               DELIVERY         ORDERED           PRICE                          IPI      (W/IPI)        DELIVERED  RECEIVABLE     RECEIVABLE      RESIDUE
+0025#STR0025#ALL#, All  
+0026#STR0026#ALL#, Open    
+0027#STR0027#ALL#, Residues
+0028#STR0028#ALL#, Attended 
+0029#STR0029#ALL#CANCELLED BY THE OPERATOR
+0030#STR0030#ALL#ORDERS 
+0031#STR0031#ALL#No 
+0032#STR0032#ALL#Yes
+0033#STR0033#ALL#Grand Total 
+0034#STR0034#ALL#Total of Items 
+0035#STR0035#ALL#Total of Product
+0036#STR0036#ALL#Total of Supplier  
+0037#STR0037#ALL#Total Value.......:
+0038#STR0038#ALL#Freight...........:
+0039#STR0039#ALL#Discount..........:
+0040#STR0040#ALL#Total of Order...:
+0041#STR0041#ALL#Phone:
+0042#STR0042#ALL#ORD/DA ITEM  DATE     CODE             PRODUCT DESCRIPTION            GROUP  DELIVERY       QUANTITY              PRICE            VALUE       TOTAL              QUANTITY        QUANT. TO      BALANCE   RESIDUE
+0043#STR0043#ALL#Total of Delivery Estimation
+0044#STR0044#ALL# Fax: 
+0045#STR0045#ALL# Contact: 
+0046#STR0046#ALL#ITEM CODE            DESCRIPT.                    GRP  CODE                 COMPANY NAME DELIVERY DATE      QUANTITY   UM         VALUE  DESCONTO  VALOR    VALOR TOTAL     QUANT.   QUANT. A         SALDO  RES.
+0047#STR0047#ALL#ORDER  ITEM  DATE      CODE                 COMPANY NAME          PHONE           DELIVERY        QUANTITY             VALUE    DISCOUNT           VALUE     T O T A L        QUANTITY     QUANT. TO         RES. BALANCES
+0048#STR0048#ALL#PURCHASE REQUISITION NR.:
+0049#STR0049#ALL# By delivery estimation 
+0050#STR0050#ALL#ORD/DA ITEM  DATE      CODE                 COMPANY NAME          PHONE           DELIVERY        QUANTITY             AMNT.    DISCOUNT           AMNT.     TOTAL AMNT.      QUANTITY     QUANT. A          RESIDUES BLNCE
+0051#STR0051#ALL#ORD/DA ITEM  DATE      CODE   COMPANY NAME                        PHONE           DELIVERY        QUANTITY             AMNT.    DISCOUNT           AMNT.     TOTAL AMNT.      QUANTITY     QUANT. A          RESIDUES BLNCE
+0052#STR0052#ALL#DELIVERY ESTIMATED: 
+0053#STR0053#ALL# - BY DELIVERY ESTIMATION 
+0054#STR0054#ALL#ORD/DA ITEM  DATE      CODE             DESCRIPT.         CODE                 COMPANY NAME    PHONE            QUANTITY          AMNT.   DISCOUNT        AMNT.     TOTAL AMNT.   QUANTITY     QUANT. A           BLNCE.RES.
+0055#STR0055#ALL#ORDER  ITEM  DATE      CODE             DESCRIPT.         CODE                 COMPANY NAME    TEL.             QUANTITY          VALUE   DISCOUNT        VALUE     TOTAL PRICE   QUANTITY     QUANT. A           RES. BALAN
+0056#STR0056#ALL#ORD/DA ITEM  DATE      CODE             DESCRIPT.         CODE   COMPANY NAME                  PHONE            QUANTITY          AMNT.   DISCOUNT        AMNT.     TOTAL AMNT.   QUANTITY     QUANT. A           BLNCE.RES.
+0057#STR0057#ALL#ORDER  ITEM  DATE      CODE             DESCRIPT.         COMPANY NAME CODE                    TEL.             QUANTIDADE        VALOR   DESCONTO        VALOR     PRECO TOTAL   QUANTIDADE   QUANT. A           SALDO RES.
+0058#STR0058#ALL#             ISSUE                      OF PRODUCT        SUPP.                                SUPP.                ORDER.       UNIT                      IPI    (  W/TAXES )     DELIVER.    RECEPT          RECEIPT DELE.
+0059#STR0059#ALL#Attended +Partially delivered
+0060#STR0060#ALL#Qty. to Receiv
+0061#STR0061#ALL#Balan. Receiv
+0062#STR0062#ALL#Purchase order / Delivery authorization  
+0063#STR0063#ALL#Purchase order / Delivery authorization (Products)   
+0064#STR0064#ALL#Suppl.
+0065#STR0065#ALL#PC Nr.
+0066#STR0066#ALL#Delivery
+0067#STR0067#ALL#St
+0068#STR0068#ALL#Issue
+0069#STR0069#ALL#ONE
+0070#STR0070#ALL#Res.
+0071#STR0071#ALL#Remov.
+0072#STR0072#ALL#Qty.
+0073#STR0073#ALL#Balance
+0074#STR0074#ALL#Receivable

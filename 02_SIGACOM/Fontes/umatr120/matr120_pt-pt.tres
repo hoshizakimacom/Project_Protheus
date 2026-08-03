@@ -1,0 +1,58 @@
+0001#STR0001#ALL#Emissão Da Relação De  Pedidos De Compras.
+0002#STR0002#ALL#Será solicitado por que ordem, qual o intervalo para
+0003#STR0003#ALL#A emissão dos pedidos de compras.
+0004#STR0004#ALL# por número         
+0005#STR0005#ALL# por produto        
+0006#STR0006#ALL# por fornecedor   
+0007#STR0007#ALL#Relação De Pedidos De Compras
+0008#STR0008#ALL#Código de barras
+0009#STR0009#ALL#Administração
+0010#STR0010#ALL#Relação De Pedidos De Compras
+0011#STR0011#ALL#Relação Dos Pedidos De Compras
+0012#STR0012#ALL#Autor. n.º : 
+0013#STR0013#ALL#Pedido n.º : 
+0014#STR0014#ALL# - Por Número
+0015#STR0015#ALL#Item Código          Descrição                    Grp  Código Razão Social  Data De   Entrega    Quantidade  Um          Valor      Desconto          Valor      Valor Total   Quant.           Quant.a        Saldo   Rest.
+0016#STR0016#ALL#     Artigo         Do Artigo                         Forn.               Emissão   Prevista       Pedida              Unit.                          Ipi      (c/impostos)  Entregue         Receber        Receber Elim.
+0017#STR0017#ALL#Produto : 
+0018#STR0018#ALL# - Por Produto
+0019#STR0019#ALL#Pedido Item  Data      Código Razão Social                        Telefone            Entrega         Quantidade           Valor    Desconto           Valor     Preço Total      Quantidade   Quant. A          Saldo Resíduos
+0020#STR0020#ALL#             Emissão   Forn.                                      Forn.           Prevista            Pedida        Unitário                         Iva     (c/impostos)       Entregue    Receber        Receber Eliminados
+0021#STR0021#ALL#Fornecedor : 
+0022#STR0022#ALL# - Por Fornecedor
+0023#STR0023#ALL#Pedido Item  Data      Código          Descrição Do Produto         Grupo Entrega       Quantidade           Preço     Desconto           Valor    Preço Total     Quantidade   Quant. A           Saldo   Resíduos
+0024#STR0024#ALL#Número       Emissão   Produto                                            Prevista          Pedida        Unitário                          Iva    (c/impostos)      Entregue    Receber         Receber   Eliminados
+0027#STR0027#ALL#, Resíduos
+0029#STR0029#ALL#Cancelado Pelo Operador
+0030#STR0030#ALL#Pedidos
+0031#STR0031#ALL#Não
+0033#STR0033#ALL#Total geral 
+0034#STR0034#ALL#Total dos itens 
+0035#STR0035#ALL#Total Do Artigo
+0036#STR0036#ALL#Total Do Fornecedor
+0040#STR0040#ALL#Total Do Pedido...:
+0041#STR0041#ALL#Telefone.:
+0042#STR0042#ALL#Ped/ae Item  Data     Código           Descrição Do Produto           Grupo  Entrega        Quantidade            Preço            Valor       Preço Total        Quantidade      Quant. A       Saldo     Resíduos
+0043#STR0043#ALL#Total Da Previsão De Entrega
+0044#STR0044#ALL# fax: 
+0045#STR0045#ALL# contacto: 
+0046#STR0046#ALL#Item Código          Descrição                    Grp  Código               Razão Social Data De Entrega    Quantidade Um         Valor  Desconto  Valor    Valor Total     Quant.   Quant. A         Saldo  Res.
+0047#STR0047#ALL#Pedido Item  Data      Código               Razão Social          Telefone            Entrega         Quantidade           Valor    Desconto           Valor     Preço Total      Quantidade   Quant. A          Saldo Resíduos
+0048#STR0048#ALL#Solicitação De Compras N.º:
+0049#STR0049#ALL# Por Previsão De Entrega
+0050#STR0050#ALL#Ped/ae Item  Data      Código               Razão Social          Telefone            Entrega         Quantidade           Valor    Desconto           Valor     Preço Total      Quantidade   Quant. A          Saldo Resíduos
+0051#STR0051#ALL#Ped/ae Item  Data      Código Razão Social                        Telefone            Entrega         Quantidade           Valor    Desconto           Valor     Preço Total      Quantidade   Quant. A          Saldo Resíduos
+0052#STR0052#ALL#Entrega prevista :  
+0053#STR0053#ALL# - Por Previsão De Entrega
+0054#STR0054#ALL#Ped/ae Item  Data      Código           Descrição         Código               Razão Social    Telefone             Quantidade        Valor   Desconto        Valor     Preço Total   Quantidade   Quant. A           Saldo Res.
+0055#STR0055#ALL#Pedido Item  Data      Código           Descrição         Código               Razão Social    Telefone             Quantidade        Valor   Desconto        Valor     Preço Total   Quantidade   Quant. A           Saldo Res.
+0056#STR0056#ALL#Ped/ae Item  Data      Código           Descrição         Código Razao Social                  Telefone             Quantidade        Valor   Desconto        Valor     Preço Total   Quantidade   Quant. A           Saldo Res.
+0057#STR0057#ALL#Pedido Item  Data      Código           Descrição         Código Razao Social                  Telefone             Quantidade        Valor   Desconto        Valor     Preço Total   Quantidade   Quant. A           Saldo Res.
+0058#STR0058#ALL#             Emissão                    Do Produto        Forn.                                Forn.                Pedida     Unitário                     Ipi    (c/impostos)     Entregue    Receber         Receber Elim.
+0059#STR0059#ALL# atendidos + parcial entregue
+0060#STR0060#ALL#Quant.receber
+0062#STR0062#ALL#Pedido De Compras / Autorização De Entrega
+0063#STR0063#ALL#Pedido de compras / autorização de entrega (artigos)
+0065#STR0065#ALL#Nr.PC
+0067#STR0067#ALL#Lj.
+0068#STR0068#ALL#Emissão
