@@ -27,7 +27,8 @@ User Function MTA010NC()
     AAdd( aCPoNC, 'B1_XDTLIB')  //#8228
     AAdd( aCPoNC, 'B1_XREPENG') //#8228
     AAdd( aCPoNC, 'B1_FANTASM') //#8786
-    AAdd( aCPoNC, 'B1_ORIGEM')
+    AAdd( aCPoNC, 'B1_ORIGEM')  //#11144
+    AAdd( aCPoNC, 'B1_GRTRIB')  //#11144
     
     //AAdd( aCPoNC,  'B1_XFAMILI') //Solicitado por Cibele via e-mail em 15/05/2025
     //AAdd( aCPoNC,  'B1_GRUPO') //Solicitado por Cibele via e-mail em 15/05/2025
