@@ -704,15 +704,16 @@ User Function M04M12M()
 	Local nOp
 	Local nPeca
 	Local cAviso    := ""
+	Local cPastaIni := "c:\metalix\"
 
 	PRIVATE aOps  := {}
 	PRIVATE aEmp  := {}
 	PRIVATE aRefs := {}
 	PRIVATE cLote := ""
 	PRIVATE lApontaRef  := GETMV("ES_APOREF",.F.,.F.) //Aponta Refugo ou considera o custo pro produto final
-
-
-	Aadd(aPergs, {6, "Arquivo CSV para Importação",SPACE(200),"","","",100,.T.,"Todos os arquivos (*.CSV) |*.CSV",,GETF_LOCALHARD+GETF_NETWORKDRIVE}) //1
+	PRIVATE cFileName := ""
+	
+	Aadd(aPergs, {6, "Arquivo CSV para Importação",SPACE(200),"","","",100,.T.,"Todos os arquivos (*.CSV) |*.CSV",cPastaIni,GETF_LOCALHARD+GETF_NETWORKDRIVE}) //1
 
 	If !ParamBox(aPergs, "Importação do arquivo de retorno de apontamento do METALIX", @aRetPar,/*bOk*/,/*aButtons*/,/*lCentered*/,/*nPOSX*/,/*nPOSY*/,/*oDlgWIzard*/,/*cLoad*/,/*lCanSave*/,.T./*lUserSave*/)
 		Return 
@@ -720,11 +721,13 @@ User Function M04M12M()
 
 	CursorWait()
 
+	cFileName := aRetPar[1]
+
 	/*
-	nHandle := FT_FUse(aRetPar[1])
+	nHandle := FT_FUse(cFileName)
   
 	If nHandle = -1 // Se houver erro de abertura abandona processamento
-		Aviso("Erro","Erro na abertura do arquivo:"+aRetPar[1],{"Fechar"})
+		Aviso("Erro","Erro na abertura do arquivo:"+cFileName,{"Fechar"})
     	return
   	EndIf
 
@@ -732,9 +735,9 @@ User Function M04M12M()
   	
   	nLast := FT_FLastRec() // Retorna o número de linhas do arquivo
 	*/
-	oFile := FwFileReader():New(aRetPar[1])
+	oFile := FwFileReader():New(cFileName)
 	If !(oFile:Open())
-		Aviso("Erro","Erro na abertura do arquivo:"+aRetPar[1],{"Fechar"})
+		Aviso("Erro","Erro na abertura do arquivo:"+cFileName,{"Fechar"})
     	return
 	EndIf
 
@@ -851,23 +854,26 @@ User Function M04M12M()
 						aPecasAux[nP] := LEFT(aPecasAux[nP],LEN(aPecasAux[nP])-5) //RETIRAR SUFIXO DFX99
 					EndIf
 
-					nPeca := ASCAN(aPecas,{|x|x[1]==ALLTRIM(aPecasAux[nP])})
+					cCodPeca := UPPER(ALLTRIM(aPecasAux[nP]))
+
+					nPeca := ASCAN(aPecas,{|x|x[1]==cCodPeca})
 					If nPeca = 0
-						AADD(aPecas,{ALLTRIM(aPecasAux[nP]),( VAL(cQtd) * nQtdChapa ),0/*Empenhada*/,0/*Peso Peça*/})
+						AADD(aPecas,{cCodPeca,( VAL(cQtd) * nQtdChapa ),0/*Empenhada*/,0/*Peso Peça*/})
 					Else
 						aPecas[nPeca][2] += ( VAL(cQtd) * nQtdChapa )
 					EndIf
 				Next
 
+				cEspecChapa := cMP+","+CVALTOCHAR(nTamX)+"x"+CVALTOCHAR(nTamY)+"x"+CVALTOCHAR(nEspess)+"mm"
 				cComp  := ""
 				cScrap := ""
-				VerComp(cMP,nTamX,nTamY,nEspess,@cComp,@cScrap)
+				VerComp(cMP,nTamX,nTamY,nEspess,@cComp,@cScrap,nPesoEff)
 								
 				//nPosRef := ASCAN(aRefs,{|x|x[1]==cScrap.And.x[2]==cComp})
 				//If nPosRef > 0
 				//	aRefs[nPosRef][3] += nQtdScrap
 				//Else
-					AADD(aRefs,{cScrap,cComp,nQtdScrap,0,aPecas,nPercSuc,nPesoEff,0 /*Calculo Peso total das Peças*/}) //Adicionar Referencia de Scrap para controle de perdas e apontamento de refugo
+					AADD(aRefs,{cScrap,cComp,nQtdScrap,0,aPecas,nPercSuc,nPesoEff,0 /*Calculo Peso total das Peças*/,cEspecChapa}) //Adicionar Referencia de Scrap para controle de perdas e apontamento de refugo
 				//EndIf
 			Else
 
@@ -1004,7 +1010,7 @@ User Function M04M12M()
 
 		If LEN(aOPs) > 0
 
-			TelaAjuste(aOPs,aRefs)
+			TelaAjuste(aOPs,aRefs,cFileName)
 
 		Else
 
@@ -1061,32 +1067,44 @@ RestArea(aArea)
 
 Return cOPMAT
 
-Static Function VerComp(cMP,nTamX,nTamY,nEspess,cComp,cScrap)
+Static Function VerComp(cMP,nTamX,nTamY,nEspess,cComp,cScrap,nPesoEff)
 
 Local aArea      := GETAREA()
 Local cQuery     := ""
 Local cAliasComp := GETNEXTALIAS()
-Local cOPMat     := " " 
+//Local cOPMat     := " " 
 Local cAMFAMIL2C := RTRIM(GetNewPar("AM_FAMIL2C",.F.,"000011;"))
+Local cLocProc   := GETMV("MV_LOCPROC",.F.,"99") //Armazem de Processo
 
 Default cComp  := SPACE(TAMSX3("B1_COD")[1])
 Default cScrap := SPACE(TAMSX3("B1_XCODREF")[1])
+Default nPesoEff := 0
 
-cOPMAT := RetXMAT(cMP)
+//cOPMAT := RetXMAT(cMP)
 
-cQuery := " SELECT B1_COD,B1_XCODREF "
+cQuery := " SELECT B1_COD,B1_XCODREF,(B2_QATU-B2_RESERVA) QTDDISP "
+cQuery += " ,(CASE WHEN ( "
+cQuery += "  ( B5_COMPR = "+STR(nTamX,TAMSX3("B5_COMPR")[1])+" AND B5_LARG = "+STR(nTamY,TAMSX3("B5_LARG")[1]) + ") "
+cQuery += " OR "
+cQuery += "  ( B5_COMPR = "+STR(nTamY,TAMSX3("B5_COMPR")[1])+" AND B5_LARG = "+STR(nTamX,TAMSX3("B5_LARG")[1]) + ") "
+cQuery += " ) THEN '1' ELSE '2'+RTRIM(B5_DES) END ) AS TAMORI "
 cQuery += " FROM " + RetSQLName('SB1') + " SB1 "
 cQuery += " INNER JOIN " + RetSQLName('SB5') + " SB5 ON B5_FILIAL = '" + xFilial("SB5") + "' AND B5_COD = B1_COD AND SB5.D_E_L_E_T_ = ' ' "
+cQuery += " INNER JOIN " + RetSQLName('SB2') + " SB2 ON B2_FILIAL = '" + xFilial("SB2") + "' AND B2_COD = B1_COD AND B2_LOCAL = '"+cLocProc+"' AND SB2.D_E_L_E_T_ = ' ' "
 cQuery += " WHERE B1_FILIAL = '" + xFilial("SB1") + "' "
-cQuery += " AND B1_XMAT = '"+cOPMAT+"' "
+//cQuery += " AND B1_XMAT = '"+cOPMAT+"' "
+cQuery += " AND B1_XMAT2 = '"+cMP+"' "
 cQuery += " AND B1_XFAMIL2 IN "+FormatIn(cAMFAMIL2C,";")
 cQuery += " AND B5_ESPESS = "+STR(nEspess,TAMSX3("B5_ESPESS")[1],TAMSX3("B5_ESPESS")[2])
+/*
 cQuery += " AND ( "
 cQuery += "  ( B5_COMPR = "+STR(nTamX,TAMSX3("B5_COMPR")[1])+" AND B5_LARG = "+STR(nTamY,TAMSX3("B5_LARG")[1]) + ") "
 cQuery += " OR "
 cQuery += "  ( B5_COMPR = "+STR(nTamY,TAMSX3("B5_COMPR")[1])+" AND B5_LARG = "+STR(nTamX,TAMSX3("B5_LARG")[1]) + ") "
 cQuery += " ) "
+*/
 cQuery += " AND SB1.D_E_L_E_T_ = ' ' "
+cQuery += " ORDER BY TAMORI, QTDDISP DESC " //Prioriza Material com quantidade atual maior e reserva maior para não alocar material que já tem baixa disponibilidade
 
 TCQUERY cQuery NEW ALIAS (cAliasComp)
 
@@ -1117,17 +1135,18 @@ Static Function VerDensid(cMP,nEspess)
 Local aArea      := GETAREA()
 Local cQuery     := ""
 Local cAliasComp := GETNEXTALIAS()
-Local cOPMat     := " "
+//Local cOPMat     := " "
 Local cAMFAMIL2C := RTRIM(GetNewPar("AM_FAMIL2C",.F.,"000011;"))
 Local nDensidade := 0
 
-cOPMAT := RetXMAT(cMP)
+//cOPMAT := RetXMAT(cMP)
 
 cQuery := " SELECT TOP 1 B5_DENSID "
 cQuery += " FROM " + RetSQLName('SB1') + " SB1 "
 cQuery += " INNER JOIN " + RetSQLName('SB5') + " SB5 ON B5_FILIAL = '" + xFilial("SB5") + "' AND B5_COD = B1_COD AND SB5.D_E_L_E_T_ = ' ' "
 cQuery += " WHERE B1_FILIAL = '" + xFilial("SB1") + "' "
-cQuery += " AND B1_XMAT = '"+cOPMAT+"' "
+//cQuery += " AND B1_XMAT = '"+cOPMAT+"' "
+cQuery += " AND B1_XMAT2 = '"+cMP+"' "
 cQuery += " AND B1_XFAMIL2 IN "+FormatIn(cAMFAMIL2C,";")
 cQuery += " AND B5_ESPESS = "+STR(nEspess,TAMSX3("B5_ESPESS")[1],TAMSX3("B5_ESPESS")[2])
 cQuery += " AND B5_DENSID > 0"
@@ -1208,7 +1227,7 @@ If lOk
 	EndDo
 
 	If EMPTY(cCompEst)
-		cObserv += IIF(!EMPTY(cObserv),"|","")+"Comp.Emp.Não encontrado!"
+		cObserv += IIF(!EMPTY(cObserv),"|","")+"Componente Empenho/Estrutura não encontrado! ("+cMP+")"
 	EndIf
 
 	dbSelectArea("SG1")
@@ -1242,8 +1261,8 @@ If lOk
 
 			aRefs[nPosMP,5][nPosPc][4] := nPesoPC //Peso da Peça
 
-			If EMPTY(cCompUsa)	
-				cObserv += IIF(!EMPTY(cObserv),"|","")+"Comp.Usado não encontrado!"
+			If EMPTY(cCompUsa)
+				cObserv += IIF(!EMPTY(cObserv),"|","")+"Componente Usado não encontrado! ("+aRefs[nPosMP,9]+")"
 			EndIf
 			cCodRef := aRefs[nPosMP,1]
 			nQtdRef := (nQtReq*nPerda)/100
@@ -1274,7 +1293,7 @@ Return Nil
 //////////////////////////////////////////////////////
 // Tela ajuste dos empenhos na importação METALIX   //
 //////////////////////////////////////////////////////
-Static Function TelaAjuste(aOPs,aRefs)
+Static Function TelaAjuste(aOPs,aRefs,cFileName)
 
 Local aArea := GetArea()
 Local aAlter:= {} //{"COMPONENTE","QTDREF"}
@@ -1283,6 +1302,7 @@ Local lOk := .F.
 Local nX
 Local lDiverg := .F.
 Local nRecSD4 := 0
+Local cMsgErro := ""
 
     //Objetos da Janela
     Private oDlgMet
@@ -1393,9 +1413,9 @@ DEFINE MSDIALOG oDlgMet TITLE "Apontamento de produção - Metalix" FROM 000, 000 
 		@ 006, 595 BUTTON oBtnFech   PROMPT "Excel"      SIZE 065, 018 OF oDlgMet ACTION U_M04M12X(3,aColsAPO,cLote) FONT oFontBtn PIXEL
 
         //Botões
-		If !lDiverg
+		//If !lDiverg
         	@ 006, 665 BUTTON oBtnFech                          PROMPT "Salvar"        SIZE 065, 018 OF oDlgMet ACTION (lOk:=.T.,oDlgMet:End())  FONT oFontBtn PIXEL 
-        EndIf
+        //EndIf
 		@ 006, (nJanLarg/2-001)-(0067*01) BUTTON oBtnFech   PROMPT "Fechar"        SIZE 065, 018 OF oDlgMet ACTION (oDlgMet:End())           FONT oFontBtn PIXEL
                
 
@@ -1453,6 +1473,15 @@ ACTIVATE MSDIALOG oDlgMet CENTERED
 //Grava os empenhos / apontamentos e perdas
 If lOk
 
+	lRet     := .F.
+	lTemErro := .F.
+	cDrive   := ""
+	cPath    := ""
+	cName    := ""
+	cExt     := ""
+
+	SplitPath(cFileName,@cDrive,@cPath,@cName,@cExt)
+
 	For nX := 1 To Len(aOPs)
 
 		cNumOp    := aOPs[nX,1]
@@ -1463,10 +1492,29 @@ If lOk
 		nQtdMP    := aOPs[nX,9]
 		cxMat     := RetXMAT(aOPs[nX, 3])
 		nRecSD4   := aOPs[nX,14]
+		cMsgErro  := aOPs[nX,11]
+		aRet      := {.F.,""}
 
-		MsgRun("Processando.....", "Apontamento produção Metalix",{|| Aponta(cLote,cNumOP,nQuant,cCodMP,cCodEstru,nQtdMp,nQtdEstr,cxMat,cCodRef,nQtdRef,lApontaRef,nRecSD4) })
+		MsgRun("Processando.....", "Apontamento produção Metalix",{|| aRet :=  Aponta(cLote,cNumOP,nQuant,cCodMP,cCodEstru,nQtdMp,nQtdEstr,cxMat,cCodRef,nQtdRef,lApontaRef,nRecSD4,cMsgErro) })
 
+		If !aRet[1] //Tem Erro
+			lTemErro := .T.
+		EndIf
 	Next
+
+	If lTemErro 
+
+		FwMakeDir(cDrive+"\"+cPath+"\processado_erro\")
+
+		FRENAME(cFileName,cDrive+"\"+cPath+"\processado_erro\"+cName+cExt)
+
+	Else
+	
+		FwMakeDir(cDrive+"\"+cPath+"\processado_ok\")
+
+		FRENAME(cFileName,cDrive+"\"+cPath+"\processado_ok\"+cName+cExt)
+
+	EndIf
 
 	VerLog(cLote)
 
@@ -2097,14 +2145,14 @@ Return .T.
 Função para gravação do apontamento via SigaAuto do Mata250
 
 */
-Static Function Aponta(cLote,cNumOP,nQuant,cCodMP,cCodEstru,nQtdMp,nQtdEstr,cxMat,cCodRef,nQtdRef,lApontaRef,nRecSD4)
+Static Function Aponta(cLote,cNumOP,nQuant,cCodMP,cCodEstru,nQtdMp,nQtdEstr,cxMat,cCodRef,nQtdRef,lApontaRef,nRecSD4,cMsgErro)
 
 Local nX
 
 Private lMsErroAuto := .F.
 Private lAutoErrNoFile := .T.
 Private lMsHelpAuto := .T.
-Private cMsgErro    := ""
+//Private cMsgErro    := ""
 Private aMata250    := {}
 Private lRet        := .T.		
 Private aErro       := {}
@@ -2117,141 +2165,149 @@ Private aSDC        := {}
 Private aSavMvPar   := { MV_PAR01 }
 
 Default lApontaRef  := .F.
+Default cMsgErro    := ""
 
-dbSelectArea("SC2")
-dbSetOrder(1) //C2_FILIAL+C2_NUM
-dbSeek(xFilial("SC2")+cNumOP)
-
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Ajuste os empenhos da Ordem de Producao                      ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-If cCodMP <> cCodEstru .Or. nQtdMP <> nQtdEstr
-	
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³Reinicializa as variáveis³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	aEsta380	:= {}
-	nQtdAnt	   	:= 0
-	nQtdAnt2UM 	:= 0
-	nQtdOriAnt 	:= 0
-	cLoteAnt   	:= ""
-	cLotCtlAnt 	:= ""
-	cLocal	   	:= cLocProc
-	dDataSD4    := dDataBase
-	cTRT        := "" 
-	cRoteiro    := ""
-	cxAnsul     := ""
-	mv_par01    := 2 //Não digita lote
-
-	lNovoSD4    := .F.
+If EMPTY(cMsgErro)
+	dbSelectArea("SC2")
+	dbSetOrder(1) //C2_FILIAL+C2_NUM
+	dbSeek(xFilial("SC2")+cNumOP)
 
 	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Posiciona no arquivo de saldos e cria se necessario          ³
+	//³ Ajuste os empenhos da Ordem de Producao                      ³
 	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	dbSelectArea("SB2")
-	dbSetOrder(1)
-	If !dbSeek(xFilial("SB2")+cCodMP+cLocProc )
-		CriaSB2(cCodMP,cLocProc)
-		MsUnLock()
+	If cCodMP <> cCodEstru .Or. nQtdMP <> nQtdEstr
+		
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³Reinicializa as variáveis³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		aEsta380	:= {}
+		nQtdAnt	   	:= 0
+		nQtdAnt2UM 	:= 0
+		nQtdOriAnt 	:= 0
+		cLoteAnt   	:= ""
+		cLotCtlAnt 	:= ""
+		cLocal	   	:= cLocProc
+		dDataSD4    := dDataBase
+		cTRT        := "" 
+		cRoteiro    := ""
+		cxAnsul     := ""
+		mv_par01    := 2 //Não digita lote
+
+		lNovoSD4    := .F.
+
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Posiciona no arquivo de saldos e cria se necessario          ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		dbSelectArea("SB2")
+		dbSetOrder(1)
+		If !dbSeek(xFilial("SB2")+cCodMP+cLocProc )
+			CriaSB2(cCodMP,cLocProc)
+			MsUnLock()
+		EndIf
+
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³Verificar se o armazém do empenho³
+		//³foi alterado na rotina.          ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		dbSelectArea("SD4")
+		SD4->( dbSetOrder(1) )//D4_FILIAL+D4_OP
+		SD4->( dbGoTo(nRECSD4) )
+		If SD4->(!EOF())
+
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³Alteração: armazena as informações    ³
+			//³anteriores dos campos para a gravação.³
+			//³(a380grava())                         ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			nQtdAnt	   := SD4->D4_QUANT
+			nQtdAnt2UM := SD4->D4_QTSEGUM
+			nQtdOriAnt := SD4->D4_QTDEORI
+			cLoteAnt   := SD4->D4_NUMLOTE
+			cLotCtlAnt := SD4->D4_LOTECTL
+			cLocal	   := SD4->D4_LOCAL
+			dDataSD4   := SD4->D4_DATA
+			cTRT       := SD4->D4_TRT 
+			cRoteiro   := SD4->D4_ROTEIRO
+			cxAnsul    := SD4->D4_XANSUL
+
+			RecLock("SD4",.F.)
+		Else
+			lNovoSD4 := .T.
+			RecLock("SD4",.T.)
+		EndIf
+
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³Grava SD4		  ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		SD4->D4_FILIAL	:= 	xFilial("SD4")
+		SD4->D4_OP		:=  cNumOP
+		SD4->D4_COD     :=  cCodMP
+		SD4->D4_PRODUTO :=  SC2->C2_PRODUTO
+		SD4->D4_QTDEORI :=  nQtdMp //Quantidade Original do Empenho
+		SD4->D4_QUANT   :=  ( ( nQtdMp / SC2->C2_QUANT ) * ( SC2->C2_QUANT - SC2->C2_QUJE) ) //Saldo do Empenho
+		SD4->D4_QTSEGUM := ConvUM(SC2->C2_PRODUTO,SD4->D4_QUANT,0,2) // 2UM
+		SD4->D4_LOCAL   :=  cLocal
+		SD4->D4_DATA    :=  dDataSD4
+		SD4->D4_TRT     :=	cTRT  
+		SD4->D4_ROTEIRO :=  cRoteiro 
+		SD4->D4_XANSUL  :=  cxAnsul
+
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Apaga o D4_NUMLOTE caso o controle de Rastro seja "L". ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		a380NumLot()
+
+		//If nOpcX==4
+		A380Grava(nQtdAnt,cLoteAnt,cLotCtlAnt,cLocal,nQtdAnt2UM) //Atualiza os Empenhos
+		//Endif
+
+		MsUnlock()
+
+		MV_PAR01 := aSavMvPar[1] //Restaura MV_PAR01
+
 	EndIf
 
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³Verificar se o armazém do empenho³
-	//³foi alterado na rotina.          ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	dbSelectArea("SD4")
-	SD4->( dbSetOrder(1) )//D4_FILIAL+D4_OP
-	SD4->( dbGoTo(nRECSD4) )
-	If SD4->(!EOF())
+	aAdd(aMata250, {})
+	aAdd(aMata250[1], {'D3_TM'     ,cTM                              ,Nil})
+	aAdd(aMata250[1], {'D3_OP'     ,cNumOP                           ,Nil})
+	aAdd(aMata250[1], {'D3_USUARIO',cUserName                        ,Nil})
+	aAdd(aMata250[1], {'D3_QUANT'  ,nQuant                           ,Nil})
+	//aAdd(aMata250[1], {'D3_PARCTOT','T'                              ,Nil})
+	aAdd(aMata250[1], {'D3_PERDA'  ,0                                ,Nil})
+	aAdd(aMata250[1], {'D3_OBSERVA','METALIX - LOTE:' + cLote        ,Nil})
 
-		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-		//³Alteração: armazena as informações    ³
-		//³anteriores dos campos para a gravação.³
-		//³(a380grava())                         ³
-		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-		nQtdAnt	   := SD4->D4_QUANT
-		nQtdAnt2UM := SD4->D4_QTSEGUM
-		nQtdOriAnt := SD4->D4_QTDEORI
-		cLoteAnt   := SD4->D4_NUMLOTE
-		cLotCtlAnt := SD4->D4_LOTECTL
-		cLocal	   := SD4->D4_LOCAL
-		dDataSD4   := SD4->D4_DATA
-		cTRT       := SD4->D4_TRT 
-		cRoteiro   := SD4->D4_ROTEIRO
-		cxAnsul    := SD4->D4_XANSUL
+	MSExecAuto({|x,y| mata250(x,y)},aMata250[1],3)
+				
+	If lMsErroAuto
 
-		RecLock("SD4",.F.)
+		lRet := .F.
+
+		aErro := GetAutoGRLog()
+		If Len(aErro) > 0
+			For nX := 1 To Len(aErro)
+					cMsgErro += aErro[nX] + CRLF
+			Next nX
+			//cFileLog := NomeAutoLog()
+			//MemoWrite( cFileLog, cMsgErro )
+		EndIf
+		If EMPTY(cMsgErro)
+			cMsgErro := "Não foi possivel recuperar LOG de Erro!"
+		EndIf
+
 	Else
-		lNovoSD4 := .T.
-		RecLock("SD4",.T.)
-	EndIf
 
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³Grava SD4		  ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	SD4->D4_FILIAL	:= 	xFilial("SD4")
-	SD4->D4_OP		:=  cNumOP
-	SD4->D4_COD     :=  cCodMP
-	SD4->D4_PRODUTO :=  SC2->C2_PRODUTO
-	SD4->D4_QTDEORI :=  nQtdMp //Quantidade Original do Empenho
-	SD4->D4_QUANT   :=  ( ( nQtdMp / SC2->C2_QUANT ) * ( SC2->C2_QUANT - SC2->C2_QUJE) ) //Saldo do Empenho
-    SD4->D4_QTSEGUM := ConvUM(SC2->C2_PRODUTO,SD4->D4_QUANT,0,2) // 2UM
-	SD4->D4_LOCAL   :=  cLocal
-	SD4->D4_DATA    :=  dDataSD4
-	SD4->D4_TRT     :=	cTRT  
-	SD4->D4_ROTEIRO :=  cRoteiro 
-	SD4->D4_XANSUL  :=  cxAnsul
+		If lApontaRef
+			lRet := ApontaRef(cNumOp,cCodRef,cCodMp,nQtdRef)
+			If !lRet
+				cMsgErro := "Erro apontamento de perda!"
+			EndIf
+		EndIf
 
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Apaga o D4_NUMLOTE caso o controle de Rastro seja "L". ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	a380NumLot()
-
-	//If nOpcX==4
-	   A380Grava(nQtdAnt,cLoteAnt,cLotCtlAnt,cLocal,nQtdAnt2UM) //Atualiza os Empenhos
-	//Endif
-
-	MsUnlock()
-
-	MV_PAR01 := aSavMvPar[1] //Restaura MV_PAR01
-
-EndIf
-
-aAdd(aMata250, {})
-aAdd(aMata250[1], {'D3_TM'     ,cTM                              ,Nil})
-aAdd(aMata250[1], {'D3_OP'     ,cNumOP                           ,Nil})
-aAdd(aMata250[1], {'D3_USUARIO',cUserName                        ,Nil})
-aAdd(aMata250[1], {'D3_QUANT'  ,nQuant                           ,Nil})
-//aAdd(aMata250[1], {'D3_PARCTOT','T'                              ,Nil})
-aAdd(aMata250[1], {'D3_PERDA'  ,0                                ,Nil})
-aAdd(aMata250[1], {'D3_OBSERVA','METALIX - LOTE:' + cLote        ,Nil})
-
-MSExecAuto({|x,y| mata250(x,y)},aMata250[1],3)
-			
-If lMsErroAuto
-
-	lRet := .F.
-
-	aErro := GetAutoGRLog()
-	If Len(aErro) > 0
-		For nX := 1 To Len(aErro)
-			    cMsgErro += aErro[nX] + CRLF
-		Next nX
-		//cFileLog := NomeAutoLog()
-		//MemoWrite( cFileLog, cMsgErro )
-	EndIf
-	If EMPTY(cMsgErro)
-		cMsgErro := "Não foi possivel recuperar LOG de Erro!"
 	EndIf
 
 Else
 
-	If lApontaRef
-		lRet := ApontaRef(cNumOp,cCodRef,cCodMp,nQtdRef)
-		If !lRet
-			cMsgErro := "Erro apontamento de perda!"
-		EndIf
-	EndIf
+	lRet := .F.
 
 EndIf
 
@@ -2391,6 +2447,7 @@ Local oDlgLog
 Local oLinhas
 Local oBtnExp
 Local oBtnExi
+Local cMsgError := ""
 
 Private aHeader  := {}
 Private aCols    := {}
@@ -2418,11 +2475,38 @@ If dbSeek(xFilial("ZAJ")+cLote)
 		Aadd(aCols,{IIF(ZAJ->ZAJ_STATUS="A","BR_VERDE","BR_VERMELHO"),;
 		             ZAJ->ZAJ_OP,ZAJ->ZAJ_SEQAPO,ZAJ->ZAJ_PROD,ZAJ->ZAJ_QTDPRO,ZAJ->ZAJ_XMAT,ZAJ->ZAJ_COMP,;
 					 ZAJ->ZAJ_QTDREQ,ZAJ->ZAJ_CODREF,ZAJ->ZAJ_QTDREF,ZAJ->ZAJ_STATUS,ZAJ->ZAJ_MSGERRO,.F.})
+
+		If ZAJ->ZAJ_STATUS <> "A"
+			If EMPTY(cMsgError)
+				cMsgError += "Lote: "+cLote+CHR(13)+CHR(10)
+			EndIf
+			cMsgError += ""+CHR(13)+CHR(10)
+			cMsgError += "OP: "+ZAJ->ZAJ_OP+CHR(13)+CHR(10)
+			cMsgError += "Produto: "+ZAJ->ZAJ_PROD+CHR(13)+CHR(10)
+			cMsgError += "Material: "+ZAJ->ZAJ_XMAT+CHR(13)+CHR(10)
+			cMsgError += "Componente: "+ZAJ->ZAJ_COMP+CHR(13)+CHR(10)
+			cMsgError += "Mensagem de Erro: "+ZAJ->ZAJ_MSGERR+CHR(13)+CHR(10)
+			cMsgError += ""+CHR(13)+CHR(10)
+		EndIf
+
 		dbSkip()
 	EndDo
 
 	If Len(aCols) == 0
 		Aadd(aCols,{"","","","","","","","","","","","",.F.})
+	EndIf
+
+	If !EMPTY(cMsgError)
+
+		cMailDestino := GetNewpar("MA_M04M12",.F.,"marcos.montes@moovegestao.com.br;sferreira@hoshizakimacom.com.br;wmanzini@hoshizakimacom.com.br")
+		cAssunto     := "Importacao Metalix - Erro no Apontamento - Lote: "+cLote
+		cTexto       := cMsgError
+		cAnexos      := ""
+		lMensagem    := .T. //Apresenta mensagem de eventual erro de conexào com o servidor de e-mail
+		cMensQdoErro := ""
+
+		lReturn := U_SendMail2(cMailDestino,cAssunto,cTexto,cAnexos,lMensagem,cMensQdoErro)
+
 	EndIf
 
 	@ 150,1 TO 720,1220 Dialog oDlgLog Title "LOG do processamento - Lote: "+cLote
