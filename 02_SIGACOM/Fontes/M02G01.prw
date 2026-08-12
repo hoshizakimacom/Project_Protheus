@@ -80,10 +80,13 @@ Static Function MG01SetLj(cCod)
 
         If (_cAlias)->(!EOf())
             cLoja := Soma1(PadL(AllTrim( (_cAlias)->A2_LOJA ),4,'0'))
+        Else 
+            cLoja := "0001"
         EndIf
     EndIf
 
     FWFldPut('A2_LOJA',cLoja)
+
 Return
 
 //+--------------------------------------------------------------------------------------------------------------------------------------
