@@ -17,7 +17,7 @@ User Function M04M13()
 
 Local aPergs     := {}
 
-Private cTitulo   := "Download arquivos de Desenho dos Produtos (PDF)"
+Private cTitulo   := "Download arquivos de Desenho dos Produtos (PDF,COM,FCT,MNL,RVT,DXF)"
 Private aRetPar   := {}
 
 Aadd(aPergs, {1, "Produto"                ,REPLICATE(' ',TAMSX3("D3_COD")[1]),"@X","","SB1","",80,.F.})     //1
@@ -85,7 +85,7 @@ Else
 
 	If nArquivos > 0
 
-		FWAlertInfo("Download de "+RTRIM(STR(nArquivos,10))+" arquivos PDF's!!", "DownLoad arquivos de Desenhos")
+		FWAlertInfo("Download de "+RTRIM(STR(nArquivos,10))+" arquivos !!", "DownLoad arquivos de Desenhos")
 
 		ShellExecute("open",LOWER(cDirDest),"","",5) //5=Show
 	Else
@@ -215,17 +215,33 @@ Static Function TemAnexo(cProduto,cDirDest,nArquivos)
 
 Local cDirServer := "\produtos_anexos\"
 Local aFile      := {}
+Local nX		 := 0	
+Local nF		 := 0	
+Local cFileURev  := "" 
+Local aSufixo 	 := { "PDF", "COM", "FCT", "MNL", "RVT", "DXF" }
 
-If LEN(aFile := Directory(cDirServer+RTRIM(cProduto)+"PDF"+"*.*", "F")) > 0
-	
-	nArquivos += 1
-	
-	//Copiando o arquivo do servidor para o cliente
-    If CpyS2T(cDirServer+"\"+aFile[1,1],cDirDest)
-		//Força a chamada para impressão pelo programa padrão definido no Explorer
-		//ShellExecute("open",LOWER(cDirDest+aFile[1,1]),"","",0) //0=ESCONDIDO
-		//ShellExecute("print","C:\Program Files\Google\Chrome\Application\chrome.exe",LOWER(cDirDest+aFile[1,1]),"",0) //0=ESCONDIDO
+
+For nX := 1 To Len(aSufixo)
+
+	If LEN(aFile := Directory(cDirServer+RTRIM(cProduto)+aSufixo[nX]+"*.*", "F")) > 0
+
+		cFileURev := aFile[1,1]
+		For nF := 1 To Len(aFile)
+			If UPPER(aFile[nF,1]) > UPPER(cFileURev)
+				cFileURev := aFile[nF,1]
+			EndIf
+		Next
+			
+		nArquivos += 1
+		
+		//Copiando o arquivo do servidor para o cliente
+		If CpyS2T(cDirServer+"\"+cFileURev,cDirDest)
+			//Força a chamada para impressão pelo programa padrão definido no Explorer
+			//ShellExecute("open",LOWER(cDirDest+cFileURev),"","",0) //0=ESCONDIDO
+			//ShellExecute("print","C:\Program Files\Google\Chrome\Application\chrome.exe",LOWER(cDirDest+cFileURev),"",0) //0=ESCONDIDO
+		EndIf
 	EndIf
-EndIf
+
+Next
 
 Return Nil

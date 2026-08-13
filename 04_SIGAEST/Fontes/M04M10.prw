@@ -206,10 +206,10 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles,lSobrepor)
         cNome    := ""
         cExtensao:= ""
         SPLITPATH( cFileName, @cDrive, @cCaminho, @cNome, @cExtensao )
-
-        cProduto  := LEFT(cNome,(LEN(cNome)-5))  
-        cSufixo   := LEFT(RIGHT(cNome,5),3) 
-		cRevisao  := RIGHT(cNome,2)
+	
+        cProduto  := PADR(UPPER(LEFT(cNome,(LEN(cNome)-5))), TAMSX3("B1_COD")[1])
+        cSufixo   := UPPER(LEFT(RIGHT(cNome,5),3)) 
+		cRevisao  := UPPER(RIGHT(cNome,2))
 		cDescProd := ""
 
         cOcorrencia := ""
@@ -225,8 +225,6 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles,lSobrepor)
             cTipoArq  := "Revit/Bloco 2D/3D"
         ElseIf cSufixo == "DXF" //"COR"
             cTipoArq  := "DXF (Desenho de corte)"
-		ElseIf cSufixo == "DEL"
-            cTipoArq  := "Diagrama Elétrico"
         Else
             cTipoArq  := "Não identificado"
             lStatus := .F.
@@ -234,7 +232,7 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles,lSobrepor)
         EndIf
 
         If lStatus 
-			If !SB1->(dbSeek(xFilial("SB1")+PADR(cProduto,TAMSX3("B1_COD")[1])))
+			If !SB1->(dbSeek(xFilial("SB1")+cProduto))
 				lStatus := .F.
 				cOcorrencia := "Produto não cadastrado!"
 			Else
@@ -262,7 +260,7 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles,lSobrepor)
 			Else
 			
 				For nX := 1 To Len(aFilesOld)
-					cRevServer := LEFT(RIGHT(aFilesOld[nX,1],2+LEN(cExtensao)),2)
+					cRevServer := UPPER(LEFT(RIGHT(aFilesOld[nX,1],2+LEN(cExtensao)),2))
 					If cRevisao <= cRevServer
 						lStatus := .F.
 						cOcorrencia := "Revisão inferior ao do servidor, não permitido sobrepor! Revisão do Servidor:"+cRevServer+" # Revisão do novo Arquivo:"+cRevisao
@@ -355,7 +353,6 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
     Local	bClick_MNL	as	codeblock
     Local	bClick_RVT	as	codeblock
     Local	bClick_DXF	as	codeblock
-	Local	bClick_DEL	as	codeblock
 
     Local	oFont 	as	object
 
@@ -370,7 +367,6 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
     Private nPosMNL  := 4
     Private nPosRVT  := 5
     Private nPosDXF  := 6
-	Private nPosDEL	 := 7
 
     Default cProduto := SB1->B1_COD
 
@@ -386,7 +382,6 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
 	cImgMNL         := cFilePath+"imgpdf.bmp" 
 	cImgRVT         := cFilePath+"imgrfa.bmp" 
 	cImgDXF         := cFilePath+"imgdxf.bmp"
-	cImgDEL			:= cFilePath+"imgdel.bmp"
 
 	cImgPDFNo       := cFilePath+"imgpdf_no.bmp"
 	cImgCOMNo       := cFilePath+"imgpdf_no.bmp" 
@@ -394,26 +389,21 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
 	cImgMNLNo       := cFilePath+"imgpdf_no.bmp" 
 	cImgRVTNo       := cFilePath+"imgrfa_no.bmp" 
 	cImgDXFNo       := cFilePath+"imgdxf_no.bmp"
-	cImgDELNo		:= cFilePath+"imgdel_no.bmp"
 
 	If FILE("c:\temp\imgpdf.bmp")
 		CPYT2S("c:\temp\imgpdf.bmp",cFilePath)
 		CPYT2S("c:\temp\imgrfa.bmp",cFilePath)
 		CPYT2S("c:\temp\imgdxf.bmp",cFilePath)
-		CPYT2S("c:\temp\imgdel,bmp",cFilePath)
 		CPYT2S("c:\temp\imgpdf_no.bmp",cFilePath)
 		CPYT2S("c:\temp\imgrfa_no.bmp",cFilePath)
 		CPYT2S("c:\temp\imgdxf_no.bmp",cFilePath)
-		CPYT2S("c:\temp\imgdel_no.bmp",cFilePath)
 
 		FERASE("c:\temp\imgpdf.bmp")
 		FERASE("c:\temp\imgrfa.bmp")
 		FERASE("c:\temp\imgdxf.bmp")
-		FERASE("c:\temp\imgdel.bmp")
 		FERASE("c:\temp\imgpdf_no.bmp")
 		FERASE("c:\temp\imgrfa_no.bmp")
 		FERASE("c:\temp\imgdxf_no.bmp")
-		FERASE("c:\tempo\imgdel_no.bmp")
 	EndIf
 
 	aPodeVis := {}
@@ -423,7 +413,6 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
 	AADD(aPodeVis,::PodeVisualizar("MNL"))
 	AADD(aPodeVis,::PodeVisualizar("RVT"))
 	AADD(aPodeVis,::PodeVisualizar("DXF"))
-	AADD(aPodeVis,::PodeVisualizar("DEL"))
 
     bClick_PDF		:=	{|| ::AbrirAnexo(cFileName+"PDF",cFilePath) }
     bClick_COM		:=	{|| ::AbrirAnexo(cFileName+"COM",cFilePath) }
@@ -431,7 +420,6 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
     bClick_MNL		:=	{|| ::AbrirAnexo(cFileName+"MNL",cFilePath) }
     bClick_RVT		:=	{|| ::AbrirAnexo(cFileName+"RVT",cFilePath) }
     bClick_DXF		:=	{|| ::AbrirAnexo(cFileName+"DXF",cFilePath) }
-	bClick_DEL		:=	{|| ::AbrirAnexo(cFileName+"DEL",cFilePath) }
 
     bValid_PDF		:=	{|| aPodeVis[nPosPDF] }
     bValid_COM		:=	{|| aPodeVis[nPosCOM] }
@@ -439,7 +427,6 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
     bValid_MNL		:=	{|| aPodeVis[nPosMNL] }
     bValid_RVT		:=	{|| aPodeVis[nPosRVT] }
     bValid_DXF		:=	{|| aPodeVis[nPosDXF] }
-	bValid_DEL		:=	{|| aPodeVis[nPosDEL] }
 
     nCol			:= 1120	/*820*/
     nLin	        :=	770 /*570*/
@@ -450,7 +437,7 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
 
 	oGrpCo1 := TGROUP():New(000, 000, nLin-450, nCol-560/*600*/, "Estrutura de Produto - Visualiza Anexos", oDlg, CLR_HBLUE,, .T.)
 	//oGrpCo1:Align := CONTROL_ALIGN_ALLCLIENT
-	oTree := DbTree():New( 000, 000, nLin, nCol, oGrpCo1,{|| AtuBotao(oTree,.T.)},,.T.,,,'Produto/Componentes;Sentido Pre;PDF;COM;FCT;MNL;RVT;DXF;DEL')
+	oTree := DbTree():New( 000, 000, nLin, nCol, oGrpCo1,{|| AtuBotao(oTree,.T.)},,.T.,,,'Produto/Componentes;Sentido Pre;PDF;COM;FCT;MNL;RVT;DXF')
 	oTree:Align := CONTROL_ALIGN_ALLCLIENT
 
 	//oGrpCo2 := TGROUP():New(nLin-450, 000, nLin-250, nCol-600, "Dados do produto", oDlg, CLR_HBLUE,, .T.)
@@ -498,12 +485,6 @@ METHOD Visualizar(cProduto) CLASS ClassAnexoProduto
 		oImgDXF := TBitmap():New(nLinIni+060,nCol+013,20,20,,cImgDXFNo,.T.,oDlg/*oGrpCo2*/,bClick_DXF,bClick_DXF,.F./*lScroll*/,.T./*lStretch*/,,,,bValid_DXF,.T.)
 		oImgDXF:Disable()
     	oTSayDXF := TSay():New(nLinIni+085,nCol+010,{||"DXF:Desenho de Corte"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
-		nCol += 080
-	EndIf
-	If aPodeVis[nPosDEL]
-		oImgDEL := TBitmap():New(nLinIni+060,nCol+013,20,20,,cImgDELNo,.T.,oDlg/*oGrpCo2*/,bClick_DEL,bClick_DEL,.F./*lScroll*/,.T./*lStretch*/,,,,bValid_DEL,.T.)
-		oImgDEL:Disable()
-	    oTSayDEL := TSay():New(nLinIni+085,nCol+010,{||"DEL:Diagrama Eletrico"},oDlg/*oGrpCo2*/,,oTFont,.F.,.F.,.F.,.T.,0,,50,020,.F.,.T.,.F.,.F.,.F.,.F. )
 	EndIf
 
     MontaEstru(oDlg,oTree)
@@ -574,15 +555,6 @@ If aPodeVis[nPosDXF]
 		oImgDXF:Disable()
 	EndIf
 EndIf
-If aPodeVis[nPosDEL] 
-	If ";DEL" $ cPrompt
-		oImgDEL:cBmpFile := cImgDEL
-		oImgDEL:Enable()
-	Else
-		oImgDEL:cBmpFile := cImgDELNo
-		oImgDEL:Disable()
-	EndIf
-EndIf
 
 oTGetPrd:Refresh()
 
@@ -600,20 +572,31 @@ METHOD AbrirAnexo(cFileName,cFilePath) CLASS ClassAnexoProduto
 	Local lRet		:= .F.
 	Local lFErase   := .F.
 	Local nTimes    := 0
+	Local nF        := 0
+	Local cFileURev := "" 
 
     aFile := Directory(cFilePath+"\"+cFileName+"*.*", "F")
 
-    If LEN(aFile) > 0 .And. File(cFilePath+"\"+aFile[1,1])
+	If LEN(aFile) > 0
+		cFileURev := aFile[1,1]
+		For nF := 1 To Len(aFile)
+			If UPPER(aFile[nF,1]) > UPPER(cFileURev)
+				cFileURev := aFile[nF,1]
+			EndIf
+		Next
+	EndIf
+	
+    If !EMPTY(cFileURev) .And. File(cFilePath+"\"+cFileURev)
         //Copiando o arquivo do servidor para o cliente
-        If CpyS2T(cFilePath+"\"+aFile[1,1],GetTempPath())
-            ShellExecute("open",GetTempPath()+aFile[1,1],"","",5) // 5=SW_SHOW
+        If CpyS2T(cFilePath+"\"+cFileURev,GetTempPath())
+            ShellExecute("open",GetTempPath()+cFileURev,"","",5) // 5=SW_SHOW
             Aviso("Visualizar","Arquivo aberto no visualizador padrão.",{"Fechar"})
             
             //Apaga arquivo após visualização
 			lFErase := .F.
 			nTimes := 0
 			While( !lFErase .And. nTimes < 10)
-				lFErase := (FERASE(GetTempPath()+aFile[1,1]) <> -1)
+				lFErase := (FERASE(GetTempPath()+cFileURev) <> -1)
 				If(!lFErase)
 					nTimes++
 					Sleep(500)
@@ -693,9 +676,9 @@ Return lRet
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Fun??o    ³ MontaTree ³ Autor ³ Montes              ³ Data ³04.10.2023³±±
+±±³Fun‡„o    ³ MontaTree ³ Autor ³ Montes              ³ Data ³04.10.2023³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri??o ³ Carrega estrutura para o Tree(Func.Recurssiva)             ³±±
+±±³Descri‡„o ³ Carrega estrutura para o Tree(Func.Recurssiva)             ³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
 ±±³Sintaxe   ³ MontaTree(ExpO1,ExpO2,ExpC1,ExpC2,ExpC3,ExpN1,ExpC4,ExpC5)³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
@@ -704,7 +687,7 @@ Return lRet
 ±±³          ³ ExpC1 = Codigo do Produto                                  ³±±
 ±±³          ³ ExpC2 = Codigo da estrutura similar		 (OPC)	          ³±±
 ±±³          ³ ExpC3 = Codigo da revisao				 (OPC)	          ³±±
-±±³          ³ ExpN1 = Numero da Op??o Escolhida         (OPC)            ³±±
+±±³          ³ ExpN1 = Numero da Op‡„o Escolhida         (OPC)            ³±±
 ±±³          ³ ExpC4 = Cargo do Produto no Tree          (OPC)            ³±±
 ±±³          ³ ExpC5 = Sequencia Pai                     (OPC)            ³±±
 ±±³          ³ ExpL1 = Zera cont. das variaves staticas  (OPC) 			  ³±±
@@ -772,7 +755,7 @@ If lRet
 	SG1->(dbSetOrder(nIndSG1))
 	If nOpcX == 3 .And. cProduto # Replicate('ú', Len(SG1->G1_COD)) 
 
-		//-- Cria??o de uma nova estrutura
+		//-- Cria‡„o de uma nova estrutura
 		oTree:AddTree(AddPromp(cPrompt,"",,cProduto),.T.,cFolderA,cFolderB,,,cProduto+Space(TamSx3("G1_TRT")[1])+cProduto+'000000000'+'000000000'+'NOVO')
 		oTree:EndTree()
 		oTree:Refresh()
@@ -829,7 +812,7 @@ If lRet
 
 			lExpEst := .T.
 
-			//-- Nao Adiciona Componentes fora da Revis?o
+			//-- Nao Adiciona Componentes fora da Revis„o
 			/*
 			If (nOpcX == 2 .Or. nOpcX == 4) .And. (cRevisao # Nil) .And. ;
 				!(SG1->G1_REVINI <= cRevisao .And. (SG1->G1_REVFIM >= cRevisao .Or. SG1->G1_REVFIM = ' '))
@@ -837,10 +820,11 @@ If lRet
 				Loop
 			EndIf
 			*/
-		    If !( Empty(cRevisao) .Or. ( SG1->G1_REVINI >= cRevisao .And. SG1->G1_REVFIM >= cRevisao ) )
-			   SG1->(dbSkip())
-			   Loop
-		    EndIf
+			If (cRevisao # Nil) .And. ;
+				!(SG1->G1_REVINI <= cRevisao .And. (SG1->G1_REVFIM >= cRevisao .Or. SG1->G1_REVFIM = ' '))
+				SG1->(dbSkip())
+				Loop
+			EndIf
 
 			nRecAnt  := SG1->(Recno())
 			cComp    := SG1->G1_COMP
@@ -937,9 +921,9 @@ Return lRet
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Fun??o	 ³ AddPromp      ³ Autor ³ MONTES             ³ Data ³ 04/10/24 ³±±
+±±³Fun‡…o	 ³ AddPromp      ³ Autor ³ MONTES             ³ Data ³ 04/10/24 ³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri??o ³ Acrescenta TRT ao prompt do dbtree baseado no conteudo       ³±±
+±±³Descri‡…o ³ Acrescenta TRT ao prompt do dbtree baseado no conteudo       ³±±
 ±±³          ³ da propriedade cargo                                         ³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
 ±±³Sintaxe   ³ ExpC3 := AddPromp(ExpC1,ExpC2,ExpN1)                      ³±±
@@ -1000,7 +984,7 @@ Static Function TemAnexo(cProduto)
 
 Local cDirServer := "\produtos_anexos\"
 Local cRet    	 := ""
-Local aSufixo 	 := { "PDF", "COM", "FCT", "MNL", "RVT", "DXF", "DEL" }
+Local aSufixo 	 := { "PDF", "COM", "FCT", "MNL", "RVT", "DXF" }
 Local nX      	 := 0
 Local cXSPRE     := ""
 
@@ -1023,9 +1007,9 @@ Return cRet
 /*/
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Fun??o    ³ EXPExcel  ³ Autor ³ Montes               ³ Data ³ 11.10.24 ³±±
+±±³Fun‡…o    ³ EXPExcel  ³ Autor ³ Montes               ³ Data ³ 11.10.24 ³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri??o ³ Rotina para exportatacao de dados para Excel               ³±±
+±±³Descri‡…o ³ Rotina para exportatacao de dados para Excel               ³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
 ±±³Retorno   ³ Nenhum                                                     ³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±

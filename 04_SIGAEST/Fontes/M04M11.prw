@@ -81,11 +81,11 @@ While .T.
 						(Iif(aOrdProd[oBrwOP:nAt,11] > 0 .And. EMPTY(aOrdProd[oBrwOP:nAt,12]), 'BR_AZUL',;
 						(Iif(!EMPTY(aOrdProd[oBrwOP:nAt,12]), 'BR_VERMELHO',;
 						)))))},,,,'CENTER', 25,.t.,.f.,,,,.f.,))
-			oBrwOP:AddColumn(TCColumn():New(PADR('Numero da OP',25),{|| Upper(aOrdProd[oBrwOP:nAt, 2])},,,,'LEFT'	, TAMSX3("C2_NUM")[1]+30       ,.f.,.f.,,,,.f.,))
-			oBrwOP:AddColumn(TCColumn():New('Item'   	   ,{|| Upper(aOrdProd[oBrwOP:nAt, 3])},,,,'LEFT'	, TAMSX3("C2_ITEM")[1]+10      ,.f.,.f.,,,,.f.,))
-			oBrwOP:AddColumn(TCColumn():New(PADR('Sequencia',15),{|| Upper(aOrdProd[oBrwOP:nAt, 4])},,,,'LEFT'	, TAMSX3("C2_SEQUEN")[1]+15    ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(PADR('Numero da OP',25),{|| aOrdProd[oBrwOP:nAt, 2]},,,,'LEFT'	, TAMSX3("C2_NUM")[1]+30       ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Item'   	   ,{|| aOrdProd[oBrwOP:nAt, 3]},,,,'LEFT'	, TAMSX3("C2_ITEM")[1]+10      ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New(PADR('Sequencia',15),{|| aOrdProd[oBrwOP:nAt, 4]},,,,'LEFT'	, TAMSX3("C2_SEQUEN")[1]+15    ,.f.,.f.,,,,.f.,))
 			oBrwOP:AddColumn(TCColumn():New('Item Grd.'    ,{|| aOrdProd[oBrwOP:nAt, 5]},,,,'LEFT'	, TAMSX3("C2_ITEMGRD")[1]+15   ,.f.,.f.,,,,.f.,))
-			oBrwOP:AddColumn(TCColumn():New('Produto'      ,{|| Upper(aOrdProd[oBrwOP:nAt, 6])},,,,'LEFT'	, TAMSX3("C2_PRODUTO")[1]+15   ,.f.,.f.,,,,.f.,))
+			oBrwOP:AddColumn(TCColumn():New('Produto'      ,{|| aOrdProd[oBrwOP:nAt, 6]},,,,'LEFT'	, TAMSX3("C2_PRODUTO")[1]+15   ,.f.,.f.,,,,.f.,))
 			oBrwOP:AddColumn(TCColumn():New('Descrição'    ,{|| aOrdProd[oBrwOP:nAt, 7]},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
 			oBrwOP:AddColumn(TCColumn():New('Emissão'      ,{|| aOrdProd[oBrwOP:nAt, 8]},,,,'LEFT'	, TAMSX3("C2_EMISSAO")[1]+10   ,.f.,.f.,,,,.f.,))
 			oBrwOP:AddColumn(TCColumn():New('Prv.Inicio'  ,{|| aOrdProd[oBrwOP:nAt, 24]},,,,'LEFT'	, TAMSX3("C2_DATPRI")[1]+10    ,.f.,.f.,,,,.f.,))
@@ -110,9 +110,9 @@ While .T.
 
 		If Len(oBrwEmp:aColumns) == 0
 			oBrwEmp:AddColumn(TCColumn():New('  '   		    ,{|| aEmpenhos[oBrwEmp:nAt,9]},,,,'CENTER', 10,.t.,.f.,,,,.f.,))
-			oBrwEmp:AddColumn(TCColumn():New(PADR('Ordem de Produção',30),{|| Upper(aEmpenhos[oBrwEmp:nAt, 1])},,,,'LEFT'	, TAMSX3("D4_OP")[1]+15  ,.f.,.f.,,,,.f.,))
-			oBrwEmp:AddColumn(TCColumn():New('Componente'       ,{|| Upper(aEmpenhos[oBrwEmp:nAt, 2])},,,,'LEFT'	, TAMSX3("D4_COD")[1]+15  ,.f.,.f.,,,,.f.,))
-			oBrwEmp:AddColumn(TCColumn():New('Descrição'  	    ,{|| Upper(aEmpenhos[oBrwEmp:nAt, 3])},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New(PADR('Ordem de Produção',30),{|| aEmpenhos[oBrwEmp:nAt, 1]},,,,'LEFT'	, TAMSX3("D4_OP")[1]+15  ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New('Componente'       ,{|| aEmpenhos[oBrwEmp:nAt, 2]},,,,'LEFT'	, TAMSX3("D4_COD")[1]+15  ,.f.,.f.,,,,.f.,))
+			oBrwEmp:AddColumn(TCColumn():New('Descrição'  	    ,{|| aEmpenhos[oBrwEmp:nAt, 3]},,,,'LEFT'	, TAMSX3("B1_DESC")[1]+30      ,.f.,.f.,,,,.f.,))
 			oBrwEmp:AddColumn(TCColumn():New('Local'            ,{|| aEmpenhos[oBrwEmp:nAt, 4]},,,,'LEFT'	, TAMSX3("D4_LOCAL")[1]+15,.f.,.f.,,,,.f.,))
 			oBrwEmp:AddColumn(TCColumn():New('UM'               ,{|| aEmpenhos[oBrwEmp:nAt, 11]},,,,'LEFT'	, TAMSX3("B1_UM")[1]+15,.f.,.f.,,,,.f.,))
 			oBrwEmp:AddColumn(TCColumn():New('Quantidade'       ,{|| aEmpenhos[oBrwEmp:nAt, 5]},PesqPict("SD4","D4_QUANT"),,,'RIGHT'	, TAMSX3("D4_QUANT")[1]+20 ,.f.,.f.,,,,.f.,))
@@ -526,7 +526,7 @@ For nX := 1 To Len(aOrdProd)
 				cRot_Cort := SB1->B1_XROTCT
 				
 
-				SB1->(dbSeek(xFilial("SB1")+(SD4->D4_COD)))
+				SB1->(dbSeek(xFilial("SB1")+SD4->D4_COD))
 				cTipo_Comp := SB1->B1_TIPO
 				cDesc_MP   := SB1->B1_DESC
 				cUM_MP     := SB1->B1_UM
@@ -554,8 +554,8 @@ For nX := 1 To Len(aOrdProd)
 								Alltrim(Transform(SC2->C2_QUANT/*SD4->D4_QUANT*/,"999999999.9"/*"999999999.999999"*/))+";"+;
 								cEspessura+";"+;
 								cMaterial+";"+;
-								"'"+Alltrim(Upper(SD4->D4_OP))+";"+;
-								Alltrim(Upper(aOrdProd[nX][16])/*SC2->C2_PRODUTO*/)+";"+;
+								"'"+Alltrim(SD4->D4_OP)+";"+;
+								Alltrim(aOrdProd[nX][16]/*SC2->C2_PRODUTO*/)+";"+;
 								cSentidoPre+";"+;
 								cRoteiro+";"+;
 								cFilePDF+";"+;
