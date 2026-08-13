@@ -1,273 +1,319 @@
-#INCLUDE "protheus.ch"
+#Include "Totvs.ch"
+#INCLUDE "PROTHEUS.CH"
+#INCLUDE "TOPCONN.CH"
+#Include "TBICONN.CH"
 
-/////////////////////////////////////////////////////////////
-// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
-/////////////////////////////////////////////////////////////
-USER FUNCTION MACOMXFUN()
+#Define Enter chr(13) + chr(10)
 
-RETURN NIL
+//#DEFINE cSpecialCharacters (('";<;>;&;};{;´;`;*;%;$;#;@;!;/;*;|') + (";';+;¨;¬"))
+#DEFINE cSpecialCharacters (('";<;>;&;};{;*;%;$;#;@;!;*;|') + (";';+;¨;¬")) // #4711 - Retirado / ´ `
 
-/////////////////////////////////////////////////////////////
-// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
-/////////////////////////////////////////////////////////////
-USER FUNCTION CLEARTEXT()
-LOCAL CVARIABLE
-LOCAL CFIELD
-LOCAL BBLOCK
-LOCAL ACHARACTERS
-LOCAL LNOMVC
-LOCAL LRETURN
-LOCAL CSTRING := ""
+/*/{Protheus.doc} MACOMXFUN
+Função genérica 
 
-LNOMVC := FWMODELACTIVE()==NIL
-CVARIABLE := READVAR()
-CFIELD := SUBSTRING(CVARIABLE,AT(">",CVARIABLE)+1, LEN(CVARIABLE))
-IF LNOMVC
-    CSTRING := &(CVARIABLE)
-ELSE 
+@type function
+@author	Jorge Heitor T. de Oliveira
+@since 20/06/2023
+@version P12
+@database MSSQL
 
-    CSTRING := FWFLDGET(CFIELD)
-ENDIF
+@history Fonte para contemplar funções genéricas utilizadas em diversos propósitos
 
-IF CSTRING==NIL
-    RETURN  .T. 
-ELSE 
-    CSTRING :=  ALLTRIM(CSTRING)
-ENDIF
+/*/
+User Function MACOMXFUN()
 
-BBLOCK := {|CHAR|CSTRING := STRTRAN(CSTRING,CHAR,"")}
-ACHARACTERS := SEPARA('"<>&}{*%$#@!*|'+"';+;¨;¬",";")
-LRETURN :=  .T. 
+Return Nil
 
-AEVAL(ACHARACTERS,BBLOCK)
-
-IF LNOMVC
-    &(CVARIABLE) := FWNOACCENT(CSTRING)
-ELSE 
-
-    FWFLDPUT(CFIELD,FWNOACCENT(CSTRING))
-ENDIF
-
-RETURN LRETURN
-
-/////////////////////////////////////////////////////////////
-// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
-/////////////////////////////////////////////////////////////
-USER FUNCTION BUSCAVEND()
-
-LOCAL CNOMEVEN := POSICIONE("SA3",1,XFILIAL("SA3")+POSICIONE("SF2",1,XFILIAL("SF2")+SB6->B6_DOC,"F2_VEND1"),"A3_NOME")
-
-RETURN CNOMEVEN
-
-/////////////////////////////////////////////////////////////
-// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
-/////////////////////////////////////////////////////////////
-USER FUNCTION BLOQPROD()
-
-LOCAL _LRET :=  .T. 
-LOCAL CCODOPER := BUSCACOLS("C6_OPER")
-
-DO CASE 
- CASE CCODOPER=="03" .AND. !((RETCODUSR()) $ ("000000|000131|000241|000690|000728|000736"))
-    MSGSTOP("AS OPERAÇÕES 03 E 04 ESTÃO INDISPONÍVEIS PARA USO. ENTRE EM CONTATO COM O DEPARTAMENTO FISCAL.","ATENÇÃO")
-    _LRET :=  .F. 
-CASE CCODOPER=="04" .AND. !((RETCODUSR()) $ ("000000|000131|000241|000690|000728|000736"))
-    MSGSTOP("AS OPERAÇÕES 03 E 04 ESTÃO INDISPONÍVEIS PARA USO. ENTRE EM CONTATO COM O DEPARTAMENTO FISCAL.","ATENÇÃO")
-    _LRET :=  .F. 
-CASE CCODOPER=="07" .AND. !((RETCODUSR()) $ ("000000|000131|000241|000385|000095|000332|000587|000467|000728|000736"))
-    MSGSTOP("AS OPERAÇÕES 07 E 08 ESTÃO INDISPONÍVEIS PARA USO. ENTRE EM CONTATO COM O DEPARTAMENTO FISCAL.","ATENÇÃO")
-    _LRET :=  .F. 
-CASE CCODOPER=="08" .AND. !((RETCODUSR()) $ ("000000|000131|000241|000385|000095|000332|000587|000467|000728|000736"))
-    MSGSTOP("AS OPERAÇÕES 07 E 08 ESTÃO INDISPONÍVEIS PARA USO. ENTRE EM CONTATO COM O DEPARTAMENTO FISCAL.","ATENÇÃO")
-    _LRET :=  .F. 
-CASE CCODOPER=="36" .AND. !((RETCODUSR()) $ ("000000"))
-    MSGSTOP("A OPERAÇÃO 36 FOI DESCONTINUADA E ESTÁ FORA DE USO. ENTRE EM CONTATO COM O DEPARTAMENTO FISCAL.","ATENÇÃO")
-    _LRET :=  .F. 
-ENDCASE
-RETURN _LRET
-
-/////////////////////////////////////////////////////////////
-// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
-/////////////////////////////////////////////////////////////
-USER FUNCTION BUSTPVEN(CTPVEN,CCAMPO)
-
-LOCAL AAREA := GETAREA()
-LOCAL AAREASX3 := SX3->(GETAREA())
-LOCAL CDESCTPVEN := "          "
-
-DBSELECTAREA("SX3")
-DBSETORDER(2)
-IF SX3->(MSSEEK(CCAMPO))
-    CCOMBO := SX3->(X3CBOX())
-    ACOMBO := STRTOKARR(CCOMBO,";")
+/*
+    Função para remover caracteres especiais de uma string de Campos em MVC (Utilizar na validação do campo)
+*/
+User Function ClearText()
+    Local cVariable     as character
+    Local cField        as character
+    Local bBlock        as block
+    Local aCharacters   as array
+    Local lNoMVC        as logical
+    Local lReturn       as logical
+    Local cString       := ""
     
-    NPOS := ASCAN(ACOMBO,{|X|LEFT(X[1],2)==CTPVEN})
+    lNoMVC := (FWModelActive() == Nil)
+    cVariable := ReadVar()
+    cField := SubString(cVariable,At(">",cVariable)+1,Len(cVariable))
+    If lNoMVC
+        cString := &(cVariable)
+
+    Else
+        cString := FWFldGet(cField)
+    EndIf
     
-    IF NPOSARR<>0
-        CDESCTPVEN := ACOMBO[NPOSARR]
-    ENDIF
-ENDIF
+    // Tratamento - 29/08/23 #4358
+    If cString == Nil
+        Return .T.
+    Else
+        cString := AllTrim(cString)
+    EndIf
 
-RESTAREA(AAREASX3)
-RESTAREA(AAREA)
+    bBlock := {|char| cString := StrTran(cString,char,"")}
+    aCharacters := Separa(cSpecialCharacters, ";")
+    lReturn := .T.
 
-RETURN CDESCTPVEN
+    //Processa substituições
+    aEval(aCharacters, bBlock)
 
-/////////////////////////////////////////////////////////////
-// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
-/////////////////////////////////////////////////////////////
-USER FUNCTION SEND2(CMAILDESTINO,CASSUNTO,CTEXTO,CANEXOS,LMENSAGEM,CMENSQDOERRO,CTPENVIO)
-
-LOCAL LRETURN
-LOCAL CTPENVIO := IIF(VALTYPE(CTPENVIO)<>"U",CTPENVIO,"D")
-PRIVATE CMAILDESTINO := IIF(VALTYPE(CMAILDESTINO)<>"U",CMAILDESTINO,"")
-PRIVATE LMENSAGEM := IIF(VALTYPE(LMENSAGEM)<>"U",LMENSAGEM, .T. )
-
-IF CTPENVIO=="D"
+    //Atualiza campo lido no "Valid"
+    If lNoMVC
+        &(cVariable) := FwNoAccent(cString)
     
-    IF LMENSAGEM
-        LRETURN := PROCESSA({||U_SENDMAIL2(CMAILDESTINO,CASSUNTO,CTEXTO,CANEXOS,LMENSAGEM,CMENSQDOERRO)})
-    ELSE 
-        LRETURN := U_SENDMAIL2(CMAILDESTINO,CASSUNTO,CTEXTO,CANEXOS,LMENSAGEM,CMENSQDOERRO)
-    ENDIF
-ENDIF
+    Else
+        FWFldPut(cField,FwNoAccent(cString))
 
-RETURN LRETURN
+    EndIf
 
-/////////////////////////////////////////////////////////////
-// FONTE RECONSTRUIDO PELO TIME BSO ********************** //
-/////////////////////////////////////////////////////////////
-USER FUNCTION SENDMAIL2(CMAILDESTINO,CASSUNTO,CTEXTO,CANEXOS,LMENSAGEM,CMENSQDOERRO)
+Return lReturn
 
-LOCAL CTITADIC :=  ALLTRIM(GETMV("ES_WFTITAD",,""))
+/*
+    Função para utilizar os tipo de vendas cadastrados no campo C5_XTPVEN
+    exemplo: 1=Projeto;2=V.Unit.;3=Dealer;4=E-Commerce;5=P.Entrega;6=Proj.Dealer;7=Vnda Pecas;8=Sup.Tec.;9=ARE;10=Serv;11=Itens Falta;12=SAC 
+*/
 
-PRIVATE CMAILCONTA := GETMV("MV_RELACNT")
-PRIVATE CMAILSENHA := GETMV("MV_RELPSW")
-PRIVATE CMAILSERVER := GETMV("MV_RELSERV")
+//U_BusTpVen(cTpVen)
 
-CASSUNTO := IIF(TYPE(CASSUNTO)<>"U",CASSUNTO,"")
-CTEXTO := IIF(VALTYPE(CTEXTO)<>"U",CTEXTO,"")
-CANEXOS := IIF(VALTYPE(CANEXOS)<>"U",CANEXOS,"")
-LCONEXAO :=  .F. 
-LENVIO :=  .F. 
-LDESCONEXAO :=  .F. 
-CERRO_CONEXAO := ""
-CERRO_ENVIO := ""
-CERRO_DESCONEXAO := ""
-CMENSQDOERRO := IIF(VALTYPE(CMENSQDOERRO)<>"U",CMENSQDOERRO,"")
+//+------------------------------------------------------------------------------------------------
+//  Função chamada de incializador padrão na SB6 - Nome do Vendedor
+//+------------------------------------------------------------------------------------------------
+User Function BuscaVend()
 
-IF LMENSAGEM
-    PROCREGUA(3)
-ENDIF
+    Local cNomeven   := POSICIONE('SA3',1,XFILIAL('SA3') + POSICIONE('SF2',1,XFILIAL('SF2') + SB6->B6_DOC ,'F2_VEND1'),'A3_NOME')
 
-IF EMPTY(CMAILDESTINO)
-    
-    IF LMENSAGEM
-        MSGSTOP("CONTA(S) DE EMAIL DESTINO NAO INFORMADA "+CMENSQDOERRO,)
-    ENDIF
-    RETURN  .F. 
-ENDIF
+Return(cNomeven)
 
-IF EMPTY(CASSUNTO)
-    
-    IF LMENSAGEM
-        MSGSTOP("ASSUNTO DO E-MAIL NAO INFORMADO"+CMENSQDOERRO,)
-    ENDIF
-    RETURN  .F. 
-ENDIF
 
-IF EMPTY(CTEXTO)
-    
-    IF LMENSAGEM
-        MSGSTOP("TEXTO DO E-MAIL NAO INFORMADO"+CMENSQDOERRO,)
-    ENDIF
-    RETURN  .F. 
-ENDIF
+// +------------------------------------------------------------+
+// | Impede o uso das operações 03 e 04, com uso exclusivo do   |
+// | setor de faturamento - Chamar função no X3_WHEN do campo no|
+// | pedido de vendas - Campos C6_PRODUTO e C6_OPER -           |
+// +------------------------------------------------------------+
+User function BloqProd()
 
-IF LMENSAGEM
-    INCPROC("CONECTANDO AO SERVIDOR DE EMAIL !!!")
-ENDIF
+Local _lRet      := .T. //Variável utilizada para controle e validação do item do pedido
+Local cCodOper   := BuscAcols('C6_OPER')
 
-FOR NPROC := 1 TO 10
-    
-    IF ( .F. ) 
-    LCONEXAO := CALLPROC("MAILSMTPON",CMAILSERVER,CMAILCONTA,CMAILSENHA,,,)
-    ELSE
-    LCONEXAO := MAILSMTPON(CMAILSERVER,CMAILCONTA,CMAILSENHA,,,)
-    ENDIF
-    
-    IF !(LCONEXAO) .AND. NPROC==10
-        
-        IF ( .F. ) 
-        CERRO_CONEXAO := CALLPROC("MAILGETERR")
-        ELSE
-        CERRO_CONEXAO := MAILGETERR()
-        ENDIF
-        MSGSTOP("NAO FOI POSSIVEL ESTABELECER A CONEXAO COM O SERVIDOR - "+CERRO_CONEXAO+" - "+CMENSQDOERRO,)
-        RETURN  .F. 
-    ENDIF
-NEXT
 
-IF GETMV("MV_RELAUTH")
-    MAILAUTH(CMAILCONTA,CMAILSENHA)
-ENDIF
+    Do Case 
+    Case cCodOper == "03" .and. !RetCodUsr() $ "000000|000131|000241|000690|000728|000736"
+        MsgStop('As operações 03 e 04 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
+		_lRet := .F.
+    Case cCodOper == "04" .and. !RetCodUsr() $ "000000|000131|000241|000690|000728|000736"
+        MsgStop('As operações 03 e 04 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
+		_lRet := .F.
+    Case cCodOper == "07" .and. !RetCodUsr() $ "000000|000131|000241|000385|000095|000332|000587|000467|000728|000736"
+        MsgStop('As operações 07 e 08 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
+		_lRet := .F.
+    Case cCodOper == "08" .and. !RetCodUsr() $ "000000|000131|000241|000385|000095|000332|000587|000467|000728|000736"
+        MsgStop('As operações 07 e 08 estão indisponíveis para uso. Entre em contato com o departamento fiscal.','Atenção')
+		_lRet := .F.  
+    Case cCodOper == "36" .and. !RetCodUsr() $ "000000"
+        MsgStop('A operação 36 foi descontinuada e está fora de uso. Entre em contato com o departamento fiscal.','Atenção')
+		_lRet := .F.    
+    EndCase
+Return _lRet
 
-IF LMENSAGEM
-    INCPROC("ENVIANDO EMAIL !!!")
-ENDIF
 
-IF !(EMPTY(CANEXOS))
-    
-    IF ( .F. ) 
-    LENVIO := CALLPROC("MAILSEND",CMAILCONTA,{CMAILDESTINO},{},{},CTITADIC+CASSUNTO,CTEXTO,{CANEXOS}, .T. ,,)
-    ELSE
-    LENVIO := MAILSEND(CMAILCONTA,{CMAILDESTINO},{},{},CTITADIC+CASSUNTO,CTEXTO,{CANEXOS}, .T. ,,)
-    ENDIF
-ELSE 
-    
-    IF ( .F. ) 
-    LENVIO := CALLPROC("MAILSEND",CMAILCONTA,{CMAILDESTINO},{},{},CTITADIC+CASSUNTO,CTEXTO,{}, .T. ,,)
-    ELSE
-    LENVIO := MAILSEND(CMAILCONTA,{CMAILDESTINO},{},{},CTITADIC+CASSUNTO,CTEXTO,{}, .T. ,,)
-    ENDIF
-ENDIF
+User Function BusTpVen(cTpVen,cCampo)
 
-IF !(LENVIO)
-    
-    IF ( .F. ) 
-    CERRO_ENVIO := CALLPROC("MAILGETERR")
-    ELSE
-    CERRO_ENVIO := MAILGETERR()
-    ENDIF
-    
-    IF LMENSAGEM
-        MSGSTOP("NAO FOI POSSIVEL ENVIAR A MENSAGEM - "+CERRO_ENVIO+" - "+CMENSQDOERRO,)
-    ENDIF
-    RETURN  .F. 
-ENDIF
+Local aArea      := GetArea()
+Local aAreaSX3   := SX3->(GetArea())
+Local cDescTpVen := Space(10)
 
-IF LMENSAGEM
-    INCPROC("DESCONECTANDO DO SERVIDOR DE EMAIL !!!")
-ENDIF
+dbSelectArea("SX3")
+dbSetOrder(2)
+If SX3->(MsSeek(cCampo))
+	cCombo := SX3->( X3CBox() )
+	aCombo := StrTokArr ( cCombo , ';' )
 
-IF ( .F. ) 
- LDESCONEXAO := CALLPROC("MAILSMTPOFF")
- ELSE
- LDESCONEXAO := MAILSMTPOFF()
- ENDIF
+    //1=Venda;2=Entrega
+    nPos := Ascan(aCombo,{|X| Left(X[1],2) == cTpVen })
+    If nPosArr <> 0
+        cDescTpVen := aCombo[nPosArr]
+    EndIf
+EndIf
 
-IF !(LDESCONEXAO)
-    
-    IF ( .F. ) 
-    CERRO_DESCONEXAO := CALLPROC("MAILGETERR")
-    ELSE
-    CERRO_DESCONEXAO := MAILGETERR()
-    ENDIF
-    
-    IF LMENSAGEM
-        MSGSTOP("NAO FOI POSSIVEL DESCONECTAR DO SERVIDOR - "+CERRO_DESCONEXAO,)
-    ENDIF
-    RETURN  .F. 
-ENDIF
+RestArea(aAreaSX3)
+RestArea(aArea)
 
-RETURN  .T. 
+Return(cDescTpVen)
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡„o    ?SendMail ?Autor ?                           ?Data ?4.11.2001 ³±?
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±?         ³Envio de E-mail                                              ³±?
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Parametros³ExpC1: Servido de E-mail                                     ³±?
+±±?         ³ExpC2: Conta de E-mail                                       ³±?
+±±?         ³ExpC3: Senha Conta E-mail                                    ³±?
+±±?         ³ExpC4: String Contas E-mail destino                          ³±?
+±±?         ³ExpC5: Assunto                                               ³±?
+±±?         ³ExpC6: Corpo de Texto                                        ³±?
+±±?         ³ExpC7: Arquivos Anexos                                       ³±?
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Retorno   ³Logico - .T. - Operacao realizada                            ³±?
+±±?         ?      - .F. - Operacao NAO realizada                        ³±?
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ?Generico                                                    ³±?
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+User Function Send2(cMailDestino,cAssunto,cTexto,cAnexos,lMensagem,cMensQdoErro,cTpEnvio)
+
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ?
+	//?Define Valores padroes. ?
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ?
+    Local lReturn
+    //Local cTpEnvio := If(ValType(cTpEnvio) != "U" , cTpEnvio,  "D" )
+    //Private cMailDestino := If( ValType(cMailDestino) != "U" , cMailDestino,  "" )
+    //Private lMensagem    := If( ValType(lMensagem)    != "U" , lMensagem,  .T. )
+
+    Default cTpEnvio := "D" // D=Direto, P=Processo
+    Default cMailDestino := ""
+    Default lMensagem := .T.
+
+    If cTpEnvio == "D"  // Envia Direto
+        If lMensagem
+            lReturn := Processa({||U_SendMail2(cMailDestino,cAssunto,cTexto,cAnexos,lMensagem,cMensQdoErro)})
+        Else
+            lReturn := U_SendMail2(cMailDestino,cAssunto,cTexto,cAnexos,lMensagem,cMensQdoErro)
+        EndIf
+
+    EndIf
+
+Return(lReturn)
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡„o    ³SendMail2 ?Autor ?TI1369-ALEX FONSECA   ?Data ?4.11.2001 ³±?
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±?         ?Envio de E-mail                                             ³±?
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ?Generico                                                    ³±?
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+User Function SendMail2(cMailDestino,cAssunto,cTexto,cAnexos,lMensagem,cMensQdoErro)
+
+	Local cTitAdic	:= AllTrim(GetMv("ES_WFTITAD",, ""))
+    Local nProc
+
+    Private cMailConta   := GetMv("MV_RELACNT")
+    Private cMailSenha   := GetMv("MV_RELPSW")
+    Private cMailServer  := GetMv("MV_RElSERV")
+
+    cAssunto 		  := If( ValType(cAssunto) != "U" , cAssunto , "" )
+    cTexto 			  := If( ValType(cTexto)   != "U" , cTexto   , "" )
+    cAnexos			  := If( ValType(cAnexos)  != "U" , cAnexos  , "" )
+    lConexao		     := .F.
+    Lenvio   		  := .F.
+    lDesconexao		  := .F.
+    cErro_Conexao 	  := ""
+    cErro_Envio		  := ""
+    cErro_Desconexao := ""
+    cMensQdoErro     := If( ValType(cMensQdoErro)   != "U" , cMensQdoErro   , "" )
+
+    If lMensagem
+        ProcRegua(3)
+    EndIf
+
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ?
+	//?Avalia conteudo ?
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ?
+    If Empty( cMailDestino )
+        If lMensagem
+            MsgStop( "Conta(s) de Email Destino nao Informada "+cMensQdoErro)
+        EndIf
+        Return(.F.)
+    EndIf
+
+    If Empty( cAssunto )
+        If lMensagem
+            MsgStop( "Assunto do E-mail nao Informado"+cMensQdoErro)
+        EndIf
+        Return(.F.)
+    EndIf
+
+    If Empty( cTexto )
+        If lMensagem
+            MsgStop( "Texto do E-mail nao Informado"+cMensQdoErro)
+        EndIf
+        Return(.F.)
+    EndIf
+
+    If lMensagem
+        IncProc("Conectando ao servidor de Email !!!")
+    EndIf
+
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//?Executa conexao ao servidor mencionado no parametro. ?
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+    For nProc := 1 To 10
+
+        Connect Smtp Server cMailServer ACCOUNT cMailConta PASSWORD cMailSenha RESULT lConexao
+
+        If !lConexao .And. nProc == 10
+            GET MAIL ERROR cErro_Conexao
+            MsgStop("Nao foi possivel estabelecer a CONEXAO com o servidor - " + cErro_Conexao + " - "+cMensQdoErro)
+            Return( .F. )
+        EndIf
+    Next
+
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ?
+	//?Verifica se o parametro de requerer autenticacao est?habilitado. ?
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ?
+    If GetMv("MV_RELAUTH")
+        MailAuth(cMailConta,cMailSenha)
+    EndIf
+
+    If lMensagem
+        IncProc("Enviando Email !!!")
+    EndIf
+
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//?Executa envio da mensagem. ?
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+    If !Empty( cANEXOS )
+            Send Mail From cMAILCONTA to cMAILDESTINO SubJect cTitAdic + cASSUNTO BODY cTEXTO FORMAT TEXT ATTACHMENT cANEXOS RESULT LenVIO
+    Else
+            Send Mail From cMAILCONTA to cMAILDESTINO SubJect cTitAdic + cASSUNTO BODY cTEXTO FORMAT TEXT RESULT LenVIO
+    EndIf
+
+    If !Lenvio
+        Get Mail Error cErro_Envio
+        If lMensagem
+            MsgStop("Nao foi possivel ENVIAR a mensagem - " + cErro_Envio + " - "+cMensQdoErro)
+        EndIf
+        Return(.F.)
+    EndIf
+
+    If lMensagem
+        IncProc("Desconectando do servidor de Email !!!")
+    EndIf
+
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//?Executa disconexao ao servidor SMTP. ?
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+    DisConnect Smtp Server Result lDesconexao
+
+    If !lDesconexao
+        Get Mail Error cErro_Desconexao
+        If lMensagem
+            MsgStop("Nao foi possivel desconectar do servidor - " + cErro_Desconexao )
+        EndIf
+        Return( .F. )
+    EndIf
+
+Return(.T.)
