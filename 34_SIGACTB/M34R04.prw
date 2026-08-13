@@ -318,7 +318,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	//cXsegm	:= Posicione("SA1",1,xFilial("SA1")+SA1->A1_XSEGM,"A1_XSEGM")						//#7746
 	//cReddes	:= POSICIONE("ZA6",1,XFILIAL("ZA6")+SA1->A1_XREDE,"ZA6_DESC") 	//#7746                                                                     
 	//cSegmde	:= POSICIONE("ZA8",1,xFilial("ZA8")+SA1->A1_XSEGM,"ZA8_DESC")	//#7746
-
+	
 	lPosB1 	:= SB1->(MsSeek(xFilial("SB1")+(cAliasQry)->D2_COD))
 	lPosA1	:= SA1->(MsSeek(xFilial("SA1")+(cAliasQry)->D2_CLIENTE))
 	lPosB5 	:= SB5->(MsSeek(xFilial("SB5")+(cAliasQry)->D2_COD))
@@ -326,6 +326,22 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cXFilial    := (cAliasQry)->D2_FILIAL
 
 		
+	If lPosA1
+		cNomeCli    := SA1->A1_NOME
+		cXrede	    := SA1->A1_XREDE
+		cXsegm      := SA1->A1_XSEGM
+		cTpCli		:= SA1->A1_TIPO
+		//cCanal		:= SA1->A1_XCANAL
+	Else
+        cNomeCli    := ""
+        //cRegiao     := ""
+		cXrede	    := SA1->A1_XREDE
+		cXsegm      := SA1->A1_XSEGM
+		cTpCli		:= SA1->A1_TIPO
+		//cCanal		:= SA1->A1_XCANAL
+	Endif
+	
+	
 	lPosC5  := SC5->(MsSeek(cXFilial+(cAliasQry)->D2_PEDIDO))
     
     dDtEntr     := (cAliasQry)->D2_EMISSAO
@@ -410,21 +426,6 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 			cXpad	:= ""
 	Endif
 
-	If lPosA1
-		cNomeCli    := SA1->A1_NOME
-		cRegiao     := SA1->A1_DSCREG
-		cXrede	    := SA1->A1_XREDE
-		cXsegm      := SA1->A1_XSEGM
-		cTpCli		:= SA1->A1_TIPO
-		//cCanal		:= SA1->A1_XCANAL
-	Else
-        cNomeCli    := ""
-        cRegiao     := ""
-		cXrede	    := SA1->A1_XREDE
-		cXsegm      := SA1->A1_XSEGM
-		cTpCli		:= SA1->A1_TIPO
-		//cCanal		:= SA1->A1_XCANAL
-	Endif
 
 	If lPosC5
     	cCodVend    := SC5->C5_VEND1
@@ -464,7 +465,8 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
         nPrcTab     := POSICIONE('DA1',2,XFILIAL('DA1') + (cAliasQry)->D2_COD + SC5->C5_TABELA,'DA1_PRCVEN')
 		cReddes		:= POSICIONE("ZA6",1,XFILIAL("ZA6")+SA1->A1_XREDE,"ZA6_DESC")                                                                    
 		cSegmde		:= POSICIONE("ZA8",1,xFilial("ZA8")+SA1->A1_XSEGM,"ZA8_DESC")
-		
+		cRegiao     := Posicione("SA1",1,xFilial("SA1")+(SC5->C5_CLIENTE + SC5->C5_LOJACLI),"A1_DSCREG")
+				
         
         If cTpCli == 'F'
         	cTpCli  	:= 'Cons. Final'
