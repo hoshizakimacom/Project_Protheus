@@ -251,7 +251,7 @@ Static Function UpLoad(lEnd,cFilePath,cDirServer,aFiles,lSobrepor)
         EndIf
 
         lUpdate := .F.
-        If lStatus .And. LEN(aFilesOld := Directory(cDirServer+cProduto+cSufixo+"*"+cExtensao, "F")) > 0
+        If lStatus .And. LEN(aFilesOld := Directory(cDirServer+ALLTRIM(cProduto)+cSufixo+"*"+cExtensao, "F")) > 0
             
 			If !lSobrepor
 				lStatus := .F.
