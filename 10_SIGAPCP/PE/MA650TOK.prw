@@ -531,6 +531,34 @@ User Function M10EPrin(_cCodProd,_nQtd,_cNumSer,lCtrlImp,_nQtdImp)
 				_oPrinter:Say(_nRow + 685 , 70, "Consumo: " + _cConsumo, _OFontP)
 		EndIf
 
+	
+	ElseIf _cFamilia == "000003"
+
+        If _cTpFluido == "1"
+             	_cTxFluido := "R134a"
+        ElseIf _cTpFluido == "2"
+              	_cTxFluido := "R404A"
+        ElseIf _cTpFluido == "3"
+                _cTxFluido := "R404A/R134a"
+		ElseIf _cTpFluido == "4"			//#5495
+                _cTxFluido := "R290"		//#5495
+		ElseIf _cTpFluido == "5"			//#5917
+                _cTxFluido := "R452A"		//#5917	
+        EndIf        
+                    
+		//_oPrinter:Say(_nRow + 605 , 70, "Fluído Refrigerante: " + _cTxFluido ,_OFontP)
+		//_oPrinter:Say(_nRow + 645 , 70, "Carga de Fluído: " + _cVlrFluido + "g", _OFontP)
+		_oPrinter:Say(_nRow + 685 , 70, "Potência: " + _cPotencia, _OFontP)
+			
+		_oPrinter:Say(_nRow + 605 , 550, "Grau de Proteção: IP" + _cGrProtecao, _OFontP)
+		//_oPrinter:Say(_nRow + 660 , 550, "Classe Climática: " + _cClClima , _OFontP)
+		_oPrinter:Say(_nRow + 685 , 550, "Corrente: " + _cCorrente + " A", _OFontP)
+			
+		_oPrinter:Say(_nRow + 605 , 950, "Tensão: " + UPPER(_cTensao), _OFontP)
+		_oPrinter:Say(_nRow + 645 , 950, "Frequência: " + _cFreq, _OFontP)
+		
+
+
 	ElseIf _cFamilia == "000004"
 
         If _cTpFluido == "1"
