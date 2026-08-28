@@ -959,7 +959,7 @@ User Function M04M12M()
 			For nPeca := 1 To Len(aRefs[aOPS[nOp][15]][5])
 				If EMPTY(aRefs[aOPS[nOp][15]][5][nPeca][4]) //Se tiver sem peso na peça    
 					nPesoTotalPecas := 0
-					aOPS[nOp][11] += IIF(EMPTY(aOPS[nOp][11]),"","|") + "SubNests No."+cValToChar(aOPS[nOp][15])+" com produtos sem peso, verifique pois compromete rateio para requisição do KG de CHAPA !!! "
+					aOPS[nOp][11] += IIF(EMPTY(aOPS[nOp][11]),"","|") + "SubNests No."+cValToChar(aOPS[nOp][15])+" com produtos sem peso ("+ALLTRIM(aRefs[aOPS[nOp][15]][5][nPeca][1])+"), verifique pois compromete rateio para requisição do KG de CHAPA !!! "
 					Exit
 				EndIf
 				nPesoTotalPecas += ( aRefs[aOPS[nOp][15]][5][nPeca][2] * aRefs[aOPS[nOp][15]][5][nPeca][4] ) //Quantidade x Peso Peça
@@ -1194,6 +1194,9 @@ If !dbSeek(xFilial("SC2")+cOP)
 Else
 	If !EMPTY(SC2->C2_DATRF)
 		cObserv += IIF(!EMPTY(cObserv),"|","")+"OP encerrada anteriormente!"
+		//lOk  := .F.
+	ElseIf !EMPTY(SC2->C2_QUJE)
+		cObserv += IIF(!EMPTY(cObserv),"|","")+"OP com apontamento parcial!"
 		//lOk  := .F.
 	EndIf
 EndIf
@@ -1495,11 +1498,11 @@ Static Function TelaAjuste(aOPs,aRefs,cFileName)
 			nRecSD4   := aOPs[nX,14]
 			cMsgErro  := aOPs[nX,11]
 			dDatRF    := aOPs[nX,18]
-			aRet      := {.F.,""}
+			aRet      := {.F.,"",""}
 
 			MsgRun("Processando.....", "Apontamento produção Metalix",{|| aRet :=  Aponta(cLote,cNumOP,nQuant,cCodMP,cCodEstru,nQtdMp,nQtdEstr,cxMat,cCodRef,nQtdRef,lApontaRef,nRecSD4,cMsgErro,dDatRF) })
 
-			If !aRet[1] //Tem Erro
+			If !aRet[1] .And. aRet[3] <> "I" //Tem Erro, não considera como erro os registros IGNORADOS
 				lTemErro := .T.
 			EndIf
 		Next
@@ -2339,7 +2342,7 @@ ZAJ->ZAJ_DATINC := dDataBase
 ZAJ->ZAJ_HORINC := Time()
 MsuNLock()
 
-Return { lRet, cMsgErro }
+Return { lRet, cMsgErro, ZAJ->ZAJ_STATUS }
 
 /*
 
@@ -2474,7 +2477,8 @@ If dbSeek(xFilial("ZAJ")+cLote)
 
 	aCols:={}
 	While !EOF() .And. ZAJ_FILIAL+ZAJ_LOTE == xFilial("ZAJ")+cLote
-		Aadd(aCols,{IIF(ZAJ->ZAJ_STATUS="A","BR_VERDE","BR_VERMELHO"),;
+
+		Aadd(aCols,{IIF(ZAJ->ZAJ_STATUS="A","BR_VERDE",IIF(ZAJ->ZAJ_STATUS="I","BR_AMARELO","BR_VERMELHO")),;
 		             ZAJ->ZAJ_OP,ZAJ->ZAJ_SEQAPO,ZAJ->ZAJ_PROD,ZAJ->ZAJ_QTDPRO,ZAJ->ZAJ_XMAT,ZAJ->ZAJ_COMP,;
 					 ZAJ->ZAJ_QTDREQ,ZAJ->ZAJ_CODREF,ZAJ->ZAJ_QTDREF,ZAJ->ZAJ_STATUS,ZAJ->ZAJ_MSGERRO,.F.})
 
