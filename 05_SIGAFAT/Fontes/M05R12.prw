@@ -116,59 +116,62 @@ oVenProd:SetTotalInLine(.F.)
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³Define celulas da secao                                                 ³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-TRCell():New(oVenProd,"NUM"			,/*Tabela*/	,"Numero"			 ,PesqPict("SCK","CK_NUM")		,TamSx3("CK_NUM")[1]		,/*lPixel*/,{|| cNum	})		// Numero do Pedido
-TRCell():New(oVenProd,"EMISSAO"		,/*Tabela*/ ,"Emissao"			 ,PesqPict("SCJ","CJ_EMISSAO")	,TamSx3("CJ_EMISSAO")[1]	,/*lPixel*/,{|| dEmissao})		// Data de Emissão do Orçamento
-TRCell():New(oVenProd,"ITEM"		,/*Tabela*/	,"Item"		 		 ,PesqPict("SCK","CK_ITEM")		,TamSx3("CK_ITEM")[1]		,/*lPixel*/,{|| cItem	})		// Item do Orçamento
-TRCell():New(oVenProd,"FAMILIA"		,/*Tabela*/	,"Familia"			 ,PesqPict("SB1","B1_XFAMILI")	,TamSx3("B1_XFAMILI")[1]	,/*lPixel*/,{|| cXFami  })		// Familia
-TRCell():New(oVenProd,"PRODUTO"		,/*Tabela*/ ,"Cod.Produto"		 ,PesqPict("SCK","CK_PRODUTO")	,TamSx3("CK_PRODUTO")[1]	,/*lPixel*/,{|| cProd	})		// Código do Produto
-TRCell():New(oVenProd,"UM"			,/*Tabela*/	,"Un.Medida"	 	 ,PesqPict("SCK","CK_UM")		,TamSx3("CK_UM")[1]			,/*lPixel*/,{|| cUM		})		// Unidade de Medida
-TRCell():New(oVenProd,"DESCRI"		,/*Tabela*/	,"Descriçao"		 ,PesqPict("SCK","CK_DESCRI")	,TamSx3("CK_DESCRI")[1]		,/*lPixel*/,{|| cDescr	})		// Descrição do Produto
-TRCell():New(oVenProd,"QUANT"		,/*Tabela*/	,"Quantidade"		 ,PesqPict("SCK","CK_QTDVEN")	,TamSx3("CK_QTDVEN")[1]		,/*lPixel*/,{|| nQtdVen	})		// Quantidade
-TRCell():New(oVenProd,"PRCVEN"		,/*Tabela*/	,"Prc.Venda"		 ,PesqPict("SCK","CK_PRCVEN")	,TamSx3("CK_PRCVEN")[1]		,/*lPixel*/,{|| nPrcUnit})		// Preço Unitário
-TRCell():New(oVenProd,"VALTOT"		,/*Tabela*/ ,"Total"			 ,PesqPict("SCK","CK_VALOR")	,TamSx3("CK_VALOR")[1]		,/*lPixel*/,{|| nValTot	})		// Valor Total do Item
-TRCell():New(oVenProd,"ENTREGA"		,/*Tabela*/	,"Dt.Entrega"		 ,PesqPict("SCJ","CJ_XFECENT")	,TamSx3("CJ_XFECENT")[1]	,/*lPixel*/,{|| dDtEntr	})		// Data de Entrega
-TRCell():New(oVenProd,"TES"			,/*Tabela*/ ,"TES"				 ,PesqPict("SCK","CK_TES")		,TamSx3("CK_TES")[1]		,/*lPixel*/,{|| cTES	})		// Código de TES
-TRCell():New(oVenProd,"XTPVEN"		,/*Tabela*/ ,"Tipo Venda"		 ,PesqPict("SCJ","CJ_XTPVEN")	,TamSx3("CJ_XTPVEN")[1]		,/*lPixel*/,{|| cXTpVen })		// Tipo de Venda
-TRCell():New(oVenProd,"CODCLI"		,/*Tabela*/	,"Cod.Cliente"		 ,PesqPict("SCK","CK_CLIENTE")	,TamSx3("CK_CLIENTE")[1]	,/*lPixel*/,{|| cCodCli	})		// Código do Cliente
-TRCell():New(oVenProd,"LOJACLI"		,/*Tabela*/	,"Loja"				 ,PesqPict("SCK","CK_LOJA")		,TamSx3("CK_LOJA")[1]		,/*lPixel*/,{|| cCodLoj	})		// Código da Loja
-TRCell():New(oVenProd,"NOMECLI"		,/*Tabela*/ ,"Nome"				 ,PesqPict("SA1","A1_NOME")		,TamSx3("A1_NOME")[1]		,/*lPixel*/,{|| cNome	})		// Nome do Cliente
-TRCell():New(oVenProd,"REGIAO"		,/*Tabela*/	,"Região"			 ,PesqPict("SA1","A1_DSCREG")	,TamSx3("A1_DSCREG")[1]		,/*lPixel*/,{|| cRegiao	})		// Região do Cliente
-TRCell():New(oVenProd,"ESTADO"		,/*Tabela*/	,"Estado"			 ,PesqPict("SA1","A1_EST")		,TamSx3("A1_EST")[1]		,/*lPixel*/,{|| cEstado })		// Estado do Cliente
-TRCell():New(oVenProd,"MUNICIPIO"	,/*Tabela*/	,"Municipio"		 ,PesqPict("SA1","A1_MUN")		,TamSx3("A1_MUN")[1]		,/*lPixel*/,{|| cMunicio})		// Municipio do Cliente		#5914
-TRCell():New(oVenProd,"GERENCIA"	,/*Tabela*/	,"Gerência"			 ,PesqPict("SA1","A3_NOME")		,TamSx3("A3_NOME")[1]		,/*lPixel*/,{|| cNomGer })		// Nome do Gerente
-TRCell():New(oVenProd,"DESCONT"		,/*Tabela*/	,"%Desconto"		 ,PesqPict("SCK","CK_DESCONT")	,TamSx3("CK_DESCONT")[1]	,/*lPixel*/,{|| nDesc 	})		// Percentual de Desconto
-TRCell():New(oVenProd,"PRCUNIT"		,/*Tabela*/	,"Prc Lista"		 ,PesqPict("SCK","CK_PRUNIT")	,TamSx3("CK_PRUNIT")[1]		,/*lPixel*/,{|| nPrcList})		// Preço de Lista
-TRCell():New(oVenProd,"CLASFIS"		,/*Tabela*/	,"Sit.Tribut."		 ,PesqPict("SCK","CK_CLASFIS")	,TamSx3("CK_CLASFIS")[1]	,/*lPixel*/,{|| cPosIpi	})		// Pos.IPI (N.C.M.)
-TRCell():New(oVenProd,"DT1VEN"		,/*Tabela*/	,"1.Vencimento"		 ,PesqPict("SCK","CK_DT1VEN")	,TamSx3("CK_DT1VEN")[1]		,/*lPixel*/,{|| dDt1Ven	})		// Data de Primeiro Vencimento
-TRCell():New(oVenProd,"ITEMPLANT"	,/*Tabela*/	,"Item Planta"		 ,PesqPict("SCK","CK_XITEMP")	,TamSx3("CK_XITEMP")[1]		,/*lPixel*/,{|| cItemP	})		// Item da Planta
-TRCell():New(oVenProd,"VLUTAB"		,/*Tabela*/	,"Vlr Tabela"		 ,PesqPict("SCK","CK_XVLUTAB")	,TamSx3("CK_XVLUTAB")[1]	,/*lPixel*/,{|| nVluTab	})		// Valor de Tabela
-TRCell():New(oVenProd,"VLTBRU"		,/*Tabela*/	,"Vl Tot + IPI"		 ,PesqPict("SCK","CK_XVLTBRU")	,TamSx3("CK_XVLTBRU")[1]	,/*lPixel*/,{|| nVltBru	})		// Valor Total + IPI
-TRCell():New(oVenProd,"ACRES"		,/*Tabela*/	,"Acresc %"			 ,PesqPict("SCK","CK_XACRESC")	,TamSx3("CK_XACRESC")[1]	,/*lPixel*/,{|| nAcres	})		// % de Acrescimo
-TRCell():New(oVenProd,"VLTIPI"		,/*Tabela*/	,"Vlr Tot IPI"		 ,PesqPict("SCK","CK_XVLTIPI")	,TamSx3("CK_XVLTIPI")[1]	,/*lPixel*/,{|| nVltIpi	})		// Valor Total de IPI
-TRCell():New(oVenProd,"ALQPIS"		,/*Tabela*/	,"Aliq PIS"			 ,PesqPict("SCK","CK_XALQPS2")	,TamSx3("CK_XALQPS2")[1]	,/*lPixel*/,{|| nAlqPis	})		// Alíquota de PIS
-TRCell():New(oVenProd,"VLTPIS"		,/*Tabela*/	,"Vlr Tot PIS"		 ,PesqPict("SCK","CK_XVLTPS2")	,TamSx3("CK_XVLTPS2")[1]	,/*lPixel*/,{|| nVltPis	})		// Valor Total de PIS
-TRCell():New(oVenProd,"ALQCOF"		,/*Tabela*/	,"Aliq COFINS"		 ,PesqPict("SCK","CK_XALQCF2")	,TamSx3("CK_XALQCF2")[1]	,/*lPixel*/,{|| nAlqCof	})		// Alíquota de COFINS
-TRCell():New(oVenProd,"VLTCOF"		,/*Tabela*/	,"Vl.Tot.COFINS"	 ,PesqPict("SCK","CK_XVLTCF2")	,TamSx3("CK_XVLTCF2")[1]	,/*lPixel*/,{|| nVltCof	})		// Valor Total de COFINS
-TRCell():New(oVenProd,"ALQICM"		,/*Tabela*/	,"Aliq.ICM"			 ,PesqPict("SCK","CK_XALQICM")	,TamSx3("CK_XALQICM")[1]	,/*lPixel*/,{|| nAlqICM	})		// Alíquota de ICMS
-TRCell():New(oVenProd,"VLTICM"		,/*Tabela*/	,"Vl.Tot.ICM"		 ,PesqPict("SCK","CK_XVLTICM")	,TamSx3("CK_XVLTICM")[1]	,/*lPixel*/,{|| nVltICM	})		// Valor Total de ICMS
-TRCell():New(oVenProd,"ALQSOL"		,/*Tabela*/	,"Alq.Sol"			 ,PesqPict("SCK","CK_XALQSOL")	,TamSx3("CK_XALQSOL")[1]	,/*lPixel*/,{|| nAlqSol	})		// Alíquota de ICMS-ST
-TRCell():New(oVenProd,"VLTSOL"		,/*Tabela*/	,"Vl.Tot.Sol"		 ,PesqPict("SCK","CK_XVLTSOL")	,TamSx3("CK_XVLTSOL")[1]	,/*lPixel*/,{|| nVltSol	})		// Valor Total de ICMS-ST
-TRCell():New(oVenProd,"VEND1"		,/*Tabela*/ ,"Vendedor 1"		 ,PesqPict("SC5","CJ_XVEND1")	,TamSx3("CJ_XVEND1")[1]		,/*lPixel*/,{|| cVend1	})		// Cod. Vendedor 1
-TRCell():New(oVenProd,"NOMVEND1"	,/*Tabela*/ ,"Nome"				 ,PesqPict("SC5","CJ_XVEND1")	,TamSx3("CJ_XVEND1")[1]		,/*lPixel*/,{|| cNomVen1})		// Nome do Vendedor 1
-TRCell():New(oVenProd,"FECHAMENTO"	,/*Tabela*/ ,"Prev.Fechamento"	 ,PesqPict("ZA9","ZA9_XFUFEC")	,TamSx3("ZA9_XFUFEC")[1]	,/*lPixel*/,{|| dXFuFec })		// Data de Previsão de fechamento da proposta
-TRCell():New(oVenProd,"PROXIMO"		,/*Tabela*/	,"Prox. Contato"	 ,PesqPict("ZA9","ZA9_XFUPRX")	,TamSx3("ZA9_XFUPRX")[1]	,/*lPixel*/,{|| dXFuprx })		// Data de previsão do próximo contato
-TRCell():New(oVenProd,"ULTIMO"		,/*Tabela*/	,"Ult.Contato"		 ,PesqPict("ZA9","ZA9_XFUULT")	,TamSx3("ZA9_XFUULT")[1]	,/*lPixel*/,{|| dXFuUlt })		// Data do ultimo contato realizado   
-TRCell():New(oVenProd,"OBRAS"		,/*Tabela*/ ,"Ref. Obras"		 ,PesqPict("SCJ","CJ_XOBRAS")	,TamSx3("CJ_XOBRAS")[1]		,/*lPixel*/,{|| cXObras })		// Ref. Obras
-TRCell():New(oVenProd,"STATUS"		,/*Tabela*/ ,"Status"		 	 ,PesqPict("SCJ","CJ_STATUS")	,TamSx3("CJ_STATUS")[1]		,/*lPixel*/,{|| cStatus })		// Status
-TRCell():New(oVenProd,"ST FOLLOW UP",/*Tabela*/ ,"Status FlwUP"		 ,PesqPict("ZA9","ZA9_XFUST")	,TamSx3("ZA9_XFUST")[1]		,/*lPixel*/,{|| cStFup })		// Status Follow Up //#5035
-TRCell():New(oVenProd,"CONTATO"		,/*Tabela*/ ,"Contato"			 ,PesqPict("SCJ","CJ_XCONTAT")	,TamSx3("CJ_XCONTAT")[1]	,/*lPixel*/,{|| cXcont })		// Contato			//#6227
-TRCell():New(oVenProd,"TEL CONTATO" ,/*Tabela*/ ,"Tel Contato"		 ,PesqPict("SCJ","CJ_XTELCON")	,TamSx3("CJ_XTELCON")[1]	,/*lPixel*/,{|| cXtelco })		// Telefone Contato //#6227
-TRCell():New(oVenProd,"EMAIL CONTAT",/*Tabela*/ ,"Email Contato"	 ,PesqPict("SCJ","CJ_XEMCON")	,TamSx3("CJ_XEMCON")[1]		,/*lPixel*/,{|| cXemcon })		// Email Contato 	//#6227
-TRCell():New(oVenProd,"CONSULTOR"	,/*Tabela*/ ,"Consultor"		 ,PesqPict("SCJ","CJ_XCONSUL")	,TamSx3("CJ_XCONSUL")[1]	,/*lPixel*/,{|| cXconsu })		// Consultor 		//#6227
-TRCell():New(oVenProd,"SUB FAM.SUG.",/*Tabela*/ ,"Familia Sugerida"  ,PesqPict("SB1","B1_XFAMSGD")	,TamSx3("B1_XFAMSGD")[1]	,/*lPixel*/,{|| cXFamSgd })		// Familia Sugerida
-TRCell():New(oVenProd,"FAMILIA.SUG.",/*Tabela*/ ,"Sub.Fam. Sugerida" ,PesqPict("SB1","B1_XSUBFAM")	,TamSx3("B1_XSUBFAM")[1]	,/*lPixel*/,{|| cXSubFam })		// Sub Fam.Sugerida
-TRCell():New(oVenProd,"PROBABILID."	,/*Tabela*/	,"Probabilidade"	 ,"@X",TamSx3("ZA9_XPROBA")[1]+10	,/*lPixel*/,{|| cXProbCod})		// Probabilidade
-TRCell():New(oVenProd,"VLR. LIQ"	,/*Tabela*/	,"Vlr. Liquido"		 ,PesqPict("SCK","CK_VALOR")	,TamSx3("CK_VALOR")[1]		,/*lPixel*/,{|| nVlrLiq})		// Valor Liquido
+TRCell():New(oVenProd,"NUM"			,/*Tabela*/	,"Numero"			 			,PesqPict("SCK","CK_NUM")		,TamSx3("CK_NUM")[1]		,/*lPixel*/,{|| cNum	})		// Numero do Pedido
+TRCell():New(oVenProd,"EMISSAO"		,/*Tabela*/ ,"Emissao"			 			,PesqPict("SCJ","CJ_EMISSAO")	,TamSx3("CJ_EMISSAO")[1]	,/*lPixel*/,{|| dEmissao})		// Data de Emissão do Orçamento
+TRCell():New(oVenProd,"ITEM"		,/*Tabela*/	,"Item"		 		 			,PesqPict("SCK","CK_ITEM")		,TamSx3("CK_ITEM")[1]		,/*lPixel*/,{|| cItem	})		// Item do Orçamento
+TRCell():New(oVenProd,"FAMILIA"		,/*Tabela*/	,"Familia"			 			,PesqPict("SB1","B1_XFAMILI")	,TamSx3("B1_XFAMILI")[1]	,/*lPixel*/,{|| cXFami  })		// Familia
+TRCell():New(oVenProd,"PRODUTO"		,/*Tabela*/ ,"Cod.Produto"		 			,PesqPict("SCK","CK_PRODUTO")	,TamSx3("CK_PRODUTO")[1]	,/*lPixel*/,{|| cProd	})		// Código do Produto
+TRCell():New(oVenProd,"UM"			,/*Tabela*/	,"Un.Medida"	 	 			,PesqPict("SCK","CK_UM")		,TamSx3("CK_UM")[1]			,/*lPixel*/,{|| cUM		})		// Unidade de Medida
+TRCell():New(oVenProd,"DESCRI"		,/*Tabela*/	,"Descriçao"		 			,PesqPict("SCK","CK_DESCRI")	,TamSx3("CK_DESCRI")[1]		,/*lPixel*/,{|| cDescr	})		// Descrição do Produto
+TRCell():New(oVenProd,"QUANT"		,/*Tabela*/	,"Quantidade"		 			,PesqPict("SCK","CK_QTDVEN")	,TamSx3("CK_QTDVEN")[1]		,/*lPixel*/,{|| nQtdVen	})		// Quantidade
+TRCell():New(oVenProd,"PRCVEN"		,/*Tabela*/	,"Prc.Venda"		 			,PesqPict("SCK","CK_PRCVEN")	,TamSx3("CK_PRCVEN")[1]		,/*lPixel*/,{|| nPrcUnit})		// Preço Unitário
+TRCell():New(oVenProd,"VALTOT"		,/*Tabela*/ ,"Total"			 			,PesqPict("SCK","CK_VALOR")	,TamSx3("CK_VALOR")[1]		,/*lPixel*/,{|| nValTot	})			// Valor Total do Item
+TRCell():New(oVenProd,"ENTREGA"		,/*Tabela*/	,"Dt.Entrega"		 			,PesqPict("SCJ","CJ_XFECENT")	,TamSx3("CJ_XFECENT")[1]	,/*lPixel*/,{|| dDtEntr	})		// Data de Entrega
+TRCell():New(oVenProd,"TES"			,/*Tabela*/ ,"TES"				 			,PesqPict("SCK","CK_TES")		,TamSx3("CK_TES")[1]		,/*lPixel*/,{|| cTES	})		// Código de TES
+TRCell():New(oVenProd,"XTPVEN"		,/*Tabela*/ ,"Tipo Venda"		 			,PesqPict("SCJ","CJ_XTPVEN")	,TamSx3("CJ_XTPVEN")[1]		,/*lPixel*/,{|| cXTpVen })		// Tipo de Venda
+TRCell():New(oVenProd,"CODCLI"		,/*Tabela*/	,"Cod.Cliente"		 			,PesqPict("SCK","CK_CLIENTE")	,TamSx3("CK_CLIENTE")[1]	,/*lPixel*/,{|| cCodCli	})		// Código do Cliente
+TRCell():New(oVenProd,"LOJACLI"		,/*Tabela*/	,"Loja"				 			,PesqPict("SCK","CK_LOJA")		,TamSx3("CK_LOJA")[1]		,/*lPixel*/,{|| cCodLoj	})		// Código da Loja
+TRCell():New(oVenProd,"NOMECLI"		,/*Tabela*/ ,"Nome"				 			,PesqPict("SA1","A1_NOME")		,TamSx3("A1_NOME")[1]		,/*lPixel*/,{|| cNome	})		// Nome do Cliente
+TRCell():New(oVenProd,"REGIAO"		,/*Tabela*/	,"Região"			 			,PesqPict("SA1","A1_DSCREG")	,TamSx3("A1_DSCREG")[1]		,/*lPixel*/,{|| cRegiao	})		// Região do Cliente
+TRCell():New(oVenProd,"ESTADO"		,/*Tabela*/	,"Estado"			 			,PesqPict("SA1","A1_EST")		,TamSx3("A1_EST")[1]		,/*lPixel*/,{|| cEstado })		// Estado do Cliente
+TRCell():New(oVenProd,"MUNICIPIO"	,/*Tabela*/	,"Municipio"		 			,PesqPict("SA1","A1_MUN")		,TamSx3("A1_MUN")[1]		,/*lPixel*/,{|| cMunicio})		// Municipio do Cliente		#5914
+TRCell():New(oVenProd,"GERENCIA"	,/*Tabela*/	,"Gerência"			 			,PesqPict("SA1","A3_NOME")		,TamSx3("A3_NOME")[1]		,/*lPixel*/,{|| cNomGer })		// Nome do Gerente
+TRCell():New(oVenProd,"DESCONT"		,/*Tabela*/	,"%Desconto"		 			,PesqPict("SCK","CK_DESCONT")	,TamSx3("CK_DESCONT")[1]	,/*lPixel*/,{|| nDesc 	})		// Percentual de Desconto
+TRCell():New(oVenProd,"PRCUNIT"		,/*Tabela*/	,"Prc Lista"		 			,PesqPict("SCK","CK_PRUNIT")	,TamSx3("CK_PRUNIT")[1]		,/*lPixel*/,{|| nPrcList})		// Preço de Lista
+TRCell():New(oVenProd,"CLASFIS"		,/*Tabela*/	,"Sit.Tribut."		 			,PesqPict("SCK","CK_CLASFIS")	,TamSx3("CK_CLASFIS")[1]	,/*lPixel*/,{|| cPosIpi	})		// Pos.IPI (N.C.M.)
+TRCell():New(oVenProd,"DT1VEN"		,/*Tabela*/	,"1.Vencimento"		 			,PesqPict("SCK","CK_DT1VEN")	,TamSx3("CK_DT1VEN")[1]		,/*lPixel*/,{|| dDt1Ven	})		// Data de Primeiro Vencimento
+TRCell():New(oVenProd,"ITEMPLANT"	,/*Tabela*/	,"Item Planta"		 			,PesqPict("SCK","CK_XITEMP")	,TamSx3("CK_XITEMP")[1]		,/*lPixel*/,{|| cItemP	})		// Item da Planta
+TRCell():New(oVenProd,"VLUTAB"		,/*Tabela*/	,"Vlr Tabela"		 			,PesqPict("SCK","CK_XVLUTAB")	,TamSx3("CK_XVLUTAB")[1]	,/*lPixel*/,{|| nVluTab	})		// Valor de Tabela
+TRCell():New(oVenProd,"VLTBRU"		,/*Tabela*/	,"Vl Tot + IPI"		 			,PesqPict("SCK","CK_XVLTBRU")	,TamSx3("CK_XVLTBRU")[1]	,/*lPixel*/,{|| nVltBru	})		// Valor Total + IPI
+TRCell():New(oVenProd,"ACRES"		,/*Tabela*/	,"Acresc %"			 			,PesqPict("SCK","CK_XACRESC")	,TamSx3("CK_XACRESC")[1]	,/*lPixel*/,{|| nAcres	})		// % de Acrescimo
+TRCell():New(oVenProd,"VLTIPI"		,/*Tabela*/	,"Vlr Tot IPI"		 			,PesqPict("SCK","CK_XVLTIPI")	,TamSx3("CK_XVLTIPI")[1]	,/*lPixel*/,{|| nVltIpi	})		// Valor Total de IPI
+TRCell():New(oVenProd,"ALQPIS"		,/*Tabela*/	,"Aliq PIS"			 			,PesqPict("SCK","CK_XALQPS2")	,TamSx3("CK_XALQPS2")[1]	,/*lPixel*/,{|| nAlqPis	})		// Alíquota de PIS
+TRCell():New(oVenProd,"VLTPIS"		,/*Tabela*/	,"Vlr Tot PIS"		 			,PesqPict("SCK","CK_XVLTPS2")	,TamSx3("CK_XVLTPS2")[1]	,/*lPixel*/,{|| nVltPis	})		// Valor Total de PIS
+TRCell():New(oVenProd,"ALQCOF"		,/*Tabela*/	,"Aliq COFINS"		 			,PesqPict("SCK","CK_XALQCF2")	,TamSx3("CK_XALQCF2")[1]	,/*lPixel*/,{|| nAlqCof	})		// Alíquota de COFINS
+TRCell():New(oVenProd,"VLTCOF"		,/*Tabela*/	,"Vl.Tot.COFINS"	 			,PesqPict("SCK","CK_XVLTCF2")	,TamSx3("CK_XVLTCF2")[1]	,/*lPixel*/,{|| nVltCof	})		// Valor Total de COFINS
+TRCell():New(oVenProd,"ALQICM"		,/*Tabela*/	,"Aliq.ICM"			 			,PesqPict("SCK","CK_XALQICM")	,TamSx3("CK_XALQICM")[1]	,/*lPixel*/,{|| nAlqICM	})		// Alíquota de ICMS
+TRCell():New(oVenProd,"VLTICM"		,/*Tabela*/	,"Vl.Tot.ICM"		 			,PesqPict("SCK","CK_XVLTICM")	,TamSx3("CK_XVLTICM")[1]	,/*lPixel*/,{|| nVltICM	})		// Valor Total de ICMS
+TRCell():New(oVenProd,"ALQSOL"		,/*Tabela*/	,"Alq.Sol"			 			,PesqPict("SCK","CK_XALQSOL")	,TamSx3("CK_XALQSOL")[1]	,/*lPixel*/,{|| nAlqSol	})		// Alíquota de ICMS-ST
+TRCell():New(oVenProd,"VLTSOL"		,/*Tabela*/	,"Vl.Tot.Sol"		 			,PesqPict("SCK","CK_XVLTSOL")	,TamSx3("CK_XVLTSOL")[1]	,/*lPixel*/,{|| nVltSol	})		// Valor Total de ICMS-ST
+TRCell():New(oVenProd,"VEND1"		,/*Tabela*/ ,"Vendedor 1"		 			,PesqPict("SC5","CJ_XVEND1")	,TamSx3("CJ_XVEND1")[1]		,/*lPixel*/,{|| cVend1	})		// Cod. Vendedor 1
+TRCell():New(oVenProd,"NOMVEND1"	,/*Tabela*/ ,"Nome"				 			,PesqPict("SC5","CJ_XVEND1")	,TamSx3("CJ_XVEND1")[1]		,/*lPixel*/,{|| cNomVen1})		// Nome do Vendedor 1
+TRCell():New(oVenProd,"FECHAMENTO"	,/*Tabela*/ ,"Prev.Fechamento"	 			,PesqPict("ZA9","ZA9_XFUFEC")	,TamSx3("ZA9_XFUFEC")[1]	,/*lPixel*/,{|| dXFuFec })		// Data de Previsão de fechamento da proposta
+TRCell():New(oVenProd,"PROXIMO"		,/*Tabela*/	,"Prox. Contato"	 			,PesqPict("ZA9","ZA9_XFUPRX")	,TamSx3("ZA9_XFUPRX")[1]	,/*lPixel*/,{|| dXFuprx })		// Data de previsão do próximo contato
+TRCell():New(oVenProd,"ULTIMO"		,/*Tabela*/	,"Ult.Contato"		 			,PesqPict("ZA9","ZA9_XFUULT")	,TamSx3("ZA9_XFUULT")[1]	,/*lPixel*/,{|| dXFuUlt })		// Data do ultimo contato realizado   
+TRCell():New(oVenProd,"OBRAS"		,/*Tabela*/ ,"Ref. Obras"		 			,PesqPict("SCJ","CJ_XOBRAS")	,TamSx3("CJ_XOBRAS")[1]		,/*lPixel*/,{|| cXObras })		// Ref. Obras
+TRCell():New(oVenProd,"STATUS"		,/*Tabela*/ ,"Status"		 	 			,PesqPict("SCJ","CJ_STATUS")	,TamSx3("CJ_STATUS")[1]		,/*lPixel*/,{|| cStatus })		// Status
+TRCell():New(oVenProd,"ST FOLLOW UP",/*Tabela*/ ,"Status FlwUP"		 			,PesqPict("ZA9","ZA9_XFUST")	,TamSx3("ZA9_XFUST")[1]		,/*lPixel*/,{|| cStFup })		// Status Follow Up //#5035
+TRCell():New(oVenProd,"CONTATO"		,/*Tabela*/ ,"Contato"			 			,PesqPict("SCJ","CJ_XCONTAT")	,TamSx3("CJ_XCONTAT")[1]	,/*lPixel*/,{|| cXcont })		// Contato			//#6227
+TRCell():New(oVenProd,"TEL CONTATO" ,/*Tabela*/ ,"Tel Contato"		 			,PesqPict("SCJ","CJ_XTELCON")	,TamSx3("CJ_XTELCON")[1]	,/*lPixel*/,{|| cXtelco })		// Telefone Contato //#6227
+TRCell():New(oVenProd,"EMAIL CONTAT",/*Tabela*/ ,"Email Contato"	 			,PesqPict("SCJ","CJ_XEMCON")	,TamSx3("CJ_XEMCON")[1]		,/*lPixel*/,{|| cXemcon })		// Email Contato 	//#6227
+TRCell():New(oVenProd,"CONSULTOR"	,/*Tabela*/ ,"Consultor"		 			,PesqPict("SCJ","CJ_XCONSUL")	,TamSx3("CJ_XCONSUL")[1]	,/*lPixel*/,{|| cXconsu })		// Consultor 		//#6227
+TRCell():New(oVenProd,"SUB FAM.SUG.",/*Tabela*/ ,"Familia Sugerida"  			,PesqPict("SB1","B1_XFAMSGD")	,TamSx3("B1_XFAMSGD")[1]	,/*lPixel*/,{|| cXFamSgd })		// Familia Sugerida
+TRCell():New(oVenProd,"FAMILIA.SUG.",/*Tabela*/ ,"Sub.Fam. Sugerida" 			,PesqPict("SB1","B1_XSUBFAM")	,TamSx3("B1_XSUBFAM")[1]	,/*lPixel*/,{|| cXSubFam })		// Sub Fam.Sugerida
+TRCell():New(oVenProd,"PROBABILID."	,/*Tabela*/	,"Probabilidade"	 			,"@X",TamSx3("ZA9_XPROBA")[1]+10	,/*lPixel*/,{|| cXProbCod})		// Probabilidade
+TRCell():New(oVenProd,"VLR. LIQ"	,/*Tabela*/	,"Vlr. Liquido"		 			,PesqPict("SCK","CK_VALOR")	,TamSx3("CK_VALOR")[1]		,/*lPixel*/,{|| nVlrLiq})			// Valor Liquido //#11288
+TRCell():New(oVenProd,"VLTBRUFRET"	,/*Tabela*/	,"VlrTot+IPI+Frete"	 			,PesqPict("SCK","CK_XVLTBRU")	,TamSx3("CK_XVLTBRU")[1]	,/*lPixel*/,{|| nVlBrFt	})		// Valor Total + IPI + Frete //#11288
+TRCell():New(oVenProd,"VLTXCARTAO"	,/*Tabela*/	,"Vl.Taxa Cartão 3%" 			,PesqPict("SCK","CK_XVLTBRU")	,TamSx3("CK_XVLTBRU")[1]	,/*lPixel*/,{|| nVTxCar})		// Valor Taxa Cartão //#11288
+TRCell():New(oVenProd,"VLTXCARTAO"	,/*Tabela*/	,"Cartão 3% + Vl.Br.+IPI+Frete" ,PesqPict("SCK","CK_XVLTBRU")	,TamSx3("CK_XVLTBRU")[1]	,/*lPixel*/,{|| nVlrTotC})		// Valor Total Cartão // #11288
 
 Return(oReport)
 
@@ -435,7 +438,10 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	nVltICM		:= (cAliasQry)->CK_XVLTICM
 	nAlqSol		:= (cAliasQry)->CK_XALQSOL
 	nVltSol		:= (cAliasQry)->CK_XVLTSOL
-	
+	nVlBrFt		:= (cAliasQry)->CK_XVLTBRU + SCJ->CJ_FRETE
+	nVTxCar		:= (nVlBrFt *3)/100
+	nVlrTotC	:= (nVTxCar+nVlBrFt)
+
 	//cStatus     := (cAliasQry)->CJ_STATUS
     
 	cXStatus := AllTrim((cAliasQry)->CJ_STATUS) //#5035
@@ -454,7 +460,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cXemcon := AllTrim((cAliasQry)->CJ_XEMCON)
 	cXconsu := AllTrim((cAliasQry)->CJ_XCONSUL)
 	//nVlrLiq := SCK->CK_XVLTBRU - SCK->(CK_XVLTICM + CK_XVLTIPI + CK_XVLTSOL + CK_XVLTPS2 + CK_XVLTCF2)
-	nVlrLiq	:= nVltBru - (nVltICM + nVltIpi + nVltSol + nVltPis + nVltCof)
+	nVlrLiq	:= (nVTxCar+ nVlBrFt) - (nVltICM + nVltIpi + nVltSol + nVltPis + nVltCof)
 	
 
     //ZA9_XFUST - Status Follow Up
