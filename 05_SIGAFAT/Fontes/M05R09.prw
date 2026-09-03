@@ -113,6 +113,7 @@ oVenProd:oReport:nFontBody := 10
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 TRCell():New(oVenProd,"FILIAL"		,/*Tabela*/	,"Filial"			 			 ,PesqPict("SC6","C6_FILIAL")	,TamSx3("C6_FILIAL")[1]		,/*lPixel*/,{|| cFil	})				// Filial do Sistema
 TRCell():New(oVenProd,"NUMPED"		,/*Tabela*/	,"Pedido"	 		 			 ,PesqPict("SC6","C6_NUM")		,TamSx3("C6_NUM")[1]		,/*lPixel*/,{|| cNum	})				// Numero do Pedido
+TRCell():New(oVenProd,"NUMORC"		,/*Tabela*/	,"Orcamento"		 			 ,PesqPict("SC6","C6_NUMORC")	,TamSx3("C6_NUMORC")[1]		,/*lPixel*/,{|| cNumOrc	})				// Numero do Orcamento //#11296
 TRCell():New(oVenProd,"NOTA"		,/*Tabela*/	,"Nota Fiscal"		 			 ,PesqPict("SC6","C6_NOTA")		,TamSx3("C6_NOTA")[1]		,/*lPixel*/,{|| cNota	})				// Numero da nota fiscal
 TRCell():New(oVenProd,"ULTFAT"		,/*Tabela*/ ,"Dt.Ult.Fat."		 			 ,PesqPict("SC6","C6_DATFAT")	,TamSx3("C6_DATFAT")[1]		,/*lPixel*/,{|| dDatFat })				// Data do Ultimo Faturamento
 TRCell():New(oVenProd,"EMISSAO"		,/*Tabela*/	,"Emissao"			 			 ,PesqPict("SC5","C5_EMISSAO")	,TamSx3("C5_EMISSAO")[1]	,/*lPixel*/,{|| dEmiss	})				// Data de Emissão
@@ -230,7 +231,7 @@ dbSetOrder(2)			// Produto,Numero
 		SELECT 
 			C6_FILIAL,C6_NUM,C6_ITEM, C6_NOTA,C6_DATFAT,C6_ENTREG,C6_CLI,C6_LOJA,C6_ITEM,C6_PRODUTO,C6_DESCRI,
 			C6_CF,C6_QTDVEN,C6_PRCVEN,C6_XVLTIPI,C6_XVLTSOL,C6_XVLTBRU,C6_XFRETE,C6_OPER,C6_XVLTICM,C6_PICMRET,
-			C6_XVLTPS2,C6_XVLTCF2, 
+			C6_XVLTPS2,C6_XVLTCF2,C6_NUMORC,
 			B1_DESC, B1_TIPO, B1_POSIPI, B1_UM, B1_XFAMILI, C6_DESCONT, SC6.R_E_C_N_O_ RECSC6
 		FROM 
 			%Table:SC6% SC6, %Table:SC5% SC5, %Table:SB1% SB1 
@@ -357,6 +358,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 			
 	cFil		:= (cAliasQry)->C6_FILIAL
 	cNum		:= (cAliasQry)->C6_NUM
+	cNumOrc		:= SubStr((cAliasQry)->C6_NUMORC,1,6)
 	cNota		:= (cAliasQry)->C6_NOTA
 	dDatFat		:= (cAliasQry)->C6_DATFAT
 	dDtEntr		:= (cAliasQry)->C6_ENTREG
