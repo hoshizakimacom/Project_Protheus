@@ -206,6 +206,7 @@ TRCell():New(oVenProd,"TPPROD"      ,/*Tabela*/ ,"Tipo do Produto"   ,PesqPict("
 TRCell():New(oVenProd,"TPCLI"       ,/*Tabela*/ ,"Tipo Cliente"   	 ,PesqPict("SA1","A1_TIPO")		,TamSx3("A1_TIPO")[1]		,/*lPixel*/,{|| cTpCli })		// Tipo de Cliente #9371
 TRCell():New(oVenProd,"CANAL"       ,/*Tabela*/ ,"Canal do Cliente"	 ,PesqPict("SA1","A1_XCANAL")	,TamSx3("A1_XCANAL")[1]		,/*lPixel*/,{|| cCanal })		// Canal do Cliente #10542
 TRCell():New(oVenProd,"LINHA"		,/*Tabela*/	,"Linha Produto"	 ,PesqPict("SB5","B5_XDSCLIN")	,TamSx3("B5_XDSCLIN")[1]    ,/*lPixel*/,{|| cLinha})		// Linha do Produto #10542
+TRCell():New(oVenProd,"ORCAMENTO"	,/*Tabela*/ ,"Orcamento"	 	 ,PesqPict("SC6","C6_NUMORC")	,TamSx3("C6_NUMORC")[1]     ,/*lPixel*/,{|| cNumOrc	})		// Numero do Orcamento //#11296
 
 Return(oReport)
 
@@ -369,6 +370,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cDescD2		:= (cAliasQry)->D2_DESC
 	cCustD2		:= (cAliasQry)->D2_CUSTO1
 	cTpTipo		:= (cAliasQry)->D2_TP
+	
 					
 //    nVlContL    := (cAliasQry)->D2_VALBRUT - ((cAliasQry)->D2_VALICM + (cAliasQry)->D2_VALIPI + (cAliasQry)->D2_VALIMP6 + (cAliasQry)->D2_VALIMP5)
     nVlContL    := (cAliasQry)->D2_VALBRUT - ((cAliasQry)->D2_VALICM + (cAliasQry)->D2_VALIPI +  (cAliasQry)->D2_ICMSRET + (cAliasQry)->D2_VALIMP6 + (cAliasQry)->D2_VALIMP5 + (cAliasQry)->D2_DIFAL+ (cAliasQry)->D2_VFCPDIF)
@@ -398,6 +400,8 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	lPosC6  	:= SC6->(MsSeek(cXFilial+(cAliasQry)->D2_PEDIDO + (cAliasQry)->D2_ITEMPV))
 	cAcresC6	:= SC6->C6_XACRESC
 	cAcresc1	:= POSICIONE('SD2',8,XFILIAL('SD2') + (cPedido + cItemPV),"cAcresC6")
+	cNumOrC6	:= SC6->C6_NUMORC
+	cNumOrc		:= SUBSTR(POSICIONE('SD2',8,XFILIAL('SD2') + (cPedido + cItemPV),"cNumOrC6"),1,6)
 
     
 	If lPosB5
