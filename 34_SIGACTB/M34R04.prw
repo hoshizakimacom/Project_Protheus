@@ -206,7 +206,8 @@ TRCell():New(oVenProd,"TPPROD"      ,/*Tabela*/ ,"Tipo do Produto"   ,PesqPict("
 TRCell():New(oVenProd,"TPCLI"       ,/*Tabela*/ ,"Tipo Cliente"   	 ,PesqPict("SA1","A1_TIPO")		,TamSx3("A1_TIPO")[1]		,/*lPixel*/,{|| cTpCli })		// Tipo de Cliente #9371
 TRCell():New(oVenProd,"CANAL"       ,/*Tabela*/ ,"Canal do Cliente"	 ,PesqPict("SA1","A1_XCANAL")	,TamSx3("A1_XCANAL")[1]		,/*lPixel*/,{|| cCanal })		// Canal do Cliente #10542
 TRCell():New(oVenProd,"LINHA"		,/*Tabela*/	,"Linha Produto"	 ,PesqPict("SB5","B5_XDSCLIN")	,TamSx3("B5_XDSCLIN")[1]    ,/*lPixel*/,{|| cLinha})		// Linha do Produto #10542
-TRCell():New(oVenProd,"ORCAMENTO"	,/*Tabela*/ ,"Orcamento"	 	 ,PesqPict("SC6","C6_NUMORC")	,TamSx3("C6_NUMORC")[1]     ,/*lPixel*/,{|| cNumOrc	})		// Numero do Orcamento //#11296
+TRCell():New(oVenProd,"ORCAMENTO"	,/*Tabela*/ ,"Orcamento"	 	 ,PesqPict("SC6","C6_NUMORC")	,TamSx3("C6_NUMORC")[1]     ,/*lPixel*/,{|| cNumOrc	})		// Numero do Orcamento #11296
+TRCell():New(oVenProd,"ARMAZEM"		,/*Tabela*/ ,"Armazem"			 ,PesqPict("SD2","D2_LOCAL")	,TamSx3("D2_LOCAL")[1]		,/*lPixel*/,{|| cLocal	})		// Armazém do Produto #11362
 
 Return(oReport)
 
@@ -258,7 +259,7 @@ dbSetOrder(3)			// Num. Docto. + Serie + Cliente + Loja + Produto + Item
 	BeginSql Alias cAliasQry
 	
 		SELECT 
-			D2_FILIAL,D2_EMISSAO,D2_DOC,D2_SERIE,D2_CLIENTE,D2_LOJA,D2_COD,D2_ITEM,
+			D2_FILIAL,D2_EMISSAO,D2_DOC,D2_SERIE,D2_CLIENTE,D2_LOJA,D2_COD,D2_ITEM,D2_LOCAL,
 			D2_CF,
 			D2_GRUPO,
 			D2_EST,D2_PEDIDO,D2_QUANT,D2_PRCVEN,D2_DESCON,D2_VALFRE,D2_SEGURO,D2_DESPESA,D2_TOTAL,
@@ -354,6 +355,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
     cCodCli     := (cAliasQry)->D2_CLIENTE 
     cLoja       := (cAliasQry)->D2_LOJA
     cCod        := (cAliasQry)->D2_COD
+	cLocal		:= (cAliasQry)->D2_LOCAL
     cCfop       := (cAliasQry)->D2_CF
     cGrupo      := (cAliasQry)->D2_GRUPO
     cEst        := (cAliasQry)->D2_EST
