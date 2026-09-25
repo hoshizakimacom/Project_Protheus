@@ -127,6 +127,8 @@ TRCell():New(oVenProd,"POSIPI"		,/*Tabela*/ ,"Pos.IPI/NCM"		 ,PesqPict("SN1","N1
 TRCell():New(oVenProd,"PIS"			,/*Tabela*/ ,"PIS"				 ,PesqPict("SN1","N1_XPIS")		,TamSx3("N1_XPIS")[1]		,/*lPixel*/,{|| nXPis	 	})		// Valor do PIS
 TRCell():New(oVenProd,"COFINS"		,/*Tabela*/ ,"COFINS"			 ,PesqPict("SN1","N1_XCOFINS")	,TamSx3("N1_XCOFINS")[1]	,/*lPixel*/,{|| nXCofins	})		// Valor do COFINS
 TRCell():New(oVenProd,"DIFAL"		,/*Tabela*/ ,"DIFAL"			 ,PesqPict("SN1","N1_DIFAL")	,TamSx3("N1_DIFAL")[1]		,/*lPixel*/,{|| nDifal		})		// Valor do DIFAL
+TRCell():New(oVenProd,"DESCEXT"		,/*Tabela*/ ,"Desc.Estend."	 	 ,PesqPict("SN1","N1_DESCRIC")	,TamSx3("N1_DESCRIC")[1]	,/*lPixel*/,{|| cDescExt	})		// Descricao Extendida
+TRCell():New(oVenProd,"CAPEX"		,/*Tabela*/ ,"CAPEX"		 	 ,PesqPict("SN1","N1_XCAPEX")	,TamSx3("N1_XCAPEX")[1]		,/*lPixel*/,{|| cCapex		})		// Capex Plan
 //SN3 - SALDOS E VALORES
 TRCell():New(oVenProd,"CONTA"		,/*Tabela*/ ,"Conta Contabil"	 ,PesqPict("SN3","N3_CCONTAB")	,TamSx3("N3_CCONTAB")[1]	,/*lPixel*/,{|| cContab		})		// Conta Contabil
 TRCell():New(oVenProd,"CCUSTO"		,/*Tabela*/ ,"C.Custo Bem"	 	 ,PesqPict("SN3","N3_CUSTBEM")	,TamSx3("N3_CUSTBEM")[1]	,/*lPixel*/,{|| cCustBem	})		// C Custo da Conta do Bem
@@ -187,7 +189,7 @@ dbSetOrder(1)			// Produto,Numero
 
 		SELECT 
 			SN1.N1_FILIAL,SN1.N1_GRUPO,SN1.N1_CBASE,SN1.N1_ITEM,SN1.N1_AQUISIC,SN1.N1_QUANTD,SN1.N1_BAIXA,SN1.N1_DESCRIC,SN1.N1_CHAPA,SN1.N1_NFISCAL,
-			SN1.N1_CODCIAP,SN1.N1_ICMSAPR,SN1.N1_DTBLOQ,SN1.N1_VLAQUIS,SN1.N1_XPOSIPI,SN1.N1_XPIS,SN1.N1_XCOFINS,SN1.N1_DIFAL,SN3.N3_FILIAL,
+			SN1.N1_CODCIAP,SN1.N1_ICMSAPR,SN1.N1_DTBLOQ,SN1.N1_VLAQUIS,SN1.N1_XPOSIPI,SN1.N1_XPIS,SN1.N1_XCOFINS,SN1.N1_DIFAL,SN1.N1_XCAPEX,SN3.N3_FILIAL,
 			SN3.N3_CCONTAB,SN3.N3_CUSTBEM,SN3.N3_CDEPREC,SN3.N3_CCUSTO,SN3.N3_CCDEPR,SN3.N3_DINDEPR,SN3.N3_FIMDEPR,SN3.N3_VORIG1,SN3.N3_XVDEPAN,
 			SN3.N3_VRDACM1,SN3.N3_VRDMES1,SN3.N3_TXDEPR1,SN3.N3_ITEM, SN3.N3_DTBAIXA
 		FROM 
@@ -256,6 +258,8 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	nXPis		:= (cAliasQry)->N1_XPIS
 	nXCofins	:= (cAliasQry)->N1_XCOFINS
 	nDifal		:= (cAliasQry)->N1_DIFAL
+	cDescExt	:= POSICIONE("SN2",1,XFILIAL("SN2")+(cAliasQry)->(N1_CBASE+N1_ITEM),"N2_HISTOR")
+	cCapex 		:= (cAliasQry)->N1_XCAPEX
 	cContab		:= (cAliasQry)->N3_CCONTAB
 	cCustBem	:= (cAliasQry)->N3_CUSTBEM
 	cCdePrec	:= (cAliasQry)->N3_CDEPREC
@@ -269,6 +273,24 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	nVldMes1	:= (cAliasQry)->N3_VRDMES1
 	nTxDepr1	:= (cAliasQry)->N3_TXDEPR1
 
+
+	 If cCapex == '1'
+        	cCapex  	:= 'GROWTH'
+        ElseIf cCapex == '2'
+            cCapex  	:= 'EFFICIENCY IMPROVEMENT'
+        ElseIf cCapex == '3'
+            cCapex  	:= 'RICK AVOIDANCE'
+        ElseIf cCapex == '4'
+             cCapex  	:= 'R&D'
+        ElseIf cCapex == '5'
+             cCapex  	:= 'IT'  
+		ElseIf cCapex == '6'
+             cCapex  	:= 'ESG'
+		ElseIf cCapex == '7'
+             cCapex  	:= 'OTHERS'                   
+    Endif
+	
+	
 	oReport:IncMeter()
 	oReport:Section(1):PrintLine()
 
