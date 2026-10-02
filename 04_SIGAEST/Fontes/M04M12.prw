@@ -1080,30 +1080,21 @@ Default cComp  := SPACE(TAMSX3("B1_COD")[1])
 Default cScrap := SPACE(TAMSX3("B1_XCODREF")[1])
 Default nPesoEff := 0
 
-//cOPMAT := RetXMAT(cMP)
-
 cQuery := " SELECT B1_COD,B1_XCODREF,(B2_QATU-B2_RESERVA) QTDDISP "
 cQuery += " ,(CASE WHEN ( "
 cQuery += "  ( B5_COMPR = "+STR(nTamX,TAMSX3("B5_COMPR")[1])+" AND B5_LARG = "+STR(nTamY,TAMSX3("B5_LARG")[1]) + ") "
 cQuery += " OR "
 cQuery += "  ( B5_COMPR = "+STR(nTamY,TAMSX3("B5_COMPR")[1])+" AND B5_LARG = "+STR(nTamX,TAMSX3("B5_LARG")[1]) + ") "
-cQuery += " ) THEN '1' ELSE '2'+RTRIM(B5_DES) END ) AS TAMORI "
+cQuery += " ) THEN '1' ELSE '2'+RTRIM((CASE WHEN B5_DES <> '' THEN B5_DES ELSE 'Z' END)) END ) AS TAMORI "
 cQuery += " FROM " + RetSQLName('SB1') + " SB1 "
 cQuery += " INNER JOIN " + RetSQLName('SB5') + " SB5 ON B5_FILIAL = '" + xFilial("SB5") + "' AND B5_COD = B1_COD AND SB5.D_E_L_E_T_ = ' ' "
 cQuery += " INNER JOIN " + RetSQLName('SB2') + " SB2 ON B2_FILIAL = '" + xFilial("SB2") + "' AND B2_COD = B1_COD AND B2_LOCAL = '"+cLocProc+"' AND SB2.D_E_L_E_T_ = ' ' "
 cQuery += " WHERE B1_FILIAL = '" + xFilial("SB1") + "' "
-//cQuery += " AND B1_XMAT = '"+cOPMAT+"' "
 cQuery += " AND B1_XMAT2 = '"+cMP+"' "
 cQuery += " AND B1_XFAMIL2 IN "+FormatIn(cAMFAMIL2C,";")
 cQuery += " AND B5_ESPESS = "+STR(nEspess,TAMSX3("B5_ESPESS")[1],TAMSX3("B5_ESPESS")[2])
-/*
-cQuery += " AND ( "
-cQuery += "  ( B5_COMPR = "+STR(nTamX,TAMSX3("B5_COMPR")[1])+" AND B5_LARG = "+STR(nTamY,TAMSX3("B5_LARG")[1]) + ") "
-cQuery += " OR "
-cQuery += "  ( B5_COMPR = "+STR(nTamY,TAMSX3("B5_COMPR")[1])+" AND B5_LARG = "+STR(nTamX,TAMSX3("B5_LARG")[1]) + ") "
-cQuery += " ) "
-*/
 cQuery += " AND SB1.D_E_L_E_T_ = ' ' "
+cQuery += " AND SB1.B1_MSBLQL <> '1' "
 cQuery += " ORDER BY TAMORI, QTDDISP DESC " //Prioriza Material com quantidade atual maior e reserva maior para não alocar material que já tem baixa disponibilidade
 
 TCQUERY cQuery NEW ALIAS (cAliasComp)
@@ -1114,10 +1105,6 @@ If (cAliasComp)->(!EOF())
 	cComp  := (cAliasComp)->B1_COD
 	cScrap := (cAliasComp)->B1_XCODREF
 EndIf
-
-//If EMPTY(cComp)
-//	cComp := PADR(cMP,TAMSX3("B1_COD")[1])
-//EndIf
 
 If EMPTY(cScrap)
 	cScrap := "SEM CODIGO"
