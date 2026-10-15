@@ -329,7 +329,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 
 		
 	If lPosA1
-		cNomeCli    := SA1->A1_NOME
+		//cNomeCli    := SA1->A1_NOME
 		cXrede	    := SA1->A1_XREDE
 		cXsegm      := SA1->A1_XSEGM
 		cTpCli		:= SA1->A1_TIPO
@@ -472,6 +472,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		cReddes		:= POSICIONE("ZA6",1,XFILIAL("ZA6")+SA1->A1_XREDE,"ZA6_DESC")                                                                    
 		cSegmde		:= POSICIONE("ZA8",1,xFilial("ZA8")+SA1->A1_XSEGM,"ZA8_DESC")
 		cRegiao     := Posicione("SA1",1,xFilial("SA1")+(SC5->C5_CLIENTE + SC5->C5_LOJACLI),"A1_DSCREG")
+		cNomeCli	:= Posicione("SA1",1,xFilial("SA1")+(SC5->C5_CLIENTE + SC5->C5_LOJACLI),"A1_NOME")
 				
         
         If cTpCli == 'F'
