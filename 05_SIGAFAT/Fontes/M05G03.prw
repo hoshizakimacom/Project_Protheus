@@ -12,6 +12,7 @@ User Function M05G03(_cField)
     Case _cField == 'B1_TIPO'
         MG04GetCta()    // Inclui conta
         MG04GetCc()     // Inclui Centro de Custo
+        MG04GetTipo()   // Troca Controle Endereçamento
 
     Case _cField $ 'B1_POSIPI|B1_EX_NCM'
         MG04GetIPI()    // Inclui IPI do produto
@@ -90,6 +91,24 @@ Static Function MG04GetGrp()
 
     FwFldPut("B1_GRTRIB", _cGrTrib)
 Return
+
+
+//+------------------------------------------------------------------------------------------------
+//| Troca Controle de Endereçamento para SIM - TIPO PA|ME
+//+------------------------------------------------------------------------------------------------
+Static Function MG04GetTipo()
+    Local cTip    := M->B1_TIPO
+    Local cEnder  := Space(TamSX3('B1_LOCALIZ')[1])
+    
+    Do Case
+    Case cTip $ "PA|ME"         // Produto Acabado (PA) - Mercadoria (ME)
+         cEnder := "S"
+    EndCase
+
+    FwFldPut("B1_LOCALIZ", cEnder)
+
+Return
+
 
 //+------------------------------------------------------------------------------------------------
 //| Preenche CEST do produto
