@@ -48,8 +48,13 @@ User Function PE01NFESEFAZ()
         	    	Endif
             	Endif
         	EndIf
+
+			// Adiciona emails fixos
+				aRet[4,16] := Lower(Alltrim(aRet[4,16]) + ";WMANZINI@HOSHIZAKIMACOM.COM.BR;SFERREIRA@HOSHIZAKIMACOM.COM.BR;NFE@VARITUS.COM.BR")
+				
+			EndIf
+
 	    EndIf
-	Endif
 
 RestArea(aAreaSC5)
 RestArea(aArea)
