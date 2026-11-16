@@ -1,6 +1,7 @@
 #Include "TOPCONN.CH"
+#Include "protheus.ch"
 #Include "rwmake.ch"
-#Include "FIVEWIN.CH"
+//#Include "FIVEWIN.CH"
 
 /*
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
@@ -19,8 +20,9 @@ User Function M261BCHOI
 
 Local aBut261 := {}
 
-aAdd(aBut261, {'PESQUISA' 	,{ || U_M261BUSCAOP() } 	, "Sel.Itens por OP"			, "Sel.OP." } )
-aAdd(aBut261, {'EDIT'	   	,{ || U_M261BUSPRD() }  	, "Sel.Produto por Empenho" 	,"Prod.Emp" } )
+aAdd(aBut261, {'PESQUISA' 	,{ || U_M261BUSCAOP(1) } 	, "Sel.Itens por OP - 70-Picking"	, "Sel.OP.Picking(70)" } )
+aAdd(aBut261, {'PESQUISA' 	,{ || U_M261BUSCAOP(2) } 	, "Sel.Itens por OP - 99-Processo"	, "Sel.OP.Processo(99)" } )
+aAdd(aBut261, {'EDIT'	   	,{ || U_M261BUSPRD() }  	, "Sel.Produto por Empenho" 	    ,"Prod.Emp" } )
 
 //aAdd(aBut261, {'EDIT'	   , { || U_M261BUSEMP() }  , "Sel.Produto por Empenho" ,"Prod.Emp" } )
 //aAdd(aBut261, {'EDITABLE'	, { || U_M261BUSPROD() } , "Sel.Produto Avulso"      ,"Prod.Av."  } )
@@ -47,49 +49,75 @@ Return(aBut261)
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 */
-User Function M261BUSCAOP
+User Function M261BUSCAOP(nTpTransf)
 
 Local cOPTrans := Space(13)
 Local oDlg
 Local nOpca
 Local cLocOri := "01"    //"Left(GetMv("MV_XLOCEST"),2) // Local de Estoque 14
-Local cLocEmp := "99"    //Left(GetMv("MV_XLOCPRO"),2)
+Local cLocEmp := "70"    //Left(GetMv("MV_XLOCPRO"),2)
+Local cEndEmp := ""
+Local cANSUL  := "3-Não"
+Local aANSUL := {"1-Interno","2-Externo","3-Não"}
 
-//DEFINE MSDIALOG oDlg TITLE OemToAnsi("Selecione a Ordem de Produção a Transferir") FROM 200,001 TO 310,350 PIXEL
+Default nTpTransf := 1 //1-Picking (70) 2-Processo (99)
+
+If nTpTransf == 1 //Picking
+	cLocOri := "01"
+	cLocEmp := "70"
+	cEndEmp := PADR(GETMV("MV_XENDPIC",.F.,"PICKING-LIST"),TAMSX3("D3_LOCALIZ")[1])
+Else
+	cLocOri := "70"
+	cLocEmp := "99" 
+	cEndEmp := PADR(GETMV("MV_ENDPROC",.F.,""),TAMSX3("D3_LOCALIZ")[1])
+EndIf
+
 DEFINE MSDIALOG oDlg TITLE OemToAnsi("Selecione a Ordem de Produção a Transferir") FROM 200,001 TO 410,350 PIXEL
 
-/*/
-@ 016,007 SAY OEMTOANSI("Ordem de Produção : ") SIZE 080,07 OF oDlg PIXEL
-@ 016,077 MSGET cOPTrans F3 "SC2" WHEN .T. SIZE 050,10 OF oDlg PIXEL Valid !Empty(cOPTrans)
-
-@ 030,007 SAY OEMTOANSI("Local Origem : ") SIZE 080,07 OF oDlg PIXEL
-@ 030,077 MSGET cLocOri F3 "97" WHEN .T. SIZE 010,07 OF oDlg PIXEL Valid !Empty(cLocOri)
-
-@ 044,007 SAY OEMTOANSI("Local Destino/Empenho : ") SIZE 080,07 OF oDlg PIXEL
-@ 044,077 MSGET cLocEmp F3 "97" WHEN .T. SIZE 010,07 OF oDlg PIXEL Valid !Empty(cLocEmp)
-/*/
-
+/*
 @ 035,007 SAY OEMTOANSI("Ordem de Produção : ") SIZE 080,07 OF oDlg PIXEL
 @ 035,077 MSGET cOPTrans F3 "SC2" WHEN .T. SIZE 050,10 OF oDlg PIXEL Valid !Empty(cOPTrans)
 
 @ 049,007 SAY OEMTOANSI("Local Origem : ") SIZE 080,07 OF oDlg PIXEL
-@ 049,077 MSGET cLocOri F3 "97" WHEN .T. SIZE 010,07 OF oDlg PIXEL Valid !Empty(cLocOri)
+@ 049,077 MSGET cLocOri F3 "97" WHEN .F. SIZE 010,07 OF oDlg PIXEL Valid !Empty(cLocOri)
 
 @ 063,007 SAY OEMTOANSI("Local Destino/Empenho : ") SIZE 080,07 OF oDlg PIXEL
-@ 063,077 MSGET cLocEmp F3 "97" WHEN .T. SIZE 010,07 OF oDlg PIXEL Valid !Empty(cLocEmp)
+@ 063,077 MSGET cLocEmp F3 "97" WHEN .F. SIZE 010,07 OF oDlg PIXEL Valid !Empty(cLocEmp)
+
+@ 077,007 SAY OEMTOANSI("Endereco : ") SIZE 080,07 OF oDlg PIXEL
+@ 077,077 MSGET cEndEmp F3 "SBE" WHEN .F. SIZE 070,07 OF oDlg PIXEL Valid !Empty(cEndEmp)
+
+@ 091,007 Say OEMTOANSI("ANSUL : ") PIXEL of oDlg  FONT oFont 
+@ 091,077 MSCOMBOBOX oCbxANSUL VAR cANSUL ITEMS aANSUL SIZE 180,10 OF oDlg PIXEL
+*/
+@ 030,007 SAY OEMTOANSI("Ordem de Produção : ") SIZE 080,07 OF oDlg PIXEL
+@ 030,077 MSGET cOPTrans F3 "SC2" WHEN .T. SIZE 050,10 OF oDlg PIXEL Valid !Empty(cOPTrans)
+
+@ 044,007 SAY OEMTOANSI("Local Origem : ") SIZE 080,07 OF oDlg PIXEL
+@ 044,077 MSGET cLocOri F3 "97" WHEN .F. SIZE 010,07 OF oDlg PIXEL Valid !Empty(cLocOri)
+
+@ 057,007 SAY OEMTOANSI("Local Destino/Empenho : ") SIZE 080,07 OF oDlg PIXEL
+@ 057,077 MSGET cLocEmp F3 "97" WHEN .F. SIZE 010,07 OF oDlg PIXEL Valid !Empty(cLocEmp)
+
+@ 072,007 SAY OEMTOANSI("Endereco : ") SIZE 080,07 OF oDlg PIXEL
+@ 072,077 MSGET cEndEmp F3 "SBE" WHEN .F. SIZE 070,07 OF oDlg PIXEL Valid !Empty(cEndEmp)
+
+@ 086,007 Say OEMTOANSI("ANSUL : ") SIZE 080,07 OF oDlg PIXEL
+@ 086,077 MSCOMBOBOX oCbxANSUL VAR cANSUL ITEMS aANSUL SIZE 100,10 OF oDlg PIXEL
 
 // Ver Tabela de Local
 ACTIVATE DIALOG oDlg ON INIT EnchoiceBar( oDlg, {|| nOpca := 1, oDlg:End() }, {||nOpca := 0, oDlg:End()}) CENTERED
 
 If nOpca <> 0
-	Processa({||U_M261BSCOP("1",cOPTrans,cLocOri,cLocEmp)},"Selecionando produtos da Ordem de producao...")
+	Processa({||U_M261BSCOP("1",cOPTrans,cLocOri,cLocEmp,cEndEmp,LEFT(cANSUL,1))},"Selecionando produtos da Ordem de producao...")
 EndIf
 
 Return
 
 /*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ ÜÜÜÜÜÜ Ü Ü Ü Ü Ü Ü Ü Ü Ü Ü Ü Ü Ü Ü Ü Ü Ü Ü Ü Ü
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± ± ± ± ± ± ± ± ± ± ± ± ± ± ± ± ± ± ± ± ±
+
 ±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
 ±±³Fun‡Æo    ³M261BUSPRD ³ Autor ³ Marcos Eduardo Rocha ³ Data ³ 11/06/08 ³±±
 ±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
@@ -102,11 +130,12 @@ Return
 */
 User Function M261BUSPRD
 
-Local cCodPro := Space(15)
+Local cCodPro := Space(TAMSX3("B1_COD")[1])
 Local oDlg
 Local nOpca
 Local cLocOri := "01"  //Left(GetMv("MV_XLOCEST"),2) // Local de Estoque 14
-Local cLocEmp := "99"   // Left(GetMv("MV_XLOCPRO"),2)
+Local cLocEmp := "70"   // Left(GetMv("MV_XLOCPRO"),2)
+Local cEndEmp := PADR(GETMV("MV_XENDPIC",.F.,"PICKING-LIST"),TAMSX3("D3_LOCALIZ")[1])
 
 DEFINE MSDIALOG oDlg TITLE OemToAnsi("Selecione o Produto a Transferir") FROM 200,001 TO 410,350 PIXEL
 
@@ -130,11 +159,14 @@ DEFINE MSDIALOG oDlg TITLE OemToAnsi("Selecione o Produto a Transferir") FROM 20
 @ 058,007 SAY OEMTOANSI("Local Destino/Empenho : ") SIZE 080,07 OF oDlg PIXEL
 @ 058,077 MSGET cLocEmp F3 "97" WHEN .T. SIZE 010,07 OF oDlg PIXEL Valid !Empty(cLocEmp)
 
+@ 072,007 SAY OEMTOANSI("Endereco : ") SIZE 080,07 OF oDlg PIXEL
+@ 072,077 MSGET cEndEmp F3 "SBE" WHEN .T. SIZE 070,07 OF oDlg PIXEL Valid !Empty(cEndEmp)
+
 // Ver Tabela de Local
 ACTIVATE DIALOG oDlg ON INIT EnchoiceBar( oDlg, {|| nOpca := 1, oDlg:End() }, {||nOpca := 0, oDlg:End()}) CENTERED
 
 If nOpca <> 0
-	Processa({||U_M261BSCOP("2",cCodPro,cLocOri,cLocEmp)},"Selecionando produtos...")
+	Processa({||U_M261BSCOP("2",cCodPro,cLocOri,cLocEmp,cEndEmp,"")},"Selecionando produtos...")
 EndIf
 
 Return
@@ -210,12 +242,13 @@ Return
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 */
-User Function M261BSCOP(cTipoSel,cCodigo,cLocOri,cLocEmp)
+User Function M261BSCOP(cTipoSel,cCodigo,cLocOri,cLocEmp,cEndEmp,cANSUL)
 
 Local aArea := GetArea()
 Local aAreaSB2 := SB2->(GetArea())
 Local cQuery
-Local nLoop
+//Local nLoop
+Local _n, _a, _ni
 Local nProc
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -237,18 +270,18 @@ Local nPosNSer   := 11	//Numero de Serie
 Local nPosLoTCTL := 12	//Lote de Controle
 Local nPosNLOTE  := 13	//Numero do Lote
 Local nPosDTVAL  := 14	//Data Valida
-Local nPosPotenc := 15	//Potencia
+//Local nPosPotenc := 15	//Potencia
 Local nPosQUANT  := 16	//Quantidade
-Local nPosQTSEG  := 17	//Quantidade na 2a. Unidade de Medida
+//Local nPosQTSEG  := 17	//Quantidade na 2a. Unidade de Medida
 Local nPosEstor  := 18	//Estornado
-Local nPosNumSeq := 19	//Sequencia
-Local nPosLotDes := 20  //Lote Destino
-Local nPosDtVldD := 21  //Data Valida de Destino
+//Local nPosNumSeq := 19	//Sequencia
+//Local nPosLotDes := 20  //Lote Destino
+//Local nPosDtVldD := 21  //Data Valida de Destino
 Local nPosOPTr   := aScan( aHeader, { |x| AllTrim( x[2] ) == "D3_XOP"})
-Local cQuery
 Local aDadosOk
-Local cLocEst  := "01"  //Getmv("MV_XLOCEST")
-Local cLocProc := "99"  //Getmv("MV_XLOCPRO")
+//Local cLocEst  := "01"  //Getmv("MV_XLOCEST")
+//Local cLocProc := "70"  //Getmv("MV_XLOCPRO")
+
 //Private cNumOPTr
 
 If Empty(cCodigo)
@@ -268,27 +301,56 @@ If cTipoSel == "1" .And. U_M261AGLUT(cCodigo) == .F.
 	Return
 Endif
 
-cQuery := "SELECT D4_COD, SUM(D4_QUANT) D4_QUANT, D4_LOTECTL, D4_OP"
+cQuery := "SELECT D4_FILIAL, D4_COD, SUM(D4_QUANT) D4_QUANT, D4_LOTECTL, D4_OP "
+
+If cLocOri == "70" //Armazem de Picking 
+	cQuery += ",(SELECT SUM(D3_QUANT) FROM " + RetSqlName("SD3") + " SD3 "
+	cQuery += "		WHERE SD3.D_E_L_E_T_<>'*' "
+	cQuery += "		AND SD3.D3_COD = SD4.D4_COD "
+	cQuery += "		AND SD3.D3_FILIAL = SD4.D4_FILIAL "
+	cQuery += "		AND SD3.D3_XOP = SD4.D4_OP "
+	cQuery += "		AND SD3.D3_LOCAL = '"+cLocOri+"' "
+	cQuery += "		AND SD3.D3_CF = 'DE4' "
+	cQuery += "     AND SD3.D3_ESTORNO <> 'S' "
+	cQuery += "	) QTDPICKING " //QUANTIDADE TRANSFERIDA PARA O PICKING
+EndIf
+
+cQuery += ",(SELECT SUM(D3_QUANT) FROM " + RetSqlName("SD3") + " SD3 "
+cQuery += "		WHERE SD3.D_E_L_E_T_<>'*' "
+cQuery += "		AND SD3.D3_COD = SD4.D4_COD "
+cQuery += "		AND SD3.D3_FILIAL = SD4.D4_FILIAL "
+cQuery += "		AND SD3.D3_XOP = SD4.D4_OP "
+cQuery += "		AND SD3.D3_LOCAL = '"+cLocEmp+"' "
+cQuery += "		AND SD3.D3_CF = 'DE4' "
+cQuery += "     AND SD3.D3_ESTORNO <> 'S' "
+cQuery += "	) QTDTRF " //QUANTIDADE JÁ TRANSFERIDA
+
 cQuery += " FROM " +RetSqlName("SD4")+" SD4 , " + RetSqlName("SB1")+" SB1"
 cQuery += " WHERE D4_FILIAL = '"+xFilial("SD4")+"'"
 
 If cTipoSel == "1"
-	cQuery += " AND SUBSTRING(D4_OP,1,11) = '" + Left(cCodigo,11) + "'"
+	cQuery += " AND D4_OP LIKE '" + ALLTRIM(cCodigo) + "%'"
+	If cANSUL == "3"
+		cQuery += " AND D4_XANSUL IN (' ','3')"
+	Else
+		cQuery += " AND D4_XANSUL = '" + cANSUL + "'"
+	EndIf
 Else
 	cQuery += " AND D4_COD  = '"+cCodigo+"'"
 	// Buscar somente os com Fabrica Sim
 EndIf
 cQuery += " AND SD4.D4_QUANT > 0"
-cQuery += " AND SD4.D4_LOCAL = '"+cLocEmp+"'"
+//cQuery += " AND SD4.D4_LOCAL = '"+cLocEmp+"'"
 cQuery += " AND SD4.D_E_L_E_T_ <> '*'"
 cQuery += " AND SB1.B1_FILIAL = '"+xFilial("SB1")+"'"
 cQuery += " AND SB1.B1_COD = D4_COD"
-//cQuery += " AND SB1.B1_FANTASM IN ('N',' ')"
+cQuery += " AND SB1.B1_FANTASM <> 'S'"
 
 cQuery += "	AND SB1.B1_XPICLIS IN ('1') "
 
 cQuery += " AND SB1.D_E_L_E_T_ <> '*'"
-cQuery += " GROUP BY D4_COD, D4_LOTECTL, D4_OP"
+cQuery += " GROUP BY D4_FILIAL, D4_COD, D4_LOTECTL, D4_OP"
+
 cQuery += " ORDER BY D4_COD, D4_OP"
 
 cQuery := ChangeQuery(cQuery)
@@ -306,15 +368,27 @@ aDadosOk := {}
 dbSelectArea("TRB")
 dbGotop()
 While !Eof()
-	
+
+	If cLocOri == "70" //Armazem de Picking
+		_nQuant := TRB->(QTDPICKING-QTDTRF)
+	Else
+		_nQuant := TRB->(D4_QUANT-QTDTRF)
+	EndIf
+
+	If _nQuant <= 0
+		dbSelectArea("TRB")
+		dbSkip()
+		Loop
+	EndIf
+
 	_cProduto := TRB->D4_COD
-	_nSaldoD4 := TRB->D4_QUANT
+	_nSaldoD4 := TRB->(D4_QUANT-QTDTRF)
 	_nSaldoB8 := 0
 	
 	aArray := {}
 	
 	If Rastro(TRB->D4_COD) .Or. Localiza(TRB->D4_COD)
-		aArray := SldPorLote(TRB->D4_COD,cLocOri, TRB->D4_QUANT,,,,,,,.F.,,.F.,,.F.)
+		aArray := SldPorLote(TRB->D4_COD,cLocOri, _nQuant,,,,,,,.F.,,.F.,,.F.)
 		
 		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 		//³ Soma a quantidade disponivel por Lote/Localizacao ³
@@ -369,20 +443,20 @@ While !Eof()
 				_nSaldoD4 -= aArray[_a,5]
 				_nSaldoB8 += aArray[_a,5]
 				
-				Aadd(aDadosOk,{ TRB->D4_COD, Iif(_nSaldoB8 > TRB->D4_QUANT, TRB->D4_QUANT, aArray[_a,5]), aArray[_a,1], _nSaldoD4, _nSaldoB8, aArray[_a,2], aArray[_a,7], aArray[_a,4], TRB->D4_OP, aArray[_a,3] } )
+				Aadd(aDadosOk,{ TRB->D4_COD, Iif(_nSaldoB8 > _nQuant, _nQuant, aArray[_a,5]), aArray[_a,1], _nSaldoD4, _nSaldoB8, aArray[_a,2], aArray[_a,7], aArray[_a,4], TRB->D4_OP, aArray[_a,3] } )
 			Else
 				Exit
 			Endif
 		Next _a
 		
 	Else
-		Aadd(aDadosOk,{TRB->D4_COD, Iif(nTotDisp > TRB->D4_QUANT, TRB->D4_QUANT, nTotDisp), "  ", _nSaldoD4, nTotDisp, "  ", "  ", "  ", TRB->D4_OP } )
+		Aadd(aDadosOk,{TRB->D4_COD, Iif(nTotDisp > _nQuant, _nQuant, nTotDisp), "  ", _nSaldoD4, nTotDisp, "  ", "  ", "  ", TRB->D4_OP } )
 		
 	EndIf
 	
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Cria o SB2 do Local 12 caso nao exista. ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Cria o SB2 do Local de Destino caso nao exista. ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 	dbSelectArea("SB2")
 	dbSetOrder(1)
 	If !dbSeek(xFilial("SB2")+TRB->D4_COD+cLocEmp)
@@ -395,6 +469,9 @@ EndDo
 
 dbSelectArea("TRB")
 dbCloseArea()
+
+// Ordena por Ansul - 1-Interno ; 2-Externo ; 3-Nao/Vazio
+aEstru := aSort(aEstru,,,{|x,y| x[10]+x[12]+x[3] < y[10]+y[12]+y[3]})
 
 nItIncl := 0
 
@@ -459,7 +536,7 @@ For nProc := 1 To Len(aDadosOk)
 	
 	If LEN(aDadosOk[nProc]) >= 10 // Endereco Origem/Destino
 		aCols[Len(aCols),nPosLcZOri] := aDadosOk[nProc,10]
-		aCols[Len(aCols),nPosLcZDes] := aDadosOk[nProc,10]
+		aCols[Len(aCols),nPosLcZDes] := cEndEmp //aDadosOk[nProc,10]
 	EndIf
 	
 Next
@@ -632,12 +709,13 @@ cQuery += "	) D4_QTDEORI "
 
 cQuery += "FROM " + RetSqlName("SD4") + " SD4 , " + RetSqlName("SB1") + " SB1 "
 cQuery += "	WHERE D4_FILIAL = '" + xFilial("SD4") + "' "
-cQuery += "	AND SUBSTRING(D4_OP,1,11) = '" + Left(cNumOPTr,11) + "'"
+//cQuery += "	AND SUBSTRING(D4_OP,1,11) = '" + Left(cNumOPTr,11) + "'"
+cQuery += "	AND D4_OP LIKE '" + ALLTRIM(cNumOPTr) + "%'"
 cQuery += "	AND SD4.D4_QUANT > 0 "
 cQuery += "	AND SD4.D_E_L_E_T_ <> '*' "
 cQuery += "	AND SB1.B1_FILIAL = '" + xFilial("SB1") + "'"
 cQuery += "	AND SB1.B1_COD = D4_COD "
-//cQuery += "	AND SB1.B1_FANTASM IN ('N',' ') "
+cQuery += "	AND SB1.B1_FANTASM <> 'S' "
 
 cQuery += "	AND SB1.B1_XPICLIS IN ('1') "
 
@@ -645,12 +723,13 @@ cQuery += "	AND SB1.D_E_L_E_T_ <> '*' "
 cQuery += "	AND EXISTS (SELECT D4_COD, COUNT(*) "
 cQuery += "		FROM " + RetSqlName("SD4") + " SD4 , " + RetSqlName("SB1") + " SB1 "
 cQuery += "			WHERE D4_FILIAL = '" + xFilial("SD4") + "'"
-cQuery += "			AND SUBSTRING(D4_OP,1,11) = '" + Left(cNumOPTr,11) + "'"
+//cQuery += "			AND SUBSTRING(D4_OP,1,11) = '" + Left(cNumOPTr,11) + "'"
+cQuery += "	        AND D4_OP LIKE '" + ALLTRIM(cNumOPTr) + "%'"
 cQuery += "			AND SD4.D4_QUANT > 0 "
 cQuery += "			AND SD4.D_E_L_E_T_ <> '*' "
 cQuery += "			AND SB1.B1_FILIAL = '" + xFilial("SB1") + "'"
 cQuery += "			AND SB1.B1_COD = D4_COD "
-//cQuery += "			AND SB1.B1_FANTASM IN ('N',' ') "
+cQuery += "			AND SB1.B1_FANTASM <> 'S' "
 cQuery += "			AND SB1.B1_XPICLIS IN ('1') "
 cQuery += "			AND SB1.D_E_L_E_T_ <> '*' "
 cQuery += "		GROUP BY D4_COD "
@@ -736,6 +815,7 @@ dbSelectArea("SZ6")
 SZ6->(dbSetOrder(1))
 SZ6->(dbSeek(xFilial("SZ6")+UPPER(cUserName)))
 
+
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Armazem de Origem									³
 //ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
@@ -777,14 +857,14 @@ Return(.T.)
 */
 Static Function M261LBOX(cProduto,cArmaz1,cArmaz2)
 
-Local aButtons	 := {}
+Local aButtons	:= {}
 Local nTotReg   := 0
 Local oDlg
 Local oOk 	    := LoadBitmap( GetResources(), "LBOK")
 Local oNo 	    := LoadBitmap( GetResources(), "LBNO")
 Local aEmpenhos := {}
 Local oEmpenhos
-Local cQuery 	 := ""
+Local cQuery 	:= ""
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Seleciona registros atraves da query                ³
@@ -800,6 +880,7 @@ cQuery += "ORDER BY D4_COD,D4_OP"
 
 cQuery := ChangeQuery(cQuery)
 dbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery), 'TMP', .T., .T.)
+
 
 //ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 //³ Compatibiliza registros atraves da setfilter        ³
