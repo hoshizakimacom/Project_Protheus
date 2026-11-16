@@ -177,6 +177,7 @@ TRCell():New(oVenProd,"VLTXCARTAO"	,/*Tabela*/	,"Vlr.Taxa Cartão 3%" 			 ,PesqPi
 TRCell():New(oVenProd,"VLCARTBRU"	,/*Tabela*/	,"Cartão 3% + Vl.Br.+IPI+Frete"	 ,PesqPict("SC6","C6_XVLTBRU")	,TamSx3("C6_XVLTBRU")[1]    ,/*lPixel*/,{|| nVlrTotC})		   		// Valor Total Cartao //#11288
 TRCell():New(oVenProd,"TPFRETE"		,/*Tabela*/	,"Tipo Frete"		 			 ,PesqPict("SC5","C5_TPFRETE")	,TamSx3("C5_TPFRETE")[1]    ,/*lPixel*/,{|| cTpFrete})		   		// Tipo de Frete //#11288
 TRCell():New(oVenProd,"VLRLIQ"		,/*Tabela*/	,"Vlr. Liquido"		 			 ,PesqPict("SC6","C6_VALOR")	,TamSx3("C6_VALOR")[1]	    ,/*lPixel*/,{|| cVlrLiq})		   		// Valor Liquido //#11288
+TRCell():New(oVenProd,"CANAL"		,/*Tabela*/	,"Canal do Cliente"	 			 ,PesqPict("SA1","A1_XCANAL")	,TamSx3("A1_XCANAL")[1]	    ,/*lPixel*/,{|| cCanal})		   		// Canal do Cliente //#11621
 
 Return(oReport)
 
@@ -493,6 +494,17 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 		cNomRed	:= SA1->A1_NREDUZ
 		cXrede  := Posicione("ZA6",1,xFilial("ZA6")+SA1->A1_XREDE,"ZA6_DESC")
 		cNomSeg := Posicione("ZA8",1,xFilial("ZA8")+SA1->A1_XSEGM,"ZA8_DESC")
+		cCanal	:= SA1->A1_XCANAL
+
+		If cCanal $ '1' 
+			cCanal := 'Gastronomia'
+		ElseIf cCanal $ '2'
+			cCanal := 'Contas Corporativas'
+		ElseIf cCanal $ '3'
+			cCanal:= 'Dealer'
+		ElseIf cCanal $ '4'
+			cCanal := 'Exportacao'
+		EndIf
 
 		If Empty(cNomSeg)
 			cNomSeg := "NAO CADASTRADO"	
