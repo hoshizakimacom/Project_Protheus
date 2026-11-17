@@ -16,7 +16,7 @@ User Function M34L01(_cOpcao)
         Case _cOpcao = 'D'   //650 - 001
 
             If !(Alltrim(SF1->F1_ESPECIE) $ 'NFS|NFPS|NFL' ) .And. (!Alltrim(SD1->D1_CF) $ _cCCFO) .And. SD1->D1_RATEIO <> '1'
-                _nret   := SD1->(D1_TOTAL - D1_VALIMP5 - D1_VALIMP6 - D1_VALICM + D1_ICMSRET + D1_VALFRE + D1_SEGURO + D1_DESPESA - D1_VALDESC ) + SF1->F1_VALPEDG + SF1->F1_DESCONT
+                _nret   := SD1->(D1_TOTAL + D1_ICMSRET + D1_VALFRE + D1_SEGURO + D1_DESPESA - D1_VALDESC - D1_VALICM - D1_VALIMP6 - D1_VALIMP5 ) + SF1->F1_VALPEDG + SF1->F1_DESCONT
             Else
                 _nret   := 0
             EndIf
