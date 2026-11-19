@@ -529,9 +529,7 @@ For nProc := 1 To Len(aDadosOk)
 	aCols[Len(aCols),nPosEstor]  := "N"
 	
 	If cTipoSel == "1"
-		aCols[Len(aCols),nPosOPTr]   := cCodigo
-//	Else
-//		aCols[Len(aCols),nPosOPTr]   := aDadosOk[nProc,9]
+		aCols[Len(aCols),nPosOPTr]   := aDadosOk[nProc,9] //cCodigo
 	EndIf
 	
 	If LEN(aDadosOk[nProc]) >= 10 // Endereco Origem/Destino
