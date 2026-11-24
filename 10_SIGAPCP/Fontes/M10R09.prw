@@ -125,6 +125,7 @@ TRCell():New(oVenProd,"CEP"			,/*Tabela*/ ,"CEP"				 ,PesqPict("SA1","A1_CEP")		
 TRCell():New(oVenProd,"Loja"		,/*Tabela*/ ,"Loja"				 ,PesqPict("SA1","A1_LOJA")		,TamSx3("A1_LOJA")[1]		,/*lPixel*/,{|| cLoja	})		// LOJA #10181
 TRCell():New(oVenProd,"STATFIN"		,/*Tabela*/	,"Financeiro"		 ,PesqPict("SC5","C5_XSTSFIN")	,TamSx3("C5_XSTSFIN")[1]	,/*lPixel*/,{|| cStatFin})		// Status Financeiro
 TRCell():New(oVenProd,"NOMTRANS"	,/*Tabela*/	,"Transportadora"	 ,PesqPict("SC5","C5_XTRANS")	,TamSx3("C5_XTRANS")[1]		,/*lPixel*/,{|| cTrans	})		// Nome da Transportadora
+TRCell():New(oVenProd,"TPVENDA"		,/*Tabela*/	,"Tipo Venda"		 ,PesqPict("SC5","C5_XTPVEN")	,TamSx3("C5_XTPVEN")[1]		,/*lPixel*/,{|| cXTpVen	})		// Tipo de Venda
 
 //TRCell():New(oVenProd,"TOTM3"		,/*Tabela*/ ,"Total M3"			 ,PesqPict("SC6","C6_PRCVEN")	,TamSx3("C6_PRCVEN")[1] 	,/*lPixel*/,{|| nTotM3	})		// Total M3 Cubagem
 //TRCell():New(oVenProd,"TOTPESO"		,/*Tabela*/ ,"Total Peso"		 ,PesqPict("SB5","B5_PESO")		,TamSx3("B5_PESO")[1]		,/*lPixel*/,{|| nTotPeso})		// Total Peso do Produto
@@ -181,7 +182,7 @@ dbSetOrder(2)			// Produto,Numero
 		COLUMN C6_ENTREG AS DATE
 
 		SELECT 
-			C5_FILIAL,C5_NUM,C5_CLIENTE,C5_LOJACLI,C5_TPFRETE,C5_XSTSFIN,C5_TRANSP,C5_NOTA,C5_MSBLQL
+			C5_FILIAL,C5_NUM,C5_CLIENTE,C5_LOJACLI,C5_TPFRETE,C5_XSTSFIN,C5_TRANSP,C5_NOTA,C5_MSBLQL,C5_XTPVEN
 		FROM 
 			%Table:SC5% SC5
 		WHERE 
@@ -239,6 +240,7 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	cStatus		:= U_R09VALFAT((cAliasQry)->C5_NUM)[2]
 	cTrans		:= Posicione("SA4",1,xFilial("SA4")+(cAliasQry)->C5_TRANSP,"A4_NOME")
 	nValPed		:= U_R09VALFAT((cAliasQry)->C5_NUM)[3]
+	cXTpVen		:= (cAliasQry)->C5_XTPVEN
 
 	If cTpFrete == "C"
 		cTpFrete := "CIF"
@@ -255,6 +257,36 @@ While !oReport:Cancel() .And. !(cAliasQry)->(Eof())
 	Else
 		cStatFin := " "
 	Endif		
+
+	Do Case
+			Case Alltrim(SC5->C5_XTPVEN) == "1" 
+				cXTpVen		:= "1 - Projeto"
+			Case Alltrim(SC5->C5_XTPVEN) == "2"
+				cXTpVen		:= "2 - Venda Unitaria"
+			Case Alltrim(SC5->C5_XTPVEN) == "3"
+				cXTpVen		:= "3 - Dealer"			
+			Case Alltrim(SC5->C5_XTPVEN) == "4"
+				cXTpVen		:= "4 - E-Commerce"
+			Case Alltrim(SC5->C5_XTPVEN) == "5"
+				cXTpVen		:= "5 - Pronta Entrega"
+			Case Alltrim(SC5->C5_XTPVEN) == "6"
+				cXTpVen		:= "6 - Projeto-Dealer"
+			Case Alltrim(SC5->C5_XTPVEN) == "7"
+				cXTpVen		:= "7 - Venda Pecas"
+			Case Alltrim(SC5->C5_XTPVEN) == "8"
+				cXTpVen		:= "8 - Sup.Tecnico"
+			Case Alltrim(SC5->C5_XTPVEN) == "9"
+				cXTpVen		:= "9 - ARE"
+			Case SC5->C5_XTPVEN == "10"
+				cXTpVen		:= "10 - Serv"
+			Case SC5->C5_XTPVEN == "11"
+				cXTpVen		:= "11 - Itens Falta"
+			Case SC5->C5_XTPVEN == "12"
+				cXTpVen		:= "12 - SAC"
+			Case SC5->C5_XTPVEN == ""
+				cXTpVen		:= ""
+		EndCase
+
 
 	oReport:IncMeter()
 	oReport:Section(1):PrintLine()
