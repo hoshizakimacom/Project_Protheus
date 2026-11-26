@@ -301,7 +301,7 @@ If cTipoSel == "1" .And. U_M261AGLUT(cCodigo) == .F.
 	Return
 Endif
 
-cQuery := "SELECT D4_FILIAL, D4_COD, SUM(D4_QUANT) D4_QUANT, D4_LOTECTL, D4_OP "
+cQuery := "SELECT D4_FILIAL, D4_COD, SUM(D4_QUANT) D4_QUANT, D4_LOTECTL, D4_OP, (CASE WHEN D4_XANSUL = '' THEN '3' ELSE D4_XANSUL END) XANSUL "
 
 If cLocOri == "70" //Armazem de Picking 
 	cQuery += ",(SELECT SUM(D3_QUANT) FROM " + RetSqlName("SD3") + " SD3 "
@@ -313,6 +313,19 @@ If cLocOri == "70" //Armazem de Picking
 	cQuery += "		AND SD3.D3_CF = 'DE4' "
 	cQuery += "     AND SD3.D3_ESTORNO <> 'S' "
 	cQuery += "	) QTDPICKING " //QUANTIDADE TRANSFERIDA PARA O PICKING
+
+	cQuery += ",(SELECT MAX(D3_NUMSEQ) FROM " + RetSqlName("SD3") + " SD3 "
+	cQuery += "		WHERE SD3.D_E_L_E_T_<>'*' "
+	cQuery += "		AND SD3.D3_COD = SD4.D4_COD "
+	cQuery += "		AND SD3.D3_FILIAL = SD4.D4_FILIAL "
+	cQuery += "		AND SD3.D3_XOP = SD4.D4_OP "
+	cQuery += "		AND SD3.D3_LOCAL = '"+cLocOri+"' "
+	cQuery += "		AND SD3.D3_CF = 'DE4' "
+	cQuery += "     AND SD3.D3_ESTORNO <> 'S' "
+	cQuery += "	) NUMSEQ "
+
+Else
+    cQuery += ",'' NUMSEQ "
 EndIf
 
 cQuery += ",(SELECT SUM(D3_QUANT) FROM " + RetSqlName("SD3") + " SD3 "
@@ -349,7 +362,7 @@ cQuery += " AND SB1.B1_FANTASM <> 'S'"
 cQuery += "	AND SB1.B1_XPICLIS IN ('1') "
 
 cQuery += " AND SB1.D_E_L_E_T_ <> '*'"
-cQuery += " GROUP BY D4_FILIAL, D4_COD, D4_LOTECTL, D4_OP"
+cQuery += " GROUP BY D4_FILIAL, D4_COD, D4_LOTECTL, D4_OP, D4_XANSUL"
 
 cQuery += " ORDER BY D4_COD, D4_OP"
 
@@ -443,14 +456,14 @@ While !Eof()
 				_nSaldoD4 -= aArray[_a,5]
 				_nSaldoB8 += aArray[_a,5]
 				
-				Aadd(aDadosOk,{ TRB->D4_COD, Iif(_nSaldoB8 > _nQuant, _nQuant, aArray[_a,5]), aArray[_a,1], _nSaldoD4, _nSaldoB8, aArray[_a,2], aArray[_a,7], aArray[_a,4], TRB->D4_OP, aArray[_a,3] } )
+				Aadd(aDadosOk,{ TRB->D4_COD, Iif(_nSaldoB8 > _nQuant, _nQuant, aArray[_a,5]), aArray[_a,1], _nSaldoD4, _nSaldoB8, aArray[_a,2], aArray[_a,7], aArray[_a,4], TRB->D4_OP, aArray[_a,3], TRB->XANSUL, TRB->NUMSEQ} )
 			Else
 				Exit
 			Endif
 		Next _a
 		
 	Else
-		Aadd(aDadosOk,{TRB->D4_COD, Iif(nTotDisp > _nQuant, _nQuant, nTotDisp), "  ", _nSaldoD4, nTotDisp, "  ", "  ", "  ", TRB->D4_OP } )
+		Aadd(aDadosOk,{TRB->D4_COD, Iif(nTotDisp > _nQuant, _nQuant, nTotDisp), "  ", _nSaldoD4, nTotDisp, "  ", "  ", "  ", TRB->D4_OP, "  ", TRB->XANSUL, TRB->NUMSEQ } )
 		
 	EndIf
 	
@@ -470,8 +483,17 @@ EndDo
 dbSelectArea("TRB")
 dbCloseArea()
 
-// Ordena por Ansul - 1-Interno ; 2-Externo ; 3-Nao/Vazio
-aEstru := aSort(aEstru,,,{|x,y| x[10]+x[12]+x[3] < y[10]+y[12]+y[3]})
+If cLocOri == "70" //Armazem de Picking
+	// Ordena por Ansul - 1-Interno ; 2-Externo ; 3-Nao/Vazio
+	// + NumSEQ
+	// + Produto
+	aDadosOk := aSort(aDadosOk,,,{|x,y| x[11]+x[12]+x[1] < y[11]+y[12]+y[1]})
+Else
+	// Ordena por Ansul - 1-Interno ; 2-Externo ; 3-Nao/Vazio
+	// + Endereço
+	// + Produto
+	aDadosOk := aSort(aDadosOk,,,{|x,y| x[11]+x[10]+x[1] < y[11]+y[10]+y[1]})
+EndIf
 
 nItIncl := 0
 
